@@ -3,6 +3,7 @@
 #include "DependencyResolver.h"
 #include <iostream>
 #include "zmq.hpp"
+#include "HapticEffect_generated.h"
 
 class TestClass
 {

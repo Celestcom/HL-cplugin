@@ -2,7 +2,7 @@
 #include "TestClass.h"
 #include "HapticFileInfo.h"
 #include "Enums.h"
-
+#include "flatbuffers.h"
 void TestClass::print()
 {
 }
@@ -37,9 +37,15 @@ int TestClass::PlaySequence(LPSTR param, Location loc)
 {
 	_resolver.Load(SequenceFileInfo(std::string(param)));
 	auto res = _resolver.ResolveSequence(std::string(param), loc);
-	int l = int(loc);
-	zmq::message_t request(4);
-	memcpy((void *)request.data(), &l, 4);
-	_socket->send(&request, sizeof(l), 0);
+	flatbuffers::FlatBufferBuilder builder;
+	auto effect = NullSpace::HapticFiles::CreateHapticEffect(builder, 12, 2, 125.1222, 1, 555.0);
+	FinishHapticEffectBuffer(builder, effect);
+
+	uint8_t *buf = builder.GetBufferPointer();
+	int size = builder.GetSize();
+	zmq::message_t msg(size);
+	memcpy((void*)msg.data(), buf, size);
+	_socket->send(msg);
+
 	return 0;
 }

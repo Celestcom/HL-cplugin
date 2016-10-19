@@ -2,6 +2,7 @@
 #include "Enums.h"
 #include <vector>
 #include "ITimeOffset.h"
+
 class HapticEffect :public ITimeOffset {
 public:
 	HapticEffect(Effect effect, Location loc, float duration, float time, unsigned int priority);
