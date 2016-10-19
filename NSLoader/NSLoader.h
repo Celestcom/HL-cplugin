@@ -13,6 +13,6 @@
 
 extern "C" {
 	NSLOADER_API TestClass* __stdcall TestClass_Create(LPSTR str) { return new TestClass(str); }
-	NSLOADER_API int __stdcall TestClass_Play(TestClass* ptr, LPSTR param) { return ptr->Play(param); }
+	NSLOADER_API int __stdcall TestClass_PlaySequence(TestClass* ptr, LPSTR param, Location loc) { return ptr->PlaySequence(param, loc); }
 	NSLOADER_API void __stdcall TestClass_Delete(TestClass* ptr) { delete ptr; }
 }
