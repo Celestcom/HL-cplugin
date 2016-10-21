@@ -26,25 +26,30 @@ TestClass::~TestClass()
 
 int TestClass::PlayPattern(LPSTR param, Side side)
 {
-	_resolver.Load(PatternFileInfo(std::string(param)));
-	auto res = _resolver.ResolvePattern(std::string(param), side);
-	_wire.Send(_wire.Encode(res));
+	auto name = std::string(param);
+	_resolver.Load(PatternFileInfo(name));
+	auto res = _resolver.ResolvePattern(name, side);
+	_wire.Send(_wire.Encode(res), name);
 	
 	return 0;
 }
 
 int TestClass::PlayExperience(LPSTR param, Side side)
 {
-
+	auto name = std::string(param);
+	_resolver.Load(ExperienceFileInfo(name));
+	auto res = _resolver.ResolvePattern(name, side);
+	_wire.Send(_wire.Encode(res), name);
 	return 0;
 }
 
 
 int TestClass::PlaySequence(LPSTR param, Location loc)
 {
-	_resolver.Load(SequenceFileInfo(std::string(param)));
-	auto res = _resolver.ResolveSequence(std::string(param), loc);
-	_wire.Send(_wire.Encode(res));
+	auto name = std::string(param);
+	_resolver.Load(SequenceFileInfo(name));
+	auto res = _resolver.ResolveSequence(name, loc);
+	_wire.Send(_wire.Encode(res), name);
 
 	return 0;
 }

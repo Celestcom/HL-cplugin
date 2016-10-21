@@ -7,10 +7,23 @@
 #include "HapticEffect_generated.h"
 #include "HapticFrame_generated.h"
 #include "HapticPacket_generated.h"
+#include "HapticSample_generated.h"
 
+#include "Experience_generated.h"
 class Wire
 {
 public:
+	struct flatbuffers::Offset<NullSpace::HapticFiles::Experience> Wire::Encode(const std::vector<HapticSample>& input) {
+		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticSample>> sample_vector;
+		sample_vector.reserve(input.size());
+		for (auto const &e : input) {
+			auto sample = NullSpace::HapticFiles::CreateHapticSample(_builder, this->Encode(e.Frames), e.Priority, e.Time);
+			sample_vector.push_back(sample);
+		}
+		auto samples = _builder.CreateVector(sample_vector);
+		return NullSpace::HapticFiles::CreateExperience(_builder, samples);
+
+	}
 	struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence> Wire::Encode(const std::vector<HapticEffect>& input)
 	{
 		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect>> effects_vector;
@@ -24,7 +37,10 @@ public:
 		return NullSpace::HapticFiles::CreateSequence(_builder, effects);
 
 	}
-
+	static bool Verify(flatbuffers::FlatBufferBuilder& builder) {
+		flatbuffers::Verifier verifier(builder.GetBufferPointer(), builder.GetSize());
+		return NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier);
+	}
 	struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern> Wire::Encode(const std::vector<HapticFrame>& input)
 	{
 		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticFrame>> frame_vector;
@@ -44,18 +60,28 @@ public:
 		return NullSpace::HapticFiles::CreatePattern(_builder, frames);
 
 	}
-
-	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern>& input)
-
-	{
-
-		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("placeholder"), NullSpace::HapticFiles::FileType_Pattern, input.Union());
+	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Experience>& input, std::string name) {
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Experience, input.Union());
 		_builder.Finish(packet);
 		const int size = _builder.GetSize();
 
+		if (Verify(_builder)) {
+			zmq::message_t msg(size);
+			memcpy((void*)msg.data(), _builder.GetBufferPointer(), size);
+			_socket->send(msg);
+		}
+	}
 
-		flatbuffers::Verifier verifier(_builder.GetBufferPointer(), _builder.GetSize());
-		if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
+
+	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern>& input, std::string name)
+
+	{
+
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Pattern, input.Union());
+		_builder.Finish(packet);
+		const int size = _builder.GetSize();
+
+		if (Verify(_builder)) {
 			zmq::message_t msg(size);
 			memcpy((void*)msg.data(), _builder.GetBufferPointer(), size);
 			_socket->send(msg);
@@ -66,15 +92,14 @@ public:
 		_builder.Clear();
 
 	}
-	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence>& input)
+	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence>& input, std::string name)
 
 	{
-		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("placeholder"), NullSpace::HapticFiles::FileType_Sequence, input.Union());
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Sequence, input.Union());
 		_builder.Finish(packet);
 		const int size = _builder.GetSize();
 
-		flatbuffers::Verifier verifier(_builder.GetBufferPointer(), _builder.GetSize());
-		if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
+		if (Verify(_builder)) {
 			zmq::message_t msg(size);
 			memcpy((void*)msg.data(), _builder.GetBufferPointer(), size);
 			_socket->send(msg);
@@ -117,6 +142,18 @@ public:
 		}
 
 		return frames;
+	}
+
+	static std::vector<HapticSample> Wire::Decode(const NullSpace::HapticFiles::Experience* experience) {
+		std::vector<HapticSample> samples;
+		auto items = experience->items();
+		samples.reserve(items->size());
+
+		for (const auto& sample : *items) {
+			samples.push_back(HapticSample(sample->time(), Decode(sample->frames()), sample->priority()));
+
+		}
+		return samples;
 	}
 	~Wire()
 	{
