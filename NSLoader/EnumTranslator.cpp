@@ -103,6 +103,7 @@ EnumTranslator::EnumTranslator() {
 	init_locations();
 	init_effects();
 	init_sides();
+	init_json_locations();
 }
 
 

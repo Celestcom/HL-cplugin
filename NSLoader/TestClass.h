@@ -3,15 +3,13 @@
 #include "DependencyResolver.h"
 #include <iostream>
 #include "zmq.hpp"
-#include "HapticEffect_generated.h"
-
+#include "zmq_addon.hpp"
+#include "Wire\Wire.h"
 class TestClass
 {
 private:
 	DependencyResolver _resolver;
-	std::unique_ptr<zmq::socket_t> _socket;
-	std::unique_ptr<zmq::context_t> _context;
-	void print();
+	Wire _wire;
 public:
 	TestClass(LPSTR param);
 	~TestClass();
