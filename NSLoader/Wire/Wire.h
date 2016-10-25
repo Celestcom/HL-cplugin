@@ -2,173 +2,94 @@
 #include <memory>
 #include "zmq.hpp"
 #include "zmq_addon.hpp"
+#include "Locator.h"
 #define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
 #include "flatbuffers\flatbuffers.h"
 #include "HapticEffect_generated.h"
 #include "HapticFrame_generated.h"
 #include "HapticPacket_generated.h"
 #include "HapticSample_generated.h"
-
+#include "ClientStatusUpdate_generated.h"
 #include "Experience_generated.h"
+#include "EnginePacket_generated.h"
+#include "SuitStatusUpdate_generated.h"
+#include "HapticClasses.h"
+#include "EncodingOperations.h"
 class Wire
 {
 public:
-	struct flatbuffers::Offset<NullSpace::HapticFiles::Experience> Wire::Encode(const std::vector<HapticSample>& input) {
-		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticSample>> sample_vector;
-		sample_vector.reserve(input.size());
-		for (auto const &e : input) {
-			auto sample = NullSpace::HapticFiles::CreateHapticSample(_builder, this->Encode(e.Frames), e.Priority, e.Time);
-			sample_vector.push_back(sample);
-		}
-		auto samples = _builder.CreateVector(sample_vector);
-		return NullSpace::HapticFiles::CreateExperience(_builder, samples);
-
+	static void Wire::sendTo(zmq::socket_t& socket, uint8_t* data, int size) {
+		zmq::message_t msg(size);
+		memcpy((void*)msg.data(), data, size);
+		socket.send(msg);
 	}
-	struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence> Wire::Encode(const std::vector<HapticEffect>& input)
-	{
-		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect>> effects_vector;
-		effects_vector.reserve(input.size());
-		for (auto const &e : input) {
-			auto effect = NullSpace::HapticFiles::CreateHapticEffect(
-				_builder, (uint16_t)e.Effect, (uint16_t)e.Location, e.Duration, e.Priority, e.Time);
-			effects_vector.push_back(effect);
-		}
-		auto effects = _builder.CreateVector(effects_vector);
-		return NullSpace::HapticFiles::CreateSequence(_builder, effects);
-
+	void Wire::sendToEngine(uint8_t* data, int size) {
+		sendTo(*_sendToEngineSocket, data, size);
 	}
-	static bool Verify(flatbuffers::FlatBufferBuilder& builder) {
-		flatbuffers::Verifier verifier(builder.GetBufferPointer(), builder.GetSize());
-		return NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier);
-	}
-	struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern> Wire::Encode(const std::vector<HapticFrame>& input)
-	{
-		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticFrame>> frame_vector;
-		frame_vector.reserve(input.size());
-
-		for (auto const &f : input) {
-			std::vector<flatbuffers::Offset<NullSpace::HapticFiles::Sequence>> sequence_vector;
-			for (auto const &seq : f.Frame) {
-				sequence_vector.push_back(this->Encode(seq.Effects));
-			}
-			auto frames = _builder.CreateVector(sequence_vector);
-			auto frame = NullSpace::HapticFiles::CreateHapticFrame(_builder, frames, f.Priority, f.Time);
-			frame_vector.push_back(frame);
-		}
-		auto frames = _builder.CreateVector(frame_vector);
-
-		return NullSpace::HapticFiles::CreatePattern(_builder, frames);
-
-	}
+	/* Sending */
 	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Experience>& input, std::string name) {
-		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Experience, input.Union());
-		_builder.Finish(packet);
-		const int size = _builder.GetSize();
-
-		if (Verify(_builder)) {
-			zmq::message_t msg(size);
-			memcpy((void*)msg.data(), _builder.GetBufferPointer(), size);
-			_socket->send(msg);
-		}
+		_encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
-
-
+	
 	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern>& input, std::string name)
-
 	{
-
-		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Pattern, input.Union());
-		_builder.Finish(packet);
-		const int size = _builder.GetSize();
-
-		if (Verify(_builder)) {
-			zmq::message_t msg(size);
-			memcpy((void*)msg.data(), _builder.GetBufferPointer(), size);
-			_socket->send(msg);
-
-		}
-
-
-		_builder.Clear();
-
+		_encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
+
 	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence>& input, std::string name)
-
 	{
-		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Sequence, input.Union());
-		_builder.Finish(packet);
-		const int size = _builder.GetSize();
-
-		if (Verify(_builder)) {
-			zmq::message_t msg(size);
-			memcpy((void*)msg.data(), _builder.GetBufferPointer(), size);
-			_socket->send(msg);
-			
-		}
-
-
-
-
-		_builder.Clear();
+	
+		_encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 
-	static std::vector<HapticEffect> Wire::Decode(const NullSpace::HapticFiles::Sequence* sequence)
-	{
-		std::vector<HapticEffect> effects;
-		auto items = sequence->items();
-		effects.reserve(items->size());
-
-		for (const auto& e : *items) {
-			effects.push_back(HapticEffect(Effect(e->effect()), Location(e->location()), e->duration(), e->time(), e->priority()));
-		}
-
-		return effects;
+	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect>& input) {
+		_encoder.Finalize(input, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
-
-	static std::vector<HapticFrame> Wire::Decode(const NullSpace::HapticFiles::Pattern* pattern)
-	{
-		std::vector<HapticFrame> frames;
-		auto items = pattern->items();
-		frames.reserve(items->size());
-
-		for (const auto& frame : *items) {
-			std::vector<HapticSequence> seqs;
-			seqs.reserve(frame->frame()->size());
-			for (const auto& seq : *frame->frame()) {
-				auto s = Decode(seq);
-				seqs.push_back(s);
+	void Wire::Send(const struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate>& input) {
+		
+	}
+	void Wire::Send(const struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate>& input) {
+	}
+	
+	bool Wire::ReceiveStatus(NullSpace::Communication::SuitStatus* status) {
+		zmq::message_t msg;
+		if (_receiveFromEngineSocket->recv(&msg, ZMQ_DONTWAIT)) {
+			flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(msg.data()), msg.size());
+			if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
+				auto packet =
+					std::unique_ptr<const NullSpace::Communication::EnginePacket>(NullSpace::Communication::GetEnginePacket(msg.data()));
+				if (packet->packet_type() == NullSpace::Communication::PacketType::PacketType_SuitStatusUpdate) {
+					auto decoded = EncodingOperations::Decode(static_cast<const NullSpace::Communication::SuitStatusUpdate*>(packet->packet()));
+					*status = decoded;
+					return true;
+				}
 			}
-			frames.push_back(HapticFrame(frame->time(), seqs, frame->priority()));
 		}
-
-		return frames;
+		return false;
 	}
 
-	static std::vector<HapticSample> Wire::Decode(const NullSpace::HapticFiles::Experience* experience) {
-		std::vector<HapticSample> samples;
-		auto items = experience->items();
-		samples.reserve(items->size());
-
-		for (const auto& sample : *items) {
-			samples.push_back(HapticSample(sample->time(), Decode(sample->frames()), sample->priority()));
-
-		}
-		return samples;
-	}
 	~Wire()
 	{
-
+		/* VERY IMPORTANT. If you do not close the sockets, the DLL will cause Unity to freeze!*/
+		_sendToEngineSocket->close();
+		_receiveFromEngineSocket->close();
 	}
-	Wire(std::string address)
+	Wire(std::string sendAddress, std::string receiveAddress)
 	{
 		_context = std::make_unique<zmq::context_t>(1);
-		_socket = std::make_unique<zmq::socket_t>(*_context, ZMQ_PAIR);
-		_socket->connect(address);
+		_sendToEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_PAIR);
+		_sendToEngineSocket->connect(sendAddress);
+
+		_receiveFromEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_SUB);
+		_receiveFromEngineSocket->connect(receiveAddress);
+		//_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "");
+
 	}
 
 private:
-	flatbuffers::FlatBufferBuilder _builder;
-	std::unique_ptr<zmq::socket_t> _socket;
+	EncodingOperations _encoder;
+	std::unique_ptr<zmq::socket_t> _sendToEngineSocket;
+	std::unique_ptr<zmq::socket_t> _receiveFromEngineSocket;
 	std::unique_ptr<zmq::context_t> _context;
 };
 

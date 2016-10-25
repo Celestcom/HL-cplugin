@@ -64,20 +64,26 @@ bool SequenceLoader::Load(const HapticFileInfo& fileInfo)
 	}
 
 	auto validNames = fileInfo.GetValidFileNames();
-	const path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
-	for (auto name : validNames)
-	{
-		auto dir = directory;
-		auto path = dir /= name;
-		if (exists(path)) {
-			vector<SequenceItem> sequence = _parser->ParseSequence(path);
-			_sequences[fileInfo.FullId] = sequence;
-			return true;
-		} 
-		
-	}
+	try {
+		const path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
+		for (auto name : validNames)
+		{
+			auto dir = directory;
+			auto path = dir /= name;
+			if (exists(path)) {
+				vector<SequenceItem> sequence = _parser->ParseSequence(path);
+				_sequences[fileInfo.FullId] = sequence;
+				return true;
+			}
 
-	std::cout << "Failed to load " << fileInfo.ToString() << ": file not found (in package " << fileInfo.FullyQualifiedPackage << ")\n";
+		}
+		std::cout << "Failed to load " << fileInfo.ToString() << ": file not found (in package " << fileInfo.FullyQualifiedPackage << ")\n";
+
+	}
+	catch (PackageNotFoundException& p) {
+		//package not found
+		return false;
+	}
 	return false;
 }
 
@@ -101,19 +107,25 @@ bool PatternLoader::Load(const HapticFileInfo& fileInfo)
 	}
 
 	auto validNames = fileInfo.GetValidFileNames();
-	path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
-	for (auto name : validNames)
-	{
+	try {
+		path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
+		for (auto name : validNames)
+		{
 
-		auto dir = directory;
-		auto path = dir /= name;
-		if (exists(path)) {
-			vector<Frame> pattern = _parser->ParsePattern(path);
-			_patterns[fileInfo.FullId] = pattern;
-			loadAllSequences(pattern);
-			return true;
+			auto dir = directory;
+			auto path = dir /= name;
+			if (exists(path)) {
+				vector<Frame> pattern = _parser->ParsePattern(path);
+				_patterns[fileInfo.FullId] = pattern;
+				loadAllSequences(pattern);
+				return true;
+			}
+
 		}
-
+	}
+	catch (PackageNotFoundException& p) {
+		//package not found
+		return false;
 	}
 	return false;
 }
@@ -152,17 +164,23 @@ bool ExperienceLoader::Load(const HapticFileInfo& fileInfo)
 	}
 
 	auto validNames = fileInfo.GetValidFileNames();
-	path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
-	for (auto name : validNames)
-	{
+	try {
+		path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
+		for (auto name : validNames)
+		{
 
-		auto dir = directory;
-		auto path = dir /= name;
-		if (exists(path)) {
-			loadExperience(fileInfo.FullId, path);
-			return true;
+			auto dir = directory;
+			auto path = dir /= name;
+			if (exists(path)) {
+				loadExperience(fileInfo.FullId, path);
+				return true;
+			}
+
 		}
-
+	}
+	catch (PackageNotFoundException& p) {
+		//package not found
+		return false;
 	}
 	return false;
 }
