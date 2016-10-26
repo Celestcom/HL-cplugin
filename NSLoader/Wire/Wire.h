@@ -58,7 +58,7 @@ public:
 		zmq::message_t msg;
 		if (_receiveFromEngineSocket->recv(&msg, ZMQ_DONTWAIT)) {
 			flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(msg.data()), msg.size());
-			if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
+			if (NullSpace::Communication::VerifyEnginePacketBuffer(verifier)) {
 				auto packet =
 					std::unique_ptr<const NullSpace::Communication::EnginePacket>(NullSpace::Communication::GetEnginePacket(msg.data()));
 				if (packet->packet_type() == NullSpace::Communication::PacketType::PacketType_SuitStatusUpdate) {
@@ -84,8 +84,10 @@ public:
 		_sendToEngineSocket->connect(sendAddress);
 
 		_receiveFromEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_SUB);
+
 		_receiveFromEngineSocket->connect(receiveAddress);
-		//_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "");
+		_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "", 0);
+
 
 	}
 
