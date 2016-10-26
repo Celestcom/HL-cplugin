@@ -40,8 +40,9 @@ public:
 	}
 	struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect> EncodingOperations::Encode(const HapticEffect& e) {
 		_builder.Clear();
+
 		auto h =  NullSpace::HapticFiles::CreateHapticEffect(
-			_builder, (uint16_t)e.Effect, (uint16_t)e.Location, e.Duration, e.Priority, e.Time);
+			_builder, (uint16_t)e.Effect, (uint16_t)e.Location, e.Duration,(uint16_t) e.Priority, e.Time);
 		
 
 		//auto b = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("hi"), NullSpace::HapticFiles::FileType_HapticEffect, h.Union());
@@ -92,7 +93,7 @@ public:
 	}
 	
 	/* Sending */
-	void EncodingOperations::_finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::HapticPacket>& input, std::function<void(uint8_t*, int)> callback) {
+	void EncodingOperations::_finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::HapticPacket> input, std::function<void(uint8_t*, int)> callback) {
 		
 		_builder.Finish(input);
 		if (VerifyHapticPacket(_builder)) {
@@ -100,7 +101,7 @@ public:
 		}
 		_builder.Clear();
 	}
-	void EncodingOperations::_finalize(const struct flatbuffers::Offset<NullSpace::Communication::EnginePacket>& input, std::function<void(uint8_t*, int)> callback) {
+	void EncodingOperations::_finalize( struct flatbuffers::Offset<NullSpace::Communication::EnginePacket> input, std::function<void(uint8_t*, int)> callback) {
 
 		_builder.Finish(input);
 		if (VerifyEnginePacket(_builder)) {
@@ -108,14 +109,14 @@ public:
 		}
 		_builder.Clear();
 	}
-	void EncodingOperations::Finalize(const struct flatbuffers::Offset<NullSpace::HapticFiles::Experience>& input, std::string name, std::function<void(uint8_t*, int)> callback) {
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Experience> input, std::string name, std::function<void(uint8_t*, int)> callback) {
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Experience, input.Union());
 		_finalize(packet, callback);
 	
 
 	}
 	
-	void EncodingOperations::Finalize(const struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern>& input, std::string name, std::function<void(uint8_t*, int)> callback)
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern> input, std::string name, std::function<void(uint8_t*, int)> callback)
 	{
 
 	
@@ -125,23 +126,20 @@ public:
 
 	}
 
-	void EncodingOperations::Finalize(const struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence>& input, std::string name, std::function<void(uint8_t*, int)> callback)
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence> input, std::string name, std::function<void(uint8_t*, int)> callback)
 	{
-		auto n = _builder.CreateString("hi");
-		NullSpace::HapticFiles::HapticPacketBuilder b = NullSpace::HapticFiles::HapticPacketBuilder(_builder);
-		b.add_packet(input.Union());
 
-		b.add_name(n);
-		b.add_packet_type(NullSpace::HapticFiles::FileType_Sequence);
-		//auto name2 = _builder.CreateString(name);
-		//auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder,name2 , NullSpace::HapticFiles::FileType_Sequence, input.Union());
-		_finalize(b.Finish(), callback);
-	}
-	void EncodingOperations::Finalize(const struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect>& input, std::function<void(uint8_t*, int)> callback) {
-		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("REPLACE_ME"), NullSpace::HapticFiles::FileType::FileType_HapticEffect, input.Union());
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name) , NullSpace::HapticFiles::FileType_Sequence, input.Union());
 		_finalize(packet, callback);
 	}
-	void EncodingOperations::Finalize(const struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate>& input, std::function<void(uint8_t*, int)> callback) {
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect> input, std::function<void(uint8_t*, int)> callback) {
+	
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("REPLACE_ME"), NullSpace::HapticFiles::FileType::FileType_HapticEffect, input.Union());
+	
+		
+		_finalize(packet, callback);
+	}
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate> input, std::function<void(uint8_t*, int)> callback) {
 		auto packet = NullSpace::Communication::CreateEnginePacket(_builder, NullSpace::Communication::PacketType::PacketType_SuitStatusUpdate, input.Union());
 		_finalize(packet, callback);
 	}

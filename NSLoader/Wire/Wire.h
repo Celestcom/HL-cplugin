@@ -18,6 +18,8 @@
 class Wire
 {
 public:
+	EncodingOperations Encoder;
+
 	static void Wire::sendTo(zmq::socket_t& socket, uint8_t* data, int size) {
 		zmq::message_t msg(size);
 		memcpy((void*)msg.data(), data, size);
@@ -27,28 +29,29 @@ public:
 		sendTo(*_sendToEngineSocket, data, size);
 	}
 	/* Sending */
-	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Experience>& input, std::string name) {
-		_encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::Experience>& input, std::string name) {
+		Encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 	
-	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern>& input, std::string name)
+	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern>& input, std::string name)
 	{
-		_encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+		Encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 
-	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence>& input, std::string name)
+	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence>& input, std::string name)
 	{
 	
-		_encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+		Encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 
-	void Wire::Send(const struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect>& input) {
-		_encoder.Finalize(input, boost::bind(&Wire::sendToEngine, this, _1, _2));
-	}
-	void Wire::Send(const struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate>& input) {
+	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect> input) {
+		Encoder.Finalize(input, boost::bind(&Wire::sendToEngine, this, _1, _2));
 		
 	}
-	void Wire::Send(const struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate>& input) {
+	void Wire::Send(struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate>& input) {
+		
+	}
+	void Wire::Send( struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate>& input) {
 	}
 	
 	bool Wire::ReceiveStatus(NullSpace::Communication::SuitStatus* status) {
@@ -87,7 +90,6 @@ public:
 	}
 
 private:
-	EncodingOperations _encoder;
 	std::unique_ptr<zmq::socket_t> _sendToEngineSocket;
 	std::unique_ptr<zmq::socket_t> _receiveFromEngineSocket;
 	std::unique_ptr<zmq::context_t> _context;

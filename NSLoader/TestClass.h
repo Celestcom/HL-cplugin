@@ -19,7 +19,6 @@ class TestClass
 private:
 	DependencyResolver _resolver;
 	Wire _wire;
-	EncodingOperations _encoder;
 	int _suitStatus;
 public:
 	TestClass(LPSTR param);
