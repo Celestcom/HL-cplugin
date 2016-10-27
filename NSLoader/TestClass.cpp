@@ -29,7 +29,7 @@ TestClass::~TestClass()
 int TestClass::PollStatus()
 {
 	NullSpace::Communication::SuitStatus status;
-	if (_wire.ReceiveStatus(&status)) {
+	if (_wire.ReceiveStatus(status)) {
 		_suitStatus = status == NullSpace::Communication::SuitStatus::SuitStatus_Connected ? 1 : 0;
 	}
 	return _suitStatus;

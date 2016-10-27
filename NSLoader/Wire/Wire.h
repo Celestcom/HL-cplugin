@@ -54,18 +54,18 @@ public:
 	void Wire::Send( struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate>& input) {
 	}
 	
-	bool Wire::ReceiveStatus(NullSpace::Communication::SuitStatus* status) {
+	bool Wire::ReceiveStatus(NullSpace::Communication::SuitStatus& status) {
 		zmq::message_t msg;
 		if (_receiveFromEngineSocket->recv(&msg, ZMQ_DONTWAIT)) {
 			flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(msg.data()), msg.size());
 			if (NullSpace::Communication::VerifyEnginePacketBuffer(verifier)) {
-				auto packet =
-					std::unique_ptr<const NullSpace::Communication::EnginePacket>(NullSpace::Communication::GetEnginePacket(msg.data()));
+				auto packet = NullSpace::Communication::GetEnginePacket(msg.data());
 				if (packet->packet_type() == NullSpace::Communication::PacketType::PacketType_SuitStatusUpdate) {
 					auto decoded = EncodingOperations::Decode(static_cast<const NullSpace::Communication::SuitStatusUpdate*>(packet->packet()));
-					*status = decoded;
+					status = decoded;
 					return true;
 				}
+				
 			}
 		}
 		return false;
