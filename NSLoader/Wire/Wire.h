@@ -81,11 +81,15 @@ public:
 	{
 		_context = std::make_unique<zmq::context_t>(1);
 		_sendToEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_PAIR);
+		_sendToEngineSocket->setsockopt(ZMQ_SNDHWM, 1);
 		_sendToEngineSocket->connect(sendAddress);
-
+		_sendToEngineSocket->setsockopt(ZMQ_LINGER, 0);
 		_receiveFromEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_SUB);
+		
+		_receiveFromEngineSocket->setsockopt(ZMQ_CONFLATE, 1);
 
 		_receiveFromEngineSocket->connect(receiveAddress);
+		
 		_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "", 0);
 
 

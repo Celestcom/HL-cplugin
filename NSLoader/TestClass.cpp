@@ -30,7 +30,7 @@ int TestClass::PollStatus()
 {
 	NullSpace::Communication::SuitStatus status;
 	if (_wire.ReceiveStatus(status)) {
-		_suitStatus = status == NullSpace::Communication::SuitStatus::SuitStatus_Connected ? 1 : 0;
+		_suitStatus = int(status);
 	}
 	return _suitStatus;
 }
