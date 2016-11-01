@@ -28,27 +28,26 @@ TestClass::~TestClass()
 /* returns 1 for connected, 0 for disconnected */
 int TestClass::PollStatus()
 {
-	NullSpace::Communication::SuitStatus status;
-	if (_wire.ReceiveStatus(status)) {
-		_suitStatus = int(status);
-	}
+	Poll();
 	return _suitStatus;
 }
 
-void TestClass::PollTracking(Quaternion& q)
-{
-	q.w = 1.0;
-	q.x = 2.9;
-	q.y = 3.0;
-	q.z = 4.0;
+bool TestClass::Poll() {
+	return _wire.Receive(_suitStatus, _tracking);
 }
+
+void TestClass::PollTracking(NullSpaceDLL::TrackingUpdate& t) {
+	Poll();
+	t = _tracking;
+}
+
 
 int TestClass::PlayPattern(LPSTR param, Side side)
 {
 	auto name = std::string(param);
 	if (_resolver.Load(PatternFileInfo(name))) {
 		auto res = _resolver.ResolvePattern(name, side);
-		_wire.Send(_wire.Encoder.Encode(res), name);
+		_wire.Send(_wire.Encoder.Encode(res), name + Locator::getTranslator().ToString(side));
 	}
 	return 0;
 }
@@ -58,7 +57,7 @@ int TestClass::PlayExperience(LPSTR param, Side side)
 	auto name = std::string(param);
 	if (_resolver.Load(ExperienceFileInfo(name))) {
 		auto res = _resolver.ResolvePattern(name, side);
-		_wire.Send(_wire.Encoder.Encode(res), name);
+		_wire.Send(_wire.Encoder.Encode(res), name + Locator::getTranslator().ToString(side));
 	}
 	return 0;
 }
@@ -69,7 +68,7 @@ int TestClass::PlaySequence(LPSTR param, Location loc)
 	auto name = std::string(param);
 	if (_resolver.Load(SequenceFileInfo(name))) {
 		auto res = _resolver.ResolveSequence(name, loc);
-		_wire.Send(_wire.Encoder.Encode(res), name);
+		_wire.Send(_wire.Encoder.Encode(res), name + Locator::getTranslator().ToString(loc));
 	}
 	return 0;
 }

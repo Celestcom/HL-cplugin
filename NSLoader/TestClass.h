@@ -7,24 +7,21 @@
 #include "Wire\Wire.h"
 #include "Wire\EncodingOperations.h"
 #pragma pack(1)
-struct Quaternion {
-	float w;
-	float x; 
-	float y;
-	float z;
-};
+
 
 class TestClass
 {
 private:
 	DependencyResolver _resolver;
 	Wire _wire;
-	int _suitStatus;
+	NullSpace::Communication::SuitStatus _suitStatus;
+	NullSpaceDLL::TrackingUpdate _tracking;
 public:
 	TestClass(LPSTR param);
 	~TestClass();
+	bool Poll();
 	int PollStatus();
-	void PollTracking(Quaternion& q);
+	void PollTracking(NullSpaceDLL::TrackingUpdate& q);
 	int PlayPattern(LPSTR param, Side side);
 	int PlayExperience(LPSTR param, Side side);
 	int PlaySequence(LPSTR param, Location loc);

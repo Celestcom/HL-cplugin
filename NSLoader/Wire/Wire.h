@@ -54,7 +54,8 @@ public:
 	void Wire::Send( struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate>& input) {
 	}
 	
-	bool Wire::ReceiveStatus(NullSpace::Communication::SuitStatus& status) {
+
+	bool Wire::Receive(NullSpace::Communication::SuitStatus& status, NullSpaceDLL::TrackingUpdate& tracking) {
 		zmq::message_t msg;
 		if (_receiveFromEngineSocket->recv(&msg, ZMQ_DONTWAIT)) {
 			flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(msg.data()), msg.size());
@@ -65,12 +66,18 @@ public:
 					status = decoded;
 					return true;
 				}
-				
+				else if (packet->packet_type() == NullSpace::Communication::PacketType::PacketType_TrackingUpdate) {
+					auto decoded = EncodingOperations::Decode(static_cast<const NullSpace::Communication::TrackingUpdate*>(packet->packet()));
+					tracking = decoded;
+					return true;
+				}
+
 			}
 		}
 		return false;
 	}
-
+	
+	
 	~Wire()
 	{
 		/* VERY IMPORTANT. If you do not close the sockets, the DLL will cause Unity to freeze!*/
@@ -100,8 +107,4 @@ private:
 	std::unique_ptr<zmq::socket_t> _receiveFromEngineSocket;
 	std::unique_ptr<zmq::context_t> _context;
 };
-
-
-
-
 

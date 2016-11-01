@@ -8,7 +8,39 @@
 #include "Experience_generated.h"
 #include "EnginePacket_generated.h"
 #include "SuitStatusUpdate_generated.h"
+#include "TrackingUpdate_generated.h"
 #include "HapticClasses.h"
+namespace NullSpaceDLL {
+	struct Quaternion {
+		float w;
+		float x;
+		float y;
+		float z;
+	};
+	struct TrackingUpdate {
+		Quaternion chest;
+		Quaternion left_upper_arm;
+		Quaternion left_forearm;
+		Quaternion right_upper_arm;
+		Quaternion right_forearm;
+	};
+}
+
+struct Quaternion {
+	float w;
+	float x;
+	float y;
+	float z;
+	Quaternion(float x, float y, float z, float w) :w(w), x(x), y(y), z(z) {}
+	Quaternion() {}
+	friend std::ostream &operator<<(std::ostream &output,
+		const Quaternion &q) {
+		output << "(" << q.x << ", " << q.y << ", " << q.z << ", " << q.w << ")";
+		return output;
+	}
+};
+
+
 class EncodingOperations
 {
 private:
@@ -27,6 +59,11 @@ public:
 	}
 	/* Encoding */
 
+	struct flatbuffers::Offset<NullSpace::Communication::TrackingUpdate> EncodingOperations::Encode(const Quaternion& input) {
+		//todo: check if this stack variable is copied by flatbuffers
+		auto q = NullSpace::Communication::Quaternion(input.x, input.y, input.z, input.w);
+		return NullSpace::Communication::CreateTrackingUpdate(_builder, &q);
+	}
 	struct flatbuffers::Offset<NullSpace::HapticFiles::Experience> EncodingOperations::Encode(const std::vector<HapticSample>& input) {
 		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticSample>> sample_vector;
 		sample_vector.reserve(input.size());
@@ -116,16 +153,21 @@ public:
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name) , NullSpace::HapticFiles::FileType_Sequence, input.Union());
 		_finalize(packet, callback);
 	}
-	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect> input, std::function<void(uint8_t*, int)> callback) {
+	typedef std::function<void(uint8_t*, int)> DataCallback;
+	//todo: can these be const references?
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect> input, DataCallback callback) {
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("REPLACE_ME"), NullSpace::HapticFiles::FileType::FileType_HapticEffect, input.Union());
 		_finalize(packet, callback);
 	}
-	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate> input, std::function<void(uint8_t*, int)> callback) {
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate> input, DataCallback callback) {
 		auto packet = NullSpace::Communication::CreateEnginePacket(_builder, NullSpace::Communication::PacketType::PacketType_SuitStatusUpdate, input.Union());
 		_finalize(packet, callback);
 	}
-	
-	
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::Communication::TrackingUpdate> input, DataCallback callback)
+	{
+		auto packet = NullSpace::Communication::CreateEnginePacket(_builder, NullSpace::Communication::PacketType::PacketType_TrackingUpdate, input.Union());
+		_finalize(packet, callback);
+	}
 	/* Decoding*/
 	static std::vector<HapticEffect> EncodingOperations::Decode(const NullSpace::HapticFiles::Sequence* sequence)
 	{
@@ -174,7 +216,18 @@ public:
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();
 	}
-	
+	static NullSpaceDLL::TrackingUpdate EncodingOperations::Decode(const NullSpace::Communication::TrackingUpdate* update) {
+		NullSpaceDLL::TrackingUpdate t;
+
+		
+		auto quat = update->chest();
+		t.chest.w = quat->w();
+		t.chest.x = quat->x();
+		t.chest.y = quat->y();
+		t.chest.z = quat->z();
+		return t;
+
+	}
 	
 	~EncodingOperations() {
 		
