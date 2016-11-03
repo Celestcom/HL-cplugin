@@ -57,8 +57,9 @@ public:
 		flatbuffers::Verifier verifier(builder.GetBufferPointer(), builder.GetSize());
 		return NullSpace::Communication::VerifyEnginePacketBuffer(verifier);
 	}
+	
 	/* Encoding */
-
+	/*****************************************************************/
 	struct flatbuffers::Offset<NullSpace::Communication::TrackingUpdate> EncodingOperations::Encode(const Quaternion& input) {
 		//todo: check if this stack variable is copied by flatbuffers
 		auto q = NullSpace::Communication::Quaternion(input.x, input.y, input.z, input.w);
@@ -113,6 +114,9 @@ public:
 		return NullSpace::HapticFiles::CreatePattern(_builder, frames);
 
 	}
+	struct flatbuffers::Offset<NullSpace::HapticFiles::Tracking> EncodingOperations::Encode(bool imusEnabled) {
+		return  NullSpace::HapticFiles::CreateTracking(_builder, imusEnabled);
+	}
 	struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate> EncodingOperations::Encode(NullSpace::Communication::Status status) {
 		return NullSpace::Communication::CreateClientStatusUpdate(_builder, status);
 	}
@@ -122,6 +126,9 @@ public:
 	}
 	
 	/* Sending */
+	/*****************************************************************/
+	typedef std::function<void(uint8_t*, int)> DataCallback;
+
 	void EncodingOperations::_finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::HapticPacket> input, std::function<void(uint8_t*, int)> callback) {
 		
 		_builder.Finish(input);
@@ -138,23 +145,26 @@ public:
 		}
 		_builder.Clear();
 	}
-	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Experience> input, std::string name, std::function<void(uint8_t*, int)> callback) {
+
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Tracking> input, DataCallback callback) {
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("tracking"), NullSpace::HapticFiles::FileType::FileType_Tracking, input.Union());
+		_finalize(packet, callback);
+	}
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Experience> input, std::string name, DataCallback callback) {
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Experience, input.Union());
 		_finalize(packet, callback);
 	}	
-	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern> input, std::string name, std::function<void(uint8_t*, int)> callback)
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern> input, std::string name, DataCallback callback)
 	{
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Pattern, input.Union());
 		_finalize(packet, callback);
 	}
-	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence> input, std::string name, std::function<void(uint8_t*, int)> callback)
+	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence> input, std::string name, DataCallback callback)
 	{
 
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name) , NullSpace::HapticFiles::FileType_Sequence, input.Union());
 		_finalize(packet, callback);
 	}
-	typedef std::function<void(uint8_t*, int)> DataCallback;
-	//todo: can these be const references?
 	void EncodingOperations::Finalize(struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect> input, DataCallback callback) {
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("REPLACE_ME"), NullSpace::HapticFiles::FileType::FileType_HapticEffect, input.Union());
 		_finalize(packet, callback);
@@ -168,7 +178,13 @@ public:
 		auto packet = NullSpace::Communication::CreateEnginePacket(_builder, NullSpace::Communication::PacketType::PacketType_TrackingUpdate, input.Union());
 		_finalize(packet, callback);
 	}
+
+
 	/* Decoding*/
+	/*****************************************************************/
+	static bool EncodingOperations::Decode(const NullSpace::HapticFiles::Tracking* tracking) {
+		return tracking->enable();
+	}
 	static std::vector<HapticEffect> EncodingOperations::Decode(const NullSpace::HapticFiles::Sequence* sequence)
 	{
 		std::vector<HapticEffect> effects;
@@ -212,6 +228,7 @@ public:
 	}
 	static HapticEffect EncodingOperations::Decode(const NullSpace::HapticFiles::HapticEffect* effect) {
 		return HapticEffect(Effect(effect->effect()), Location(effect->location()), effect->duration(), effect->time(), effect->priority());
+		
 	}
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();

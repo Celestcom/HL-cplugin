@@ -53,6 +53,9 @@ public:
 	}
 	void Wire::Send( struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate>& input) {
 	}
+	void Wire::Send(struct flatbuffers::Offset<NullSpace::HapticFiles::Tracking>& input) {
+		Encoder.Finalize(input, boost::bind(&Wire::sendToEngine, this, _1, _2));
+	}
 	
 
 	bool Wire::Receive(NullSpace::Communication::SuitStatus& status, NullSpaceDLL::TrackingUpdate& tracking) {
@@ -87,18 +90,18 @@ public:
 	Wire(std::string sendAddress, std::string receiveAddress)
 	{
 		_context = std::make_unique<zmq::context_t>(1);
-		_sendToEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_PAIR);
-		_sendToEngineSocket->setsockopt(ZMQ_SNDHWM, 1);
+		_sendToEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_PUB);
+		_sendToEngineSocket->setsockopt(ZMQ_SNDHWM, 16);
 		_sendToEngineSocket->connect(sendAddress);
 		_sendToEngineSocket->setsockopt(ZMQ_LINGER, 0);
-		_receiveFromEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_SUB);
-		
-		_receiveFromEngineSocket->setsockopt(ZMQ_CONFLATE, 1);
 
+
+		_receiveFromEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_SUB);
+		_receiveFromEngineSocket->setsockopt(ZMQ_CONFLATE, 1);
 		_receiveFromEngineSocket->connect(receiveAddress);
-		
 		_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "", 0);
 
+		//TODO: use different socket types, because we can't have multiple apps bind to the same tcp socket
 
 	}
 

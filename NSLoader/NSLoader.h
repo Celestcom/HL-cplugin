@@ -20,4 +20,6 @@ extern "C" {
 	NSLOADER_API int __stdcall TestClass_PollStatus(TestClass* ptr) { return ptr->PollStatus(); }
 	NSLOADER_API void __stdcall TestClass_PollTracking(TestClass* ptr, NullSpaceDLL::TrackingUpdate& q) { ptr->PollTracking(q); }
 	NSLOADER_API void __stdcall TestClass_Delete(TestClass* ptr) { delete ptr; }
+	NSLOADER_API void __stdcall TestClass_SetTrackingEnabled(TestClass* ptr, bool wantTracking) { ptr->SetTrackingEnabled(wantTracking); }
+
 }

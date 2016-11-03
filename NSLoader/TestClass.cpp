@@ -61,7 +61,7 @@ int TestClass::PlayExperience(LPSTR param, Side side)
 	}
 	return 0;
 }
-
+//TODO: wrap with exception handling incase flatbuffers fails/file fails to load/etc
 
 int TestClass::PlaySequence(LPSTR param, Location loc)
 {
@@ -77,4 +77,10 @@ int TestClass::PlayEffect(Effect e, Location loc, float duration, float time, un
 {
 	_wire.Send(_wire.Encoder.Encode(HapticEffect(e, loc, duration, time, priority)));
 	return 0;
+}
+
+void TestClass::SetTrackingEnabled(bool wantTracking)
+{
+	_wire.Send(_wire.Encoder.Encode(wantTracking));
+
 }

@@ -26,5 +26,6 @@ public:
 	int PlayExperience(LPSTR param, Side side);
 	int PlaySequence(LPSTR param, Location loc);
 	int PlayEffect(Effect e, Location loc, float duration, float time, unsigned int priority);
+	void SetTrackingEnabled(bool wantTracking);
 };
 
