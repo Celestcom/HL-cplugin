@@ -236,17 +236,17 @@ vector<HapticSample> ExperienceResolver::Resolve(ExperienceArgs args)
 HapticSample ExperienceResolver::transformMomentToHapticSample(Moment moment, Side side) const
 {
 	//todo: step through this
-	vector<HapticFrame>* frames = nullptr;
+
 	if (moment.Side != Side::NotSpecified && moment.Side != Side::Inherit)
 	{
 		//then resolve the pattern using that file-defined side.
-		*frames = _patResolver->Resolve(PatternArgs(moment.Name, moment.Side));
+		return HapticSample(moment.Time, _patResolver->Resolve(PatternArgs(moment.Name, moment.Side)), 1);
 	}
 	else
 	{
 		//else, use the programmatic side given at runtime by the programmer
-		*frames = _patResolver->Resolve(PatternArgs(moment.Name, side));
+		return HapticSample(moment.Time, _patResolver->Resolve(PatternArgs(moment.Name, side)), 1);
 	}
-	return HapticSample(moment.Time, *frames, 1);
+
 
 }

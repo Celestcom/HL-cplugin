@@ -56,7 +56,7 @@ int TestClass::PlayExperience(LPSTR param, Side side)
 {
 	auto name = std::string(param);
 	if (_resolver.Load(ExperienceFileInfo(name))) {
-		auto res = _resolver.ResolvePattern(name, side);
+		auto res = _resolver.ResolveSample(name, side);
 		_wire.Send(_wire.Encoder.Encode(res), name + Locator::getTranslator().ToString(side));
 	}
 	return 0;
