@@ -10,6 +10,27 @@
 #include "SuitStatusUpdate_generated.h"
 #include "TrackingUpdate_generated.h"
 #include "HapticClasses.h"
+
+
+template<typename Seq, typename Pat, typename Exp, typename ImuCommand, typename ClientStatus, typename SuitStatus, typename Quat>
+class IEncoder {
+public:
+	virtual Quat Encode(const Quaternion& input) = 0;
+	virtual Pat Encode(const Pattern& input) = 0;
+	virtual Seq Encode(const Sequence& input) = 0;
+	virtual ImuCommand Encode(bool input) = 0;
+	virtual ClientStatus Encode(NullSpace::Communication::Status status) = 0;
+	virtual SuitStatus Encode(NullSpace::Communication::SuitStatus status) = 0;
+
+	virtual void Send(Quat) = 0;
+	virtual void Send(Pat) = 0;
+	virtual void Send(Seq) = 0;
+	virtual void Send(ImuCommand) = 0;
+	virtual void Send(ClientStatus) = 0;
+	virtual void Send(SuitStatus) = 0;
+};
+
+
 namespace NullSpaceDLL {
 	struct Quaternion {
 		float w;
@@ -40,8 +61,15 @@ struct Quaternion {
 	}
 };
 
+typedef flatbuffers::Offset<NullSpace::HapticFiles::Sequence> SeqOffset;
+typedef flatbuffers::Offset<NullSpace::HapticFiles::Pattern> PatOffset;
+typedef flatbuffers::Offset<NullSpace::HapticFiles::Experience> ExpOffset;
+typedef flatbuffers::Offset<NullSpace::Communication::TrackingUpdate> TrackOffset;
+typedef flatbuffers::Offset<NullSpace::HapticFiles::Tracking> ImuOffset;
+typedef flatbuffers::Offset<NullSpace::Communication:SuitStatus> StatusOffset;
+typedef flatbuffers::Offset<NullSpace::Communication::ClientStatus> ClientOffset;
 
-class EncodingOperations
+class EncodingOperations : public IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset>
 {
 private:
 	flatbuffers::FlatBufferBuilder _builder;
@@ -60,7 +88,7 @@ public:
 	
 	/* Encoding */
 	/*****************************************************************/
-	struct flatbuffers::Offset<NullSpace::Communication::TrackingUpdate> EncodingOperations::Encode(const Quaternion& input) {
+	struct TrackOffset EncodingOperations::Encode(const Quaternion& input) {
 		//todo: check if this stack variable is copied by flatbuffers
 		auto q = NullSpace::Communication::Quaternion(input.x, input.y, input.z, input.w);
 		return NullSpace::Communication::CreateTrackingUpdate(_builder, &q);
