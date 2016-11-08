@@ -9,11 +9,11 @@ class HapticCache
 public:
 	HapticCache();
 	~HapticCache();
-	void Cache(const HapticArgs& href, std::vector<T> data);
-	std::vector<T> Get(const HapticArgs& href);
+	void Cache(const HapticArgs& href, T data);
+	T Get(const HapticArgs& href);
 	bool Contains(const HapticArgs& href);
 private:
-	std::unordered_map<int, std::vector<T>> _resolvedHaptics;
+	std::unordered_map<int, T> _resolvedHaptics;
 
 };
 
@@ -29,21 +29,21 @@ HapticCache<T>::~HapticCache()
 }
 
 template <class T>
-void HapticCache<T>::Cache(const HapticArgs& href, std::vector<T> data)
+void HapticCache<T>::Cache(const HapticArgs& href, T data)
 {
 	_resolvedHaptics[href.GetCombinedHash()] = data;
 	
 }
 
 template <class T>
-std::vector<T> HapticCache<T>::Get(const HapticArgs& href)
+T HapticCache<T>::Get(const HapticArgs& href)
 {
 	if (_resolvedHaptics.find(href.GetCombinedHash()) != _resolvedHaptics.end())
 	{
 		return _resolvedHaptics[href.GetCombinedHash()];
 	}
 
-	return std::vector<T>();
+	return T();
 }
 
 template <class T>

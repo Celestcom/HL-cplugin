@@ -42,9 +42,9 @@ public:
 class SequenceArgs : public HapticArgs
 {
 public:
-	SequenceArgs(const std::string& name, Location loc);
+	SequenceArgs(const std::string& name, std::string loc);
 	~SequenceArgs();
-	Location Location;
+	std::string Location;
 	std::string Name;
 	int GetCombinedHash() const override;
 	std::string ToString() const override {

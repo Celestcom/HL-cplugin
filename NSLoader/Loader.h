@@ -25,30 +25,30 @@ public:
 
 
 
-class SequenceLoader : public IHapticLoadingStrategy<vector<SequenceItem>>
+class SequenceLoader : public IHapticLoadingStrategy<JsonSequence>
 {
 public:
 	SequenceLoader(shared_ptr<Parser>);
 	~SequenceLoader();
 	bool Load(const HapticFileInfo& fileInfo) override;
-	vector<SequenceItem> GetLoadedResource(const std::string& key) override;
+	JsonSequence GetLoadedResource(const std::string& key) override;
 private:
 	shared_ptr<Parser> _parser;
-	unordered_map<string, vector<SequenceItem>> _sequences;
+	unordered_map<string, JsonSequence> _sequences;
 };
 
-class PatternLoader : public IHapticLoadingStrategy<vector<Frame>>
+class PatternLoader : public IHapticLoadingStrategy<JsonPattern>
 {
 public:
 	PatternLoader(shared_ptr<Parser>, shared_ptr<SequenceLoader>);
 	~PatternLoader();
 	bool Load(const HapticFileInfo& fileInfo) override;
-	vector<Frame> GetLoadedResource(const std::string& key) override;
+	JsonPattern GetLoadedResource(const std::string& key) override;
 private:
 	shared_ptr<SequenceLoader> _sequenceLoader;
 	shared_ptr<Parser> _parser;
-	unordered_map<string, vector<Frame>> _patterns;
-	void loadAllSequences(vector<Frame>) const;
+	unordered_map<string, JsonPattern> _patterns;
+	void loadAllSequences(vector<JsonPatternAtom>) const;
 };
 
 class ExperienceLoader : public IHapticLoadingStrategy<vector<Moment>>

@@ -81,9 +81,9 @@ void Parser::Traverse(EnumNode node, std::string prefix)
 	
 }
 
-std::vector<SequenceItem> Parser::ParseSequence(boost::filesystem::path path)
+std::vector<JsonSequenceAtom> Parser::ParseSequence(boost::filesystem::path path)
 {
-	std::vector<SequenceItem> outItems;
+	std::vector<JsonSequenceAtom> outItems;
 	//check if exists
 	Json::Value root;
 	std::ifstream json(path.string(), std::ifstream::binary);
@@ -92,7 +92,7 @@ std::vector<SequenceItem> Parser::ParseSequence(boost::filesystem::path path)
 	{
 		for (auto x : root["sequence"])
 		{
-			SequenceItem s;
+			JsonSequenceAtom s;
 			s.Deserialize(x);
 			outItems.push_back(s);
 		}
@@ -100,9 +100,9 @@ std::vector<SequenceItem> Parser::ParseSequence(boost::filesystem::path path)
 	return outItems;
 }
 
-std::vector<Frame> Parser::ParsePattern(boost::filesystem::path path)
+std::vector<JsonPatternAtom> Parser::ParsePattern(boost::filesystem::path path)
 {
-	std::vector<Frame> outFrames;
+	std::vector<JsonPatternAtom> outAtoms;
 	//check if exists
 	Json::Value root;
 	std::ifstream json(path.string(), std::ifstream::binary);
@@ -111,12 +111,12 @@ std::vector<Frame> Parser::ParsePattern(boost::filesystem::path path)
 	{
 		for (auto x : root["pattern"])
 		{
-			Frame f;
+			JsonPatternAtom f;
 			f.Deserialize(x);
-			outFrames.push_back(f);
+			outAtoms.push_back(f);
 		}
 	}
-	return outFrames;
+	return outAtoms;
 }
 
 std::vector<Sample> Parser::ParseExperience(boost::filesystem::path path)
@@ -139,16 +139,16 @@ std::vector<Sample> Parser::ParseExperience(boost::filesystem::path path)
 	
 }
 
-void SequenceItem::Serialize(const Json::Value& root) {
+void JsonSequenceAtom::Serialize(const Json::Value& root) {
 
 }
 
-void SequenceItem::Deserialize(const Json::Value& root) {
+void JsonSequenceAtom::Deserialize(const Json::Value& root) {
 	this->Time = root.get("time", 0.0f).asFloat();
+	this->Effect = root.get("effect", "INVALID_EFFECT").asString();
+	this->Strength = root.get("strength", 1.0).asFloat();
 	this->Duration = root.get("duration", 0.0f).asFloat();
-	//TODO: decide if we should warn or be optimistic
-	this->Waveform = root.get("waveform", "INVALID_WAVEFORM").asString();
-	this->Repeat = root.get("repeat", 0).asInt();
+	this->Repeat = root.get("repeat", 1).asInt();
 	
 }
 
@@ -214,4 +214,12 @@ void Pattern::Deserialize(const Json::Value& root) {
 			this->Frames.push_back(f);
 		}
 	}
+}
+
+void JsonPatternAtom::Deserialize(const Json::Value & root)
+{
+	this->Time = root.get("time", 0.0).asFloat();
+	this->Sequence = root.get("sequence", "UNKNOWN_SEQUENCE").asString();
+	this->Area = root.get("area", "UNKNOWN_AREA").asString();
+	
 }

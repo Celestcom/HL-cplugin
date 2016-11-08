@@ -71,8 +71,8 @@ bool SequenceLoader::Load(const HapticFileInfo& fileInfo)
 			auto dir = directory;
 			auto path = dir /= name;
 			if (exists(path)) {
-				vector<SequenceItem> sequence = _parser->ParseSequence(path);
-				_sequences[fileInfo.FullId] = sequence;
+				vector<JsonSequenceAtom> sequence = _parser->ParseSequence(path);
+				_sequences[fileInfo.FullId] = JsonSequence(fileInfo.FullId, sequence);
 				return true;
 			}
 
@@ -87,7 +87,7 @@ bool SequenceLoader::Load(const HapticFileInfo& fileInfo)
 	return false;
 }
 
-vector<SequenceItem> SequenceLoader::GetLoadedResource(const std::string& key)
+JsonSequence SequenceLoader::GetLoadedResource(const std::string& key)
 {
 	return _sequences.at(key);
 }
@@ -115,9 +115,9 @@ bool PatternLoader::Load(const HapticFileInfo& fileInfo)
 			auto dir = directory;
 			auto path = dir /= name;
 			if (exists(path)) {
-				vector<Frame> pattern = _parser->ParsePattern(path);
-				_patterns[fileInfo.FullId] = pattern;
-				loadAllSequences(pattern);
+				auto atoms = _parser->ParsePattern(path);
+				_patterns[fileInfo.FullId] = JsonPattern(fileInfo.FullId, atoms);
+				loadAllSequences(atoms);
 				return true;
 			}
 
@@ -130,21 +130,18 @@ bool PatternLoader::Load(const HapticFileInfo& fileInfo)
 	return false;
 }
 
-vector<Frame> PatternLoader::GetLoadedResource(const std::string & key)
+JsonPattern PatternLoader::GetLoadedResource(const std::string & key)
 {
 	return _patterns.at(key);
 }
 
-void PatternLoader::loadAllSequences(vector<Frame> pattern) const
+void PatternLoader::loadAllSequences(vector<JsonPatternAtom> pattern) const
 {
-	for (auto frame : pattern)
-	{
-		for (auto sequence : frame.FrameSet)
-		{
-			SequenceFileInfo info(sequence.Sequence);
-			_sequenceLoader->Load(info);
-		}
+	for (auto atom : pattern) {
+		SequenceFileInfo info(atom.Sequence);
+		_sequenceLoader->Load(info);
 	}
+	
 }
 
 ExperienceLoader::ExperienceLoader(shared_ptr<Parser> p, shared_ptr<PatternLoader> pat)
@@ -223,10 +220,10 @@ float ExperienceLoader::getLatestTime(const std::string& patternName) const
 	
 	auto pattern = _patternLoader->GetLoadedResource(patternName);
 	float latestTime = 0;
-	for (auto frame : pattern)
-	{
-		latestTime = max(latestTime, frame.Time);
-	}
+//	for (auto frame : pattern)
+	//{
+	//	latestTime = max(latestTime, frame.Time);
+	//}
 	return latestTime;
 
 }

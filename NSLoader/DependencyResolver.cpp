@@ -53,12 +53,12 @@ Location DependencyResolver::ComputeLocationSide(JsonLocation location, Side sid
 	}
 }
 
-std::vector<HapticEffect> DependencyResolver::ResolveSequence(const std::string & name, Location location) const
+PackedSequence DependencyResolver::ResolveSequence(const std::string & name, std::string location) const
 {
 	return _sequenceResolver->Resolve(SequenceArgs(name, location));
 }
 
-std::vector<HapticFrame> DependencyResolver::ResolvePattern(const std::string& name, Side side) const
+PackedPattern DependencyResolver::ResolvePattern(const std::string& name, Side side) const
 {
 	return _patternResolver->Resolve(PatternArgs(name, side));
 }
@@ -82,38 +82,33 @@ SequenceResolver::SequenceResolver(shared_ptr<SequenceLoader> loader) :_sequence
 {
 }
 
-vector<HapticEffect> SequenceResolver::Resolve(SequenceArgs args)
+PackedSequence SequenceResolver::Resolve(SequenceArgs args)
 {
 	//if (_loadedFiles.find(args.Name) != _loadedFiles.end())
 	//{
 	//	throw HapticsNotLoadedException(args);
 	//}
-
+	
 	if (_cache.Contains(args))
 	{
 		return _cache.Get(args);
 	}
 
-	vector<SequenceItem> inputItems = _sequenceLoader->GetLoadedResource(args.Name);
-	vector<HapticEffect> outputEffects;
-	outputEffects.reserve(inputItems.size());
-	for (auto seqItem : inputItems)
-	{
-		outputEffects.push_back(transformSequenceItemIntoEffect(seqItem, args.Location));
-	}
+	auto inputItems = _sequenceLoader->GetLoadedResource(args.Name);
+	auto packed = PackedSequence(inputItems.Name(), inputItems.JsonAtoms(), args.Location);
 
-	_cache.Cache(args, outputEffects);
-	return outputEffects;
+	_cache.Cache(args, packed);
+	return packed;
 }
 
-HapticEffect SequenceResolver::transformSequenceItemIntoEffect(const SequenceItem& seq, Location loc)
+HapticEffect SequenceResolver::transformSequenceItemIntoEffect(const JsonSequenceAtom& seq, Location loc)
 {
 	//TODO: priority and explain default values
-	Effect effect = Locator::getTranslator().ToEffect(seq.Waveform, Effect::Buzz_100);
+	Effect effect = Locator::getTranslator().ToEffect(seq.Effect, Effect::Buzz_100);
 	return HapticEffect(effect, loc, seq.Duration, seq.Time, 1);
 }
 
-PatternResolver::PatternResolver(shared_ptr<IResolvable<SequenceArgs, HapticEffect>>  seq, shared_ptr<PatternLoader> p)
+PatternResolver::PatternResolver(shared_ptr<IResolvable<SequenceArgs, PackedSequence>>  seq, shared_ptr<PatternLoader> p)
 : _patternLoader(p), _seqResolver(seq)
 {
 }
@@ -125,7 +120,7 @@ PatternResolver::~PatternResolver()
 {
 }
 
-vector<HapticFrame> PatternResolver::Resolve(PatternArgs args)
+PackedPattern PatternResolver::Resolve(PatternArgs args)
 {
 	////if (_loadedFiles.find(args.Name) != _loadedFiles.end())
 	//{
@@ -136,15 +131,18 @@ vector<HapticFrame> PatternResolver::Resolve(PatternArgs args)
 	{
 		return _cache.Get(args);
 	}
+	std::vector<TimeIndex<PackedSequence>> seqs;
+	
+	auto jsonpat = _patternLoader->GetLoadedResource(args.Name);
+	seqs.reserve(jsonpat.JsonAtoms().size());
 
-	std::vector<HapticFrame> outFrames;
-	for (auto frame : _patternLoader->GetLoadedResource(args.Name))
-	{
-		outFrames.push_back(transformFrameToHapticFrame(frame, args.Side));
+	for (auto seq : jsonpat.JsonAtoms()) {
+		
+		seqs.push_back(TimeIndex<PackedSequence>(seq.Time, _seqResolver->Resolve(SequenceArgs(seq.Sequence, seq.Area))));
 	}
-
-	_cache.Cache(args, outFrames);
-	return outFrames;
+	auto packedPattern = PackedPattern(args.Name, seqs);
+	_cache.Cache(args, packedPattern);
+	return packedPattern;
 }
 
 HapticFrame PatternResolver::transformFrameToHapticFrame(const Frame& frame, Side side) const
@@ -164,22 +162,22 @@ HapticFrame PatternResolver::transformFrameToHapticFrame(const Frame& frame, Sid
 			break;
 		case Side::Mirror:
 			{
-				auto left = _seqResolver->Resolve(
-					SequenceArgs(name, DependencyResolver::ComputeLocationSide(location, Side::Left))
-				);
-				sequences.push_back(HapticSequence(left));
-				auto right = _seqResolver->Resolve(
-					SequenceArgs(name, DependencyResolver::ComputeLocationSide(location, Side::Right))
-				);
-				sequences.push_back(HapticSequence(right));
+				//auto left = _seqResolver->Resolve(
+				//	SequenceArgs(name, DependencyResolver::ComputeLocationSide(location, Side::Left))
+				//);
+			//	sequences.push_back(HapticSequence(left));
+			//	auto right = _seqResolver->Resolve(
+				//	SequenceArgs(name, DependencyResolver::ComputeLocationSide(location, Side::Right))
+				//);
+			//	sequences.push_back(HapticSequence(right));
 			}
 			break;
 		default:
 			{
-				auto specific = _seqResolver->Resolve(
-					SequenceArgs(name, DependencyResolver::ComputeLocationSide(location, actualSide))
-				);
-				sequences.push_back(HapticSequence(specific));
+				//auto specific = _seqResolver->Resolve(
+				//	SequenceArgs(name, DependencyResolver::ComputeLocationSide(location, actualSide))
+				//);
+			//	sequences.push_back(HapticSequence(specific));
 			}
 			break;
 		}
@@ -202,7 +200,7 @@ Side PatternResolver::ComputeSidePrecedence(Side inputSide, Side programmaticSid
 	}
 }
 
-ExperienceResolver::ExperienceResolver(shared_ptr<IResolvable<PatternArgs, HapticFrame>> pat, shared_ptr<ExperienceLoader> el):
+ExperienceResolver::ExperienceResolver(shared_ptr<IResolvable<PatternArgs, PackedPattern>> pat, shared_ptr<ExperienceLoader> el):
 	_experienceLoader(el), _patResolver(pat)
 {
 }
@@ -240,13 +238,14 @@ HapticSample ExperienceResolver::transformMomentToHapticSample(Moment moment, Si
 	if (moment.Side != Side::NotSpecified && moment.Side != Side::Inherit)
 	{
 		//then resolve the pattern using that file-defined side.
-		return HapticSample(moment.Time, _patResolver->Resolve(PatternArgs(moment.Name, moment.Side)), 1);
+		//return HapticSample(moment.Time, _patResolver->Resolve(PatternArgs(moment.Name, moment.Side)), 1);
 	}
 	else
 	{
 		//else, use the programmatic side given at runtime by the programmer
-		return HapticSample(moment.Time, _patResolver->Resolve(PatternArgs(moment.Name, side)), 1);
+		//return HapticSample(moment.Time, _patResolver->Resolve(PatternArgs(moment.Name, side)), 1);
 	}
-
+	//todo: fix
+	return HapticSample(1, std::vector<HapticFrame>(), 1);
 
 }

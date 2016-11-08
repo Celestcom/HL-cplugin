@@ -8,7 +8,8 @@
 #include "Loader.h"
 using namespace std;
 
-template<class TArgType, class HapticArgs>
+
+template<class TArgType, class T>
 class IResolvable
 {
 public:
@@ -16,7 +17,7 @@ public:
 	{
 	}
 
-	virtual std::vector<HapticArgs> Resolve(TArgType args) = 0;
+	virtual T Resolve(TArgType args) = 0;
 };
 class DependencyResolver
 {
@@ -25,16 +26,16 @@ public:
 	~DependencyResolver();
 	//void SetBasePath(const std::string& path);
 	static Location ComputeLocationSide(JsonLocation loc, Side side);
-	std::vector<HapticEffect> ResolveSequence(const std::string& name, Location location) const;
-	std::vector<HapticFrame> ResolvePattern(const std::string& name, Side side) const;
+	PackedSequence ResolveSequence(const std::string& name, std::string location) const;
+	PackedPattern ResolvePattern(const std::string& name, Side side) const;
 	std::vector<HapticSample> ResolveSample(const std::string& name, Side side) const;
 
 
 	bool Load(const HapticFileInfo& fileInfo) const;
 private:
-	shared_ptr<IResolvable<SequenceArgs, HapticEffect>> _sequenceResolver;
-	shared_ptr<IResolvable<PatternArgs, HapticFrame>> _patternResolver;
-	shared_ptr<IResolvable<ExperienceArgs, HapticSample>> _experienceResolver;
+	shared_ptr<IResolvable<SequenceArgs, PackedSequence>> _sequenceResolver;
+	shared_ptr<IResolvable<PatternArgs, PackedPattern>> _patternResolver;
+	shared_ptr<IResolvable<ExperienceArgs, std::vector<HapticSample>>> _experienceResolver;
 	Loader _loader;
 	
 };
@@ -42,41 +43,41 @@ private:
 
 
 
-class SequenceResolver : public IResolvable<SequenceArgs, HapticEffect>
+class SequenceResolver : public IResolvable<SequenceArgs, PackedSequence>
 {
 public:
 	SequenceResolver(shared_ptr<SequenceLoader> loader);
 	~SequenceResolver();
-	vector<HapticEffect> Resolve(SequenceArgs args) override;
+	PackedSequence Resolve(SequenceArgs args) override;
 private:
-	HapticCache<HapticEffect> _cache;
+	HapticCache<PackedSequence> _cache;
 	shared_ptr<SequenceLoader> _sequenceLoader;
-	static HapticEffect transformSequenceItemIntoEffect(const SequenceItem& seq, Location loc);
+	static HapticEffect transformSequenceItemIntoEffect(const JsonSequenceAtom& seq, Location loc);
 };
 
-class PatternResolver : public IResolvable<PatternArgs, HapticFrame>
+class PatternResolver : public IResolvable<PatternArgs, PackedPattern>
 {
 public:
-	PatternResolver(shared_ptr<IResolvable<SequenceArgs, HapticEffect>>  seq, shared_ptr<PatternLoader>);
+	PatternResolver(shared_ptr<IResolvable<SequenceArgs, PackedSequence>>  seq, shared_ptr<PatternLoader>);
 	~PatternResolver();
-	vector<HapticFrame> Resolve(PatternArgs args) override;
+	PackedPattern Resolve(PatternArgs args) override;
 private:
-	HapticCache<HapticFrame> _cache;
+	HapticCache<PackedPattern> _cache;
 	shared_ptr<PatternLoader> _patternLoader;
-	shared_ptr<IResolvable<SequenceArgs, HapticEffect>>  _seqResolver;
+	shared_ptr<IResolvable<SequenceArgs, PackedSequence>>  _seqResolver;
 	HapticFrame transformFrameToHapticFrame(const Frame& frame, Side side) const;
 	static Side ComputeSidePrecedence(Side inputSide, Side programmaticSide);
 };
 
-class ExperienceResolver : public IResolvable<ExperienceArgs, HapticSample>
+class ExperienceResolver : public IResolvable<ExperienceArgs, std::vector<HapticSample>>
 {
 public:
-	ExperienceResolver(shared_ptr<IResolvable<PatternArgs, HapticFrame>> pat, shared_ptr<ExperienceLoader> el);
+	ExperienceResolver(shared_ptr<IResolvable<PatternArgs, PackedPattern>> pat, shared_ptr<ExperienceLoader> el);
 	~ExperienceResolver();
 	vector<HapticSample> Resolve(ExperienceArgs args) override;
 private:
-	HapticCache<HapticSample> _cache;
+	HapticCache<std::vector<HapticSample>> _cache;
 	shared_ptr<ExperienceLoader> _experienceLoader;
-	shared_ptr<IResolvable<PatternArgs, HapticFrame>> _patResolver;
+	shared_ptr<IResolvable<PatternArgs, PackedPattern>> _patResolver;
 	HapticSample transformMomentToHapticSample(Moment moment, Side side) const;
 };

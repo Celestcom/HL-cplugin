@@ -32,8 +32,8 @@ typedef std::function<void(uint8_t*, int)> DataCallback;
 template<typename Seq, typename Pat, typename Exp, typename ImuOffset, typename ClientStatus, typename SuitStatus, typename TrackOffset>
 class IEncoder {
 public:
-	virtual Pat Encode(const std::vector<HapticFrame>& input) = 0;
-	virtual Seq Encode(const std::vector<HapticEffect>& input) = 0;
+	virtual Pat Encode(const PackedPattern& input) = 0;
+	virtual Seq Encode(const PackedSequence& input) = 0;
 	virtual Exp Encode(const std::vector<HapticSample>& input) = 0;
 	virtual ImuOffset Encode(bool inpu) = 0;
 	virtual TrackOffset Encode(const Quaternion& input) = 0;
@@ -102,8 +102,8 @@ public:
 		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticSample>> sample_vector;
 		sample_vector.reserve(input.size());
 		for (auto const &e : input) {
-			auto sample = NullSpace::HapticFiles::CreateHapticSample(_builder, this->Encode(e.Frames), e.Priority, e.Time);
-			sample_vector.push_back(sample);
+			//auto sample = NullSpace::HapticFiles::CreateHapticSample(_builder, this->Encode(e.Frames), e.Priority, e.Time);
+			//sample_vector.push_back(sample);
 		}
 		auto samples = _builder.CreateVector(sample_vector);
 		return NullSpace::HapticFiles::CreateExperience(_builder, samples);
@@ -118,30 +118,27 @@ public:
 
 	}
 	*/
-	SeqOffset EncodingOperations::Encode(const std::vector<HapticEffect>& input)
+	SeqOffset EncodingOperations::Encode(const PackedSequence& input)
 	{
 		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect>> effects_vector;
-		effects_vector.reserve(input.size());
-		for (auto const &e : input) {
-			auto effect = NullSpace::HapticFiles::CreateHapticEffect(
-				_builder, (uint16_t)e.Effect, (uint16_t)e.Location, e.Duration, e.Priority, e.Time);
+		effects_vector.reserve(input.JsonAtoms().size());
+		for (auto const &e : input.JsonAtoms()) {
+		
+			auto effect = NullSpace::HapticFiles::CreateHapticEffect(_builder,e.Time, _builder.CreateString(e.Effect), e.Strength, e.Duration, e.Repeat);
 			effects_vector.push_back(effect);
 		}
 		auto effects = _builder.CreateVector(effects_vector);
 		return NullSpace::HapticFiles::CreateSequence(_builder, effects);
 	}
-	PatOffset EncodingOperations::Encode(const std::vector<HapticFrame>& input)
+	PatOffset EncodingOperations::Encode(const PackedPattern& input)
 	{
 		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticFrame>> frame_vector;
-		frame_vector.reserve(input.size());
+		frame_vector.reserve(input.PackedAtoms().size());
 
-		for (auto const &f : input) {
-			std::vector<flatbuffers::Offset<NullSpace::HapticFiles::Sequence>> sequence_vector;
-			for (auto const &seq : f.Frame) {
-				sequence_vector.push_back(this->Encode(seq.Effects));
-			}
-			auto frames = _builder.CreateVector(sequence_vector);
-			auto frame = NullSpace::HapticFiles::CreateHapticFrame(_builder, frames, f.Priority, f.Time);
+		for (auto const &f : input.PackedAtoms()) {
+			
+
+			auto frame = NullSpace::HapticFiles::CreateHapticFrame(_builder, f.Time, Encode(f.Haptic), _builder.CreateString(f.Haptic.Area()));
 			frame_vector.push_back(frame);
 		}
 		auto frames = _builder.CreateVector(frame_vector);
@@ -229,7 +226,7 @@ public:
 		effects.reserve(items->size());
 
 		for (const auto& e : *items) {
-			effects.push_back(HapticEffect(Effect(e->effect()), Location(e->location()), e->duration(), e->time(), e->priority()));
+			//effects.push_back(HapticEffect(Effect(e->effect()), Location(e->location()), e->duration(), e->time(), e->priority()));
 		}
 
 		return effects;
@@ -242,12 +239,12 @@ public:
 
 		for (const auto& frame : *items) {
 			std::vector<HapticSequence> seqs;
-			seqs.reserve(frame->frame()->size());
-			for (const auto& seq : *frame->frame()) {
-				auto s = Decode(seq);
-				seqs.push_back(s);
-			}
-			frames.push_back(HapticFrame(frame->time(), seqs, frame->priority()));
+			//seqs.reserve(frame->frame()->size());
+			//for (const auto& seq : *frame->frame()) {
+			//	auto s = Decode(seq);
+			//	seqs.push_back(s);
+			//}
+		//	frames.push_back(HapticFrame(frame->time(), seqs, frame->priority()));
 		}
 
 		return frames;
@@ -264,7 +261,7 @@ public:
 		return samples;
 	}
 	static HapticEffect EncodingOperations::Decode(const NullSpace::HapticFiles::HapticEffect* effect) {
-		return HapticEffect(Effect(effect->effect()), Location(effect->location()), effect->duration(), effect->time(), effect->priority());
+		return HapticEffect(Effect(0), Location(0), effect->duration(), effect->time(), 0);
 		
 	}
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
