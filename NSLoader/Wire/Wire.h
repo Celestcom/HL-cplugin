@@ -15,10 +15,12 @@
 #include "SuitStatusUpdate_generated.h"
 #include "HapticClasses.h"
 #include "EncodingOperations.h"
+
+typedef IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset> FlatbuffEncoder;
 class Wire
 {
 public:
-	EncodingOperations Encoder;
+	std::unique_ptr<FlatbuffEncoder> Encoder;
 
 	static void Wire::sendTo(zmq::socket_t& socket, uint8_t* data, int size) {
 		zmq::message_t msg(size);
@@ -29,32 +31,33 @@ public:
 		sendTo(*_sendToEngineSocket, data, size);
 	}
 	/* Sending */
-	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::Experience>& input, std::string name) {
-		Encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+	void Wire::Send(ExpOffset& input, std::string name) {
+		Encoder->Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 	
-	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern>& input, std::string name)
+	void Wire::Send( PatOffset& input, std::string name)
 	{
-		Encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+		Encoder->Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 
-	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence>& input, std::string name)
+	void Wire::Send( SeqOffset& input, std::string name)
 	{
 	
-		Encoder.Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+		Encoder->Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
-
+	/*
 	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect> input) {
 		Encoder.Finalize(input, boost::bind(&Wire::sendToEngine, this, _1, _2));
 		
 	}
-	void Wire::Send(struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate>& input) {
+	*/
+	void Wire::Send(ClientOffset& input) {
 		
 	}
-	void Wire::Send( struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate>& input) {
+	void Wire::Send(StatusOffset& input) {
 	}
 	void Wire::Send(struct flatbuffers::Offset<NullSpace::HapticFiles::Tracking>& input) {
-		Encoder.Finalize(input, boost::bind(&Wire::sendToEngine, this, _1, _2));
+		Encoder->Finalize(input, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 	
 
@@ -89,6 +92,7 @@ public:
 	}
 	Wire(std::string sendAddress, std::string receiveAddress)
 	{
+		Encoder = std::unique_ptr<FlatbuffEncoder>(new EncodingOperations);
 		_context = std::make_unique<zmq::context_t>(1);
 		_sendToEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_PUB);
 		_sendToEngineSocket->setsockopt(ZMQ_SNDHWM, 16);

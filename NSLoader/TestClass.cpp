@@ -47,7 +47,7 @@ int TestClass::PlayPattern(LPSTR param, Side side)
 	auto name = std::string(param);
 	if (_resolver.Load(PatternFileInfo(name))) {
 		auto res = _resolver.ResolvePattern(name, side);
-		_wire.Send(_wire.Encoder.Encode(res), name + Locator::getTranslator().ToString(side));
+		_wire.Send(_wire.Encoder->Encode(res), name + Locator::getTranslator().ToString(side));
 	}
 	return 0;
 }
@@ -57,7 +57,7 @@ int TestClass::PlayExperience(LPSTR param, Side side)
 	auto name = std::string(param);
 	if (_resolver.Load(ExperienceFileInfo(name))) {
 		auto res = _resolver.ResolveSample(name, side);
-		_wire.Send(_wire.Encoder.Encode(res), name + Locator::getTranslator().ToString(side));
+		_wire.Send(_wire.Encoder->Encode(res), name + Locator::getTranslator().ToString(side));
 	}
 	return 0;
 }
@@ -68,19 +68,19 @@ int TestClass::PlaySequence(LPSTR param, Location loc)
 	auto name = std::string(param);
 	if (_resolver.Load(SequenceFileInfo(name))) {
 		auto res = _resolver.ResolveSequence(name, loc);
-		_wire.Send(_wire.Encoder.Encode(res), name + Locator::getTranslator().ToString(loc));
+		_wire.Send(_wire.Encoder->Encode(res), name + Locator::getTranslator().ToString(loc));
 	}
 	return 0;
 }
 
 int TestClass::PlayEffect(Effect e, Location loc, float duration, float time, unsigned int priority)
 {
-	_wire.Send(_wire.Encoder.Encode(HapticEffect(e, loc, duration, time, priority)));
+	//_wire.Send(_wire.Encoder->Encode(HapticEffect(e, loc, duration, time, priority)));
 	return 0;
 }
 
 void TestClass::SetTrackingEnabled(bool wantTracking)
 {
-	_wire.Send(_wire.Encoder.Encode(wantTracking));
+	_wire.Send(_wire.Encoder->Encode(wantTracking));
 
 }
