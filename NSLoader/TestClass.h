@@ -29,7 +29,7 @@ public:
 	void PollTracking(NullSpaceDLL::TrackingUpdate& q);
 	int PlayPattern(LPSTR param, Side side);
 	int PlayExperience(LPSTR param, Side side);
-	int PlaySequence(unsigned int handle, LPSTR param, Location loc);
+	int PlaySequence(unsigned int handle, LPSTR param, uint32_t loc);
 	int PlayEffect(Effect e, Location loc, float duration, float time, unsigned int priority);
 	void SetTrackingEnabled(bool wantTracking);
 	void HandleCommand(unsigned int handle, short c);

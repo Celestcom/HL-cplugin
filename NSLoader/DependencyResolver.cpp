@@ -53,7 +53,7 @@ Location DependencyResolver::ComputeLocationSide(JsonLocation location, Side sid
 	}
 }
 
-PackedSequence DependencyResolver::ResolveSequence(const std::string & name, Area location) const
+PackedSequence DependencyResolver::ResolveSequence(const std::string & name, AreaFlag location) const
 {
 	return _sequenceResolver->Resolve(SequenceArgs(name, location));
 }
@@ -138,7 +138,7 @@ PackedPattern PatternResolver::Resolve(PatternArgs args)
 
 	for (auto seq : jsonpat.JsonAtoms()) {
 		//TODO: REPLACE seq.Sequence, 1  with the ACTUAL AREA FROM TRANSLATOR!
-		seqs.push_back(TimeIndex<PackedSequence>(seq.Time, _seqResolver->Resolve(SequenceArgs(seq.Sequence, 1))));
+		seqs.push_back(TimeIndex<PackedSequence>(seq.Time, _seqResolver->Resolve(SequenceArgs(seq.Sequence, AreaFlag::Back_Left))));
 	}
 	auto packedPattern = PackedPattern(args.Name, seqs);
 	_cache.Cache(args, packedPattern);

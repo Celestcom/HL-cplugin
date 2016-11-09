@@ -142,7 +142,7 @@ public:
 			effects_vector.push_back(effect);
 		}
 		auto effects = _builder.CreateVector(effects_vector);
-		return NullSpace::HapticFiles::CreateSequence(_builder, input.Area(), effects);
+		return NullSpace::HapticFiles::CreateSequence(_builder, uint32_t(input.Area()), effects);
 	}
 	PatOffset EncodingOperations::Encode(const PackedPattern& input)
 	{
@@ -152,7 +152,7 @@ public:
 		for (auto const &f : input.PackedAtoms()) {
 			
 
-			auto frame = NullSpace::HapticFiles::CreateHapticFrame(_builder, f.Time, Encode(f.Haptic), f.Haptic.Area());
+			auto frame = NullSpace::HapticFiles::CreateHapticFrame(_builder, f.Time, Encode(f.Haptic), uint32_t(f.Haptic.Area()));
 			frame_vector.push_back(frame);
 		}
 		auto frames = _builder.CreateVector(frame_vector);

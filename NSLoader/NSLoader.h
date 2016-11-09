@@ -19,7 +19,7 @@ extern "C" {
 	}
 	NSLOADER_API int __stdcall TestClass_PlayExperience(TestClass* ptr, LPSTR param, Side side) { return ptr->PlayExperience(param, side); }
 	NSLOADER_API unsigned int __stdcall TestClass_GenHandle(TestClass* ptr) { return ptr->GenHandle(); }
-	NSLOADER_API int __stdcall TestClass_PlaySequence(TestClass* ptr, unsigned int handle, LPSTR param, Location loc) { return ptr->PlaySequence(handle, param, loc); }
+	NSLOADER_API int __stdcall TestClass_PlaySequence(TestClass* ptr, unsigned int handle, LPSTR param, uint32_t loc) { return ptr->PlaySequence(handle, param, loc); }
 	NSLOADER_API int __stdcall TestClass_PlayPattern(TestClass* ptr, LPSTR param, Side side) { return ptr->PlayPattern(param, side); }
 	NSLOADER_API int __stdcall TestClass_PollStatus(TestClass* ptr) { return ptr->PollStatus(); }
 	NSLOADER_API void __stdcall TestClass_PollTracking(TestClass* ptr, NullSpaceDLL::TrackingUpdate& q) { ptr->PollTracking(q); }

@@ -1,8 +1,7 @@
 #pragma once
 #include "Enums.h"
 #include <string>
-
-typedef unsigned int Area;
+#include "Wire\IntermediateHapticFormats.h"
 
 inline void hash_combine(std::size_t& seed) { }
 
@@ -43,9 +42,9 @@ public:
 class SequenceArgs : public HapticArgs
 {
 public:
-	SequenceArgs(const std::string& name, Area loc);
+	SequenceArgs(const std::string& name, AreaFlag loc);
 	~SequenceArgs();
-	Area Location;
+	AreaFlag Location;
 	std::string Name;
 	int GetCombinedHash() const override;
 	std::string ToString() const override {

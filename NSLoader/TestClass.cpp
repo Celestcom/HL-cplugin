@@ -73,11 +73,11 @@ int TestClass::PlayExperience(LPSTR param, Side side)
 }
 //TODO: wrap with exception handling incase flatbuffers fails/file fails to load/etc
 
-int TestClass::PlaySequence(unsigned int handle, LPSTR param, Location loc)
+int TestClass::PlaySequence(unsigned int handle, LPSTR param, uint32_t loc)
 {
 	auto name = std::string(param);
 	if (_resolver.Load(SequenceFileInfo(name))) {
-		auto res = _resolver.ResolveSequence(name, Area(loc));
+		auto res = _resolver.ResolveSequence(name, AreaFlag(loc));
 		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
 	}
 	return 0;

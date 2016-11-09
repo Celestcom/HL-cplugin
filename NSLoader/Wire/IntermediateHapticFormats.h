@@ -1,7 +1,29 @@
 #pragma once
 #include <vector>
 #include "IJsonSerializable.h"
-typedef unsigned int Area;
+
+
+enum class AreaFlag  : uint32_t {
+	Forearm_Left = 1 << 0,
+	Upper_Arm_Left = 1 << 1,
+	Shoulder_Left = 1 << 2,
+	Back_Left = 1 << 3,
+	Chest_Left = 1 << 4,
+	Upper_Ab_Left = 1 << 5,
+	Mid_Ab_Left = 1 << 6,
+	Lower_Ab_Left = 1 << 7,
+
+	Forearm_Right = 1 << 16,
+	Upper_Arm_Right = 1 << 17,
+	Shoulder_Right = 1 << 18,
+	Back_Right = 1 << 19,
+	Chest_Right = 1 << 20,
+	Upper_Ab_Right = 1 << 21,
+	Mid_Ab_Right = 1 << 22,
+	Lower_Ab_Right = 1 << 23
+};
+
+
 
 template<typename T>
 struct TimeIndex {
@@ -57,14 +79,14 @@ private:
 
 class PackedSequence {
 public:
-	PackedSequence(std::string name, std::vector<JsonSequenceAtom> atoms, Area a) :_name(name), _atoms(atoms), _area(a) {};
+	PackedSequence(std::string name, std::vector<JsonSequenceAtom> atoms, AreaFlag a) :_name(name), _atoms(atoms), _area(a) {};
 	PackedSequence() = default;
 	std::string Name() const { return _name; }
-	::Area Area() const { return _area; }
+	::AreaFlag Area() const { return _area; }
 	std::vector<JsonSequenceAtom> JsonAtoms() const { return _atoms; }
 private:
 	std::string _name;
-	::Area _area;
+	::AreaFlag _area;
 	std::vector<JsonSequenceAtom> _atoms;
 };
 
