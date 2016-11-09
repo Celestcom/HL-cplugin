@@ -192,6 +192,7 @@ public:
 	}
 	void EncodingOperations::Finalize(HandleCommandOffset input, std::string name, DataCallback callback) {
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("handle"), NullSpace::HapticFiles::FileType::FileType_HandleCommand, input.Union());
+		_finalize(packet, callback);
 	}
 	void EncodingOperations::Finalize(ImuOffset input, DataCallback callback) {
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("tracking"), NullSpace::HapticFiles::FileType::FileType_Tracking, input.Union());
@@ -248,6 +249,12 @@ public:
 		}
 		return atoms;
 	}
+
+	static NullSpaceDLL::HandleCommand EncodingOperations::Decode(const NullSpace::HapticFiles::HandleCommand* command) {
+		return NullSpaceDLL::HandleCommand(command->handle(), command->command());
+	}
+
+	
 	/*
 	static std::vector<HapticEffect> EncodingOperations::Decode(const NullSpace::HapticFiles::Sequence* sequence)
 	{
