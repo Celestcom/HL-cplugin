@@ -77,7 +77,7 @@ int TestClass::PlaySequence(unsigned int handle, LPSTR param, Location loc)
 {
 	auto name = std::string(param);
 	if (_resolver.Load(SequenceFileInfo(name))) {
-		auto res = _resolver.ResolveSequence(name, "test");
+		auto res = _resolver.ResolveSequence(name, Area(loc));
 		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
 	}
 	return 0;

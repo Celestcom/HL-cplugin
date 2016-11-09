@@ -142,7 +142,7 @@ public:
 			effects_vector.push_back(effect);
 		}
 		auto effects = _builder.CreateVector(effects_vector);
-		return NullSpace::HapticFiles::CreateSequence(_builder, effects);
+		return NullSpace::HapticFiles::CreateSequence(_builder, input.Area(), effects);
 	}
 	PatOffset EncodingOperations::Encode(const PackedPattern& input)
 	{
@@ -152,7 +152,7 @@ public:
 		for (auto const &f : input.PackedAtoms()) {
 			
 
-			auto frame = NullSpace::HapticFiles::CreateHapticFrame(_builder, f.Time, Encode(f.Haptic), _builder.CreateString(f.Haptic.Area()));
+			auto frame = NullSpace::HapticFiles::CreateHapticFrame(_builder, f.Time, Encode(f.Haptic), f.Haptic.Area());
 			frame_vector.push_back(frame);
 		}
 		auto frames = _builder.CreateVector(frame_vector);
@@ -235,6 +235,18 @@ public:
 	/*****************************************************************/
 	static bool EncodingOperations::Decode(const NullSpace::HapticFiles::Tracking* tracking) {
 		return tracking->enable();
+	}
+	static JsonSequenceAtom EncodingOperations::Decode(const NullSpace::HapticFiles::HapticEffect* effect) {
+		return JsonSequenceAtom(effect->time(), effect->effect()->str(), effect->strength(), effect->duration(), effect->repeat());
+	}
+	static std::vector<JsonSequenceAtom> EncodingOperations::Decode(const NullSpace::HapticFiles::Sequence* sequence) {
+		std::vector<JsonSequenceAtom> atoms;
+		atoms.reserve(sequence->items()->size());
+		auto seqs = sequence->items();
+		for (const auto& e : *seqs) {
+			atoms.push_back(Decode(e));
+		}
+		return atoms;
 	}
 	/*
 	static std::vector<HapticEffect> EncodingOperations::Decode(const NullSpace::HapticFiles::Sequence* sequence)

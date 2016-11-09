@@ -22,7 +22,7 @@ int PatternArgs::GetCombinedHash() const
 	return s;
 }
 
-SequenceArgs::SequenceArgs(const std::string& name, std::string loc) : Location(loc), Name(name)
+SequenceArgs::SequenceArgs(const std::string& name, Area loc) : Location(loc), Name(name)
 {
 }
 

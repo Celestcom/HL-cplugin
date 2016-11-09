@@ -1,13 +1,14 @@
 #pragma once
 #include <vector>
 #include "IJsonSerializable.h"
+typedef unsigned int Area;
+
 template<typename T>
 struct TimeIndex {
 	float Time;
 	T Haptic;
 	TimeIndex(float time, T haptic) :Time(time), Haptic(haptic) {};
 };
-typedef std::string Area;
 class JsonSequenceAtom : public IJsonSerializable {
 public:
 	float Time;
@@ -15,6 +16,8 @@ public:
 	float Strength;
 	float Duration;
 	int Repeat;
+	JsonSequenceAtom() = default;
+	JsonSequenceAtom(float t, std::string e, float s, float d, int r) :Time(t), Effect(e), Strength(s), Duration(d), Repeat(r) {};
 	void Deserialize(const Json::Value& root);
 	void Serialize(const Json::Value& root);
 };

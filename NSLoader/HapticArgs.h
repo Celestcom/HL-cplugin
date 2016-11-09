@@ -2,6 +2,7 @@
 #include "Enums.h"
 #include <string>
 
+typedef unsigned int Area;
 
 inline void hash_combine(std::size_t& seed) { }
 
@@ -42,9 +43,9 @@ public:
 class SequenceArgs : public HapticArgs
 {
 public:
-	SequenceArgs(const std::string& name, std::string loc);
+	SequenceArgs(const std::string& name, Area loc);
 	~SequenceArgs();
-	std::string Location;
+	Area Location;
 	std::string Name;
 	int GetCombinedHash() const override;
 	std::string ToString() const override {
