@@ -32,6 +32,16 @@ int TestClass::PollStatus()
 	return _suitStatus;
 }
 
+unsigned int TestClass::GenHandle()
+{
+	return _currentHandleId++;
+}
+
+bool TestClass::LoadSequence(LPSTR param)
+{
+	return _resolver.Load(SequenceFileInfo(std::string(param)));
+}
+
 bool TestClass::Poll() {
 	return _wire.Receive(_suitStatus, _tracking);
 }
@@ -56,19 +66,19 @@ int TestClass::PlayExperience(LPSTR param, Side side)
 {
 	auto name = std::string(param);
 	if (_resolver.Load(ExperienceFileInfo(name))) {
-		auto res = _resolver.ResolveSample(name, side);
+		auto res = _resolver.ResolveExperience(name, side);
 		_wire.Send(_wire.Encoder->Encode(res), name + Locator::getTranslator().ToString(side));
 	}
 	return 0;
 }
 //TODO: wrap with exception handling incase flatbuffers fails/file fails to load/etc
 
-int TestClass::PlaySequence(LPSTR param, Location loc)
+int TestClass::PlaySequence(unsigned int handle, LPSTR param, Location loc)
 {
 	auto name = std::string(param);
 	if (_resolver.Load(SequenceFileInfo(name))) {
 		auto res = _resolver.ResolveSequence(name, "test");
-		_wire.Send(_wire.Encoder->Encode(res), res.Name());
+		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
 	}
 	return 0;
 }
@@ -83,4 +93,9 @@ void TestClass::SetTrackingEnabled(bool wantTracking)
 {
 	_wire.Send(_wire.Encoder->Encode(wantTracking));
 
+}
+
+void TestClass::HandleCommand(unsigned int handle, short c)
+{
+	_wire.Send(_wire.Encoder->Encode(NullSpaceDLL::HandleCommand(handle, c)));
 }

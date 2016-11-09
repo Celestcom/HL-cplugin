@@ -63,7 +63,7 @@ PackedPattern DependencyResolver::ResolvePattern(const std::string& name, Side s
 	return _patternResolver->Resolve(PatternArgs(name, side));
 }
 
-std::vector<HapticSample> DependencyResolver::ResolveSample(const std::string& name, Side side) const
+PackedExperience DependencyResolver::ResolveExperience(const std::string& name, Side side) const
 {
 	return _experienceResolver->Resolve(ExperienceArgs(name, side));
 }
@@ -145,47 +145,6 @@ PackedPattern PatternResolver::Resolve(PatternArgs args)
 	return packedPattern;
 }
 
-HapticFrame PatternResolver::transformFrameToHapticFrame(const Frame& frame, Side side) const
-{
-	std::vector<HapticSequence> sequences;
-	for (auto inputSequence : frame.FrameSet)
-	{
-		Side actualSide = ComputeSidePrecedence(Locator::getTranslator().ToSide(inputSequence.Side, Side::NotSpecified), side);
-		const std::string& name = inputSequence.Sequence;
-		JsonLocation location = Locator::getTranslator().ToJsonLocation(inputSequence.Location);
-
-		switch (actualSide)
-		{
-		case Side::Inherit:
-			//should not ever happen. Call NullSpace!
-			std::cout << "(Error: impossible) Please email casey@nullspacevr.com if you see this message" << "\n";
-			break;
-		case Side::Mirror:
-			{
-				//auto left = _seqResolver->Resolve(
-				//	SequenceArgs(name, DependencyResolver::ComputeLocationSide(location, Side::Left))
-				//);
-			//	sequences.push_back(HapticSequence(left));
-			//	auto right = _seqResolver->Resolve(
-				//	SequenceArgs(name, DependencyResolver::ComputeLocationSide(location, Side::Right))
-				//);
-			//	sequences.push_back(HapticSequence(right));
-			}
-			break;
-		default:
-			{
-				//auto specific = _seqResolver->Resolve(
-				//	SequenceArgs(name, DependencyResolver::ComputeLocationSide(location, actualSide))
-				//);
-			//	sequences.push_back(HapticSequence(specific));
-			}
-			break;
-		}
-	}
-
-	return HapticFrame(frame.Time, sequences);
-	
-}
 
 Side PatternResolver::ComputeSidePrecedence(Side inputSide, Side programmaticSide)
 {
@@ -209,7 +168,7 @@ ExperienceResolver::~ExperienceResolver()
 {
 }
 
-vector<HapticSample> ExperienceResolver::Resolve(ExperienceArgs args)
+PackedExperience ExperienceResolver::Resolve(ExperienceArgs args)
 {
 	//if (_loadedFiles.find(args.Name) != _loadedFiles.end())
 	//{
@@ -221,31 +180,13 @@ vector<HapticSample> ExperienceResolver::Resolve(ExperienceArgs args)
 		return _cache.Get(args);
 	}
 
-	std::vector<HapticSample> outSamples;
-	for (auto moment : _experienceLoader->GetLoadedResource(args.Name))
-	{
-		outSamples.push_back(transformMomentToHapticSample(moment, args.Side));
+	std::vector<TimeIndex<PackedPattern>> patterns;
+	auto moment = _experienceLoader->GetLoadedResource(args.Name);
+	for (auto pat : moment) {
+		patterns.push_back(TimeIndex<PackedPattern>(pat.Time, _patResolver->Resolve(PatternArgs(pat.Name, pat.Side))));
 	}
+	auto packedExp = PackedExperience(args.Name, patterns);
 
-	_cache.Cache(args, outSamples);
-	return outSamples;
-}
-
-HapticSample ExperienceResolver::transformMomentToHapticSample(Moment moment, Side side) const
-{
-	//todo: step through this
-
-	if (moment.Side != Side::NotSpecified && moment.Side != Side::Inherit)
-	{
-		//then resolve the pattern using that file-defined side.
-		//return HapticSample(moment.Time, _patResolver->Resolve(PatternArgs(moment.Name, moment.Side)), 1);
-	}
-	else
-	{
-		//else, use the programmatic side given at runtime by the programmer
-		//return HapticSample(moment.Time, _patResolver->Resolve(PatternArgs(moment.Name, side)), 1);
-	}
-	//todo: fix
-	return HapticSample(1, std::vector<HapticFrame>(), 1);
-
+	_cache.Cache(args, packedExp);
+	return packedExp;
 }

@@ -189,29 +189,7 @@ vector<Moment> ExperienceLoader::GetLoadedResource(const std::string & key)
 
 void ExperienceLoader::loadExperience(std::string id, path path)
 {
-	vector<Sample> unprocessedSamples = _parser->ParseExperience(path);
-	vector<Moment> processedSamples;
-	processedSamples.reserve(unprocessedSamples.size());
-
-	for (const auto sample : unprocessedSamples)
-	{
-		std::string patternName = sample.Pattern;
-		PatternFileInfo patInfo(patternName);
-		_patternLoader->Load(patInfo);
-		Side sideEnum = Locator::getTranslator().ToSide(sample.Side);
-		processedSamples.push_back(Moment(patternName, sample.Time, sideEnum));
-		if (sample.Repeat > 0)
-		{
-			float offset = 0.1f + getLatestTime(patternName);
-			for (std::size_t repetition = 1; repetition < sample.Repeat; ++repetition)
-			{
-				processedSamples.push_back(Moment(patternName, sample.Time + offset * repetition, sideEnum));
-			}
-		}
-	}
-
-	_experiences[id] = processedSamples;
-
+	//todo: implement
 
 }
 

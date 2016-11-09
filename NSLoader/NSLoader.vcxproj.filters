@@ -84,6 +84,9 @@
     <ClInclude Include="Wire\EncodingOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Wire\IntermediateHapticFormats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -132,6 +135,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EnumTranslator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Wire\IntermediateHapticFormats.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

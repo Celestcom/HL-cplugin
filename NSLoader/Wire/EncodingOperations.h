@@ -9,8 +9,7 @@
 #include "EnginePacket_generated.h"
 #include "SuitStatusUpdate_generated.h"
 #include "TrackingUpdate_generated.h"
-#include "HapticClasses.h"
-
+#include "IntermediateHapticFormats.h"
 
 
 struct Quaternion {
@@ -27,27 +26,7 @@ struct Quaternion {
 	}
 };
 
-typedef std::function<void(uint8_t*, int)> DataCallback;
 
-template<typename Seq, typename Pat, typename Exp, typename ImuOffset, typename ClientStatus, typename SuitStatus, typename TrackOffset>
-class IEncoder {
-public:
-	virtual Pat Encode(const PackedPattern& input) = 0;
-	virtual Seq Encode(const PackedSequence& input) = 0;
-	virtual Exp Encode(const std::vector<HapticSample>& input) = 0;
-	virtual ImuOffset Encode(bool inpu) = 0;
-	virtual TrackOffset Encode(const Quaternion& input) = 0;
-	virtual ClientStatus Encode(NullSpace::Communication::Status status) = 0;
-	virtual SuitStatus Encode(NullSpace::Communication::SuitStatus status) = 0;
-
-	virtual void Finalize(TrackOffset, DataCallback) = 0;
-	virtual void Finalize(Pat, std::string, DataCallback) = 0;
-	virtual void Finalize(Seq, std::string, DataCallback) = 0;
-	virtual void Finalize(Exp, std::string, DataCallback) = 0;
-	virtual void Finalize(ImuOffset, DataCallback) = 0;
-	virtual void Finalize(ClientStatus, DataCallback) = 0;
-	virtual void Finalize(SuitStatus, DataCallback) = 0;
-};
 
 
 namespace NullSpaceDLL {
@@ -64,7 +43,38 @@ namespace NullSpaceDLL {
 		Quaternion right_upper_arm;
 		Quaternion right_forearm;
 	};
+
+	struct HandleCommand {
+		unsigned int Handle;
+		NullSpace::HapticFiles::Command Command;
+		HandleCommand(unsigned int h, NullSpace::HapticFiles::Command c) :Handle(h), Command(c) {}
+		HandleCommand(unsigned int h, short c) : Handle(h), Command(NullSpace::HapticFiles::Command(c)) {}
+	};
 }
+
+typedef std::function<void(uint8_t*, int)> DataCallback;
+
+template<typename Seq, typename Pat, typename Exp, typename ImuOffset, typename ClientStatus, typename SuitStatus, typename TrackOffset, typename HandleCommandOffset>
+class IEncoder {
+public:
+	virtual Pat Encode(const PackedPattern& input) = 0;
+	virtual Seq Encode(const PackedSequence& input) = 0;
+	virtual Exp Encode(const PackedExperience& input) = 0;
+	virtual ImuOffset Encode(bool inpu) = 0;
+	virtual TrackOffset Encode(const Quaternion& input) = 0;
+	virtual ClientStatus Encode(NullSpace::Communication::Status status) = 0;
+	virtual SuitStatus Encode(NullSpace::Communication::SuitStatus status) = 0;
+	virtual HandleCommandOffset Encode(NullSpaceDLL::HandleCommand h) = 0;
+
+	virtual void Finalize(HandleCommandOffset, std::string, DataCallback) = 0;
+	virtual void Finalize(TrackOffset, DataCallback) = 0;
+	virtual void Finalize(Pat, std::string, DataCallback) = 0;
+	virtual void Finalize(unsigned int handle, Seq, std::string, DataCallback) = 0;
+	virtual void Finalize(Exp, std::string, DataCallback) = 0;
+	virtual void Finalize(ImuOffset, DataCallback) = 0;
+	virtual void Finalize(ClientStatus, DataCallback) = 0;
+	virtual void Finalize(SuitStatus, DataCallback) = 0;
+};
 
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::Sequence> SeqOffset;
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::Pattern> PatOffset;
@@ -73,8 +83,8 @@ typedef struct flatbuffers::Offset<NullSpace::Communication::TrackingUpdate> Tra
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::Tracking> ImuOffset;
 typedef struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate> StatusOffset;
 typedef struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate> ClientOffset;
-
-class EncodingOperations : public IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset>
+typedef struct flatbuffers::Offset<NullSpace::HapticFiles::HandleCommand> HandleCommandOffset;
+class EncodingOperations : public IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset>
 {
 private:
 	flatbuffers::FlatBufferBuilder _builder;
@@ -93,17 +103,21 @@ public:
 	
 	/* Encoding */
 	/*****************************************************************/
+	HandleCommandOffset EncodingOperations::Encode(NullSpaceDLL::HandleCommand h) {
+		return NullSpace::HapticFiles::CreateHandleCommand(_builder, h.Handle, h.Command);
+	}
 	TrackOffset EncodingOperations::Encode(const Quaternion& input) {
 		//todo: check if this stack variable is copied by flatbuffers
 		auto q = NullSpace::Communication::Quaternion(input.x, input.y, input.z, input.w);
 		return NullSpace::Communication::CreateTrackingUpdate(_builder, &q);
 	}
-	ExpOffset EncodingOperations::Encode(const std::vector<HapticSample>& input) {
+	ExpOffset EncodingOperations::Encode(const PackedExperience& input) {
 		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticSample>> sample_vector;
-		sample_vector.reserve(input.size());
-		for (auto const &e : input) {
-			//auto sample = NullSpace::HapticFiles::CreateHapticSample(_builder, this->Encode(e.Frames), e.Priority, e.Time);
-			//sample_vector.push_back(sample);
+		sample_vector.reserve(input.JsonAtoms().size());
+		for (auto const &e : input.JsonAtoms()) {
+			auto pat = NullSpace::HapticFiles::CreateHapticSample(_builder, e.Time, Encode(e.Haptic));
+			
+			sample_vector.push_back(pat);
 		}
 		auto samples = _builder.CreateVector(sample_vector);
 		return NullSpace::HapticFiles::CreateExperience(_builder, samples);
@@ -176,7 +190,9 @@ public:
 		}
 		_builder.Clear();
 	}
-
+	void EncodingOperations::Finalize(HandleCommandOffset input, std::string name, DataCallback callback) {
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("handle"), NullSpace::HapticFiles::FileType::FileType_HandleCommand, input.Union());
+	}
 	void EncodingOperations::Finalize(ImuOffset input, DataCallback callback) {
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("tracking"), NullSpace::HapticFiles::FileType::FileType_Tracking, input.Union());
 		_finalize(packet, callback);
@@ -190,10 +206,11 @@ public:
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Pattern, input.Union());
 		_finalize(packet, callback);
 	}
-	void EncodingOperations::Finalize(SeqOffset input, std::string name, DataCallback callback)
+	void EncodingOperations::Finalize(unsigned int handle, SeqOffset input, std::string name, DataCallback callback)
 	{
 
-		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name) , NullSpace::HapticFiles::FileType_Sequence, input.Union());
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(
+			_builder, _builder.CreateString(name) , NullSpace::HapticFiles::FileType_Sequence, input.Union(), handle);
 		_finalize(packet, callback);
 	}
 	/*
@@ -219,6 +236,7 @@ public:
 	static bool EncodingOperations::Decode(const NullSpace::HapticFiles::Tracking* tracking) {
 		return tracking->enable();
 	}
+	/*
 	static std::vector<HapticEffect> EncodingOperations::Decode(const NullSpace::HapticFiles::Sequence* sequence)
 	{
 		std::vector<HapticEffect> effects;
@@ -231,6 +249,8 @@ public:
 
 		return effects;
 	}
+	*/
+	/*
 	static std::vector<HapticFrame> EncodingOperations::Decode(const NullSpace::HapticFiles::Pattern* pattern)
 	{
 		std::vector<HapticFrame> frames;
@@ -255,7 +275,7 @@ public:
 		samples.reserve(items->size());
 
 		for (const auto& sample : *items) {
-			samples.push_back(HapticSample(sample->time(), Decode(sample->frames()), sample->priority()));
+		//	samples.push_back(HapticSample(sample->time(), Decode(sample->frames()), sample->priority()));
 
 		}
 		return samples;
@@ -264,6 +284,7 @@ public:
 		return HapticEffect(Effect(0), Location(0), effect->duration(), effect->time(), 0);
 		
 	}
+	*/
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();
 	}

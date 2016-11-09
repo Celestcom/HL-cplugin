@@ -119,8 +119,9 @@ std::vector<JsonPatternAtom> Parser::ParsePattern(boost::filesystem::path path)
 	return outAtoms;
 }
 
-std::vector<Sample> Parser::ParseExperience(boost::filesystem::path path)
+std::vector<JsonPatternAtom> Parser::ParseExperience(boost::filesystem::path path)
 {
+	/*
 	std::vector<Sample> outSamples;
 	//check if exists
 	Json::Value root;
@@ -130,96 +131,14 @@ std::vector<Sample> Parser::ParseExperience(boost::filesystem::path path)
 	{
 		for (auto x : root["experience"])
 		{
-			Sample s;
-			s.Deserialize(x);
-			outSamples.push_back(s);
+			//todo:implement
+		//	Sample s;
+			//s.Deserialize(x);
+			//outSamples.push_back(s);
 		}
 	}
 	return outSamples;
-	
-}
-
-void JsonSequenceAtom::Serialize(const Json::Value& root) {
-
-}
-
-void JsonSequenceAtom::Deserialize(const Json::Value& root) {
-	this->Time = root.get("time", 0.0f).asFloat();
-	this->Effect = root.get("effect", "INVALID_EFFECT").asString();
-	this->Strength = root.get("strength", 1.0).asFloat();
-	this->Duration = root.get("duration", 0.0f).asFloat();
-	this->Repeat = root.get("repeat", 1).asInt();
-	
-}
-
-
-
-void JEffect::Serialize(const Json::Value& root) {
-
-}
-
-void JEffect::Deserialize(const Json::Value& root) {
-	this->Location = root.get("location", "INVALID_LOCATION").asString();
-	this->Sequence = root.get("sequence", "INVALID_SEQUENCE").asString();
-	this->Side = root.get("side", "INVALID_SIDE").asString();
-
-}
-
-void Frame::Serialize(const Json::Value& root) {
-
-}
-
-void Frame::Deserialize(const Json::Value& root) {
-	this->Time = root.get("time", 0.0f).asFloat();
-	Json::Value frames = root["frame"];
-	if (frames.isArray()) {
-		for (auto effect : frames) {
-			JEffect e;
-			e.Deserialize(effect);
-			this->FrameSet.push_back(e);
-		}
-	}
-}
-
-void Pattern::Serialize(const Json::Value& root) {
-
-}
-
-Sample::Sample()
-{
-}
-
-Sample::~Sample()
-{
-}
-
-void Sample::Deserialize(const Json::Value& root)
-{
-	Side = root.get("side", "INVALID_SIDE").asString();
-	Pattern = root.get("pattern", "INVALID_PATTERN").asString();
-	Time = root.get("time", 0.0).asFloat();
-	Repeat = root.get("repeat", 0).asUInt();
-}
-
-void Sample::Serialize(const Json::Value& root)
-{
-}
-
-void Pattern::Deserialize(const Json::Value& root) {
-	Json::Value frames = root["pattern"];
-	if (frames.isArray()) {
-		for (auto frame : frames) {
-			Frame f;
-			f.Deserialize(frame);
-			this->Frames.push_back(f);
-		}
-	}
-}
-
-void JsonPatternAtom::Deserialize(const Json::Value & root)
-{
-	this->Time = root.get("time", 0.0).asFloat();
-	this->Sequence = root.get("sequence", "UNKNOWN_SEQUENCE").asString();
-	this->Area = root.get("area", "UNKNOWN_AREA").asString();
+	*/
+	return std::vector<JsonPatternAtom>();
 	
 }

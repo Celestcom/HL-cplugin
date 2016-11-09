@@ -16,7 +16,9 @@
 #include "HapticClasses.h"
 #include "EncodingOperations.h"
 
-typedef IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset> FlatbuffEncoder;
+
+
+typedef IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset> FlatbuffEncoder;
 class Wire
 {
 public:
@@ -40,10 +42,14 @@ public:
 		Encoder->Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 
-	void Wire::Send( SeqOffset& input, std::string name)
+	void Wire::Send( SeqOffset& input, std::string name, unsigned int handle)
 	{
 	
-		Encoder->Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+		Encoder->Finalize(handle, input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+	}
+
+	void Wire::Send(HandleCommandOffset& input) {
+		Encoder->Finalize(input, "whatever", boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 	/*
 	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect> input) {

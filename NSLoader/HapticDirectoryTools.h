@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include "boost/filesystem.hpp"
 #include "json/json.h"
-#include "IJsonSerializable.h"
+#include "Wire\IJsonSerializable.h"
 
 namespace HapticDirectoryTools {
 

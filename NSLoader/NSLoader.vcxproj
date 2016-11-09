@@ -184,6 +184,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TestClass.h" />
     <ClInclude Include="Wire\EncodingOperations.h" />
+    <ClInclude Include="Wire\IntermediateHapticFormats.h" />
     <ClInclude Include="Wire\Wire.h" />
     <ClInclude Include="zmq.hpp" />
   </ItemGroup>
@@ -222,6 +223,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TestClass.cpp" />
+    <ClCompile Include="Wire\IntermediateHapticFormats.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
