@@ -4,6 +4,7 @@
 
 
 enum class AreaFlag  : uint32_t {
+	None = 0,
 	Forearm_Left = 1 << 0,
 	Upper_Arm_Left = 1 << 1,
 	Shoulder_Left = 1 << 2,
@@ -20,10 +21,17 @@ enum class AreaFlag  : uint32_t {
 	Chest_Right = 1 << 20,
 	Upper_Ab_Right = 1 << 21,
 	Mid_Ab_Right = 1 << 22,
-	Lower_Ab_Right = 1 << 23
+	Lower_Ab_Right = 1 << 23,
+	Left_All = 0x000000FF,
+	Right_All = 0x00FF0000,
+	All_Areas = Left_All | Right_All
 };
 
-
+inline AreaFlag& operator|=(AreaFlag& a, const AreaFlag b)
+{
+	a = static_cast<AreaFlag>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
+	return a;
+}
 
 template<typename T>
 struct TimeIndex {

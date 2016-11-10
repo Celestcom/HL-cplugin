@@ -3,12 +3,14 @@
 #include "Enums.h"
 #include <boost/bimap.hpp>
 #include <boost/bimap/unordered_set_of.hpp>
+#include "Wire\IntermediateHapticFormats.h"
 using namespace boost::bimaps;
 
 typedef bimap<Effect, std::string> EffectMap;
 typedef bimap<Location, std::string> LocationMap;
 typedef bimap<Side, std::string> SideMap;
 typedef bimap<JsonLocation, std::string> JsonLocationMap;
+typedef bimap<AreaFlag, std::string> AreaMap;
 
 class EnumTranslator
 {
@@ -32,12 +34,19 @@ public:
 	std::string ToString(JsonLocation jsonLoc) const;
 	JsonLocation ToJsonLocation(std::string jsonLoc) const;
 	JsonLocation ToJsonLocation(std::string jsonLoc, JsonLocation defaultLocation);
+	AreaFlag ToArea(std::string area, AreaFlag default) const;
+
+	AreaFlag ToArea(std::string area) const;
+	std::string ToString(AreaFlag area) const;
 private:
 	
 	void init_locations();
 	void init_effects();
 	void init_sides();
 	void init_json_locations();
+	void init_areas();
+
+	AreaMap _areaMap;
 	EffectMap _effectMap;
 	LocationMap _locationMap;
 	SideMap _sideMap;

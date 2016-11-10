@@ -3,7 +3,7 @@
 #include "Locator.h"
 #include <iostream>
 #include "HapticFileInfo.h"
-
+#include "AreaParser.h"
 class HapticsNotLoadedException : public std::runtime_error {
 public:
 	HapticsNotLoadedException(const HapticArgs& args) : std::runtime_error(std::string("Attempted to resolve " + args.ToString() + ", but it was not loaded so failed.").c_str()) {}
@@ -58,9 +58,10 @@ PackedSequence DependencyResolver::ResolveSequence(const std::string & name, Are
 	return _sequenceResolver->Resolve(SequenceArgs(name, location));
 }
 
-PackedPattern DependencyResolver::ResolvePattern(const std::string& name, Side side) const
+PackedPattern DependencyResolver::ResolvePattern(const std::string& name) const
 {
-	return _patternResolver->Resolve(PatternArgs(name, side));
+	//Todo: replace side with ops
+	return _patternResolver->Resolve(PatternArgs(name, Side::NotSpecified));
 }
 
 PackedExperience DependencyResolver::ResolveExperience(const std::string& name, Side side) const
@@ -122,10 +123,6 @@ PatternResolver::~PatternResolver()
 
 PackedPattern PatternResolver::Resolve(PatternArgs args)
 {
-	////if (_loadedFiles.find(args.Name) != _loadedFiles.end())
-	//{
-	//	throw HapticsNotLoadedException(args);
-//	}
 
 	if (_cache.Contains(args))
 	{
@@ -137,8 +134,10 @@ PackedPattern PatternResolver::Resolve(PatternArgs args)
 	seqs.reserve(jsonpat.JsonAtoms().size());
 
 	for (auto seq : jsonpat.JsonAtoms()) {
-		//TODO: REPLACE seq.Sequence, 1  with the ACTUAL AREA FROM TRANSLATOR!
-		seqs.push_back(TimeIndex<PackedSequence>(seq.Time, _seqResolver->Resolve(SequenceArgs(seq.Sequence, AreaFlag::Back_Left))));
+		auto parsedArea = AreaParser(seq.Area).GetArea();
+		seqs.push_back(TimeIndex<PackedSequence>(
+			seq.Time, 
+			_seqResolver->Resolve(SequenceArgs(seq.Sequence, parsedArea))));
 	}
 	auto packedPattern = PackedPattern(args.Name, seqs);
 	_cache.Cache(args, packedPattern);

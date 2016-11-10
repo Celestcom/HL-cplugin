@@ -11,7 +11,6 @@
 #include "TrackingUpdate_generated.h"
 #include "IntermediateHapticFormats.h"
 
-
 struct Quaternion {
 	float w;
 	float x;
@@ -250,6 +249,7 @@ public:
 		return atoms;
 	}
 
+	
 	static NullSpaceDLL::HandleCommand EncodingOperations::Decode(const NullSpace::HapticFiles::HandleCommand* command) {
 		return NullSpaceDLL::HandleCommand(command->handle(), command->command());
 	}
@@ -269,7 +269,7 @@ public:
 		return effects;
 	}
 	*/
-	/*
+	
 	static std::vector<HapticFrame> EncodingOperations::Decode(const NullSpace::HapticFiles::Pattern* pattern)
 	{
 		std::vector<HapticFrame> frames;
@@ -277,17 +277,15 @@ public:
 		frames.reserve(items->size());
 
 		for (const auto& frame : *items) {
-			std::vector<HapticSequence> seqs;
-			//seqs.reserve(frame->frame()->size());
-			//for (const auto& seq : *frame->frame()) {
-			//	auto s = Decode(seq);
-			//	seqs.push_back(s);
-			//}
-		//	frames.push_back(HapticFrame(frame->time(), seqs, frame->priority()));
+			
+			auto seq = Decode(frame->sequence());
+			
+			frames.push_back(HapticFrame(frame->time(), seq, AreaFlag(frame->area()), 1));
 		}
 
 		return frames;
 	}
+	/*
 	static std::vector<HapticSample> EncodingOperations::Decode(const NullSpace::HapticFiles::Experience* experience) {
 		std::vector<HapticSample> samples;
 		auto items = experience->items();

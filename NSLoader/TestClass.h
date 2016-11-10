@@ -25,11 +25,14 @@ public:
 	bool Poll();
 	int PollStatus();
 	unsigned int GenHandle();
-	bool LoadSequence(LPSTR param);
 	void PollTracking(NullSpaceDLL::TrackingUpdate& q);
-	int PlayPattern(LPSTR param, Side side);
-	int PlayExperience(LPSTR param, Side side);
-	int CreateSequence(unsigned int handle, LPSTR param, uint32_t loc);
+
+	bool LoadSequence(LPSTR param);
+	int CreateSequence(uint32_t handle, LPSTR param, uint32_t loc);
+
+	bool LoadPattern(LPSTR param);
+	int CreatePattern(uint32_t handle, LPSTR param);
+
 	int PlayEffect(Effect e, Location loc, float duration, float time, unsigned int priority);
 	void SetTrackingEnabled(bool wantTracking);
 	void HandleCommand(unsigned int handle, short c);

@@ -164,6 +164,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AreaParser.h" />
     <ClInclude Include="DependencyResolver.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="EnumTranslator.h" />
@@ -189,6 +190,7 @@
     <ClInclude Include="zmq.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AreaParser.cpp" />
     <ClCompile Include="DependencyResolver.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>

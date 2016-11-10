@@ -37,12 +37,12 @@ public:
 		Encoder->Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 	
-	void Wire::Send( PatOffset& input, std::string name)
+	void Wire::Send( PatOffset& input, std::string name, uint32_t handle)
 	{
 		Encoder->Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 
-	void Wire::Send( SeqOffset& input, std::string name, unsigned int handle)
+	void Wire::Send( SeqOffset& input, std::string name, uint32_t handle)
 	{
 	
 		Encoder->Finalize(handle, input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));

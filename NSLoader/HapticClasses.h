@@ -2,11 +2,10 @@
 #include "Enums.h"
 #include <vector>
 #include "ITimeOffset.h"
-
+#include "Wire\IntermediateHapticFormats.h"
 class HapticEffect :public ITimeOffset {
 public:
 	HapticEffect(Effect effect, Location loc, float duration, float time, unsigned int priority);
-	HapticEffect();
 	~HapticEffect();
 	Effect Effect;
 	Location Location;
@@ -28,13 +27,14 @@ public:
 class HapticFrame : public ITimeOffset
 {
 public:
-	HapticFrame(float time, std::vector<HapticSequence> frame, unsigned int priority = 1);
+	HapticFrame(float time, std::vector<JsonSequenceAtom> frame, AreaFlag area, unsigned int priority = 1);
 	~HapticFrame();
 	float Time;
+	AreaFlag Area;
 	float GetTime() override;
 	float OriginalTime;
 	unsigned int Priority;
-	std::vector<HapticSequence> Frame;
+	std::vector<JsonSequenceAtom> Frame;
 };
 
 class HapticSample : public ITimeOffset
