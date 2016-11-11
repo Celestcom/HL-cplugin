@@ -32,7 +32,7 @@ int TestClass::PollStatus()
 	return _suitStatus;
 }
 
-unsigned int TestClass::GenHandle()
+uint32_t TestClass::GenHandle()
 {
 	return _currentHandleId++;
 }

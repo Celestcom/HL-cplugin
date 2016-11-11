@@ -67,8 +67,8 @@ public:
 
 	virtual void Finalize(HandleCommandOffset, std::string, DataCallback) = 0;
 	virtual void Finalize(TrackOffset, DataCallback) = 0;
-	virtual void Finalize(Pat, std::string, DataCallback) = 0;
-	virtual void Finalize(unsigned int handle, Seq, std::string, DataCallback) = 0;
+	virtual void Finalize(uint32_t handle, Pat, std::string, DataCallback) = 0;
+	virtual void Finalize(uint32_t handle, Seq, std::string, DataCallback) = 0;
 	virtual void Finalize(Exp, std::string, DataCallback) = 0;
 	virtual void Finalize(ImuOffset, DataCallback) = 0;
 	virtual void Finalize(ClientStatus, DataCallback) = 0;
@@ -201,12 +201,12 @@ public:
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Experience, input.Union());
 		_finalize(packet, callback);
 	}	
-	void EncodingOperations::Finalize(PatOffset input, std::string name, DataCallback callback)
+	void EncodingOperations::Finalize(uint32_t handle, PatOffset input, std::string name, DataCallback callback)
 	{
-		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Pattern, input.Union());
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Pattern, input.Union(), handle);
 		_finalize(packet, callback);
 	}
-	void EncodingOperations::Finalize(unsigned int handle, SeqOffset input, std::string name, DataCallback callback)
+	void EncodingOperations::Finalize(uint32_t handle, SeqOffset input, std::string name, DataCallback callback)
 	{
 
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(

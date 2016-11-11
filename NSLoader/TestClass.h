@@ -16,7 +16,7 @@ private:
 	Wire _wire;
 	NullSpace::Communication::SuitStatus _suitStatus;
 	NullSpaceDLL::TrackingUpdate _tracking;
-	unsigned int _currentHandleId;
+	uint32_t _currentHandleId;
 public:
 	
 
@@ -24,7 +24,7 @@ public:
 	~TestClass();
 	bool Poll();
 	int PollStatus();
-	unsigned int GenHandle();
+	uint32_t GenHandle();
 	void PollTracking(NullSpaceDLL::TrackingUpdate& q);
 
 	bool LoadSequence(LPSTR param);

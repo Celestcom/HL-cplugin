@@ -39,7 +39,7 @@ public:
 	
 	void Wire::Send( PatOffset& input, std::string name, uint32_t handle)
 	{
-		Encoder->Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+		Encoder->Finalize(handle, input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 
 	void Wire::Send( SeqOffset& input, std::string name, uint32_t handle)

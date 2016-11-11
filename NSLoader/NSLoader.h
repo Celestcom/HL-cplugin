@@ -13,7 +13,7 @@
 
 extern "C" {
 	NSLOADER_API TestClass* __stdcall NSVR_Create(LPSTR str) { return new TestClass(str); }
-	NSLOADER_API unsigned int __stdcall NSVR_GenHandle(TestClass* ptr) { return ptr->GenHandle(); }
+	NSLOADER_API uint32_t __stdcall NSVR_GenHandle(TestClass* ptr) { return ptr->GenHandle(); }
 	NSLOADER_API int __stdcall NSVR_PollStatus(TestClass* ptr) { return ptr->PollStatus(); }
 	NSLOADER_API void __stdcall NSVR_PollTracking(TestClass* ptr, NullSpaceDLL::TrackingUpdate& q) { ptr->PollTracking(q); }
 	NSLOADER_API void __stdcall NSVR_Delete(TestClass* ptr) { delete ptr; }
