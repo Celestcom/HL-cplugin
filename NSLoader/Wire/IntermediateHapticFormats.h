@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "IJsonSerializable.h"
-
+#include <algorithm>
 
 enum class AreaFlag  : uint32_t {
 	None = 0,
@@ -33,6 +33,8 @@ inline AreaFlag& operator|=(AreaFlag& a, const AreaFlag b)
 	return a;
 }
 
+
+
 template<typename T>
 struct TimeIndex {
 	float Time;
@@ -63,7 +65,22 @@ private:
 };
 
 
+class HapticFrame 
+{
+public:
+	HapticFrame(float time, std::vector<JsonSequenceAtom> frame, AreaFlag area, unsigned int priority = 1);
+	~HapticFrame();
+	float Time;
+	float OriginalTime;
+	AreaFlag Area;
+	unsigned int Priority;
+	std::vector<JsonSequenceAtom> Frame;
 
+};
+
+float GetTotalPlayTime(const std::vector<JsonSequenceAtom>& atoms);
+
+float GetTotalPlayTime(const std::vector<HapticFrame>& frames);
 class JsonPatternAtom : public IJsonSerializable {
 public:
 	float Time;

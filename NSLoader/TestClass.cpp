@@ -12,11 +12,15 @@
 #include "HapticPacket_generated.h"
 
 
-TestClass::TestClass(LPSTR param) : _resolver(std::string(param)), _wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453")
+TestClass::TestClass(LPSTR param) : _resolver(std::make_unique<DependencyResolver>(std::string(param))), _wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453")
 {
 
 
 
+}
+
+TestClass::TestClass():_wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453")
+{
 }
 
 
@@ -39,19 +43,19 @@ uint32_t TestClass::GenHandle()
 
 bool TestClass::LoadSequence(LPSTR param)
 {
-	return _resolver.Load(SequenceFileInfo(std::string(param)));
+	return _resolver->Load(SequenceFileInfo(std::string(param)));
 }
 
 bool TestClass::LoadPattern(LPSTR param)
 {
-	return _resolver.Load(PatternFileInfo(std::string(param)));
+	return _resolver->Load(PatternFileInfo(std::string(param)));
 }
 
 int TestClass::CreatePattern(uint32_t handle, LPSTR param)
 {
 	auto name = std::string(param);
-	if (_resolver.Load(PatternFileInfo(name))) {
-		auto res = _resolver.ResolvePattern(name);
+	if (_resolver->Load(PatternFileInfo(name))) {
+		auto res = _resolver->ResolvePattern(name);
 		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
 	}
 	return 0;
@@ -73,8 +77,8 @@ void TestClass::PollTracking(NullSpaceDLL::TrackingUpdate& t) {
 int TestClass::CreateSequence(uint32_t handle, LPSTR param, uint32_t loc)
 {
 	auto name = std::string(param);
-	if (_resolver.Load(SequenceFileInfo(name))) {
-		auto res = _resolver.ResolveSequence(name, AreaFlag(loc));
+	if (_resolver->Load(SequenceFileInfo(name))) {
+		auto res = _resolver->ResolveSequence(name, AreaFlag(loc));
 		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
 	}
 	return 0;

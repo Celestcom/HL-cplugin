@@ -12,7 +12,7 @@
 class TestClass
 {
 private:
-	DependencyResolver _resolver;
+	std::unique_ptr<DependencyResolver> _resolver;
 	Wire _wire;
 	NullSpace::Communication::SuitStatus _suitStatus;
 	NullSpaceDLL::TrackingUpdate _tracking;
@@ -21,6 +21,7 @@ public:
 	
 
 	TestClass(LPSTR param);
+	TestClass();
 	~TestClass();
 	bool Poll();
 	int PollStatus();
