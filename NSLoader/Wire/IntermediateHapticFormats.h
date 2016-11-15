@@ -22,6 +22,16 @@ enum class AreaFlag  : uint32_t {
 	Upper_Ab_Right = 1 << 21,
 	Mid_Ab_Right = 1 << 22,
 	Lower_Ab_Right = 1 << 23,
+
+	Forearm_Both = Forearm_Left | Forearm_Right,
+	Upper_Arm_Both = Upper_Arm_Left | Upper_Arm_Right,
+	Shoulder_Both = Shoulder_Left | Shoulder_Right,
+	Back_Both = Back_Left | Back_Right,
+	Chest_Both = Chest_Left | Chest_Right,
+	Upper_Ab_Both = Upper_Ab_Left | Upper_Ab_Right,
+	Mid_Ab_Both = Mid_Ab_Left | Mid_Ab_Right,
+	Lower_Ab_Both = Mid_Ab_Left | Mid_Ab_Right,
+
 	Left_All = 0x000000FF,
 	Right_All = 0x00FF0000,
 	All_Areas = Left_All | Right_All
