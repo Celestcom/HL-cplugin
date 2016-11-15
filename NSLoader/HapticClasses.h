@@ -25,18 +25,6 @@ public:
 };
 
 
-class HapticSample : public ITimeOffset
-{
-public:
-	unsigned int Priority;
-	float Time;
-	float OriginalTime;
-	float GetTime() override;
-	std::vector<HapticFrame> Frames;
-	HapticSample(float time, std::vector<HapticFrame> frames, unsigned int priority);
-	~HapticSample();
-};
-
 class Moment : public ITimeOffset
 {
 public:
