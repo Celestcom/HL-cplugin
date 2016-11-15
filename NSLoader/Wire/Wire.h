@@ -15,7 +15,7 @@
 #include "SuitStatusUpdate_generated.h"
 #include "HapticClasses.h"
 #include "EncodingOperations.h"
-
+#include <mutex>
 
 
 typedef IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset> FlatbuffEncoder;
@@ -33,8 +33,8 @@ public:
 		sendTo(*_sendToEngineSocket, data, size);
 	}
 	/* Sending */
-	void Wire::Send(ExpOffset& input, std::string name) {
-		Encoder->Finalize(input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+	void Wire::Send(ExpOffset& input, std::string name, uint32_t handle) {
+		Encoder->Finalize(handle, input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 	
 	void Wire::Send( PatOffset& input, std::string name, uint32_t handle)
@@ -114,8 +114,10 @@ public:
 		//TODO: use different socket types, because we can't have multiple apps bind to the same tcp socket
 
 	}
-
+	void AquireEncodingLock() { _flatbufferMutex.lock(); }
+	void ReleaseEncodingLock() { _flatbufferMutex.unlock(); }
 private:
+	std::mutex _flatbufferMutex;
 	std::unique_ptr<zmq::socket_t> _sendToEngineSocket;
 	std::unique_ptr<zmq::socket_t> _receiveFromEngineSocket;
 	std::unique_ptr<zmq::context_t> _context;

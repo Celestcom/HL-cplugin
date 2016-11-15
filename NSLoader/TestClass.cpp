@@ -51,14 +51,35 @@ bool TestClass::LoadPattern(LPSTR param)
 	return _resolver->Load(PatternFileInfo(std::string(param)));
 }
 
-int TestClass::CreatePattern(uint32_t handle, LPSTR param)
+bool TestClass::CreatePattern(uint32_t handle, LPSTR param)
 {
 	auto name = std::string(param);
 	if (_resolver->Load(PatternFileInfo(name))) {
 		auto res = _resolver->ResolvePattern(name);
+		_wire.AquireEncodingLock();
 		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
+		_wire.ReleaseEncodingLock();
+		return true;
 	}
-	return 0;
+	return false;
+}
+
+bool TestClass::LoadExperience(LPSTR param)
+{
+	return _resolver->Load(ExperienceFileInfo(std::string(param)));
+}
+
+bool TestClass::CreateExperience(uint32_t handle, LPSTR param)
+{
+	auto name = std::string(param);
+	if (_resolver->Load(ExperienceFileInfo(name))) {
+		auto res = _resolver->ResolveExperience(name);
+		_wire.AquireEncodingLock();
+		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
+		_wire.ReleaseEncodingLock();
+		return true;
+	}
+	return false;
 }
 
 bool TestClass::Poll() {
@@ -74,14 +95,17 @@ void TestClass::PollTracking(NullSpaceDLL::TrackingUpdate& t) {
 
 //TODO: wrap with exception handling incase flatbuffers fails/file fails to load/etc
 
-int TestClass::CreateSequence(uint32_t handle, LPSTR param, uint32_t loc)
+bool TestClass::CreateSequence(uint32_t handle, LPSTR param, uint32_t loc)
 {
 	auto name = std::string(param);
 	if (_resolver->Load(SequenceFileInfo(name))) {
 		auto res = _resolver->ResolveSequence(name, AreaFlag(loc));
+		_wire.AquireEncodingLock();
 		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
+		_wire.ReleaseEncodingLock();
+		return true;
 	}
-	return 0;
+	return false;
 }
 
 int TestClass::PlayEffect(Effect e, Location loc, float duration, float time, unsigned int priority)
@@ -92,11 +116,15 @@ int TestClass::PlayEffect(Effect e, Location loc, float duration, float time, un
 
 void TestClass::SetTrackingEnabled(bool wantTracking)
 {
+	_wire.AquireEncodingLock();
 	_wire.Send(_wire.Encoder->Encode(wantTracking));
+	_wire.ReleaseEncodingLock();
 
 }
 
 void TestClass::HandleCommand(unsigned int handle, short c)
 {
+	_wire.AquireEncodingLock();
 	_wire.Send(_wire.Encoder->Encode(NullSpaceDLL::HandleCommand(handle, c)));
+	_wire.ReleaseEncodingLock();
 }

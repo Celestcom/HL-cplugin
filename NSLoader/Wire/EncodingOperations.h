@@ -69,7 +69,7 @@ public:
 	virtual void Finalize(TrackOffset, DataCallback) = 0;
 	virtual void Finalize(uint32_t handle, Pat, std::string, DataCallback) = 0;
 	virtual void Finalize(uint32_t handle, Seq, std::string, DataCallback) = 0;
-	virtual void Finalize(Exp, std::string, DataCallback) = 0;
+	virtual void Finalize(uint32_t handle, Exp, std::string, DataCallback) = 0;
 	virtual void Finalize(ImuOffset, DataCallback) = 0;
 	virtual void Finalize(ClientStatus, DataCallback) = 0;
 	virtual void Finalize(SuitStatus, DataCallback) = 0;
@@ -197,8 +197,8 @@ public:
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("tracking"), NullSpace::HapticFiles::FileType::FileType_Tracking, input.Union());
 		_finalize(packet, callback);
 	}
-	void EncodingOperations::Finalize(ExpOffset input, std::string name, DataCallback callback) {
-		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Experience, input.Union());
+	void EncodingOperations::Finalize(uint32_t handle, ExpOffset input, std::string name, DataCallback callback) {
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Experience, input.Union(), handle);
 		_finalize(packet, callback);
 	}	
 	void EncodingOperations::Finalize(uint32_t handle, PatOffset input, std::string name, DataCallback callback)
@@ -285,23 +285,26 @@ public:
 
 		return frames;
 	}
-	/*
+
+	
+	
 	static std::vector<HapticSample> EncodingOperations::Decode(const NullSpace::HapticFiles::Experience* experience) {
 		std::vector<HapticSample> samples;
 		auto items = experience->items();
 		samples.reserve(items->size());
 
 		for (const auto& sample : *items) {
-		//	samples.push_back(HapticSample(sample->time(), Decode(sample->frames()), sample->priority()));
+			samples.push_back(HapticSample(sample->time(), Decode(sample->pattern()), 1));
 
 		}
 		return samples;
 	}
+	/*
 	static HapticEffect EncodingOperations::Decode(const NullSpace::HapticFiles::HapticEffect* effect) {
 		return HapticEffect(Effect(0), Location(0), effect->duration(), effect->time(), 0);
 		
-	}
-	*/
+	}*/
+	
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();
 	}

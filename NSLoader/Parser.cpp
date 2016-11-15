@@ -119,10 +119,9 @@ std::vector<JsonPatternAtom> Parser::ParsePattern(boost::filesystem::path path)
 	return outAtoms;
 }
 
-std::vector<JsonPatternAtom> Parser::ParseExperience(boost::filesystem::path path)
+std::vector<JsonExperienceAtom> Parser::ParseExperience(boost::filesystem::path path)
 {
-	/*
-	std::vector<Sample> outSamples;
+	std::vector<JsonExperienceAtom> outAtoms;
 	//check if exists
 	Json::Value root;
 	std::ifstream json(path.string(), std::ifstream::binary);
@@ -131,14 +130,11 @@ std::vector<JsonPatternAtom> Parser::ParseExperience(boost::filesystem::path pat
 	{
 		for (auto x : root["experience"])
 		{
-			//todo:implement
-		//	Sample s;
-			//s.Deserialize(x);
-			//outSamples.push_back(s);
+			JsonExperienceAtom f;
+			f.Deserialize(x);
+			outAtoms.push_back(f);
 		}
 	}
-	return outSamples;
-	*/
-	return std::vector<JsonPatternAtom>();
+	return outAtoms;
 	
 }

@@ -25,6 +25,12 @@ void JsonPatternAtom::Deserialize(const Json::Value & root)
 	this->Area = root.get("area", "UNKNOWN_AREA").asString();
 
 }
+
+void JsonExperienceAtom::Deserialize(const Json::Value& root) {
+	this->Time = root.get("time", 0.0).asFloat();
+	this->Pattern = root.get("pattern", "UNKNOWN_PATTERN").asString();
+
+}
 HapticFrame::HapticFrame(float time, std::vector<JsonSequenceAtom> frame, AreaFlag a, unsigned int priority) : Time(time), OriginalTime(time), Priority(priority), Frame(frame), Area(a)
 {
 }

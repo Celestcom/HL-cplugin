@@ -31,18 +31,8 @@ HapticSequence::~HapticSequence()
 {
 }
 
-HapticFrame::HapticFrame(float time, std::vector<JsonSequenceAtom> frame, AreaFlag a, unsigned int priority) : Time(time), OriginalTime(time), Priority(priority), Frame(frame), Area(a)
-{
-}
 
-HapticFrame::~HapticFrame()
-{
-}
 
-float HapticFrame::GetTime()
-{
-	return Time;
-}
 
 float HapticSample::GetTime()
 {

@@ -169,7 +169,9 @@ bool ExperienceLoader::Load(const HapticFileInfo& fileInfo)
 			auto dir = directory;
 			auto path = dir /= name;
 			if (exists(path)) {
-				loadExperience(fileInfo.FullId, path);
+				auto atoms = _parser->ParseExperience(path);
+				_experiences[fileInfo.FullId] = JsonExperience(fileInfo.FullId, atoms);
+				loadAllPatterns(atoms);
 				return true;
 			}
 
@@ -182,27 +184,18 @@ bool ExperienceLoader::Load(const HapticFileInfo& fileInfo)
 	return false;
 }
 
-vector<Moment> ExperienceLoader::GetLoadedResource(const std::string & key)
+JsonExperience ExperienceLoader::GetLoadedResource(const std::string & key)
 {
 	return _experiences.at(key);
 }
 
-void ExperienceLoader::loadExperience(std::string id, path path)
+
+
+void ExperienceLoader::loadAllPatterns(vector<JsonExperienceAtom> experience) const
 {
-	//todo: implement
-
-}
-
-float ExperienceLoader::getLatestTime(const std::string& patternName) const
-{
-	
-	auto pattern = _patternLoader->GetLoadedResource(patternName);
-	float latestTime = 0;
-//	for (auto frame : pattern)
-	//{
-	//	latestTime = max(latestTime, frame.Time);
-	//}
-	return latestTime;
-
+	for (auto atom : experience) {
+		PatternFileInfo info(atom.Pattern);
+		_patternLoader->Load(info);
+	}
 }
 

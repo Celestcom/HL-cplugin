@@ -51,20 +51,18 @@ private:
 	void loadAllSequences(vector<JsonPatternAtom>) const;
 };
 
-class ExperienceLoader : public IHapticLoadingStrategy<vector<Moment>>
+class ExperienceLoader : public IHapticLoadingStrategy<JsonExperience>
 {
 public:
 	ExperienceLoader(shared_ptr<Parser>, shared_ptr<PatternLoader>);
 	~ExperienceLoader();
 	bool Load(const HapticFileInfo& fileInfo) override;
-	vector<Moment> GetLoadedResource(const std::string& key) override;
+	JsonExperience GetLoadedResource(const std::string& key) override;
 private:
 	shared_ptr<PatternLoader> _patternLoader;
 	shared_ptr<Parser> _parser;
-	unordered_map<string, vector<Moment>> _experiences;
-	
-	void loadExperience(std::string id, boost::filesystem::path path);
-	float getLatestTime(const std::string& patternName) const;
+	unordered_map<string, JsonExperience> _experiences;
+	void loadAllPatterns(vector<JsonExperienceAtom>) const;
 };
 class Loader
 {

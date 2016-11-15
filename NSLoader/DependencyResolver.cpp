@@ -64,9 +64,9 @@ PackedPattern DependencyResolver::ResolvePattern(const std::string& name) const
 	return _patternResolver->Resolve(PatternArgs(name, Side::NotSpecified));
 }
 
-PackedExperience DependencyResolver::ResolveExperience(const std::string& name, Side side) const
+PackedExperience DependencyResolver::ResolveExperience(const std::string& name) const
 {
-	return _experienceResolver->Resolve(ExperienceArgs(name, side));
+	return _experienceResolver->Resolve(ExperienceArgs(name, Side::NotSpecified));
 }
 
 bool DependencyResolver::Load(const HapticFileInfo& fileInfo) const
@@ -90,14 +90,12 @@ PackedSequence SequenceResolver::Resolve(SequenceArgs args)
 	//	throw HapticsNotLoadedException(args);
 	//}
 	
-	if (_cache.Contains(args))
-	{
+	if (_cache.Contains(args)) {
 		return _cache.Get(args);
 	}
-
 	auto inputItems = _sequenceLoader->GetLoadedResource(args.Name);
-	auto packed = PackedSequence(inputItems.Name(), inputItems.JsonAtoms(), args.Location);
 
+	auto packed = PackedSequence(inputItems.Name(), inputItems.JsonAtoms(), args.Location);
 	_cache.Cache(args, packed);
 	return packed;
 }
@@ -123,11 +121,10 @@ PatternResolver::~PatternResolver()
 
 PackedPattern PatternResolver::Resolve(PatternArgs args)
 {
-
-	if (_cache.Contains(args))
-	{
+	if (_cache.Contains(args)) {
 		return _cache.Get(args);
 	}
+
 	std::vector<TimeIndex<PackedSequence>> seqs;
 	
 	auto jsonpat = _patternLoader->GetLoadedResource(args.Name);
@@ -139,9 +136,9 @@ PackedPattern PatternResolver::Resolve(PatternArgs args)
 			seq.Time, 
 			_seqResolver->Resolve(SequenceArgs(seq.Sequence, parsedArea))));
 	}
-	auto packedPattern = PackedPattern(args.Name, seqs);
-	_cache.Cache(args, packedPattern);
-	return packedPattern;
+	auto packed = PackedPattern(args.Name, seqs);
+	_cache.Cache(args, packed);
+	return packed;
 }
 
 
@@ -173,19 +170,22 @@ PackedExperience ExperienceResolver::Resolve(ExperienceArgs args)
 	//{
 	//	throw HapticsNotLoadedException(args);
 	//}
-
-	if (_cache.Contains(args))
-	{
+	if (_cache.Contains(args)) {
 		return _cache.Get(args);
 	}
 
 	std::vector<TimeIndex<PackedPattern>> patterns;
-	auto moment = _experienceLoader->GetLoadedResource(args.Name);
-	for (auto pat : moment) {
-		patterns.push_back(TimeIndex<PackedPattern>(pat.Time, _patResolver->Resolve(PatternArgs(pat.Name, pat.Side))));
-	}
-	auto packedExp = PackedExperience(args.Name, patterns);
 
-	_cache.Cache(args, packedExp);
-	return packedExp;
+	auto jsonexp = _experienceLoader->GetLoadedResource(args.Name);
+	patterns.reserve(jsonexp.JsonAtoms().size());
+
+	for (auto pat : jsonexp.JsonAtoms()) {
+		patterns.push_back(TimeIndex<PackedPattern>(
+			pat.Time,
+			_patResolver->Resolve(PatternArgs(pat.Pattern, Side::NotSpecified))));
+	}
+
+	auto packed= PackedExperience(args.Name, patterns);
+	_cache.Cache(args, packed);
+	return packed;
 }

@@ -28,7 +28,7 @@ public:
 	static Location ComputeLocationSide(JsonLocation loc, Side side);
 	PackedSequence ResolveSequence(const std::string& name, AreaFlag location) const;
 	PackedPattern ResolvePattern(const std::string& name) const;
-	PackedExperience ResolveExperience(const std::string& name, Side side) const;
+	PackedExperience ResolveExperience(const std::string& name) const;
 
 
 	bool Load(const HapticFileInfo& fileInfo) const;

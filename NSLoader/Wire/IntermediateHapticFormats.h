@@ -90,6 +90,14 @@ public:
 	void Serialize(const Json::Value& root) {};
 };
 
+class JsonExperienceAtom : public IJsonSerializable {
+public: 
+	float Time;
+	std::string Pattern;
+	void Deserialize(const Json::Value& root);
+	void Serialize(const Json::Value& root) {};
+
+};
 
 class JsonPattern {
 public:
@@ -100,6 +108,17 @@ public:
 private:
 	std::string _name;
 	std::vector<JsonPatternAtom> _atoms;
+};
+
+class JsonExperience {
+public:
+	JsonExperience() = default;
+	JsonExperience(std::string name, std::vector<JsonExperienceAtom> atoms) : _name(name), _atoms(atoms) {};
+	std::string Name() const { return _name; }
+	std::vector<JsonExperienceAtom> JsonAtoms() const { return _atoms; }
+private:
+	std::string _name;
+	std::vector<JsonExperienceAtom> _atoms;
 };
 
 class PackedSequence {

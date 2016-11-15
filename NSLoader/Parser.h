@@ -39,7 +39,7 @@ public:
 	std::vector<JsonSequenceAtom> ParseSequence(boost::filesystem::path);
 	std::vector<JsonPatternAtom> ParsePattern(boost::filesystem::path);
 	//todo: implement experiences
-	std::vector<JsonPatternAtom> ParseExperience(boost::filesystem::path);
+	std::vector<JsonExperienceAtom> ParseExperience(boost::filesystem::path);
 	
 
 private:

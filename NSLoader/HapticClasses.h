@@ -24,18 +24,6 @@ public:
 	std::vector<HapticEffect> Effects;
 };
 
-class HapticFrame : public ITimeOffset
-{
-public:
-	HapticFrame(float time, std::vector<JsonSequenceAtom> frame, AreaFlag area, unsigned int priority = 1);
-	~HapticFrame();
-	float Time;
-	AreaFlag Area;
-	float GetTime() override;
-	float OriginalTime;
-	unsigned int Priority;
-	std::vector<JsonSequenceAtom> Frame;
-};
 
 class HapticSample : public ITimeOffset
 {

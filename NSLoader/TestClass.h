@@ -29,10 +29,13 @@ public:
 	void PollTracking(NullSpaceDLL::TrackingUpdate& q);
 
 	bool LoadSequence(LPSTR param);
-	int CreateSequence(uint32_t handle, LPSTR param, uint32_t loc);
+	bool CreateSequence(uint32_t handle, LPSTR param, uint32_t loc);
 
 	bool LoadPattern(LPSTR param);
-	int CreatePattern(uint32_t handle, LPSTR param);
+	bool CreatePattern(uint32_t handle, LPSTR param);
+
+	bool LoadExperience(LPSTR param);
+	bool CreateExperience(uint32_t handle, LPSTR param);
 
 	int PlayEffect(Effect e, Location loc, float duration, float time, unsigned int priority);
 	void SetTrackingEnabled(bool wantTracking);
