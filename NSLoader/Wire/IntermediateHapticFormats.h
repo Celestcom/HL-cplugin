@@ -77,10 +77,22 @@ public:
 	std::vector<JsonSequenceAtom> Frame;
 
 };
+class HapticSample
+{
+public:
+	unsigned int Priority;
+	float Time;
+	float OriginalTime;
+	std::vector<HapticFrame> Frames;
+	HapticSample(float time, std::vector<HapticFrame> frames, unsigned int priority);
+	~HapticSample();
+};
 
 float GetTotalPlayTime(const std::vector<JsonSequenceAtom>& atoms);
 
 float GetTotalPlayTime(const std::vector<HapticFrame>& frames);
+float GetTotalPlayTime(const std::vector<HapticSample>& samples);
+
 class JsonPatternAtom : public IJsonSerializable {
 public:
 	float Time;

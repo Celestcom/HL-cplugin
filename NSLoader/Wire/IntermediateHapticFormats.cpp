@@ -39,6 +39,19 @@ HapticFrame::~HapticFrame()
 {
 }
 
+
+HapticSample::HapticSample(float time, std::vector<HapticFrame> frames, unsigned int priority) :
+	Priority(priority), Time(time), OriginalTime(time), Frames(frames)
+
+{
+}
+
+HapticSample::~HapticSample()
+{
+}
+
+
+
 float GetTotalPlayTime(const std::vector<HapticFrame>& frames) {
 	float endOfLastEffect = 0.0;
 	for (const auto& item : frames) {
@@ -53,6 +66,16 @@ float GetTotalPlayTime(const std::vector<JsonSequenceAtom>& atoms) {
 	for (const auto& item : atoms) {
 		//fudge factor of quarter of second for oneshots
 		float endTime = (item.Duration + 0.25) + item.Time;
+		endOfLastEffect = std::max(endOfLastEffect, endTime);
+	}
+	return endOfLastEffect;
+}
+
+float GetTotalPlayTime(const std::vector<HapticSample>& atoms) {
+	float endOfLastEffect = 0.0;
+	for (const auto& item : atoms) {
+		//fudge factor of quarter of second for oneshots
+		float endTime = (GetTotalPlayTime(item.Frames) + 0.25) + item.Time;
 		endOfLastEffect = std::max(endOfLastEffect, endTime);
 	}
 	return endOfLastEffect;
