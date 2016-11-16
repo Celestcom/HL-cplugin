@@ -17,6 +17,7 @@ private:
 	NullSpace::Communication::SuitStatus _suitStatus;
 	NullSpaceDLL::TrackingUpdate _tracking;
 	uint32_t _currentHandleId;
+	std::string _currentError;
 public:
 	
 
@@ -40,5 +41,7 @@ public:
 	int PlayEffect(Effect e, Location loc, float duration, float time, unsigned int priority);
 	void SetTrackingEnabled(bool wantTracking);
 	void HandleCommand(unsigned int handle, short c);
+
+	LPCSTR GetError();
 };
 
