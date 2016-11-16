@@ -12,6 +12,8 @@
 #include "HapticPacket_generated.h"
 
 
+
+
 TestClass::TestClass(LPSTR param) : _resolver(std::make_unique<DependencyResolver>(std::string(param))), _wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453")
 {
 
@@ -43,12 +45,52 @@ uint32_t TestClass::GenHandle()
 
 bool TestClass::LoadSequence(LPSTR param)
 {
-	return _resolver->Load(SequenceFileInfo(std::string(param)));
+	try {
+		return _resolver->Load(SequenceFileInfo(std::string(param)));
+
+	}
+	catch (const InvalidPackageNameException& e) {
+		_currentError = std::string(param) + ": " + e.what();
+	}
+	catch (const PackageNotFoundException& e) {
+		_currentError = std::string(param) + ": " + e.what();
+	}
+	catch (const FileNotFoundException& e) {
+		_currentError = std::string(param) + ": " + e.what();
+	}
+	catch (const MalformedHapticsFileException& m) {
+		_currentError = std::string(param) + ": " + m.what();
+	}
+	catch (Json::Exception& e) {
+		_currentError = std::string(param) + ": " + e.what() + " (Invalid JSON syntax)";
+	}
+	return false;
 }
 
 bool TestClass::LoadPattern(LPSTR param)
 {
-	return _resolver->Load(PatternFileInfo(std::string(param)));
+	try {
+		return _resolver->Load(PatternFileInfo(std::string(param)));
+		
+	}
+	catch (const InvalidPackageNameException& e) {
+		_currentError = std::string(param) + ": " + e.what();
+	}
+	catch (const PackageNotFoundException& e) {
+		_currentError = std::string(param) + ": " + e.what();
+	}
+	catch (const FileNotFoundException& e) {
+		_currentError = std::string(param) + ": " + e.what();
+	}
+	catch (const MalformedHapticsFileException& m) {
+		_currentError = std::string(param) +": " + m.what();
+	}
+	catch (Json::Exception& e) {
+		_currentError = std::string(param) +  ": " + e.what() + " (Invalid JSON syntax)";
+	}
+
+	return false;
+
 }
 
 bool TestClass::CreatePattern(uint32_t handle, LPSTR param)
@@ -66,7 +108,26 @@ bool TestClass::CreatePattern(uint32_t handle, LPSTR param)
 
 bool TestClass::LoadExperience(LPSTR param)
 {
-	return _resolver->Load(ExperienceFileInfo(std::string(param)));
+	try {
+		return _resolver->Load(ExperienceFileInfo(std::string(param)));
+	}
+
+	catch (const InvalidPackageNameException& e) {
+		_currentError = std::string(param) + ": " + e.what();
+	}
+	catch (const PackageNotFoundException& e) {
+		_currentError = std::string(param) + ": " + e.what();
+	}
+	catch (const FileNotFoundException& e) {
+		_currentError = std::string(param) + ": " + e.what();
+	}
+	catch (const MalformedHapticsFileException& m) {
+		_currentError = std::string(param) + ": " + m.what();
+	}
+	catch (Json::Exception& e) {
+		_currentError = std::string(param) + ": " + e.what() + " (Invalid JSON syntax)";
+	}
+	return false;
 }
 
 bool TestClass::CreateExperience(uint32_t handle, LPSTR param)
@@ -127,4 +188,9 @@ void TestClass::HandleCommand(unsigned int handle, short c)
 	_wire.AquireEncodingLock();
 	_wire.Send(_wire.Encoder->Encode(NullSpaceDLL::HandleCommand(handle, c)));
 	_wire.ReleaseEncodingLock();
+}
+
+LPCSTR TestClass::GetError()
+{
+	return _currentError.c_str();
 }

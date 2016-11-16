@@ -2,7 +2,11 @@
 #include "Parser.h"
 #include "HapticArgs.h"
 #include <boost/algorithm/string.hpp>
+class InvalidPackageNameException : public std::runtime_error {
+public:
+	InvalidPackageNameException(const std::string& package) : std::runtime_error(std::string("The package name " + package + " is invalid").c_str()) {}
 
+};
 class HapticFileInfo
 {
 public:

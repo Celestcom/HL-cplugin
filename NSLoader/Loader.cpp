@@ -64,28 +64,27 @@ bool SequenceLoader::Load(const HapticFileInfo& fileInfo)
 	}
 
 	auto validNames = fileInfo.GetValidFileNames();
-	try {
-		const path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
-		for (auto name : validNames)
-		{
-			auto dir = directory;
-			auto path = dir /= name;
-			if (exists(path)) {
+
+	const path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
+	for (auto name : validNames)
+	{
+		auto dir = directory;
+		auto path = dir /= name;
+		if (exists(path)) {
+			try {
 				vector<JsonSequenceAtom> sequence = _parser->ParseSequence(path);
 				_sequences[fileInfo.FullId] = JsonSequence(fileInfo.FullId, sequence);
 				return true;
 			}
-
+			catch (const MalformedHapticsFileException& e) {
+				throw MalformedHapticsFileException(fileInfo.FullId, e.what());
+			}
 		}
-		std::cout << "Failed to load " << fileInfo.ToString() << ": file not found (in package " << fileInfo.FullyQualifiedPackage << ")\n";
 
 	}
-	catch (PackageNotFoundException& p) {
-		//package not found
-		return false;
-	}
-	return false;
+	throw FileNotFoundException(fileInfo.ToString(), fileInfo.FullyQualifiedPackage);
 }
+	
 
 JsonSequence SequenceLoader::GetLoadedResource(const std::string& key)
 {
@@ -107,27 +106,30 @@ bool PatternLoader::Load(const HapticFileInfo& fileInfo)
 	}
 
 	auto validNames = fileInfo.GetValidFileNames();
-	try {
-		path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
-		for (auto name : validNames)
-		{
 
-			auto dir = directory;
-			auto path = dir /= name;
-			if (exists(path)) {
+	path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
+	for (auto name : validNames)
+	{
+
+		auto dir = directory;
+		auto path = dir /= name;
+		if (exists(path)) {
+			try {
 				auto atoms = _parser->ParsePattern(path);
 				_patterns[fileInfo.FullId] = JsonPattern(fileInfo.FullId, atoms);
 				loadAllSequences(atoms);
 				return true;
 			}
-
+			catch (const MalformedHapticsFileException& e) {
+				throw MalformedHapticsFileException(fileInfo.FullId, e.what());
+			}
+		
 		}
+
 	}
-	catch (PackageNotFoundException& p) {
-		//package not found
-		return false;
-	}
-	return false;
+	throw FileNotFoundException(fileInfo.ToString(), fileInfo.FullyQualifiedPackage);
+
+	
 }
 
 JsonPattern PatternLoader::GetLoadedResource(const std::string & key)
@@ -138,8 +140,13 @@ JsonPattern PatternLoader::GetLoadedResource(const std::string & key)
 void PatternLoader::loadAllSequences(vector<JsonPatternAtom> pattern) const
 {
 	for (auto atom : pattern) {
-		SequenceFileInfo info(atom.Sequence);
-		_sequenceLoader->Load(info);
+		try {
+			SequenceFileInfo info(atom.Sequence);
+			_sequenceLoader->Load(info);
+		}
+		catch (const Json::Exception& e) {
+			throw Json::Exception(atom.Sequence + ": " + e.what());
+		}
 	}
 	
 }
@@ -161,7 +168,6 @@ bool ExperienceLoader::Load(const HapticFileInfo& fileInfo)
 	}
 
 	auto validNames = fileInfo.GetValidFileNames();
-	try {
 		path directory = _parser->GetDirectory(fileInfo.FullyQualifiedPackage) /= fileInfo.GetDirectory();
 		for (auto name : validNames)
 		{
@@ -169,19 +175,21 @@ bool ExperienceLoader::Load(const HapticFileInfo& fileInfo)
 			auto dir = directory;
 			auto path = dir /= name;
 			if (exists(path)) {
-				auto atoms = _parser->ParseExperience(path);
-				_experiences[fileInfo.FullId] = JsonExperience(fileInfo.FullId, atoms);
-				loadAllPatterns(atoms);
-				return true;
+				try {
+					auto atoms = _parser->ParseExperience(path);
+					_experiences[fileInfo.FullId] = JsonExperience(fileInfo.FullId, atoms);
+					loadAllPatterns(atoms);
+					return true;
+				}
+				catch (const MalformedHapticsFileException& e) {
+					throw MalformedHapticsFileException(fileInfo.FullId, e.what());
+				}
 			}
 
 		}
-	}
-	catch (PackageNotFoundException& p) {
-		//package not found
-		return false;
-	}
-	return false;
+	
+
+	throw FileNotFoundException(fileInfo.ToString(), fileInfo.FullyQualifiedPackage);
 }
 
 JsonExperience ExperienceLoader::GetLoadedResource(const std::string & key)
@@ -194,8 +202,13 @@ JsonExperience ExperienceLoader::GetLoadedResource(const std::string & key)
 void ExperienceLoader::loadAllPatterns(vector<JsonExperienceAtom> experience) const
 {
 	for (auto atom : experience) {
-		PatternFileInfo info(atom.Pattern);
-		_patternLoader->Load(info);
+		try {
+			PatternFileInfo info(atom.Pattern);
+			_patternLoader->Load(info);
+		}
+		catch (const Json::Exception& e) {
+			throw Json::Exception(atom.Pattern + ": " + e.what());
+		}
 	}
 }
 

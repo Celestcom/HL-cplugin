@@ -18,6 +18,9 @@ std::string HapticFileInfo::getPackage(std::string thing)
 {
 	std::vector<std::string> parts;
 	boost::split(parts, thing, boost::is_any_of(_packageSeparator));
+	if (parts.size() <= 1) {
+		throw InvalidPackageNameException(thing);
+	}
 	auto range = boost::make_iterator_range(parts.begin(), parts.end() - 1);
 	return boost::join(range, _packageSeparator);
 }

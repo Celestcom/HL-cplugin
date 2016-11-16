@@ -97,6 +97,9 @@ std::vector<JsonSequenceAtom> Parser::ParseSequence(boost::filesystem::path path
 			outItems.push_back(s);
 		}
 	}
+	else {
+		throw MalformedHapticsFileException("key 'sequence' must be present in sequence files");
+	}
 	return outItems;
 }
 
@@ -116,9 +119,11 @@ std::vector<JsonPatternAtom> Parser::ParsePattern(boost::filesystem::path path)
 			outAtoms.push_back(f);
 		}
 	}
+	else {
+		throw MalformedHapticsFileException( "key 'pattern' must be present in pattern files");
+	}
 	return outAtoms;
 }
-
 std::vector<JsonExperienceAtom> Parser::ParseExperience(boost::filesystem::path path)
 {
 	std::vector<JsonExperienceAtom> outAtoms;
@@ -134,6 +139,9 @@ std::vector<JsonExperienceAtom> Parser::ParseExperience(boost::filesystem::path 
 			f.Deserialize(x);
 			outAtoms.push_back(f);
 		}
+	}
+	else {
+		throw MalformedHapticsFileException( "key 'experience' must be present in experience files");
 	}
 	return outAtoms;
 	
