@@ -42,6 +42,6 @@ public:
 	void SetTrackingEnabled(bool wantTracking);
 	void HandleCommand(unsigned int handle, short c);
 
-	LPCSTR GetError();
+	char* GetError();
 };
 

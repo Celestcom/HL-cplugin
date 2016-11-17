@@ -40,5 +40,7 @@ extern "C" {
 	//Play, stop, etc.
 	NSLOADER_API void __stdcall NSVR_HandleCommand(TestClass* ptr, unsigned int handle, short command) { ptr->HandleCommand(handle, command); }
 
-	NSLOADER_API LPCSTR __stdcall NSVR_GetError(TestClass* ptr) { return ptr->GetError(); }
+	NSLOADER_API char* __stdcall NSVR_GetError(TestClass* ptr) { return ptr->GetError(); }
+
+	NSLOADER_API void __stdcall NSVR_FreeString(char* string) { delete[] string; }
 }

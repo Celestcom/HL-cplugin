@@ -190,7 +190,14 @@ void TestClass::HandleCommand(unsigned int handle, short c)
 	_wire.ReleaseEncodingLock();
 }
 
-LPCSTR TestClass::GetError()
+char* TestClass::GetError()
 {
-	return _currentError.c_str();
+	const char* sampleString = _currentError.c_str();
+	std::size_t len = strlen(sampleString) + sizeof(char);
+	char* newString = new char[len];
+	newString[len - 1] = 0;
+	strcpy_s(newString, len, sampleString);
+
+
+	return newString;
 }
