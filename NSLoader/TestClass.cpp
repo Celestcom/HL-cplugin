@@ -59,7 +59,7 @@ bool TestClass::LoadSequence(LPSTR param)
 		_currentError = std::string(param) + ": " + e.what();
 	}
 	catch (const MalformedHapticsFileException& m) {
-		_currentError = std::string(param) + ": " + m.what();
+		_currentError =  m.what();
 	}
 	catch (Json::Exception& e) {
 		_currentError = std::string(param) + ": " + e.what() + " (Invalid JSON syntax)";
@@ -83,7 +83,7 @@ bool TestClass::LoadPattern(LPSTR param)
 		_currentError = std::string(param) + ": " + e.what();
 	}
 	catch (const MalformedHapticsFileException& m) {
-		_currentError = std::string(param) +": " + m.what();
+		_currentError = m.what();
 	}
 	catch (Json::Exception& e) {
 		_currentError = std::string(param) +  ": " + e.what() + " (Invalid JSON syntax)";
@@ -111,7 +111,7 @@ bool TestClass::LoadExperience(LPSTR param)
 	try {
 		return _resolver->Load(ExperienceFileInfo(std::string(param)));
 	}
-
+	
 	catch (const InvalidPackageNameException& e) {
 		_currentError = std::string(param) + ": " + e.what();
 	}
@@ -122,7 +122,7 @@ bool TestClass::LoadExperience(LPSTR param)
 		_currentError = std::string(param) + ": " + e.what();
 	}
 	catch (const MalformedHapticsFileException& m) {
-		_currentError = std::string(param) + ": " + m.what();
+		_currentError = m.what();
 	}
 	catch (Json::Exception& e) {
 		_currentError = std::string(param) + ": " + e.what() + " (Invalid JSON syntax)";

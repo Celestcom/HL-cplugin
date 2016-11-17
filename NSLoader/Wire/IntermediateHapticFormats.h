@@ -2,7 +2,6 @@
 #include <vector>
 #include "IJsonSerializable.h"
 #include <algorithm>
-
 enum class AreaFlag  : uint32_t {
 	None = 0,
 	Forearm_Left = 1 << 0,
@@ -42,6 +41,12 @@ inline AreaFlag& operator|=(AreaFlag& a, const AreaFlag b)
 	a = static_cast<AreaFlag>(static_cast<uint32_t>(a) | static_cast<uint32_t>(b));
 	return a;
 }
+class MalformedHapticsFileException : public std::runtime_error {
+public:
+	MalformedHapticsFileException(const std::string& detail) : std::runtime_error(detail) {}
+	MalformedHapticsFileException(const std::string& package, const std::string& detail) : std::runtime_error(std::string(package + ": " + detail)) {}
+
+};
 
 
 

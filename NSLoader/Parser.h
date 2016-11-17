@@ -28,12 +28,7 @@ public:
 	FileNotFoundException(const std::string& notFoundHaptic, const std::string& notFoundHapticPackage) : std::runtime_error(std::string("could not find " + notFoundHaptic + " in package " + notFoundHapticPackage).c_str()) {}
 
 };
-class MalformedHapticsFileException : public std::runtime_error {
-public:
-	MalformedHapticsFileException(const std::string& detail) : std::runtime_error(detail) {}
-	MalformedHapticsFileException(const std::string& package, const std::string& detail) : std::runtime_error(std::string(package +": " + detail)) {}
 
-};
 std::string GetFileType(HapticFileType ftype);
 
 class Parser
