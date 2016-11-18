@@ -153,15 +153,28 @@ void TestClass::PollTracking(NullSpaceDLL::TrackingUpdate& t) {
 }
 
 
+bool TestClass::CreateSequence(uint32_t handle, uint32_t* data, uint32_t size) {
+	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
+	if (NullSpace::HapticFiles::VerifySequenceBuffer(verifier)) {
+		auto sequence = NullSpace::HapticFiles::GetSequence(data);
+		auto decodedSeq = EncodingOperations::Decode(sequence);
+		auto packed = PackedSequence("code", decodedSeq, AreaFlag(sequence->location()));
+		_wire.AquireEncodingLock();
 
+		_wire.Send(_wire.Encoder->Encode(packed), "code", handle);
+		_wire.ReleaseEncodingLock();
+		return true;
+	}
+	return false;
+}
 //TODO: wrap with exception handling incase flatbuffers fails/file fails to load/etc
-
 bool TestClass::CreateSequence(uint32_t handle, LPSTR param, uint32_t loc)
 {
 	auto name = std::string(param);
 	if (_resolver->Load(SequenceFileInfo(name))) {
 		auto res = _resolver->ResolveSequence(name, AreaFlag(loc));
 		_wire.AquireEncodingLock();
+		
 		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
 		_wire.ReleaseEncodingLock();
 		return true;

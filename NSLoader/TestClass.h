@@ -29,8 +29,10 @@ public:
 	uint32_t GenHandle();
 	void PollTracking(NullSpaceDLL::TrackingUpdate& q);
 
+	
 	bool LoadSequence(LPSTR param);
 	bool CreateSequence(uint32_t handle, LPSTR param, uint32_t loc);
+	bool CreateSequence(uint32_t handle, uint32_t* data, uint32_t size);
 
 	bool LoadPattern(LPSTR param);
 	bool CreatePattern(uint32_t handle, LPSTR param);

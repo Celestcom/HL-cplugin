@@ -23,6 +23,9 @@ extern "C" {
 	NSLOADER_API bool __stdcall NSVR_CreateSequence(TestClass* ptr, uint32_t handle, LPSTR name, uint32_t loc) {
 		return ptr->CreateSequence(handle, name, loc);
 	}
+	NSLOADER_API bool __stdcall NSVR_CreateCodeSequence(TestClass* ptr, uint32_t handle, uint32_t* data, uint32_t size) {
+		return ptr->CreateSequence(handle, data, size);
+	}
 	NSLOADER_API bool __stdcall NSVR_LoadSequence(TestClass* ptr, LPSTR param) { return ptr->LoadSequence(param); }
 	
 	//Pattern
