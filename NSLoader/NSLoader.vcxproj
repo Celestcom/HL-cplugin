@@ -185,6 +185,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TestClass.h" />
     <ClInclude Include="Wire\EncodingOperations.h" />
+    <ClInclude Include="Wire\FlatbuffDecoder.h" />
     <ClInclude Include="Wire\IntermediateHapticFormats.h" />
     <ClInclude Include="Wire\Wire.h" />
     <ClInclude Include="zmq.hpp" />

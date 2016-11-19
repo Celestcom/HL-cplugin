@@ -6,6 +6,7 @@
 #include "zmq_addon.hpp"
 #include "Wire\Wire.h"
 #include "Wire\EncodingOperations.h"
+#include "Wire\FlatbuffDecoder.h"
 #pragma pack(1)
 
 
@@ -18,6 +19,7 @@ private:
 	NullSpaceDLL::TrackingUpdate _tracking;
 	uint32_t _currentHandleId;
 	std::string _currentError;
+	std::unique_ptr<FlatbuffDecoder> _decoder;
 public:
 	
 
@@ -36,6 +38,7 @@ public:
 
 	bool LoadPattern(LPSTR param);
 	bool CreatePattern(uint32_t handle, LPSTR param);
+	bool CreatePattern(uint32_t handle, uint32_t* data, uint32_t size);
 
 	bool LoadExperience(LPSTR param);
 	bool CreateExperience(uint32_t handle, LPSTR param);

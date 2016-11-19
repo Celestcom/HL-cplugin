@@ -14,7 +14,10 @@
 
 
 
-TestClass::TestClass(LPSTR param) : _resolver(std::make_unique<DependencyResolver>(std::string(param))), _wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453")
+TestClass::TestClass(LPSTR param) : 
+	_resolver(std::make_unique<DependencyResolver>(std::string(param))), 
+	_wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453"),
+	_decoder(std::make_unique<FlatbuffDecoder>())
 {
 
 
@@ -182,6 +185,20 @@ bool TestClass::CreateSequence(uint32_t handle, LPSTR param, uint32_t loc)
 	return false;
 }
 
+
+bool TestClass::CreatePattern(uint32_t handle, uint32_t* data, uint32_t size) {
+	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
+	
+	if (NullSpace::HapticFiles::Mixed::VerifyPatternBuffer(verifier)) {
+		auto pattern = NullSpace::HapticFiles::Mixed::GetPattern(data);
+		auto packed = _decoder->Decode(pattern, _resolver);
+		_wire.AquireEncodingLock();
+		_wire.Send(_wire.Encoder->Encode(packed), packed.Name(), handle);
+		_wire.ReleaseEncodingLock();
+		return true;
+	}
+	return false;
+}
 int TestClass::PlayEffect(Effect e, Location loc, float duration, float time, unsigned int priority)
 {
 	//_wire.Send(_wire.Encoder->Encode(HapticEffect(e, loc, duration, time, priority)));

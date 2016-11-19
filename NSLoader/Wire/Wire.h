@@ -15,15 +15,14 @@
 #include "SuitStatusUpdate_generated.h"
 #include "HapticClasses.h"
 #include "EncodingOperations.h"
-#include <mutex>
 
+#include <mutex>
 
 typedef IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset> FlatbuffEncoder;
 class Wire
 {
 public:
 	std::unique_ptr<FlatbuffEncoder> Encoder;
-
 	static void Wire::sendTo(zmq::socket_t& socket, uint8_t* data, int size) {
 		zmq::message_t msg(size);
 		memcpy((void*)msg.data(), data, size);
@@ -51,12 +50,7 @@ public:
 	void Wire::Send(HandleCommandOffset& input) {
 		Encoder->Finalize(input, "whatever", boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
-	/*
-	void Wire::Send( struct flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect> input) {
-		Encoder.Finalize(input, boost::bind(&Wire::sendToEngine, this, _1, _2));
-		
-	}
-	*/
+	
 	void Wire::Send(ClientOffset& input) {
 		
 	}

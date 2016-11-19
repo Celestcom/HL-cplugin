@@ -90,6 +90,9 @@
     <ClInclude Include="AreaParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Wire\FlatbuffDecoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

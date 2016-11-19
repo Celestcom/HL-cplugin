@@ -84,7 +84,8 @@ bool SequenceLoader::Load(const HapticFileInfo& fileInfo)
 	}
 	throw FileNotFoundException(fileInfo.ToString(), fileInfo.FullyQualifiedPackage);
 }
-	
+
+
 
 JsonSequence SequenceLoader::GetLoadedResource(const std::string& key)
 {

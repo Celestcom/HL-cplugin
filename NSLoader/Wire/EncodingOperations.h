@@ -11,6 +11,11 @@
 #include "TrackingUpdate_generated.h"
 #include "IntermediateHapticFormats.h"
 
+
+#include "MixedHapticFrame_generated.h"
+#include "MixedPattern_generated.h"
+#include "MixedSequence_generated.h"
+
 struct Quaternion {
 	float w;
 	float x;
@@ -83,6 +88,7 @@ typedef struct flatbuffers::Offset<NullSpace::HapticFiles::Tracking> ImuOffset;
 typedef struct flatbuffers::Offset<NullSpace::Communication::SuitStatusUpdate> StatusOffset;
 typedef struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate> ClientOffset;
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::HandleCommand> HandleCommandOffset;
+
 class EncodingOperations : public IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset>
 {
 private:
@@ -249,26 +255,13 @@ public:
 		return atoms;
 	}
 
+
 	
 	static NullSpaceDLL::HandleCommand EncodingOperations::Decode(const NullSpace::HapticFiles::HandleCommand* command) {
 		return NullSpaceDLL::HandleCommand(command->handle(), command->command());
 	}
 
-	
-	/*
-	static std::vector<HapticEffect> EncodingOperations::Decode(const NullSpace::HapticFiles::Sequence* sequence)
-	{
-		std::vector<HapticEffect> effects;
-		auto items = sequence->items();
-		effects.reserve(items->size());
 
-		for (const auto& e : *items) {
-			//effects.push_back(HapticEffect(Effect(e->effect()), Location(e->location()), e->duration(), e->time(), e->priority()));
-		}
-
-		return effects;
-	}
-	*/
 	
 	static std::vector<HapticFrame> EncodingOperations::Decode(const NullSpace::HapticFiles::Pattern* pattern)
 	{
@@ -299,11 +292,7 @@ public:
 		}
 		return samples;
 	}
-	/*
-	static HapticEffect EncodingOperations::Decode(const NullSpace::HapticFiles::HapticEffect* effect) {
-		return HapticEffect(Effect(0), Location(0), effect->duration(), effect->time(), 0);
-		
-	}*/
+
 	
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();
@@ -320,6 +309,8 @@ public:
 		return t;
 
 	}
+	
+
 	
 	~EncodingOperations() {
 		
