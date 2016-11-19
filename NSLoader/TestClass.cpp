@@ -186,15 +186,13 @@ bool TestClass::CreateSequence(uint32_t handle, LPSTR param, uint32_t loc)
 }
 
 
-bool TestClass::CreatePattern(uint32_t handle, uint32_t* data, uint32_t size) {
+bool TestClass::SavePattern(LPSTR name, uint32_t* data, uint32_t size) {
 	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
 	
 	if (NullSpace::HapticFiles::Mixed::VerifyPatternBuffer(verifier)) {
 		auto pattern = NullSpace::HapticFiles::Mixed::GetPattern(data);
 		auto packed = _decoder->Decode(pattern, _resolver);
-		_wire.AquireEncodingLock();
-		_wire.Send(_wire.Encoder->Encode(packed), packed.Name(), handle);
-		_wire.ReleaseEncodingLock();
+		_resolver->CacheCodePattern(std::string(name), packed);
 		return true;
 	}
 	return false;

@@ -38,7 +38,7 @@ public:
 
 	bool LoadPattern(LPSTR param);
 	bool CreatePattern(uint32_t handle, LPSTR param);
-	bool CreatePattern(uint32_t handle, uint32_t* data, uint32_t size);
+	bool SavePattern(LPSTR name, uint32_t* data, uint32_t size);
 
 	bool LoadExperience(LPSTR param);
 	bool CreateExperience(uint32_t handle, LPSTR param);

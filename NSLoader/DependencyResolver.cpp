@@ -69,6 +69,11 @@ PackedExperience DependencyResolver::ResolveExperience(const std::string& name) 
 	return _experienceResolver->Resolve(ExperienceArgs(name, Side::NotSpecified));
 }
 
+void DependencyResolver::CacheNewSequence(std::string name, PackedSequence s)
+{
+	//todo: NEED TO IMPLEMENT THE CACHING
+}
+
 std::vector<JsonSequenceAtom> DependencyResolver::FetchCachedSequence(const std::string & name) const
 {
 	return _loader.GetSequenceLoader()->GetLoadedResource(name).JsonAtoms();

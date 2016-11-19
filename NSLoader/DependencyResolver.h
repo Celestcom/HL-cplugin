@@ -30,6 +30,7 @@ public:
 	PackedPattern ResolvePattern(const std::string& name) const;
 	PackedExperience ResolveExperience(const std::string& name) const;
 
+	void CacheNewSequence(std::string name, PackedSequence s);
 	std::vector<JsonSequenceAtom> FetchCachedSequence(const std::string& name) const;
 
 	bool Load(const HapticFileInfo& fileInfo) const;

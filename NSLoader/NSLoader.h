@@ -32,7 +32,7 @@ extern "C" {
 	NSLOADER_API bool __stdcall NSVR_CreatePattern(TestClass* ptr, uint32_t handle, LPSTR name) {
 		return ptr->CreatePattern(handle, name);
 	}
-	NSLOADER_API bool __stdcall NSVR_CreateCodePattern(TestClass* ptr, uint32_t handle, uint32_t* data, uint32_t size) { return ptr->CreatePattern(handle, data, size); }
+	NSLOADER_API bool __stdcall NSVR_SaveCodePattern(TestClass* ptr, LPSTR name,  uint32_t* data, uint32_t size) { return ptr->SavePattern(name, data, size); }
 	NSLOADER_API bool __stdcall NSVR_LoadPattern(TestClass* ptr, LPSTR param) { return ptr->LoadPattern(param); }
 
 	//Experience
