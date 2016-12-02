@@ -34,16 +34,15 @@ public:
 	
 	bool LoadSequence(LPSTR param);
 	bool CreateSequence(uint32_t handle, LPSTR param, uint32_t loc);
-	bool CreateSequence(uint32_t handle, uint32_t* data, uint32_t size);
+//	bool CreateSequence(uint32_t handle, uint32_t* data, uint32_t size);
 
 	bool LoadPattern(LPSTR param);
 	bool CreatePattern(uint32_t handle, LPSTR param);
-	bool SavePattern(LPSTR name, uint32_t* data, uint32_t size);
+	//bool SavePattern(LPSTR name, uint32_t* data, uint32_t size);
 
 	bool LoadExperience(LPSTR param);
 	bool CreateExperience(uint32_t handle, LPSTR param);
 
-	int PlayEffect(Effect e, Location loc, float duration, float time, unsigned int priority);
 	void SetTrackingEnabled(bool wantTracking);
 	void HandleCommand(unsigned int handle, short c);
 
