@@ -15,7 +15,7 @@ extern "C" {
 	NSLOADER_API TestClass* __stdcall NSVR_Create(LPSTR str) { return new TestClass(str); }
 	NSLOADER_API uint32_t __stdcall NSVR_GenHandle(TestClass* ptr) { return ptr->GenHandle(); }
 	NSLOADER_API int  __stdcall NSVR_PollStatus(TestClass* ptr) { return ptr->PollStatus(); }
-	NSLOADER_API void __stdcall NSVR_PollTracking(TestClass* ptr, NullSpaceDLL::TrackingUpdate& q) { ptr->PollTracking(q); }
+	NSLOADER_API void __stdcall NSVR_PollTracking(TestClass* ptr, NullSpaceDLL::InteropTrackingUpdate& q) { ptr->PollTracking(q); }
 	NSLOADER_API void __stdcall NSVR_Delete(TestClass* ptr) { delete ptr; }
 	NSLOADER_API void __stdcall NSVR_SetTrackingEnabled(TestClass* ptr, bool wantTracking) { ptr->SetTrackingEnabled(wantTracking); }
 	
@@ -44,4 +44,11 @@ extern "C" {
 	NSLOADER_API char* __stdcall NSVR_GetError(TestClass* ptr) { return ptr->GetError(); }
 
 	NSLOADER_API void __stdcall NSVR_FreeString(char* string) { delete[] string; }
+
+	NSLOADER_API bool __stdcall NSVR_GetEngineStatus(TestClass* ptr) { return ptr->GetPlayingStatus(); }
+	NSLOADER_API bool NSVR_EngineCommand(TestClass* ptr, short command) { return ptr->EngineCommand(command); }
+	//timewarp
+
+	//engine commands
+
 }

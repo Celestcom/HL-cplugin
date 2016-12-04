@@ -17,7 +17,8 @@
 TestClass::TestClass(LPSTR param) : 
 	_resolver(std::make_unique<DependencyResolver>(std::string(param))), 
 	_wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453"),
-	_decoder(std::make_unique<FlatbuffDecoder>())
+	_decoder(std::make_unique<FlatbuffDecoder>()), 
+	_isEnginePlaying(true)
 {
 
 
@@ -150,9 +151,32 @@ bool TestClass::Poll() {
 	return _wire.Receive(_suitStatus, _tracking);
 }
 
-void TestClass::PollTracking(NullSpaceDLL::TrackingUpdate& t) {
+void TestClass::PollTracking(NullSpaceDLL::InteropTrackingUpdate& t) {
 	Poll();
 	t = _tracking;
+}
+
+bool TestClass::GetPlayingStatus()
+{
+	return _isEnginePlaying;
+}
+
+bool TestClass::EngineCommand(short command)
+{
+	if (command && NullSpace::HapticFiles::EngineCommand_PLAY_ALL) {
+		//update our cached state
+
+		_isEnginePlaying = true;
+	}
+	else if (command && NullSpace::HapticFiles::EngineCommand_PAUSE_ALL) {
+		//update our cached state
+		_isEnginePlaying = false;
+	}
+
+	_wire.AquireEncodingLock();
+	_wire.Send(_wire.Encoder->Encode(NullSpaceDLL::EngineCommand(command)));
+	_wire.ReleaseEncodingLock();
+	return true;
 }
 
 

@@ -18,7 +18,7 @@
 
 #include <mutex>
 
-typedef IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset> FlatbuffEncoder;
+typedef IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset> FlatbuffEncoder;
 class Wire
 {
 public:
@@ -50,7 +50,9 @@ public:
 	void Wire::Send(HandleCommandOffset& input) {
 		Encoder->Finalize(input, "whatever", boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
-	
+	void Wire::Send(EngineCommandOffset& input) {
+		Encoder->Finalize(input, "whatever", boost::bind(&Wire::sendToEngine, this, _1, _2));
+	}
 	void Wire::Send(ClientOffset& input) {
 		
 	}
@@ -61,7 +63,7 @@ public:
 	}
 	
 
-	bool Wire::Receive(NullSpace::Communication::SuitStatus& status, NullSpaceDLL::TrackingUpdate& tracking) {
+	bool Wire::Receive(NullSpace::Communication::SuitStatus& status, NullSpaceDLL::InteropTrackingUpdate& tracking) {
 		zmq::message_t msg;
 		if (_receiveFromEngineSocket->recv(&msg, ZMQ_DONTWAIT)) {
 			flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(msg.data()), msg.size());

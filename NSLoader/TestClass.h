@@ -16,10 +16,11 @@ private:
 	std::unique_ptr<DependencyResolver> _resolver;
 	Wire _wire;
 	NullSpace::Communication::SuitStatus _suitStatus;
-	NullSpaceDLL::TrackingUpdate _tracking;
+	NullSpaceDLL::InteropTrackingUpdate _tracking;
 	uint32_t _currentHandleId;
 	std::string _currentError;
 	std::unique_ptr<FlatbuffDecoder> _decoder;
+	bool _isEnginePlaying;
 public:
 	
 
@@ -29,9 +30,9 @@ public:
 	bool Poll();
 	int PollStatus();
 	uint32_t GenHandle();
-	void PollTracking(NullSpaceDLL::TrackingUpdate& q);
-
-	
+	void PollTracking(NullSpaceDLL::InteropTrackingUpdate& q);
+	bool GetPlayingStatus();
+	bool EngineCommand(short command);
 	bool LoadSequence(LPSTR param);
 	bool CreateSequence(uint32_t handle, LPSTR param, uint32_t loc);
 //	bool CreateSequence(uint32_t handle, uint32_t* data, uint32_t size);

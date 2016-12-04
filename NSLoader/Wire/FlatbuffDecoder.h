@@ -96,8 +96,8 @@ public:
 	static NullSpace::Communication::SuitStatus FlatbuffDecoder::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();
 	}
-	static NullSpaceDLL::TrackingUpdate FlatbuffDecoder::Decode(const NullSpace::Communication::TrackingUpdate* update) {
-		NullSpaceDLL::TrackingUpdate t;
+	static NullSpaceDLL::InteropTrackingUpdate FlatbuffDecoder::Decode(const NullSpace::Communication::TrackingUpdate* update) {
+		NullSpaceDLL::InteropTrackingUpdate t;
 
 
 		auto quat = update->chest();
