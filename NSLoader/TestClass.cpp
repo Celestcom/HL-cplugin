@@ -32,6 +32,7 @@ TestClass::TestClass():_wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453")
 
 TestClass::~TestClass()
 {
+
 	//TODO: figure out why we can't leave destruction totally up to zmq context destroy
 }
 
@@ -163,12 +164,12 @@ bool TestClass::GetPlayingStatus()
 
 bool TestClass::EngineCommand(short command)
 {
-	if (command && NullSpace::HapticFiles::EngineCommand_PLAY_ALL) {
+	if (command == NullSpace::HapticFiles::EngineCommand_PLAY_ALL) {
 		//update our cached state
 
 		_isEnginePlaying = true;
 	}
-	else if (command && NullSpace::HapticFiles::EngineCommand_PAUSE_ALL) {
+	else if (command == NullSpace::HapticFiles::EngineCommand_PAUSE_ALL) {
 		//update our cached state
 		_isEnginePlaying = false;
 	}
