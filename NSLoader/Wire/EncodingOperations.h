@@ -109,9 +109,16 @@ class EncodingOperations : public IEncoder<SeqOffset, PatOffset, ExpOffset, ImuO
 {
 private:
 	flatbuffers::FlatBufferBuilder _builder;
+	std::mutex _encodingLock;
 public:
 	EncodingOperations() {
 	
+	}
+	void AquireEncodingLock() {
+		_encodingLock.lock();
+	}
+	void ReleaseEncodingLock() {
+		_encodingLock.unlock();
 	}
 	static bool VerifyHapticPacket(flatbuffers::FlatBufferBuilder& builder) {
 		flatbuffers::Verifier verifier(builder.GetBufferPointer(), builder.GetSize());

@@ -17,7 +17,6 @@ extern "C" {
 	NSLOADER_API int  __stdcall NSVR_PollStatus(TestClass* ptr) { return ptr->PollStatus(); }
 	NSLOADER_API void __stdcall NSVR_PollTracking(TestClass* ptr, NullSpaceDLL::InteropTrackingUpdate& q) { ptr->PollTracking(q); }
 	NSLOADER_API void __stdcall NSVR_Delete(TestClass* ptr) { delete ptr; }
-	NSLOADER_API void __stdcall NSVR_SetTrackingEnabled(TestClass* ptr, bool wantTracking) { ptr->SetTrackingEnabled(wantTracking); }
 	
 	//Sequence
 	NSLOADER_API bool __stdcall NSVR_CreateSequence(TestClass* ptr, uint32_t handle, LPSTR name, uint32_t loc) {
