@@ -169,6 +169,7 @@ public:
 	{
 		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect>> effects_vector;
 		effects_vector.reserve(input.JsonAtoms().size());
+	
 		for (auto const &e : input.JsonAtoms()) {
 		
 			auto effect = NullSpace::HapticFiles::CreateHapticEffect(_builder,e.Time, _builder.CreateString(e.Effect), e.Strength, e.Duration, e.Repeat);
@@ -185,7 +186,7 @@ public:
 		for (auto const &f : input.PackedAtoms()) {
 			
 
-			auto frame = NullSpace::HapticFiles::CreateHapticFrame(_builder, f.Time, Encode(f.Haptic), uint32_t(f.Haptic.Area()));
+			auto frame = NullSpace::HapticFiles::CreateHapticFrame(_builder, f.Time, Encode(f.Haptic), uint32_t(f.Haptic.Area()), f.Haptic.Strength());
 			frame_vector.push_back(frame);
 		}
 		auto frames = _builder.CreateVector(frame_vector);
@@ -302,7 +303,7 @@ public:
 			
 			auto seq = Decode(frame->sequence());
 			
-			frames.push_back(HapticFrame(frame->time(), seq, AreaFlag(frame->area()), 1));
+			frames.push_back(HapticFrame(frame->time(), seq, AreaFlag(frame->area()), 1, frame->strength()));
 		}
 
 		return frames;

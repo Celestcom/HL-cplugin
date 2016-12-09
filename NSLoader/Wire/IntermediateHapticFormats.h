@@ -83,10 +83,11 @@ private:
 class HapticFrame 
 {
 public:
-	HapticFrame(float time, std::vector<JsonSequenceAtom> frame, AreaFlag area, unsigned int priority = 1);
+	HapticFrame(float time, std::vector<JsonSequenceAtom> frame, AreaFlag area, unsigned int priority, float strength);
 	~HapticFrame();
 	float Time;
 	float OriginalTime;
+	float Strength;
 	AreaFlag Area;
 	unsigned int Priority;
 	std::vector<JsonSequenceAtom> Frame;
@@ -113,6 +114,7 @@ public:
 	float Time;
 	std::string Sequence;
 	std::string Area;
+	float Strength;
 	void Deserialize(const Json::Value& root);
 	void Serialize(const Json::Value& root) {};
 };
@@ -150,14 +152,16 @@ private:
 
 class PackedSequence {
 public:
-	PackedSequence(std::string name, std::vector<JsonSequenceAtom> atoms, AreaFlag a) :_name(name), _atoms(atoms), _area(a) {};
+	PackedSequence(std::string name, std::vector<JsonSequenceAtom> atoms, AreaFlag a, float strength) :_name(name), _atoms(atoms), _area(a), _strength(strength) {};
 	PackedSequence() = default;
 	std::string Name() const { return _name; }
 	::AreaFlag Area() const { return _area; }
+	float Strength() const { return _strength; }
 	std::vector<JsonSequenceAtom> JsonAtoms() const { return _atoms; }
 private:
 	std::string _name;
 	::AreaFlag _area;
+	float _strength;
 	std::vector<JsonSequenceAtom> _atoms;
 };
 

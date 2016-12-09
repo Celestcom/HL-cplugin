@@ -57,7 +57,7 @@ void JsonPatternAtom::Deserialize(const Json::Value & root)
 	jsonGet(this->Time, root, "time", 0.0, "key 'time' must be present in this sequence-item");
 	jsonGet(this->Sequence, root, "sequence", "INVALID_SEQUENCE", "key 'sequence' must be present in this sequence-item");
 	jsonGet(this->Area, root, "area", "INVALID_AREA", "key 'area' must be present in this sequence-item");
-
+	this->Strength = root.get("strength", 1.0).asFloat();
 }
 
 void JsonExperienceAtom::Deserialize(const Json::Value& root) {
@@ -65,7 +65,7 @@ void JsonExperienceAtom::Deserialize(const Json::Value& root) {
 	jsonGet(this->Pattern, root, "pattern", "INVALID_PATTERN", "key 'pattern' must be present in this pattern-item");
 
 }
-HapticFrame::HapticFrame(float time, std::vector<JsonSequenceAtom> frame, AreaFlag a, unsigned int priority) : Time(time), OriginalTime(time), Priority(priority), Frame(frame), Area(a)
+HapticFrame::HapticFrame(float time, std::vector<JsonSequenceAtom> frame, AreaFlag a, unsigned int priority, float strength) : Time(time), OriginalTime(time), Priority(priority), Frame(frame), Area(a), Strength(strength)
 {
 }
 

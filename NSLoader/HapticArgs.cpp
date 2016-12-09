@@ -22,7 +22,7 @@ int PatternArgs::GetCombinedHash() const
 	return s;
 }
 
-SequenceArgs::SequenceArgs(const std::string& name, AreaFlag loc) : Location(loc), Name(name)
+SequenceArgs::SequenceArgs(const std::string& name, AreaFlag loc, float strength) : Location(loc), Name(name), Strength(strength)
 {
 }
 
@@ -33,7 +33,7 @@ SequenceArgs::~SequenceArgs()
 int SequenceArgs::GetCombinedHash() const
 {
 	std::size_t s = 17;
-	hash_combine(s, this->Name, this->Location);
+	hash_combine(s, this->Name, this->Location, this->Strength);
 	return s;
 }
 

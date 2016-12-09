@@ -26,7 +26,7 @@ public:
 	~DependencyResolver();
 	//void SetBasePath(const std::string& path);
 	static Location ComputeLocationSide(JsonLocation loc, Side side);
-	PackedSequence ResolveSequence(const std::string& name, AreaFlag location) const;
+	PackedSequence ResolveSequence(const std::string& name, AreaFlag location, float strength) const;
 	PackedPattern ResolvePattern(const std::string& name) const;
 	PackedExperience ResolveExperience(const std::string& name) const;
 

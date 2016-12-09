@@ -53,9 +53,9 @@ Location DependencyResolver::ComputeLocationSide(JsonLocation location, Side sid
 	}
 }
 
-PackedSequence DependencyResolver::ResolveSequence(const std::string & name, AreaFlag location) const
+PackedSequence DependencyResolver::ResolveSequence(const std::string & name, AreaFlag location, float strength) const
 {
-	return _sequenceResolver->Resolve(SequenceArgs(name, location));
+	return _sequenceResolver->Resolve(SequenceArgs(name, location, strength));
 }
 
 PackedPattern DependencyResolver::ResolvePattern(const std::string& name) const
@@ -105,7 +105,7 @@ PackedSequence SequenceResolver::Resolve(SequenceArgs args)
 	}
 	auto inputItems = _sequenceLoader->GetLoadedResource(args.Name);
 
-	auto packed = PackedSequence(inputItems.Name(), inputItems.JsonAtoms(), args.Location);
+	auto packed = PackedSequence(inputItems.Name(), inputItems.JsonAtoms(), args.Location, args.Strength);
 	_cache.Cache(args, packed);
 	return packed;
 }
@@ -144,7 +144,7 @@ PackedPattern PatternResolver::Resolve(PatternArgs args)
 		auto parsedArea = AreaParser(seq.Area).GetArea();
 		seqs.push_back(TimeIndex<PackedSequence>(
 			seq.Time, 
-			_seqResolver->Resolve(SequenceArgs(seq.Sequence, parsedArea))));
+			_seqResolver->Resolve(SequenceArgs(seq.Sequence, parsedArea, seq.Strength))));
 	}
 	auto packed = PackedPattern(args.Name, seqs);
 	_cache.Cache(args, packed);

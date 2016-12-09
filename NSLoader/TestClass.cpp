@@ -185,9 +185,11 @@ bool TestClass::EngineCommand(short command)
 //TODO: wrap with exception handling incase flatbuffers fails/file fails to load/etc
 bool TestClass::CreateSequence(uint32_t handle, LPSTR param, uint32_t loc)
 {
+	//strengths need to keep propogating everywhere. Tehn need to do it in engine
 	auto name = std::string(param);
 	if (_resolver->Load(SequenceFileInfo(name))) {
-		auto res = _resolver->ResolveSequence(name, AreaFlag(loc));
+		//default strength for now
+		auto res = _resolver->ResolveSequence(name, AreaFlag(loc), 1.0);
 		_wire.AquireEncodingLock();
 		
 		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);

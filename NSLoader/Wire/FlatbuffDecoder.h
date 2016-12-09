@@ -72,7 +72,7 @@ public:
 
 			auto seq = Decode(frame->sequence());
 
-			frames.push_back(HapticFrame(frame->time(), seq, AreaFlag(frame->area()), 1));
+			frames.push_back(HapticFrame(frame->time(), seq, AreaFlag(frame->area()), 1, frame->strength()));
 		}
 
 		return frames;
@@ -116,11 +116,11 @@ public:
 		//std::vector<HapticFrame> frames;
 		const auto items = pattern->items();
 	//	frames.reserve(items->size());
-
+		//TODO: THIS DOES NOT WORK AT ALL
 		for (const auto& frame : *items) {
 
 			auto seq = Decode(frame->sequence(), resolver);
-			test.push_back(TimeIndex<PackedSequence>(frame->time(), PackedSequence("placeholder", seq, AreaFlag(frame->area()))));
+			//test.push_back(TimeIndex<PackedSequence>(frame->time(), PackedSequence("placeholder", seq, AreaFlag(frame->area()),frame->strength() )));
 			//frames.push_back(HapticFrame(frame->time(), seq, AreaFlag(frame->area()), 1));
 		}
 
