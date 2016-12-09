@@ -38,7 +38,7 @@ extern "C" {
 	}
 	NSLOADER_API bool __stdcall NSVR_LoadExperience(TestClass* ptr, LPSTR param) { return ptr->LoadExperience(param); }
 	//Play, stop, etc.
-	NSLOADER_API void __stdcall NSVR_HandleCommand(TestClass* ptr, unsigned int handle, short command) { ptr->HandleCommand(handle, command); }
+	NSLOADER_API void __stdcall NSVR_HandleCommand(TestClass* ptr, uint32_t handle, short command) { ptr->HandleCommand(handle, command); }
 
 	NSLOADER_API char* __stdcall NSVR_GetError(TestClass* ptr) { return ptr->GetError(); }
 
