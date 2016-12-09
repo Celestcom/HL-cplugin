@@ -15,6 +15,7 @@
 #include "MixedHapticFrame_generated.h"
 #include "MixedPattern_generated.h"
 #include "MixedSequence_generated.h"
+#include <mutex>
 
 struct Quaternion {
 	float w;
