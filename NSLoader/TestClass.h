@@ -24,14 +24,15 @@ private:
 public:
 	
 
-	TestClass(LPSTR param);
 	TestClass();
 	~TestClass();
 	bool Poll();
 	int PollStatus();
 	uint32_t GenHandle();
+	bool InitializeFromFilesystem(LPSTR path);
 	void PollTracking(NullSpaceDLL::InteropTrackingUpdate& q);
 	bool GetPlayingStatus();
+	bool Load(LPSTR param, int filetype);
 	bool EngineCommand(short command);
 	bool LoadSequence(LPSTR param);
 	bool CreateSequence(uint32_t handle, LPSTR param, uint32_t loc);

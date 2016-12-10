@@ -14,8 +14,8 @@
 
 
 
-TestClass::TestClass(LPSTR param) : 
-	_resolver(std::make_unique<DependencyResolver>(std::string(param))), 
+TestClass::TestClass() : 
+	
 	_wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453"),
 	_decoder(std::make_unique<FlatbuffDecoder>()), 
 	_isEnginePlaying(true)
@@ -25,8 +25,11 @@ TestClass::TestClass(LPSTR param) :
 
 }
 
-TestClass::TestClass():_wire("tcp://127.0.0.1:9452", "tcp://127.0.0.1:9453")
-{
+bool TestClass::InitializeFromFilesystem(LPSTR path) {
+	//ideally we see if the filesystem exists first, and return a bool representing failure / throw an exception and 
+	//catch it, translate across the interop boundary
+	_resolver = std::make_unique<DependencyResolver>(std::string(path));
+	return true;
 }
 
 
@@ -160,6 +163,18 @@ void TestClass::PollTracking(NullSpaceDLL::InteropTrackingUpdate& t) {
 bool TestClass::GetPlayingStatus()
 {
 	return _isEnginePlaying;
+}
+
+bool TestClass::Load(LPSTR param, int filetype)
+{
+	switch (filetype) {
+	case 0:
+		return this->LoadSequence(param);
+	case 1:
+		return this->LoadPattern(param);
+	case 2:
+		return this->LoadExperience(param);
+	}
 }
 
 bool TestClass::EngineCommand(short command)
