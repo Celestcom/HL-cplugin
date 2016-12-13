@@ -35,7 +35,7 @@ bool TestClass::InitializeFromFilesystem(LPSTR path) {
 
 TestClass::~TestClass()
 {
-
+	EngineCommand(NullSpace::HapticFiles::EngineCommand_CLEAR_ALL);
 	//TODO: figure out why we can't leave destruction totally up to zmq context destroy
 }
 

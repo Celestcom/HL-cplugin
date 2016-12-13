@@ -1,9 +1,12 @@
 #pragma once
+#define NOMINMAX
+
 #include <memory>
 #include "zmq.hpp"
 #include "zmq_addon.hpp"
 #include "Locator.h"
 #define FLATBUFFERS_DEBUG_VERIFICATION_FAILURE
+
 #include "flatbuffers\flatbuffers.h"
 #include "HapticEffect_generated.h"
 #include "HapticFrame_generated.h"
