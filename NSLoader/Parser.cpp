@@ -58,6 +58,8 @@ boost::filesystem::path Parser::GetDirectory(std::string package) {
 }
 void Parser::Traverse(EnumNode node, std::string prefix)
 {
+	//if it has a namespace,
+	//then check if it had a parent namespace. 
 	if (node.Data.Namespace!= "")
 	{
 		if (prefix == "")
@@ -76,6 +78,8 @@ void Parser::Traverse(EnumNode node, std::string prefix)
 
 	for (auto child : node.Children)
 	{
+		//if PARENT is a toplevel node, we want to pass in just the parent name as the prefix
+		//if PARENT is a child node, we want to pass in the full history by adding it on
 		Traverse(child.second, prefix == "" ? node.Namespace : prefix + "." + node.Namespace);
 	}
 	

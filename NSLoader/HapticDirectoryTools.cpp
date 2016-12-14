@@ -230,6 +230,7 @@ void HapticEnumerator::insert(EnumNode& node,  HapticEnumList& list) const
 		} else
 		{
 			node.Children[topLevel] = EnumNode();
+			node.Children[topLevel].Namespace = topLevel;
 			insert(node.Children[topLevel], list);
 		}
 	}
