@@ -39,11 +39,10 @@ TestClass::~TestClass()
 	//TODO: figure out why we can't leave destruction totally up to zmq context destroy
 }
 
-/* returns 1 for connected, 0 for disconnected */
 int TestClass::PollStatus()
 {
 	Poll();
-	return _suitStatus;
+	return (int)_suitStatus;
 }
 
 uint32_t TestClass::GenHandle()

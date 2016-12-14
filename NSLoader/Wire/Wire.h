@@ -68,7 +68,13 @@ public:
 
 	bool Wire::Receive(NullSpace::Communication::SuitStatus& status, NullSpaceDLL::InteropTrackingUpdate& tracking) {
 		zmq::message_t msg;
+		
 		if (_receiveFromEngineSocket->recv(&msg, ZMQ_DONTWAIT)) {
+			int size = msg.size();
+			if (size == 0) {
+				//THIS TERRIBLE BUG WHERE WE RECEIVE SOCKET INFORMATION!
+				return false;
+			}
 			flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(msg.data()), msg.size());
 			if (NullSpace::Communication::VerifyEnginePacketBuffer(verifier)) {
 				auto packet = NullSpace::Communication::GetEnginePacket(msg.data());
@@ -106,8 +112,10 @@ public:
 
 
 		_receiveFromEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_SUB);
-		_receiveFromEngineSocket->setsockopt(ZMQ_CONFLATE, 1);
+		int confl = 1;
 		_receiveFromEngineSocket->connect(receiveAddress);
+		_receiveFromEngineSocket->setsockopt(ZMQ_CONFLATE, &confl, sizeof(confl));
+
 		_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "", 0);
 
 		//TODO: use different socket types, because we can't have multiple apps bind to the same tcp socket
