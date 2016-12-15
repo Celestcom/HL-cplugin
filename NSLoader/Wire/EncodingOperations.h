@@ -18,6 +18,7 @@
 #include "MixedSequence_generated.h"
 #include <mutex>
 
+//need to include the quaternion structures a better way
 #ifndef IS_ENGINE
 #include "NSLoader.h"
 #else 
@@ -57,6 +58,9 @@ namespace NullSpaceDLL {
 
 typedef std::function<void(uint8_t*, int)> DataCallback;
 
+
+// This monstrosity is to enforce that the proper encode/finalize methods exist. 
+// It does not enfore decoding but we could add it. 
 template<
 		typename Seq, 
 		typename Pat, 
@@ -160,6 +164,7 @@ public:
 
 	}
 	*/
+
 	SeqOffset EncodingOperations::Encode(const PackedSequence& input)
 	{
 		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::HapticEffect>> effects_vector;

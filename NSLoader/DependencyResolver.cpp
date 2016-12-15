@@ -199,3 +199,53 @@ PackedExperience ExperienceResolver::Resolve(ExperienceArgs args)
 	_cache.Cache(args, packed);
 	return packed;
 }
+
+NodeDependencyResolver::NodeDependencyResolver(const std::string & basePath) :_loader(basePath)
+{
+	
+	
+}
+
+
+
+NodeDependencyResolver::~NodeDependencyResolver()
+{
+}
+
+Node NodeDependencyResolver::Resolve(const SequenceArgs & args)
+{
+	Node root = _loader.GetSequenceLoader()->GetLoadedResource(args.Name);
+	root.Area = (uint32_t)args.Location;
+	return root;
+}
+
+Node NodeDependencyResolver::Resolve(const PatternArgs & args)
+{
+	Node root = _loader.GetPatternLoader()->GetLoadedResource(args.Name);
+	Node packedRoot(Node::EffectType::Pattern);
+	packedRoot.Effect = root.Effect;
+	for (auto n : root.Children) {
+		Node resolved = Resolve(SequenceArgs(n.Effect, (AreaFlag)n.Area, n.Strength));
+		packedRoot.Children.push_back(resolved);
+	}
+
+	return packedRoot;
+}
+
+Node NodeDependencyResolver::Resolve(const ExperienceArgs & args)
+{
+	Node root = _loader.GetExperienceLoader()->GetLoadedResource(args.Name);
+	Node packedRoot(Node::EffectType::Experience);
+	packedRoot.Effect = root.Effect;
+	for (auto n : root.Children) {
+		Node resolved = Resolve(PatternArgs(n.Effect, Side::NotSpecified));
+		packedRoot.Children.push_back(resolved);
+	}
+	return packedRoot;
+}
+
+bool NodeDependencyResolver::Load(const HapticFileInfo & info)
+{
+	return _loader.Load(info);
+}
+

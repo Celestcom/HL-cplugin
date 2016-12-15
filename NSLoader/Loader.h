@@ -23,6 +23,46 @@ public:
 	virtual T GetLoadedResource(const std::string& key) = 0;
 };
 
+class NodeSequenceLoader : public IHapticLoadingStrategy<Node> {
+public: 
+	NodeSequenceLoader(shared_ptr<Parser>);
+	~NodeSequenceLoader();
+	bool Load(const HapticFileInfo& fileInfo) override;
+	Node GetLoadedResource(const std::string& key) override;
+private:
+	shared_ptr<Parser> _parser;
+	unordered_map<string, Node> _nodes;
+};
+
+class NodePatternLoader : public IHapticLoadingStrategy<Node> {
+public:
+	NodePatternLoader(shared_ptr<Parser>, shared_ptr<NodeSequenceLoader>);
+	~NodePatternLoader();
+	bool Load(const HapticFileInfo& fileInfo) override;
+	Node GetLoadedResource(const std::string& key) override;
+private:
+	shared_ptr<Parser> _parser;
+	shared_ptr<NodeSequenceLoader> _sequenceLoader;
+
+	unordered_map<string, Node> _nodes;
+	void loadAllSequences(vector<JsonPatternAtom>) const;
+
+};
+
+class NodeExperienceLoader : public IHapticLoadingStrategy<Node> {
+public:
+	NodeExperienceLoader(shared_ptr<Parser>, shared_ptr<NodePatternLoader>);
+	~NodeExperienceLoader();
+	bool Load(const HapticFileInfo& fileInfo) override;
+	Node GetLoadedResource(const std::string& key) override;
+private:
+	shared_ptr<Parser> _parser;
+	shared_ptr<NodePatternLoader> _patternLoader;
+
+	unordered_map<string, Node> _nodes;
+	void loadAllNodePatterns(vector<JsonExperienceAtom>) const;
+
+};
 
 
 class SequenceLoader : public IHapticLoadingStrategy<JsonSequence>
@@ -79,6 +119,26 @@ private:
 	shared_ptr<PatternLoader> _patternLoader;
 	shared_ptr<ExperienceLoader> _experienceLoader;
 	shared_ptr<SequenceLoader> _sequenceLoader;
+
+
+
+};
+
+class NodeLoader
+{
+public:
+	NodeLoader(const std::string& basePath);
+	~NodeLoader();
+	shared_ptr<NodePatternLoader> GetPatternLoader() const;
+	shared_ptr<NodeSequenceLoader> GetSequenceLoader() const;
+	shared_ptr<NodeExperienceLoader> GetExperienceLoader() const;
+	bool Load(const HapticFileInfo& fileInfo) const;
+
+private:
+	shared_ptr<Parser> _parser;
+	shared_ptr<NodePatternLoader> _patternLoader;
+	shared_ptr<NodeExperienceLoader> _experienceLoader;
+	shared_ptr<NodeSequenceLoader> _sequenceLoader;
 
 
 

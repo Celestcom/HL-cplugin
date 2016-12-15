@@ -150,6 +150,19 @@ private:
 	std::vector<JsonExperienceAtom> _atoms;
 };
 
+class Node {
+public:
+	enum class EffectType {Effect, Sequence, Pattern, Experience};
+	Node::EffectType Type;
+	std::vector<Node> Children;
+	float Time;
+	std::string Effect;
+	float Strength;
+	float Duration;
+	uint32_t Area;
+	Node(Node::EffectType nodeType) : Type(nodeType) {}
+};
+
 class PackedSequence {
 public:
 	PackedSequence(std::string name, std::vector<JsonSequenceAtom> atoms, AreaFlag a, float strength) :_name(name), _atoms(atoms), _area(a), _strength(strength) {};

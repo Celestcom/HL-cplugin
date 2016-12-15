@@ -28,8 +28,9 @@ public:
 	static Location ComputeLocationSide(JsonLocation loc, Side side);
 	PackedSequence ResolveSequence(const std::string& name, AreaFlag location, float strength) const;
 	PackedPattern ResolvePattern(const std::string& name) const;
+	
 	PackedExperience ResolveExperience(const std::string& name) const;
-
+	
 	void CacheNewSequence(std::string name, PackedSequence s);
 	std::vector<JsonSequenceAtom> FetchCachedSequence(const std::string& name) const;
 
@@ -43,7 +44,22 @@ private:
 };
 
 
+class NodeDependencyResolver {
+public:
+	NodeDependencyResolver(const std::string& basePath);
+	~NodeDependencyResolver();
+	Node Resolve(const SequenceArgs& args);
+	Node Resolve(const PatternArgs& args);
+	Node Resolve(const ExperienceArgs& args);
+	
+	bool Load(const HapticFileInfo& info);
+	
+private:
+	
+	NodeLoader _loader;
 
+	
+};
 
 class SequenceResolver : public IResolvable<SequenceArgs, PackedSequence>
 {
