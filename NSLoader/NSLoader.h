@@ -33,13 +33,14 @@ extern "C" {
 	
 
 	NSLOADER_API NSVRPlugin __stdcall NSVR_Create();
-	
+	NSLOADER_API void __stdcall NSVR_Delete(NSVRPlugin ptr);
+
 	NSLOADER_API unsigned int __stdcall NSVR_GenHandle(NSVRPlugin ptr);
 	NSLOADER_API int  __stdcall NSVR_PollStatus(NSVRPlugin ptr);
+
 	NSLOADER_API void __stdcall NSVR_PollTracking(NSVRPlugin ptr, NullSpaceDLL::InteropTrackingUpdate& q);
-	NSLOADER_API void __stdcall NSVR_Delete(NSVRPlugin ptr);
-	NSLOADER_API bool __stdcall NSVR_CreateSequence(NSVRPlugin ptr, unsigned int handle, LPSTR name, unsigned int loc);
 	NSLOADER_API bool __stdcall NSVR_Load(NSVRPlugin ptr, LPSTR param, int fileType);
+	NSLOADER_API bool __stdcall NSVR_CreateSequence(NSVRPlugin ptr, unsigned int handle, LPSTR name, unsigned int loc);
 
 	NSLOADER_API bool __stdcall NSVR_CreatePattern(NSVRPlugin ptr, unsigned int handle, LPSTR name);
 

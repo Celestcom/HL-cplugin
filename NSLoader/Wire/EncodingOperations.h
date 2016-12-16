@@ -67,8 +67,9 @@ template<
 	typename TrackOffset,
 	typename HandleCommandOffset,
 	typename EngineCommandOffset,
-typename NodeOffset>
-	class IEncoder {
+	typename NodeOffset>
+
+class IEncoder {
 	public:
 		
 		virtual NodeOffset Encode(const Node& input) = 0;
@@ -97,6 +98,7 @@ typedef struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate>
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::HandleCommand> HandleCommandOffset;
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::EngineCommandData> EngineCommandOffset;
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::Node> NodeOffset;
+
 class EncodingOperations : public IEncoder<ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset, NodeOffset>
 {
 private:
@@ -314,7 +316,6 @@ public:
 		}
 		return atoms;
 	}
-
 	static std::vector<HapticSample> EncodingOperations::DecodeExperience(const NullSpace::HapticFiles::Node* node) {
 		assert(node->type() == NullSpace::HapticFiles::NodeType_Experience);
 
@@ -328,12 +329,9 @@ public:
 		}
 		return atoms;
 	}
-
-
 	static bool EncodingOperations::Decode(const NullSpace::HapticFiles::Tracking* tracking) {
 		return tracking->enable();
 	}
-	
 	static NullSpaceDLL::EngineCommand EncodingOperations::Decode(const NullSpace::HapticFiles::EngineCommandData* command)
 	{
 		return NullSpaceDLL::EngineCommand(command->command());
@@ -352,17 +350,13 @@ public:
 	}
 	static NullSpaceDLL::InteropTrackingUpdate EncodingOperations::Decode(const NullSpace::Communication::TrackingUpdate* update) {
 		NullSpaceDLL::InteropTrackingUpdate t;
-
-
 		auto quat = update->chest();
 		t.chest.w = quat->w();
 		t.chest.x = quat->x();
 		t.chest.y = quat->y();
 		t.chest.z = quat->z();
 		return t;
-
 	}
-
 
 
 	~EncodingOperations() {
