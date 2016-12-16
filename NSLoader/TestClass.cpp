@@ -28,7 +28,7 @@ TestClass::TestClass() :
 bool TestClass::InitializeFromFilesystem(LPSTR path) {
 	//ideally we see if the filesystem exists first, and return a bool representing failure / throw an exception and 
 	//catch it, translate across the interop boundary
-	_resolver = std::make_unique<DependencyResolver>(std::string(path));
+	_resolver = std::make_unique<NodeDependencyResolver>(std::string(path));
 	return true;
 }
 
@@ -104,9 +104,9 @@ bool TestClass::CreatePattern(uint32_t handle, LPSTR param)
 {
 	auto name = std::string(param);
 	if (_resolver->Load(PatternFileInfo(name))) {
-		auto res = _resolver->ResolvePattern(name);
+		auto res = _resolver->Resolve(PatternArgs(name, Side::NotSpecified));
 		_wire.AquireEncodingLock();
-		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
+		_wire.Send(_wire.Encoder->Encode(res), res.Effect, handle);
 		_wire.ReleaseEncodingLock();
 		return true;
 	}
@@ -141,9 +141,9 @@ bool TestClass::CreateExperience(uint32_t handle, LPSTR param)
 {
 	auto name = std::string(param);
 	if (_resolver->Load(ExperienceFileInfo(name))) {
-		auto res = _resolver->ResolveExperience(name);
+		auto res = _resolver->Resolve(ExperienceArgs(name, Side::NotSpecified));
 		_wire.AquireEncodingLock();
-		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
+		_wire.Send(_wire.Encoder->Encode(res), res.Effect, handle);
 		_wire.ReleaseEncodingLock();
 		return true;
 	}
@@ -203,10 +203,11 @@ bool TestClass::CreateSequence(uint32_t handle, LPSTR param, uint32_t loc)
 	auto name = std::string(param);
 	if (_resolver->Load(SequenceFileInfo(name))) {
 		//default strength for now
-		auto res = _resolver->ResolveSequence(name, AreaFlag(loc), 1.0);
+		
+		auto res = _resolver->Resolve(SequenceArgs(name, AreaFlag(loc), 1.0));
 		_wire.AquireEncodingLock();
 		
-		_wire.Send(_wire.Encoder->Encode(res), res.Name(), handle);
+		_wire.Send(_wire.Encoder->Encode(res), res.Effect, handle);
 		_wire.ReleaseEncodingLock();
 		return true;
 	}

@@ -21,7 +21,7 @@
 
 #include <mutex>
 
-typedef IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset> FlatbuffEncoder;
+typedef IEncoder<SeqOffset, PatOffset, ExpOffset, ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset, NodeOffset> FlatbuffEncoder;
 class Wire
 {
 public:
@@ -50,7 +50,10 @@ public:
 		Encoder->Finalize(handle, input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 
-	void Wire::Send(HandleCommandOffset& input) {
+	void Wire::Send(NodeOffset& input, std::string name, uint32_t handle) {
+		Encoder->Finalize(handle, input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
+	}
+	void Wire::Send(HandleCommandOffset& input) { 
 		Encoder->Finalize(input, "whatever", boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
 	void Wire::Send(EngineCommandOffset& input) {

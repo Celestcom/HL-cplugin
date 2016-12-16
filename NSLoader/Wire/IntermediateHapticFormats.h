@@ -160,6 +160,7 @@ public:
 	float Strength;
 	float Duration;
 	uint32_t Area;
+	Node() {}
 	Node(Node::EffectType nodeType) : Type(nodeType) {}
 };
 

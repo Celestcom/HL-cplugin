@@ -13,7 +13,7 @@
 class TestClass
 {
 private:
-	std::unique_ptr<DependencyResolver> _resolver;
+	std::unique_ptr<NodeDependencyResolver> _resolver;
 	Wire _wire;
 	NullSpace::Communication::SuitStatus _suitStatus;
 	NullSpaceDLL::InteropTrackingUpdate _tracking;
