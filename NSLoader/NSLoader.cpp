@@ -76,3 +76,8 @@
 	 return reinterpret_cast<TestClass*>(ptr)->InitializeFromFilesystem(path);
  }
 
+ NSLOADER_API void __stdcall NSVR_CreateHaptic(NSVRPlugin ptr, unsigned int handle, void * data, unsigned int size)
+ {
+	 reinterpret_cast<TestClass*>(ptr)->CreateHaptic(handle, data, size);
+ }
+

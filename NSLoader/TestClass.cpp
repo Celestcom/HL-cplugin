@@ -230,6 +230,14 @@ void TestClass::HandleCommand(unsigned int handle, short c)
 	_wire.ReleaseEncodingLock();
 }
 
+void TestClass::CreateHaptic(unsigned int handle, void * data, unsigned int size)
+{
+	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
+	if (NullSpace::HapticFiles::VerifyNodeBuffer(verifier)) {
+		_wire.sendToEngine(reinterpret_cast<uint8_t*>(data), size);
+	}
+}
+
 char* TestClass::GetError()
 {
 	const char* sampleString = _currentError.c_str();

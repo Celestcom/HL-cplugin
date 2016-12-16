@@ -46,6 +46,7 @@ public:
 	void SetTrackingEnabled(bool wantTracking);
 	void HandleCommand(unsigned int handle, short c);
 
+	void CreateHaptic(unsigned int handle, void* data, unsigned int size);
 	char* GetError();
 };
 

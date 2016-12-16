@@ -56,4 +56,5 @@ extern "C" {
 
 	NSLOADER_API bool __stdcall NSVR_InitializeFromFilesystem(NSVRPlugin ptr, LPSTR path);
 
+	NSLOADER_API void __stdcall NSVR_CreateHaptic(NSVRPlugin ptr, unsigned int handle, void* data, unsigned int size);
 }
