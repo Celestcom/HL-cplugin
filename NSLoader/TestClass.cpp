@@ -233,7 +233,7 @@ void TestClass::HandleCommand(unsigned int handle, short c)
 void TestClass::CreateHaptic(unsigned int handle, void * data, unsigned int size)
 {
 	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
-	if (NullSpace::HapticFiles::VerifyNodeBuffer(verifier)) {
+	if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
 		_wire.sendToEngine(reinterpret_cast<uint8_t*>(data), size);
 	}
 }
