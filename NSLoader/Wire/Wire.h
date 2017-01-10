@@ -108,7 +108,6 @@ public:
 
 		_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "", 0);
 
-		//TODO: use different socket types, because we can't have multiple apps bind to the same tcp socket
 
 	}
 	void AquireEncodingLock() { _flatbufferMutex.lock(); }
