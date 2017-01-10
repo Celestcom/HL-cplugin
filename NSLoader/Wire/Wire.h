@@ -97,16 +97,18 @@ public:
 		_context = std::make_unique<zmq::context_t>(1);
 		_sendToEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_PUB);
 		_sendToEngineSocket->setsockopt(ZMQ_SNDHWM, 16);
-		_sendToEngineSocket->connect(sendAddress);
 		_sendToEngineSocket->setsockopt(ZMQ_LINGER, 0);
+
+		_sendToEngineSocket->connect(sendAddress);
 
 
 		_receiveFromEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_SUB);
 		int confl = 1;
+		_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "", 0);
+
 		_receiveFromEngineSocket->connect(receiveAddress);
 		_receiveFromEngineSocket->setsockopt(ZMQ_CONFLATE, &confl, sizeof(confl));
 
-		_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "", 0);
 
 
 	}
