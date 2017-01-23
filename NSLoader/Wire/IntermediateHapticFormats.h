@@ -160,6 +160,7 @@ public:
 	float Strength;
 	float Duration;
 	uint32_t Area;
+	void Propogate(float time, float strength);
 	Node() {}
 	Node(Node::EffectType nodeType) : Type(nodeType) {}
 };

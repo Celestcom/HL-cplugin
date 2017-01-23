@@ -90,6 +90,7 @@ public:
 		/* VERY IMPORTANT. If you do not close the sockets, the DLL will cause Unity to freeze!*/
 		_sendToEngineSocket->close();
 		_receiveFromEngineSocket->close();
+		_context->close();
 	}
 	Wire(std::string sendAddress, std::string receiveAddress)
 	{
@@ -100,7 +101,7 @@ public:
 		_sendToEngineSocket->setsockopt(ZMQ_LINGER, 0);
 
 		_sendToEngineSocket->connect(sendAddress);
-
+		
 
 		_receiveFromEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_SUB);
 		int confl = 1;
@@ -116,8 +117,9 @@ public:
 	void ReleaseEncodingLock() { _flatbufferMutex.unlock(); }
 private:
 	std::mutex _flatbufferMutex;
+	std::unique_ptr<zmq::context_t> _context;
+
 	std::unique_ptr<zmq::socket_t> _sendToEngineSocket;
 	std::unique_ptr<zmq::socket_t> _receiveFromEngineSocket;
-	std::unique_ptr<zmq::context_t> _context;
 };
 

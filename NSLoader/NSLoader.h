@@ -7,6 +7,7 @@
 #define NSLOADER_API __declspec(dllimport) 
 #endif
 
+#define NSVR_VERSION "v0.3.0-rc1"
 
 struct _NSVRPlugin;
 typedef struct _NSVRPlugin* NSVRPlugin;

@@ -337,7 +337,7 @@ public:
 		return NullSpaceDLL::EngineCommand(command->command());
 	}
 	static NullSpaceDLL::HandleCommand EncodingOperations::Decode(const NullSpace::HapticFiles::HandleCommand* command) {
-		return NullSpaceDLL::HandleCommand(command->handle(), command->command());
+		return NullSpaceDLL::HandleCommand((unsigned int) command->handle(), command->command());
 	}
 
 

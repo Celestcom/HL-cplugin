@@ -99,7 +99,7 @@ float GetTotalPlayTime(const std::vector<JsonSequenceAtom>& atoms) {
 	float endOfLastEffect = 0.0;
 	for (const auto& item : atoms) {
 		//fudge factor of quarter of second for oneshots
-		float endTime = (item.Duration + 0.25) + item.Time;
+		float endTime = (item.Duration + 0.25f) + item.Time;
 		endOfLastEffect = std::max(endOfLastEffect, endTime);
 	}
 	return endOfLastEffect;
@@ -109,8 +109,17 @@ float GetTotalPlayTime(const std::vector<HapticSample>& atoms) {
 	float endOfLastEffect = 0.0;
 	for (const auto& item : atoms) {
 		//fudge factor of quarter of second for oneshots
-		float endTime = (GetTotalPlayTime(item.Frames) + 0.25) + item.Time;
+		float endTime = (GetTotalPlayTime(item.Frames) + 0.25f) + item.Time;
 		endOfLastEffect = std::max(endOfLastEffect, endTime);
 	}
 	return endOfLastEffect;
+}
+
+void Node::Propogate(float time, float strength)
+{
+	Time += time;
+	Strength *= strength;
+	for (auto& child : Children) {
+		child.Propogate(Time, Strength);
+	}
 }
