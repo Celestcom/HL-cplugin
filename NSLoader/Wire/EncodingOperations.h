@@ -1,6 +1,9 @@
 #pragma once
 #define NOMINMAX
 #include "flatbuffers\flatbuffers.h"
+
+#include "TinyEffect_generated.h"
+#include "TinyEffectArray_generated.h"
 #include "HapticEffect_generated.h"
 #include "HapticFrame_generated.h"
 #include "HapticPacket_generated.h"
@@ -12,11 +15,12 @@
 #include "TrackingUpdate_generated.h"
 #include "IntermediateHapticFormats.h"
 
+
 #include "MixedHapticFrame_generated.h"
 #include "MixedPattern_generated.h"
 #include "MixedSequence_generated.h"
 #include <mutex>
-
+#include "Locator.h"
 //need to include the quaternion structures a better way
 #ifndef IS_ENGINE
 #include "NSLoader.h"
@@ -67,7 +71,8 @@ template<
 	typename TrackOffset,
 	typename HandleCommandOffset,
 	typename EngineCommandOffset,
-	typename NodeOffset>
+	typename NodeOffset,
+typename TinyEffectArrayOffset>
 
 class IEncoder {
 	public:
@@ -79,7 +84,7 @@ class IEncoder {
 		virtual SuitStatus Encode(NullSpace::Communication::SuitStatus status) = 0;
 		virtual HandleCommandOffset Encode(NullSpaceDLL::HandleCommand h) = 0;
 		virtual EngineCommandOffset Encode(NullSpaceDLL::EngineCommand e) = 0;
-
+		virtual TinyEffectArrayOffset Encode(std::vector<Node*>& input) = 0;
 
 		virtual void Finalize(HandleCommandOffset, std::string, DataCallback) = 0;
 		virtual void Finalize(TrackOffset, DataCallback) = 0;
@@ -88,6 +93,7 @@ class IEncoder {
 		virtual void Finalize(ClientStatus, DataCallback) = 0;
 		virtual void Finalize(SuitStatus, DataCallback) = 0;
 		virtual void Finalize(EngineCommandOffset, std::string, DataCallback) = 0;
+		virtual void Finalize(uint32_t handle, TinyEffectArrayOffset input, DataCallback callback) = 0;
 };
 
 
@@ -98,8 +104,9 @@ typedef struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate>
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::HandleCommand> HandleCommandOffset;
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::EngineCommandData> EngineCommandOffset;
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::Node> NodeOffset;
+typedef struct flatbuffers::Offset<NullSpace::HapticFiles::TinyEffectArray> TinyEffectArrayOffset;
 
-class EncodingOperations : public IEncoder<ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset, NodeOffset>
+class EncodingOperations : public IEncoder<ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset, NodeOffset, TinyEffectArrayOffset>
 {
 private:
 	flatbuffers::FlatBufferBuilder _builder;
@@ -199,6 +206,28 @@ public:
 		nodeBuilder.add_type(NullSpace::HapticFiles::NodeType_Experience);
 		return nodeBuilder.Finish();
 	}
+	flatbuffers::Offset<NullSpace::HapticFiles::TinyEffect> EncodingOperations::Encode(const Node* input) {
+		
+		NullSpace::HapticFiles::TinyEffectBuilder effectBuilder(_builder);
+		effectBuilder.add_duration(input->Duration);
+		//todo: ADD REAL EFFECT HERE
+		effectBuilder.add_effect(Locator::getTranslator().ToEffectFamily(input->Effect));
+		effectBuilder.add_strength(input->Strength);
+		effectBuilder.add_time(input->Time);
+		effectBuilder.add_area(input->Area);
+		return effectBuilder.Finish();
+	}
+	TinyEffectArrayOffset EncodingOperations::Encode(std::vector<Node*>& input) {
+		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::TinyEffect>> effects;
+		for (const auto& child : input) {
+			effects.push_back(Encode(child));
+		}
+		auto effectsOffset = _builder.CreateVector(effects);
+
+		return NullSpace::HapticFiles::CreateTinyEffectArray(_builder, effectsOffset);
+
+
+	}
 	NodeOffset EncodingOperations::Encode(const Node& input) {
 		//Base case
 		if (input.Type == Node::EffectType::Effect) {
@@ -252,7 +281,10 @@ public:
 		}
 		_builder.Clear();
 	}
-
+	void EncodingOperations::Finalize(uint32_t handle, TinyEffectArrayOffset input, DataCallback callback) {
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("tinyeffectarray"), NullSpace::HapticFiles::FileType_TinyEffectArray, input.Union(), handle);
+		_finalize(packet, callback);
+	}
 	void EncodingOperations::Finalize(uint32_t handle, NodeOffset input, std::string name, DataCallback callback) {
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Node, input.Union(), handle);
 		_finalize(packet, callback);
@@ -341,7 +373,15 @@ public:
 	}
 
 
-
+	
+	static std::vector<TinyEffect> EncodingOperations::Decode(const NullSpace::HapticFiles::TinyEffectArray* effects) {
+		std::vector<TinyEffect> result;
+		result.reserve(effects->effects()->size());
+		for (const auto& effect : *effects->effects()) {
+			result.push_back(TinyEffect(effect->time(), effect->strength(), effect->duration(), effect->effect(), effect->area()));
+		}
+		return result;
+	}
 
 
 

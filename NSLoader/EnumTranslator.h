@@ -11,6 +11,7 @@ typedef bimap<Location, std::string> LocationMap;
 typedef bimap<Side, std::string> SideMap;
 typedef bimap<JsonLocation, std::string> JsonLocationMap;
 typedef bimap<AreaFlag, std::string> AreaMap;
+typedef bimap<std::string, uint8_t> EffectFamilyMap;
 
 class EnumTranslator
 {
@@ -38,6 +39,9 @@ public:
 
 	AreaFlag ToArea(std::string area) const;
 	std::string ToString(AreaFlag area) const;
+
+	uint8_t ToEffectFamily(std::string effectFamily) const;
+	std::string ToString(uint8_t effectFamily) const;
 private:
 	
 	void init_locations();
@@ -45,11 +49,13 @@ private:
 	void init_sides();
 	void init_json_locations();
 	void init_areas();
+	void init_familymap();
 
 	AreaMap _areaMap;
 	EffectMap _effectMap;
 	LocationMap _locationMap;
 	SideMap _sideMap;
 	JsonLocationMap _jsonLocationMap;
+	EffectFamilyMap _effectFamilyMap;
 };
 

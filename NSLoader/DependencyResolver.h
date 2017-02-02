@@ -28,13 +28,14 @@ public:
 	Node Resolve(const SequenceArgs& args);
 	Node Resolve(const PatternArgs& args);
 	Node Resolve(const ExperienceArgs& args);
-	
+	std::vector<Node*> Flatten(Node* rootNode);
+
 	bool Load(const HapticFileInfo& info);
 	
 private:
 	
 	NodeLoader _loader;
 
-	
+	void Visit(Node* node, std::vector<Node*>& result);
 };
 

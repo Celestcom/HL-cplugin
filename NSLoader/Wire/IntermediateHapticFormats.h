@@ -48,7 +48,14 @@ public:
 
 };
 
-
+struct TinyEffect {
+	float Time;
+	float Strength;
+	float Duration;
+	unsigned int Area;
+	uint8_t Effect;
+	TinyEffect(float time, float strength, float duration, uint8_t effect, unsigned int area) :Time(time), Strength(strength), Duration(duration), Effect(effect), Area(area) {}
+};
 
 template<typename T>
 struct TimeIndex {
@@ -108,7 +115,7 @@ float GetTotalPlayTime(const std::vector<JsonSequenceAtom>& atoms);
 
 float GetTotalPlayTime(const std::vector<HapticFrame>& frames);
 float GetTotalPlayTime(const std::vector<HapticSample>& samples);
-
+float GetTotalPlayTime(const std::vector<TinyEffect>& effects);
 class JsonPatternAtom : public IJsonSerializable {
 public:
 	float Time;
@@ -160,9 +167,22 @@ public:
 	float Strength;
 	float Duration;
 	uint32_t Area;
-	void Propogate(float time, float strength);
+	void Propogate(float time, float strength, uint32_t area);
 	Node() {}
-	Node(Node::EffectType nodeType) : Type(nodeType) {}
+	Node(Node::EffectType nodeType) : Type(nodeType), _marked(false) {}
+	bool Marked() {
+		return _marked;
+	}
+
+	void Mark() {
+		_marked = true;
+	}
+
+	void Unmark() {
+		_marked = false;
+	}
+private:
+	bool _marked;
 };
 
 class PackedSequence {

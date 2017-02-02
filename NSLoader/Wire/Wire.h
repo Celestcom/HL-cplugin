@@ -21,7 +21,7 @@
 
 #include <mutex>
 
-typedef IEncoder<ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset, NodeOffset> FlatbuffEncoder;
+typedef IEncoder<ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset, NodeOffset, TinyEffectArrayOffset> FlatbuffEncoder;
 class Wire
 {
 public:
@@ -36,7 +36,9 @@ public:
 	}
 	/* Sending */
 	
-
+	void Wire::Send(TinyEffectArrayOffset& input, uint32_t handle) {
+		Encoder->Finalize(handle, input, boost::bind(&Wire::sendToEngine, this, _1, _2));
+	}
 	void Wire::Send(NodeOffset& input, std::string name, uint32_t handle) {
 		Encoder->Finalize(handle, input, name, boost::bind(&Wire::sendToEngine, this, _1, _2));
 	}
@@ -106,7 +108,7 @@ public:
 		_receiveFromEngineSocket = std::make_unique<zmq::socket_t>(*_context, ZMQ_SUB);
 		int confl = 1;
 		_receiveFromEngineSocket->setsockopt(ZMQ_SUBSCRIBE, "", 0);
-
+		_receiveFromEngineSocket->setsockopt(ZMQ_RCVHWM, 1);
 		_receiveFromEngineSocket->connect(receiveAddress);
 		_receiveFromEngineSocket->setsockopt(ZMQ_CONFLATE, &confl, sizeof(confl));
 

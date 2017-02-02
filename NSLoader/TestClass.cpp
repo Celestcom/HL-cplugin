@@ -104,8 +104,10 @@ bool TestClass::CreatePattern(uint32_t handle, LPSTR param)
 	auto name = std::string(param);
 	if (_resolver->Load(PatternFileInfo(name))) {
 		auto res = _resolver->Resolve(PatternArgs(name, Side::NotSpecified));
+
+		auto new_version = _resolver->Flatten(&res);
 		_wire.AquireEncodingLock();
-		_wire.Send(_wire.Encoder->Encode(res), res.Effect, handle);
+		_wire.Send(_wire.Encoder->Encode(new_version), handle);
 		_wire.ReleaseEncodingLock();
 		return true;
 	}
@@ -140,9 +142,17 @@ bool TestClass::CreateExperience(uint32_t handle, LPSTR param)
 {
 	auto name = std::string(param);
 	if (_resolver->Load(ExperienceFileInfo(name))) {
+	
 		auto res = _resolver->Resolve(ExperienceArgs(name, Side::NotSpecified));
+
+	
+		auto new_version = _resolver->Flatten(&res);
+	
 		_wire.AquireEncodingLock();
-		_wire.Send(_wire.Encoder->Encode(res), res.Effect, handle);
+		_wire.Send(_wire.Encoder->Encode(new_version), handle);
+
+	//	_wire.Send(_wire.Encoder->Encode(res), res.Effect, handle);
+	
 		_wire.ReleaseEncodingLock();
 		return true;
 	}
@@ -204,9 +214,11 @@ bool TestClass::CreateSequence(uint32_t handle, LPSTR param, uint32_t loc)
 		//default strength for now
 		
 		auto res = _resolver->Resolve(SequenceArgs(name, AreaFlag(loc), 1.0));
+		auto new_version = _resolver->Flatten(&res);
+
 		_wire.AquireEncodingLock();
 		
-		_wire.Send(_wire.Encoder->Encode(res), res.Effect, handle);
+		_wire.Send(_wire.Encoder->Encode(new_version), handle);
 		_wire.ReleaseEncodingLock();
 		return true;
 	}

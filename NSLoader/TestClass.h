@@ -21,6 +21,8 @@ private:
 	std::string _currentError;
 	std::unique_ptr<FlatbuffDecoder> _decoder;
 	bool _isEnginePlaying;
+
+
 public:
 	
 

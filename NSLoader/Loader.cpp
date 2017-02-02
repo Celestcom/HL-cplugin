@@ -306,6 +306,7 @@ bool NodePatternLoader::Load(const HapticFileInfo & fileInfo)
 				}
 				Node rootNode(Node::EffectType::Pattern);
 				rootNode.Children = nodes;
+				rootNode.Strength = 1.0;
 				rootNode.Effect = fileInfo.FullId;
 				_nodes[fileInfo.FullId] = rootNode;
 				loadAllSequences(atoms);
@@ -374,6 +375,7 @@ bool NodeExperienceLoader::Load(const HapticFileInfo & fileInfo)
 				}
 				Node rootNode(Node::EffectType::Experience);
 				rootNode.Children = nodes;
+				rootNode.Strength = 1.0f;
 				rootNode.Effect = fileInfo.FullId;
 				_nodes[fileInfo.FullId] = rootNode;
 				loadAllNodePatterns(atoms);

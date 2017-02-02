@@ -95,6 +95,18 @@ float GetTotalPlayTime(const std::vector<HapticFrame>& frames) {
 	return endOfLastEffect;
 }
 
+float GetTotalPlayTime(const std::vector<TinyEffect>& effects) {
+	float endOfLastEffect = 0.0;
+	for (const auto& item : effects) {
+		//fudge factor of quarter of second for oneshots
+		float endTime = (item.Duration + 0.25f) + item.Time;
+		endOfLastEffect = std::max(endOfLastEffect, endTime);
+	}
+	return endOfLastEffect;
+}
+
+
+
 float GetTotalPlayTime(const std::vector<JsonSequenceAtom>& atoms) {
 	float endOfLastEffect = 0.0;
 	for (const auto& item : atoms) {
@@ -104,6 +116,9 @@ float GetTotalPlayTime(const std::vector<JsonSequenceAtom>& atoms) {
 	}
 	return endOfLastEffect;
 }
+
+
+
 
 float GetTotalPlayTime(const std::vector<HapticSample>& atoms) {
 	float endOfLastEffect = 0.0;
@@ -115,11 +130,15 @@ float GetTotalPlayTime(const std::vector<HapticSample>& atoms) {
 	return endOfLastEffect;
 }
 
-void Node::Propogate(float time, float strength)
+
+void Node::Propogate(float time, float strength, uint32_t area)
 {
 	Time += time;
 	Strength *= strength;
+	if (this->Type == Node::EffectType::Effect) {
+		Area = area;
+	}
 	for (auto& child : Children) {
-		child.Propogate(Time, Strength);
+		child.Propogate(Time, Strength, Area);
 	}
 }
