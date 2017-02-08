@@ -16,7 +16,7 @@
 #include "Experience_generated.h"
 #include "EnginePacket_generated.h"
 #include "SuitStatusUpdate_generated.h"
-#include "HapticClasses.h"
+//#include "HapticClasses.h" <-- must recomment!
 #include "EncodingOperations.h"
 
 #include <mutex>

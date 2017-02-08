@@ -25,7 +25,7 @@
 #ifndef IS_ENGINE
 #include "NSLoader.h"
 #else 
-#include "ExportedStructures.h"
+#include "../ExportedStructures.h" //MUST CHANGE TO ExportedStructures
 #endif
 struct Quaternion {
 	float w;
