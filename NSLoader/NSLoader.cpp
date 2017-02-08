@@ -64,6 +64,7 @@
  NSLOADER_API void __stdcall NSVR_FreeString(char * string)
  {
 	 delete[] string;
+	 string = nullptr;
  }
 
  NSLOADER_API bool __stdcall NSVR_EngineCommand(NSVRPlugin ptr, short command)
