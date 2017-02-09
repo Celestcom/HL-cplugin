@@ -44,11 +44,37 @@ public:
 		NullSpaceDLL::InteropTrackingUpdate t;
 
 
-		auto quat = update->chest();
-		t.chest.w = quat->w();
-		t.chest.x = quat->x();
-		t.chest.y = quat->y();
-		t.chest.z = quat->z();
+		for (const auto& q : *update->quaternions()) {
+			NullSpaceDLL::Quaternion* quat = nullptr;
+
+			switch (q->id()) {
+			case NullSpace::Communication::ImuId_Chest:
+				quat = &t.chest;
+				break;
+			case NullSpace::Communication::ImuId_Left_Forearm:
+				quat = &t.left_forearm;
+				break;
+			case NullSpace::Communication::ImuId_Left_Upper_Arm:
+				quat = &t.left_upper_arm;
+				break;
+			case NullSpace::Communication::ImuId_Right_Forearm:
+				quat = &t.right_forearm;
+				break;
+			case NullSpace::Communication::ImuId_Right_Upper_Arm:
+				quat = &t.right_upper_arm;
+				break;
+			default:
+				break;
+			}
+
+			if (quat != nullptr) {
+				quat->w = q->w();
+				quat->x = q->x();
+				quat->y = q->y();
+				quat->z = q->z();
+			}
+		}
+	
 		return t;
 
 	}

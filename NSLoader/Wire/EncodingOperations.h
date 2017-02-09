@@ -74,7 +74,7 @@ class IEncoder {
 		
 		virtual NodeOffset Encode(const Node& input) = 0;
 		virtual ImuOffset Encode(bool inpu) = 0;
-		virtual TrackOffset Encode(const Quaternion& input) = 0;
+		virtual TrackOffset Encode(const std::vector<std::tuple<Imu, Quaternion>>&) = 0;
 		virtual ClientStatus Encode(NullSpace::Communication::Status status) = 0;
 		virtual SuitStatus Encode(NullSpace::Communication::SuitStatus status) = 0;
 		virtual HandleCommandOffset Encode(NullSpaceDLL::HandleCommand h) = 0;
@@ -132,11 +132,20 @@ public:
 	EngineCommandOffset EncodingOperations::Encode(NullSpaceDLL::EngineCommand e) {
 		return NullSpace::HapticFiles::CreateEngineCommandData(_builder, e.Command);
 	}
-	TrackOffset EncodingOperations::Encode(const Quaternion& input) {
-		//todo: check if this stack variable is copied by flatbuffers
-		auto q = NullSpace::Communication::Quaternion(input.x, input.y, input.z, input.w);
-		return NullSpace::Communication::CreateTrackingUpdate(_builder, &q);
+	TrackOffset EncodingOperations::Encode(const std::vector<std::tuple<Imu, Quaternion>>& tuples) {
+
+		std::vector<NullSpace::Communication::Quaternion> outQuats;
+		for (const auto& pair : tuples) {
+			Imu id;
+			Quaternion quat;
+			std::tie(id, quat) = pair;
+			outQuats.push_back(NullSpace::Communication::Quaternion(NullSpace::Communication::ImuId(id), quat.x, quat.y, quat.z, quat.w)
+			);
+		}
+		auto finalQuats = _builder.CreateVectorOfStructs(outQuats);
+		return NullSpace::Communication::CreateTrackingUpdate(_builder, finalQuats);
 	}
+	
 	
 	NodeOffset EncodingOperations::EncodeEffect(const Node& input) {
 		auto effect = _builder.CreateString(input.Effect);
@@ -349,12 +358,42 @@ public:
 		return update->status();
 	}
 	static NullSpaceDLL::InteropTrackingUpdate EncodingOperations::Decode(const NullSpace::Communication::TrackingUpdate* update) {
-		NullSpaceDLL::InteropTrackingUpdate t;
-		auto quat = update->chest();
-		t.chest.w = quat->w();
-		t.chest.x = quat->x();
-		t.chest.y = quat->y();
-		t.chest.z = quat->z();
+	
+		NullSpaceDLL::InteropTrackingUpdate t = { 0 };
+		auto encodedQuats = update->quaternions();
+		std::vector<std::tuple<Imu, NullSpaceDLL::Quaternion>> decodedQuats;
+		for (const auto& ec : *encodedQuats) {
+			NullSpaceDLL::Quaternion q;
+	
+			q.x = ec->x();
+			q.y = ec->y();
+			q.z = ec->z();
+			q.w = ec->w();
+			decodedQuats.push_back(std::make_tuple<Imu, NullSpaceDLL::Quaternion>(Imu(ec->id()), std::move(q)));
+		}
+		
+		
+		for (const auto& quat : decodedQuats) {
+			switch (std::get<0>(quat)) {
+			case Imu::Chest:
+				t.chest = std::get<1>(quat);
+				break;
+			case Imu::Left_Forearm:
+				t.left_forearm = std::get<1>(quat);
+				break;
+			case Imu::Left_Upper_Arm:
+				t.left_upper_arm = std::get<1>(quat);
+				break;
+			case Imu::Right_Forearm:
+				t.right_forearm = std::get<1>(quat);
+				break;
+			case Imu::Right_Upper_Arm:
+				t.right_upper_arm = std::get<1>(quat);
+				break;
+			default:
+				break;
+			}
+		}
 		return t;
 	}
 
