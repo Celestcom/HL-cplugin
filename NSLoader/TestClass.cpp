@@ -233,7 +233,14 @@ void TestClass::CreateHaptic(unsigned int handle, void * data, unsigned int size
 {
 	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
 	if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
-		_wire.sendToEngine(reinterpret_cast<uint8_t*>(data), size);
+		auto packet = NullSpace::HapticFiles::UnPackHapticPacket(data);
+		packet->handle = handle;
+
+		flatbuffers::FlatBufferBuilder fbb;
+		auto res = NullSpace::HapticFiles::CreateHapticPacket(fbb, packet.get());
+		fbb.Finish(res);
+		
+		_wire.sendToEngine(reinterpret_cast<uint8_t*>(fbb.GetBufferPointer()), fbb.GetSize());
 	}
 }
 
