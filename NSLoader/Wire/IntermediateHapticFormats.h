@@ -2,6 +2,8 @@
 #include <vector>
 #include "IJsonSerializable.h"
 #include <algorithm>
+
+
 enum class AreaFlag  : uint32_t {
 	None = 0,
 	Forearm_Left = 1 << 0,
@@ -156,34 +158,40 @@ private:
 	std::string _name;
 	std::vector<JsonExperienceAtom> _atoms;
 };
+namespace NullSpace {
 
-class Node {
-public:
-	enum class EffectType {Effect, Sequence, Pattern, Experience};
-	Node::EffectType Type;
-	std::vector<Node> Children;
-	float Time;
-	std::string Effect;
-	float Strength;
-	float Duration;
-	uint32_t Area;
-	void Propogate(float time, float strength, uint32_t area);
-	Node() {}
-	Node(Node::EffectType nodeType) : Type(nodeType), _marked(false) {}
-	bool Marked() {
-		return _marked;
-	}
+	
+	class Node {
+	public:
+		enum class EffectType { Effect, Sequence, Pattern, Experience };
+		Node::EffectType Type;
+		std::vector<Node> Children;
+		float Time;
+		std::string Effect;
+		float Strength;
+		float Duration;
+		uint32_t Area;
+		void Propogate(float time, float strength, uint32_t area);
+		Node() {}
+		Node(Node::EffectType nodeType) : Type(nodeType), _marked(false) {}
+		bool Marked() {
+			return _marked;
+		}
 
-	void Mark() {
-		_marked = true;
-	}
+		void Mark() {
+			_marked = true;
+		}
 
-	void Unmark() {
-		_marked = false;
-	}
-private:
-	bool _marked;
-};
+		void Unmark() {
+			_marked = false;
+		}
+	private:
+		bool _marked;
+	};
+	void Propogate(NullSpace::Node& rootNode);
+	std::vector<NullSpace::Node*> Flatten(NullSpace::Node& rootNode);
+
+}
 
 class PackedSequence {
 public:

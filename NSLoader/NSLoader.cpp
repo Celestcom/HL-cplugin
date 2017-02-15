@@ -3,22 +3,22 @@
 
 #include "stdafx.h"
 #include "NSLoader.h"
-#include "TestClass.h"
+#include "Engine.h"
 
  NSVRPlugin __stdcall NSVR_Create()
 {
-	return reinterpret_cast<NSVRPlugin>(new TestClass());
+	return reinterpret_cast<NSVRPlugin>(new Engine());
 }
 
  NSLOADER_API unsigned int __stdcall NSVR_GenHandle(NSVRPlugin ptr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->GenHandle();
+	 return reinterpret_cast<Engine*>(ptr)->GenHandle();
 
  }
 
  NSLOADER_API int __stdcall NSVR_PollStatus(NSVRPlugin ptr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->PollStatus();
+	 return reinterpret_cast<Engine*>(ptr)->PollStatus();
  }
 
  NSLOADER_API void __stdcall NSVR_PollTracking(NSVRPlugin ptr, NullSpaceDLL::InteropTrackingUpdate & q)
@@ -28,7 +28,7 @@
 
  NSLOADER_API void __stdcall NSVR_Delete(NSVRPlugin ptr)
  {
-	 delete reinterpret_cast<TestClass*>(ptr);
+	 delete reinterpret_cast<Engine*>(ptr);
  }
 
 
@@ -44,12 +44,12 @@
 
  NSLOADER_API void __stdcall NSVR_HandleCommand(NSVRPlugin ptr, unsigned int handle, short command)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->HandleCommand(handle, command);
+	 return reinterpret_cast<Engine*>(ptr)->HandleCommand(handle, command);
  }
 
  NSLOADER_API char * __stdcall NSVR_GetError(NSVRPlugin ptr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->GetError();
+	 return reinterpret_cast<Engine*>(ptr)->GetError();
  }
 
  NSLOADER_API void __stdcall NSVR_FreeString(char * string)
@@ -60,16 +60,16 @@
 
  NSLOADER_API bool __stdcall NSVR_EngineCommand(NSVRPlugin ptr, short command)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->EngineCommand(command);
+	 return reinterpret_cast<Engine*>(ptr)->EngineCommand(command);
  }
 
  NSLOADER_API bool __stdcall NSVR_InitializeFromFilesystem(NSVRPlugin ptr, LPSTR path)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->InitializeFromFilesystem(path);
+	 return reinterpret_cast<Engine*>(ptr)->InitializeFromFilesystem(path);
  }
 
  NSLOADER_API void __stdcall NSVR_CreateHaptic(NSVRPlugin ptr, unsigned int handle, void * data, unsigned int size)
  {
-	 reinterpret_cast<TestClass*>(ptr)->CreateHaptic(handle, data, size);
+	 reinterpret_cast<Engine*>(ptr)->CreateHaptic(handle, data, size);
  }
 

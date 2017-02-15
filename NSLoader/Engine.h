@@ -6,10 +6,12 @@
 #include "IoService.h"
 #include "Wire\FlatbuffDecoder.h"
 #include "ClientMessenger.h"
+#include <boost\asio\deadline_timer.hpp>
+#include "HapticsPlayer.h"
 #pragma pack(1)
 
 
-class TestClass
+class Engine
 {
 private:
 	IoService m_ioService;
@@ -23,12 +25,20 @@ private:
 	bool _isEnginePlaying;
 	ClientMessenger m_messenger;
 
+	//haptics playing 
+	HapticsPlayer m_player;
+
+	boost::asio::deadline_timer m_hapticsExecutionTimer;
+	boost::posix_time::millisec m_hapticsExecutionInterval;
+
+	void scheduleTimestep();
+	void executeTimestep(const boost::system::error_code& ec);
 
 public:
 	
 
-	TestClass();
-	~TestClass();
+	Engine();
+	~Engine();
 	bool Poll();
 	int PollStatus();
 	uint32_t GenHandle();

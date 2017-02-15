@@ -361,6 +361,30 @@ public:
 		}
 		return atoms;
 	}
+	static NullSpace::Node EncodingOperations::Decode(const NullSpace::HapticFiles::Node* node) {
+		Node rootNode;
+		//common attributes 
+		rootNode.Type = Node::EffectType(node->type());
+		rootNode.Strength = node->strength();
+		rootNode.Time = node->time();
+
+		if (rootNode.Type == Node::EffectType::Effect) {
+			rootNode.Duration = node->duration();
+			rootNode.Effect = node->effect()->str();
+		}
+		if (rootNode.Type == Node::EffectType::Sequence) {
+			rootNode.Area = node->area();
+		}
+		if (node->children() != nullptr && node->children()->size() > 0) {
+			for (const auto& child : *node->children()) {
+				rootNode.Children.push_back(Decode(child));
+			}
+		}
+		
+		
+		return rootNode;
+
+	}
 	static bool EncodingOperations::Decode(const NullSpace::HapticFiles::Tracking* tracking) {
 		return tracking->enable();
 	}

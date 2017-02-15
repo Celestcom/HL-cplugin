@@ -1,6 +1,6 @@
 #include "IntermediateHapticFormats.h"
 #include "json.h"
-
+#include <functional>
 
 
 //todo: These want to have an actual schema system. Could get another dependency Valijson
@@ -131,7 +131,7 @@ float GetTotalPlayTime(const std::vector<HapticSample>& atoms) {
 }
 
 
-void Node::Propogate(float time, float strength, uint32_t area)
+void NullSpace::Node::Propogate(float time, float strength, uint32_t area)
 {
 	Time += time;
 	Strength *= strength;
@@ -141,4 +141,38 @@ void Node::Propogate(float time, float strength, uint32_t area)
 	for (auto& child : Children) {
 		child.Propogate(Time, Strength, Area);
 	}
+}
+
+
+
+
+void NullSpace::Propogate(NullSpace::Node & rootNode)
+{
+	rootNode.Propogate(0.0f, 1.0f, uint32_t(AreaFlag::None));
+
+}
+
+std::vector<NullSpace::Node*> NullSpace::Flatten(NullSpace::Node& rootNode)
+{
+	//In order to flatten the heirarchy, we must add all the leaf nodes to a list
+	//We will not have any cycles 
+	//Take a pointer to the root node, and hold on to the list result
+	typedef std::function<void(Node&, std::vector<Node*>&)> DFSFunc;
+
+	DFSFunc visitor = [&](Node& node, std::vector<Node*>& result) {
+		if (node.Children.empty()) {
+			result.push_back(&node);
+			return;
+		}
+		for (auto& child : node.Children) {
+			visitor(child, result);
+		}
+	};
+
+	std::vector<Node*> result;
+	visitor(rootNode, result);
+
+	//Sort the flattened effects by their time offsets
+	std::sort(result.begin(), result.end(), [](const Node* lhs, const Node* rhs) {return lhs->Time < rhs->Time; });
+	return result;
 }

@@ -20,17 +20,17 @@ Loader::~Loader()
 {
 }
 
-shared_ptr<PatternLoader> Loader::GetPatternLoader() const
+std::shared_ptr<PatternLoader> Loader::GetPatternLoader() const
 {
 	return _patternLoader;
 }
 
-shared_ptr<SequenceLoader> Loader::GetSequenceLoader() const
+std::shared_ptr<SequenceLoader> Loader::GetSequenceLoader() const
 {
 	return _sequenceLoader;
 }
 
-shared_ptr<ExperienceLoader> Loader::GetExperienceLoader() const
+std::shared_ptr<ExperienceLoader> Loader::GetExperienceLoader() const
 {
 	return _experienceLoader;
 }
@@ -49,7 +49,7 @@ bool Loader::Load(const HapticFileInfo& fileInfo) const
 	return false;
 }
 
-SequenceLoader::SequenceLoader(shared_ptr<Parser> p)
+SequenceLoader::SequenceLoader(std::shared_ptr<Parser> p)
 	:_parser(p) {
 }
 
@@ -92,7 +92,7 @@ JsonSequence SequenceLoader::GetLoadedResource(const std::string& key)
 	return _sequences.at(key);
 }
 
-PatternLoader::PatternLoader(shared_ptr<Parser> p, shared_ptr<SequenceLoader> seq)
+PatternLoader::PatternLoader(std::shared_ptr<Parser> p, std::shared_ptr<SequenceLoader> seq)
 :_sequenceLoader(std::move(seq)), _parser(p){
 }
 
@@ -152,7 +152,7 @@ void PatternLoader::loadAllSequences(vector<JsonPatternAtom> pattern) const
 	
 }
 
-ExperienceLoader::ExperienceLoader(shared_ptr<Parser> p, shared_ptr<PatternLoader> pat)
+ExperienceLoader::ExperienceLoader(std::shared_ptr<Parser> p, std::shared_ptr<PatternLoader> pat)
 	:_patternLoader(std::move(pat)), _parser(p)
 {
 }
@@ -213,7 +213,7 @@ void ExperienceLoader::loadAllPatterns(vector<JsonExperienceAtom> experience) co
 	}
 }
 
-NodeSequenceLoader::NodeSequenceLoader(shared_ptr<Parser> p): _parser(p)
+NodeSequenceLoader::NodeSequenceLoader(std::shared_ptr<Parser> p): _parser(p)
 {
 }
 
@@ -268,7 +268,7 @@ Node NodeSequenceLoader::GetLoadedResource(const std::string & key)
 	return _nodes.at(key);
 }
 
-NodePatternLoader::NodePatternLoader(shared_ptr<Parser> p, shared_ptr<NodeSequenceLoader> loader):_parser(p), _sequenceLoader(loader)
+NodePatternLoader::NodePatternLoader(std::shared_ptr<Parser> p, std::shared_ptr<NodeSequenceLoader> loader):_parser(p), _sequenceLoader(loader)
 {
 }
 
@@ -340,7 +340,7 @@ void NodePatternLoader::loadAllSequences(vector<JsonPatternAtom> pattern) const
 	}
 }
 
-NodeExperienceLoader::NodeExperienceLoader(shared_ptr<Parser> p, shared_ptr<NodePatternLoader> l):_parser(p), _patternLoader(l)
+NodeExperienceLoader::NodeExperienceLoader(std::shared_ptr<Parser> p, std::shared_ptr<NodePatternLoader> l):_parser(p), _patternLoader(l)
 {
 }
 
@@ -423,17 +423,17 @@ NodeLoader::~NodeLoader()
 {
 }
 
-shared_ptr<NodePatternLoader> NodeLoader::GetPatternLoader() const
+std::shared_ptr<NodePatternLoader> NodeLoader::GetPatternLoader() const
 {
 	return _patternLoader;
 }
 
-shared_ptr<NodeSequenceLoader> NodeLoader::GetSequenceLoader() const
+std::shared_ptr<NodeSequenceLoader> NodeLoader::GetSequenceLoader() const
 {
 	return _sequenceLoader;
 }
 
-shared_ptr<NodeExperienceLoader> NodeLoader::GetExperienceLoader() const
+std::shared_ptr<NodeExperienceLoader> NodeLoader::GetExperienceLoader() const
 {
 	return _experienceLoader;
 }
