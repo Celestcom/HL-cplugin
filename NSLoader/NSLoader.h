@@ -41,11 +41,7 @@ extern "C" {
 
 	NSLOADER_API void __stdcall NSVR_PollTracking(NSVRPlugin ptr, NullSpaceDLL::InteropTrackingUpdate& q);
 	NSLOADER_API bool __stdcall NSVR_Load(NSVRPlugin ptr, LPSTR param, int fileType);
-	NSLOADER_API bool __stdcall NSVR_CreateSequence(NSVRPlugin ptr, unsigned int handle, LPSTR name, unsigned int loc);
-
-	NSLOADER_API bool __stdcall NSVR_CreatePattern(NSVRPlugin ptr, unsigned int handle, LPSTR name);
-
-	NSLOADER_API bool __stdcall NSVR_CreateExperience(NSVRPlugin ptr, unsigned int handle, LPSTR name);
+	
 
 	NSLOADER_API void __stdcall NSVR_HandleCommand(NSVRPlugin ptr, unsigned int handle, short command);
 
