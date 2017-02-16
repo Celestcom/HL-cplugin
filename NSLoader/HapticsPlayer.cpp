@@ -98,13 +98,11 @@ bool EffectIsExpired(const std::unique_ptr<IPlayable> &p, bool isGlobalPause) {
 	*/
 }
 
-std::vector<PriorityModel::ExecutionCommand> HapticsPlayer::Update(float dt)
+std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 {
-	//updateLocationModels(dt);
 
 	for (auto& effect : _effects) {
-		//need atoms somehow
-		//effect.second->Update(dt, _iset->Atoms());
+		effect.second->Update(dt);
 	}
 
 	//mark & erase from _effects

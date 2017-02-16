@@ -55,8 +55,8 @@ struct TinyEffect {
 	float Strength;
 	float Duration;
 	unsigned int Area;
-	uint8_t Effect;
-	TinyEffect(float time, float strength, float duration, uint8_t effect, unsigned int area) :Time(time), Strength(strength), Duration(duration), Effect(effect), Area(area) {}
+	std::string Effect;
+	TinyEffect(float time, float strength, float duration, std::string effect, unsigned int area) :Time(time), Strength(strength), Duration(duration), Effect(effect), Area(area) {}
 };
 
 template<typename T>
@@ -190,7 +190,10 @@ namespace NullSpace {
 	};
 	void Propogate(NullSpace::Node& rootNode);
 	std::vector<NullSpace::Node*> Flatten(NullSpace::Node& rootNode);
+	std::vector<TinyEffect> EncodeTinyEffects(std::vector<Node*>& input);
+	
 
+	
 }
 
 class PackedSequence {

@@ -21,7 +21,7 @@ public:
 	HapticsPlayer();
 	~HapticsPlayer();
 
-	std::vector<PriorityModel::ExecutionCommand> Update(float dt);
+	std::vector<NullSpaceIPC::EffectCommand> Update(float dt);
 	void Play(HapticHandle h);
 	void Pause(HapticHandle h);
 	void Restart(HapticHandle h);

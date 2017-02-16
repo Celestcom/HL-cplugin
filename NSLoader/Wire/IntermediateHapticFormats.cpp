@@ -154,7 +154,7 @@ void NullSpace::Propogate(NullSpace::Node & rootNode)
 
 std::vector<NullSpace::Node*> NullSpace::Flatten(NullSpace::Node& rootNode)
 {
-	//In order to flatten the heirarchy, we must add all the leaf nodes to a list
+	//In order to flatten the hierarchy, we must add all the leaf nodes to a list
 	//We will not have any cycles 
 	//Take a pointer to the root node, and hold on to the list result
 	typedef std::function<void(Node&, std::vector<Node*>&)> DFSFunc;
@@ -175,4 +175,14 @@ std::vector<NullSpace::Node*> NullSpace::Flatten(NullSpace::Node& rootNode)
 	//Sort the flattened effects by their time offsets
 	std::sort(result.begin(), result.end(), [](const Node* lhs, const Node* rhs) {return lhs->Time < rhs->Time; });
 	return result;
+}
+
+std::vector<TinyEffect> NullSpace::EncodeTinyEffects(std::vector<Node*>& input)
+{
+	std::vector<TinyEffect> effects;
+	effects.reserve(input.size());
+	for (const auto& e : input) {
+		effects.push_back(TinyEffect(e->Time, e->Strength, e->Duration, e->Effect, e->Area));
+	}
+	return effects;
 }

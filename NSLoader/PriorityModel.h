@@ -3,6 +3,7 @@
 #include "HapticQueue.h"
 #include "Wire\IntermediateHapticFormats.h"
 #include "Enums.h"
+#include "EffectCommand.pb.h"
 class PriorityModel
 {
 public:
@@ -18,7 +19,7 @@ public:
 	};
 	PriorityModel();
 	~PriorityModel();
-	std::vector<PriorityModel::ExecutionCommand> Update(float dt);
+	std::vector<NullSpaceIPC::EffectCommand> Update(float dt);
 	void Clean(Location loc);
 	boost::optional<boost::uuids::uuid> Put(AreaFlag area, HapticEvent e);
 	boost::optional<HapticEvent> Remove(AreaFlag area, boost::uuids::uuid e);

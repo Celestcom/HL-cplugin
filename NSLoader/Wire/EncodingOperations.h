@@ -139,7 +139,7 @@ public:
 	EngineCommandOffset EncodingOperations::Encode(NullSpaceDLL::EngineCommand e) {
 		return NullSpace::HapticFiles::CreateEngineCommandData(_builder, e.Command);
 	}
-	TrackOffset EncodingOperations::Encode(const Quaternion& input) {
+	TrackOffset EncodingOperations::Encode(const NullSpaceDLL::Quaternion& input) {
 		//todo: check if this stack variable is copied by flatbuffers
 		auto q = NullSpace::Communication::Quaternion(input.x, input.y, input.z, input.w);
 		return NullSpace::Communication::CreateTrackingUpdate(_builder, &q);
@@ -397,16 +397,16 @@ public:
 	}
 
 
-	
+	/*
 	static std::vector<TinyEffect> EncodingOperations::Decode(const NullSpace::HapticFiles::TinyEffectArray* effects) {
 		std::vector<TinyEffect> result;
 		result.reserve(effects->effects()->size());
 		for (const auto& effect : *effects->effects()) {
-			result.push_back(TinyEffect(effect->time(), effect->strength(), effect->duration(), effect->effect(), effect->area()));
+			result.push_back(TinyEffect(effect->time(), effect->strength(), effect->duration(), effect->, effect->area()));
 		}
 		return result;
 	}
-
+	*/
 
 
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {

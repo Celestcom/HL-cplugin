@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "PriorityModel.h"
 #include "HapticEvent.h"
-
 PriorityModel::PriorityModel()
 {
 }
@@ -17,21 +16,25 @@ for (uint32_t bit = 1; x >= bit; bit *=2) if (x & bit) switch(AreaFlag(bit))
 
 
 
-std::vector<PriorityModel::ExecutionCommand> PriorityModel::Update(float dt)
+std::vector<NullSpaceIPC::EffectCommand> PriorityModel::Update(float dt)
 {
+	using namespace NullSpaceIPC;
 	for (auto& queue : _model) {
 		queue.second.Update(dt);
 	}
-
-	std::vector<ExecutionCommand> commands;
+	
+	std::vector<NullSpaceIPC::EffectCommand> commands;
 	for (auto& queue : _model) {
 		HapticEvent* effect = _model[queue.first].GetNextEvent();
 		if (effect == nullptr)
 		{
 			if (queue.second.Dirty)
 			{
-				commands.push_back(ExecutionCommand(queue.first, PriorityModel::Command::HALT));
-				//_hardware->HaltEffect(queue.first);
+				EffectCommand command;
+				
+				command.set_area(uint32_t(queue.first));
+				command.set_command(EffectCommand_Command::EffectCommand_Command_HALT);
+				commands.push_back(command);
 				_model[queue.first].Dirty = false;
 			}
 			continue;
@@ -41,8 +44,16 @@ std::vector<PriorityModel::ExecutionCommand> PriorityModel::Update(float dt)
 			if (!effect->Sent) {
 				effect->Sent = true;
 				Duration d = Duration(effect->DurationType());
-				
-				commands.push_back(ExecutionCommand(queue.first, PriorityModel::Command::PLAY, effect->DurationType(), effect->Effect));
+				EffectCommand command;
+				command.set_area(uint32_t(queue.first));
+				if (effect->DurationType() == Duration::OneShot) {
+					command.set_command(EffectCommand_Command::EffectCommand_Command_PLAY);
+				}
+				else {
+					command.set_command(EffectCommand_Command::EffectCommand_Command_PLAY_CONTINUOUS);
+				}
+				command.set_effect(effect->Effect);
+				commands.push_back(command);
 			}
 		}
 	}

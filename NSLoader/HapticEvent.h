@@ -1,15 +1,16 @@
 #pragma once
 #include "Enums.h"
 #include <boost\uuid\uuid.hpp>
+#include <string>
 class HapticEvent
 {
 public:
-	HapticEvent(Effect effect, float duration, boost::uuids::uuid handle);
+	HapticEvent(std::string effect, float duration, boost::uuids::uuid handle);
 	HapticEvent() {}
 	~HapticEvent();
 	boost::uuids::uuid Handle;
 	bool Dirty;
-	Effect Effect;
+	std::string Effect;
 	float Duration;
 	float TimeElapsed;
 	bool Sent;

@@ -104,11 +104,8 @@ void PlayableEffect::Update(float dt)
 	while (current != _effects.end()) {
 
 		if (current->Time <= _time) {
-			//todo: FIX
-		//	auto a = atoms.at(Locator::getTranslator().ToString(current->Effect)).GetEffect(current->Strength);
-		//	_gen.NewEvent((AreaFlag)current->Area, current->Duration, a, _id);
-			
-			
+	
+			_gen.NewEvent(AreaFlag(current->Area), current->Duration, current->Effect, _id);
 			std::advance(current, 1);
 			_lastExecutedEffect = current;
 

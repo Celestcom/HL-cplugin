@@ -23,7 +23,8 @@ void Engine::scheduleTimestep()
 void Engine::executeTimestep(const boost::system::error_code & ec)
 {
 	auto dt = float( m_hapticsExecutionInterval.fractional_seconds())/1000.0f;
-	m_player.Update(dt);
+	auto effectCommands = m_player.Update(dt);
+
 	scheduleTimestep();
 }
 
@@ -39,7 +40,7 @@ Engine::Engine() :
 {
 
 
-
+	scheduleTimestep();
 }
 
 bool Engine::InitializeFromFilesystem(LPSTR path) {
@@ -130,9 +131,24 @@ void Engine::SetTrackingEnabled(bool wantTracking)
 
 void Engine::HandleCommand(unsigned int handle, short c)
 {
-	//_wire.AquireEncodingLock();
-	//_wire.Send(_wire.Encoder->Encode(NullSpaceDLL::HandleCommand(handle, c)));
-	//_wire.ReleaseEncodingLock();
+	HapticHandle h = HapticHandle(handle);
+	switch (NullSpace::HapticFiles::Command(c)) {
+	case NullSpace::HapticFiles::Command_PAUSE:
+		m_player.Pause(h);
+		break;
+	case NullSpace::HapticFiles::Command_PLAY:
+		m_player.Play(h);
+		break;
+	case NullSpace::HapticFiles::Command_RELEASE:
+		m_player.Release(h);
+		break;
+	case NullSpace::HapticFiles::Command_RESET:
+		m_player.Stop(h);
+		break;
+	default:
+		break;
+	}
+	
 }
 
 //coming in as nodal formatted data..?
@@ -142,17 +158,26 @@ void Engine::CreateHaptic(unsigned int handle, void * data, unsigned int size)
 	if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
 		
 		auto packet = NullSpace::HapticFiles::GetHapticPacket(data);
-		auto type = packet->packet_type();
-		auto  n = static_cast<const NullSpace::HapticFiles::Node*>(packet->packet());
-		auto node = EncodingOperations::Decode(n);
+		if (packet->packet_type() != NullSpace::HapticFiles::FileType::FileType_Node) {
+			return;
+		}
+
+		auto node = EncodingOperations::Decode(static_cast<const NullSpace::HapticFiles::Node*>(packet->packet()));
 		
 		//Push all values down, such as strength and time offset
 		NullSpace::Propogate(node);
 		//Pull out all effects
 		auto effects = NullSpace::Flatten(node);
-		int a = 3;
+
+		//Encode the nodes as TinyEffects for use in engine
+		auto tinyEffects = NullSpace::EncodeTinyEffects(effects);
+
+
+		m_player.Create(handle, tinyEffects);
 	}
 }
+
+
 
 char* Engine::GetError()
 {

@@ -45,6 +45,7 @@ public:
 		return c;
 		
 	}
+
 private:
 	flatbuffers::FlatBufferBuilder _builder;
 	std::mutex _encodingLock;
