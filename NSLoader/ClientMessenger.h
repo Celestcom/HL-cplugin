@@ -18,7 +18,7 @@ public:
 	~ClientMessenger();
 	boost::optional<TrackingUpdate> ReadTracking();
 	boost::optional<SuitsConnectionInfo> ReadSuits();
-	void WriteHaptics(ExecutionCommand e);
+	void WriteHaptics(NullSpaceIPC::EffectCommand e);
 
 private:
 	//Wite haptics to the suit using this shared queue

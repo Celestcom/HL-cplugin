@@ -2,6 +2,7 @@
 #include "ClientMessenger.h"
 //#include "Locator.h"
 #include <boost\bind.hpp>
+#include "EffectCommand.pb.h"
 ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 
 	m_sentinalTimer(io),
@@ -34,23 +35,20 @@ boost::optional<SuitsConnectionInfo> ClientMessenger::ReadSuits()
 	return boost::optional<SuitsConnectionInfo>();
 }
 
-void ClientMessenger::WriteHaptics(ExecutionCommand e)
+void ClientMessenger::WriteHaptics(NullSpaceIPC::EffectCommand e)
 {
-	m_encoder.AquireEncodingLock();
-	auto encoded = m_encoder.Encode(e);
-	m_encoder.ReleaseEncodingLock();
-
-	m_encoder._finalize(encoded, [this](void* data, int size) {
-		if (m_hapticsStream) {
-			try {
-				m_hapticsStream->Push(data, size);
-			}
-			catch (const boost::interprocess::interprocess_exception& ec) {
-				//probably full queue, which means the server isn't reading fast enough!
-				//should log
-			}
+	std::string binaryData;
+	e.SerializeToString(&binaryData);
+	if (m_hapticsStream) {
+		try {
+			m_hapticsStream->Push(binaryData.data(), e.ByteSize());
 		}
-	});
+		catch (const boost::interprocess::interprocess_exception& ec) {
+			//probably full queue, which means the server isn't reading fast enough!
+			//should log
+		}
+	}
+	
 }
 
 
