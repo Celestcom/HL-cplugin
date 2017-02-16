@@ -17,9 +17,9 @@ HapticEventGenerator::~HapticEventGenerator()
 {
 }
 
-void HapticEventGenerator::NewEvent(AreaFlag area, float duration, std::string effect, boost::uuids::uuid id)
+void HapticEventGenerator::NewEvent(AreaFlag area, float duration, std::string effect, float strength, boost::uuids::uuid id)
 {
-	auto ev = GeneratedEvent(HapticEvent(effect, duration, id), area);
+	auto ev = GeneratedEvent(HapticEvent(effect, duration, id, strength), area);
 	if (auto optionalId = _model.Put(area, ev.Event)) {
 		_events[uuid_hasher(optionalId.get())].push_back(ev);
 		

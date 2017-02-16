@@ -53,6 +53,7 @@ std::vector<NullSpaceIPC::EffectCommand> PriorityModel::Update(float dt)
 					command.set_command(EffectCommand_Command::EffectCommand_Command_PLAY_CONTINUOUS);
 				}
 				command.set_effect(effect->Effect);
+				command.set_strength(effect->Strength)
 				commands.push_back(command);
 			}
 		}

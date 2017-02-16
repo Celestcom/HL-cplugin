@@ -2,7 +2,7 @@
 #include "HapticEvent.h"
 
 
-HapticEvent::HapticEvent(std::string effect, float duration, boost::uuids::uuid handle):Dirty(false), Effect(effect), Duration(duration), TimeElapsed(0), Sent(false),
+HapticEvent::HapticEvent(std::string effect, float duration, boost::uuids::uuid handle, float strength):Dirty(false), Effect(effect), Duration(duration), TimeElapsed(0), Sent(false),Strength(strength),
 Handle(handle)
 {
 }

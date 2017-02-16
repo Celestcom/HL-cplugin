@@ -105,7 +105,7 @@ void PlayableEffect::Update(float dt)
 
 		if (current->Time <= _time) {
 	
-			_gen.NewEvent(AreaFlag(current->Area), current->Duration, current->Effect, _id);
+			_gen.NewEvent(AreaFlag(current->Area), current->Duration, current->Effect, current->Strength, _id);
 			std::advance(current, 1);
 			_lastExecutedEffect = current;
 
