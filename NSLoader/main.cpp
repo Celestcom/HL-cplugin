@@ -8,6 +8,7 @@ int main() {
 	using namespace std;
 
 	auto ptr = NSVR_Create();
+	//std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	std::ifstream input("test_all.haptic", std::ios::binary);
 	if (!input.is_open()) {
 		throw std::runtime_error("Couldn't find the file");

@@ -5,12 +5,14 @@
 #include "EffectCommand.pb.h"
 ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 
-	m_sentinalTimer(io),
-	m_sentinalInterval(1000),
+	m_sentinelTimer(io),
+	m_sentinelInterval(500),
 	m_sentinalTimeout(1000)
 {
-	//default state is that we are not connected to the driver
-	startAttemptEstablishConnection();
+	//First time we attempt to establish connection, do it with zero delay
+	m_sentinelTimer.expires_from_now(boost::posix_time::millisec(0));
+	m_sentinelTimer.async_wait(boost::bind(&ClientMessenger::attemptEstablishConnection, this, boost::asio::placeholders::error));
+
 }
 
 
@@ -35,7 +37,7 @@ boost::optional<SuitsConnectionInfo> ClientMessenger::ReadSuits()
 	return boost::optional<SuitsConnectionInfo>();
 }
 
-void ClientMessenger::WriteHaptics(NullSpaceIPC::EffectCommand e)
+void ClientMessenger::WriteHaptics(const NullSpaceIPC::EffectCommand& e)
 {
 	std::string binaryData;
 	e.SerializeToString(&binaryData);
@@ -54,15 +56,15 @@ void ClientMessenger::WriteHaptics(NullSpaceIPC::EffectCommand e)
 
 void ClientMessenger::startAttemptEstablishConnection()
 {
-	m_sentinalTimer.expires_from_now(m_sentinalInterval);
-	m_sentinalTimer.async_wait(boost::bind(&ClientMessenger::attemptEstablishConnection, this, boost::asio::placeholders::error));
+	m_sentinelTimer.expires_from_now(m_sentinelInterval);
+	m_sentinelTimer.async_wait(boost::bind(&ClientMessenger::attemptEstablishConnection, this, boost::asio::placeholders::error));
 }
 
 void ClientMessenger::attemptEstablishConnection(const boost::system::error_code & ec)
 {
 	try {
-		//Locator::Logger().Log("ClientMessenger", "Attempting to create Sentinal Shared Object", LogLevel::Info);
-		m_sentinal = std::make_unique<ReadableSharedObject<std::time_t>>("ns-sentinal");
+		//Locator::Logger().Log("ClientMessenger", "Attempting to create Sentinel Shared Object", LogLevel::Info);
+		m_sentinel = std::make_unique<ReadableSharedObject<std::time_t>>("ns-sentinel");
 
 	}
 	catch (const boost::interprocess::interprocess_exception& ec) {
@@ -74,7 +76,7 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 	}
 
 
-	//Once the sentinal has connected, we want to setup the other shared objects
+	//Once the sentinel has connected, we want to setup the other shared objects
 	try {
 		//Locator::Logger().Log("ClientMessenger", "Attempting to create all the other shared objects");
 
@@ -108,8 +110,8 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 
 void ClientMessenger::startMonitorConnection()
 {
-	m_sentinalTimer.expires_from_now(m_sentinalInterval);
-	m_sentinalTimer.async_wait(boost::bind(&ClientMessenger::monitorConnection, this, boost::asio::placeholders::error));
+	m_sentinelTimer.expires_from_now(m_sentinelInterval);
+	m_sentinelTimer.async_wait(boost::bind(&ClientMessenger::monitorConnection, this, boost::asio::placeholders::error));
 }
 
 void ClientMessenger::monitorConnection(const boost::system::error_code & ec)
@@ -117,7 +119,7 @@ void ClientMessenger::monitorConnection(const boost::system::error_code & ec)
 	if (!ec) {
 	//	Locator::Logger().Log("ClientMessenger", "Reading the sentinal..");
 
-		std::time_t lastDriverTimestamp = m_sentinal->Read();
+		std::time_t lastDriverTimestamp = m_sentinel->Read();
 		//assumes that the current time is >= the read time
 		auto time = boost::chrono::duration_cast<boost::chrono::milliseconds>(
 			boost::chrono::seconds(std::time(nullptr) - lastDriverTimestamp)

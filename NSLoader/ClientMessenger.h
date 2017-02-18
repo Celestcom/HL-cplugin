@@ -9,6 +9,8 @@
 #include <boost\optional.hpp>
 #include <boost\asio.hpp>
 #include <boost\chrono.hpp>
+
+#include "EffectCommand.pb.h"
 using namespace boost::interprocess;
 using namespace NullSpace::SharedMemory;
 class ClientMessenger
@@ -18,10 +20,10 @@ public:
 	~ClientMessenger();
 	boost::optional<TrackingUpdate> ReadTracking();
 	boost::optional<SuitsConnectionInfo> ReadSuits();
-	void WriteHaptics(NullSpaceIPC::EffectCommand e);
+	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
 
 private:
-	//Wite haptics to the suit using this shared queue
+	//Write haptics to the suit using this shared queue
 	std::unique_ptr<WritableSharedQueue> m_hapticsStream;
 
 	//Read the most up-to-date tracking data from this object
@@ -34,14 +36,14 @@ private:
 	std::unique_ptr<ReadableSharedQueue> m_logStream;
 
 	//Sentinal to see if the driver is running
-	std::unique_ptr<ReadableSharedObject<std::time_t>> m_sentinal;
+	std::unique_ptr<ReadableSharedObject<std::time_t>> m_sentinel;
 
 
 	//We use a sentinal to see if the driver is responsive/exists
-	boost::asio::deadline_timer m_sentinalTimer;
+	boost::asio::deadline_timer m_sentinelTimer;
 
 	//How often we read the sentinal
-	boost::posix_time::milliseconds m_sentinalInterval;
+	boost::posix_time::milliseconds m_sentinelInterval;
 
 	//If currentTime - sentinalTime > m_sentinalTimeout, we say that we are disconnected
 	boost::chrono::milliseconds m_sentinalTimeout;

@@ -29,8 +29,7 @@ private:
 	HapticsPlayer m_player;
 
 	boost::asio::deadline_timer m_hapticsExecutionTimer;
-	boost::posix_time::millisec m_hapticsExecutionInterval;
-
+	boost::posix_time::milliseconds m_hapticsExecutionInterval;
 	void scheduleTimestep();
 	void executeTimestep(const boost::system::error_code& ec);
 

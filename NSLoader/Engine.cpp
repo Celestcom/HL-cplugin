@@ -22,10 +22,16 @@ void Engine::scheduleTimestep()
 
 void Engine::executeTimestep(const boost::system::error_code & ec)
 {
-	auto dt = float( m_hapticsExecutionInterval.fractional_seconds())/1000.0f;
-	auto effectCommands = m_player.Update(dt);
-
-	scheduleTimestep();
+	if (!ec) {
+		//dt = total_ms * (1/1000) seconds 
+		constexpr auto fraction_of_second = (1.0f / 1000.f);
+		auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
+		auto effectCommands = m_player.Update(dt);
+		for (const auto& command : effectCommands) {
+			m_messenger.WriteHaptics(command);
+		}
+		scheduleTimestep();
+	}
 }
 
 Engine::Engine() :
@@ -35,7 +41,7 @@ Engine::Engine() :
 	m_ioService(),
 	m_messenger(m_ioService.GetIOService()),
 	m_player(),
-	m_hapticsExecutionInterval(10),
+	m_hapticsExecutionInterval(boost::posix_time::milliseconds(10)),
 	m_hapticsExecutionTimer(m_ioService.GetIOService())
 {
 
