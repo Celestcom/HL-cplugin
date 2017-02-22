@@ -15,7 +15,7 @@ namespace NS {
 	}
 }
 
-PlayableEffect::PlayableEffect(std::vector<TinyEffect> effects, HapticEventGenerator& gen) :
+PlayableEffect::PlayableEffect(std::vector<FlatbuffDecoder::SuitEvent> effects, HapticEventGenerator& gen) :
 	_effects(effects),
 	_state(PlaybackState::IDLE),
 	_gen(gen),
@@ -100,9 +100,8 @@ void PlayableEffect::Update(float dt)
 
 	_time += dt;
 	
-	std::vector<TinyEffect>::iterator current(_lastExecutedEffect);
+	auto current(_lastExecutedEffect);
 	while (current != _effects.end()) {
-
 		if (current->Time <= _time) {
 	
 			_gen.NewEvent(AreaFlag(current->Area), current->Duration, current->Effect, current->Strength, _id);
@@ -127,7 +126,8 @@ void PlayableEffect::Update(float dt)
 
 float PlayableEffect::GetTotalPlayTime() const
 {
-	return ::GetTotalPlayTime(_effects);
+	//todo: FIX
+	//return ::GetTotalPlayTime(_effects);
 }
 
 float PlayableEffect::CurrentTime() const

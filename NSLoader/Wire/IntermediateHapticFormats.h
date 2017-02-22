@@ -58,7 +58,14 @@ struct TinyEffect {
 	std::string Effect;
 	TinyEffect(float time, float strength, float duration, std::string effect, unsigned int area) :Time(time), Strength(strength), Duration(duration), Effect(effect), Area(area) {}
 };
-
+struct BasicHapticEvent {
+	float Time;
+	float Strength;
+	float Duration;
+	uint32_t Area;
+	std::string Effect;
+	BasicHapticEvent(float time, float strength, float duration, uint32_t area, std::string effect);
+};
 template<typename T>
 struct TimeIndex {
 	float Time;

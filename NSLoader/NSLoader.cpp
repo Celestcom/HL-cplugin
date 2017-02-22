@@ -5,71 +5,86 @@
 #include "NSLoader.h"
 #include "Engine.h"
 
- NSVRPlugin __stdcall NSVR_Create()
+#define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
+#define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
+
+NSLOADER_API unsigned int __stdcall NSVR_GetVersion(void)
 {
-	return reinterpret_cast<NSVRPlugin>(new Engine());
+	return NSLOADER_API_VERSION;
 }
 
- NSLOADER_API unsigned int __stdcall NSVR_GenHandle(NSVRPlugin ptr)
+NSLOADER_API int _stdcall NSVR_IsCompatibleDLL(void)
+{
+	unsigned int major = NSVR_GetVersion() >> 16;
+	return major == NSLOADER_API_VERSION_MAJOR;
+}
+
+NSLOADER_API NSVR_Context_t* __stdcall NSVR_Create()
+{
+	return AS_TYPE(NSVR_Context_t, new Engine());
+}
+
+ NSLOADER_API unsigned int __stdcall NSVR_GenHandle(NSVR_Context_t* ptr)
  {
-	 return reinterpret_cast<Engine*>(ptr)->GenHandle();
+	 return AS_TYPE(Engine, ptr)->GenHandle();
 
  }
 
- NSLOADER_API int __stdcall NSVR_PollStatus(NSVRPlugin ptr)
+ NSLOADER_API int __stdcall NSVR_PollStatus(NSVR_Context_t* ptr)
  {
-	 return reinterpret_cast<Engine*>(ptr)->PollStatus();
+	return AS_TYPE(Engine, ptr)->PollStatus();
  }
 
- NSLOADER_API void __stdcall NSVR_PollTracking(NSVRPlugin ptr, NullSpaceDLL::InteropTrackingUpdate & q)
+ NSLOADER_API void __stdcall NSVR_PollTracking(NSVR_Context_t* ptr, NSVR_InteropTrackingUpdate & q)
  {
 	// return reinterpret_cast<TestClass*>(ptr)->PollTracking(q);
  }
 
- NSLOADER_API void __stdcall NSVR_Delete(NSVRPlugin ptr)
+ NSLOADER_API void __stdcall NSVR_Delete(NSVR_Context_t* ptr)
  {
-	 delete reinterpret_cast<Engine*>(ptr);
- }
-
-
-
- NSLOADER_API bool __stdcall NSVR_Load(NSVRPlugin ptr, LPSTR param, int fileType)
- {
-//	 return reinterpret_cast<TestClass*>(ptr)->Load(param, fileType);
-	return true;
+	 if (!ptr) {
+		 return;
+	 }
+	 delete AS_TYPE(Engine,ptr);
  }
 
 
 
 
- NSLOADER_API void __stdcall NSVR_HandleCommand(NSVRPlugin ptr, unsigned int handle, short command)
+
+
+ NSLOADER_API void __stdcall NSVR_HandleCommand(NSVR_Context_t* ptr, uint32_t handle, uint16_t command)
  {
-	 return reinterpret_cast<Engine*>(ptr)->HandleCommand(handle, command);
+	 return AS_TYPE(Engine, ptr)->HandleCommand(handle, command);
  }
 
- NSLOADER_API char * __stdcall NSVR_GetError(NSVRPlugin ptr)
+ NSLOADER_API char * __stdcall NSVR_GetError(NSVR_Context_t* ptr)
  {
-	 return reinterpret_cast<Engine*>(ptr)->GetError();
+	 return AS_TYPE(Engine, ptr)->GetError();
  }
 
- NSLOADER_API void __stdcall NSVR_FreeString(char * string)
+ NSLOADER_API void __stdcall NSVR_FreeError(char * string)
  {
 	 delete[] string;
 	 string = nullptr;
  }
 
- NSLOADER_API bool __stdcall NSVR_EngineCommand(NSVRPlugin ptr, short command)
+ NSLOADER_API int __stdcall NSVR_EngineCommand(NSVR_Context_t* ptr, uint16_t command)
  {
-	 return reinterpret_cast<Engine*>(ptr)->EngineCommand(command);
+	  return AS_TYPE(Engine, ptr)->EngineCommand(command);
  }
 
- NSLOADER_API bool __stdcall NSVR_InitializeFromFilesystem(NSVRPlugin ptr, LPSTR path)
+ NSLOADER_API int __stdcall NSVR_InitializeFromFilesystem(NSVR_Context_t* ptr, char* path)
  {
-	 return reinterpret_cast<Engine*>(ptr)->InitializeFromFilesystem(path);
+	  return AS_TYPE(Engine, ptr)->InitializeFromFilesystem(path);
  }
 
- NSLOADER_API void __stdcall NSVR_CreateHaptic(NSVRPlugin ptr, unsigned int handle, void * data, unsigned int size)
+ NSLOADER_API uint32_t __stdcall NSVR_TransmitEvents(NSVR_Context_t* ptr, void * data, uint32_t size)
  {
-	 reinterpret_cast<Engine*>(ptr)->CreateHaptic(handle, data, size);
+
+	
+
+
+	 return AS_TYPE(Engine, ptr)->CreateEffect(data, size);
  }
 

@@ -6,6 +6,7 @@
 #include "IPlayable.h"
 #include "PriorityModel.h"
 #include "HapticEventGenerator.h"
+#include "Wire\FlatbuffDecoder.h"
 typedef unsigned int HapticHandle;
 class HapticsPlayer
 {
@@ -27,7 +28,7 @@ public:
 	void Restart(HapticHandle h);
 	void Stop(HapticHandle h);
 	void Release(HapticHandle h);
-	void Create(HapticHandle h, std::vector<TinyEffect>);
+	void Create(HapticHandle h, std::vector<FlatbuffDecoder::SuitEvent>);
 
 	PriorityModel& GetModel();
 

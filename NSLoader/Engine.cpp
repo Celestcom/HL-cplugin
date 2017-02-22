@@ -10,10 +10,8 @@
 #include "HapticEffect_generated.h"
 #include "HapticFrame_generated.h"
 #include "HapticPacket_generated.h"
-#include "Wire\EncodingOperations.h"
 #include "Wire\FlatbuffDecoder.h"
-
-
+#include <boost\bind.hpp>
 void Engine::scheduleTimestep()
 {
 	m_hapticsExecutionTimer.expires_from_now(m_hapticsExecutionInterval);
@@ -157,31 +155,31 @@ void Engine::HandleCommand(unsigned int handle, short c)
 	
 }
 
-//coming in as nodal formatted data..?
-void Engine::CreateHaptic(unsigned int handle, void * data, unsigned int size)
-{
-	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
-	if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
-		
-		auto packet = NullSpace::HapticFiles::GetHapticPacket(data);
-		if (packet->packet_type() != NullSpace::HapticFiles::FileType::FileType_Node) {
-			return;
-		}
-
-		auto node = EncodingOperations::Decode(static_cast<const NullSpace::HapticFiles::Node*>(packet->packet()));
-		
-		//Push all values down, such as strength and time offset
-		NullSpace::Propogate(node);
-		//Pull out all effects
-		auto effects = NullSpace::Flatten(node);
-
-		//Encode the nodes as TinyEffects for use in engine
-		auto tinyEffects = NullSpace::EncodeTinyEffects(effects);
-
-
-		m_player.Create(handle, tinyEffects);
-	}
-}
+////coming in as nodal formatted data..?
+//void Engine::CreateHaptic(unsigned int handle, void * data, unsigned int size)
+//{
+//	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
+//	if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
+//		
+//		auto packet = NullSpace::HapticFiles::GetHapticPacket(data);
+//		if (packet->packet_type() != NullSpace::HapticFiles::FileType::FileType_Node) {
+//			return;
+//		}
+//
+//		auto node = EncodingOperations::Decode(static_cast<const NullSpace::HapticFiles::Node*>(packet->packet()));
+//		
+//		//Push all values down, such as strength and time offset
+//		NullSpace::Propogate(node);
+//		//Pull out all effects
+//		auto effects = NullSpace::Flatten(node);
+//
+//		//Encode the nodes as TinyEffects for use in engine
+//		auto tinyEffects = NullSpace::EncodeTinyEffects(effects);
+//
+//
+//		//m_player.Create(handle, tinyEffects);
+//	}
+//}
 
 
 
@@ -195,4 +193,17 @@ char* Engine::GetError()
 
 
 	return newString;
+}
+
+uint32_t Engine::CreateEffect(void* data, unsigned int size)
+{
+	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
+	if (NullSpace::Events::VerifySuitEventListBuffer(verifier)) {
+		auto encodedList = NullSpace::Events::GetSuitEventList(data);
+		auto decodedList = FlatbuffDecoder::Decode(encodedList);
+		
+	}
+
+	return 0;
+	throw std::logic_error("The method or operation is not implemented.");
 }

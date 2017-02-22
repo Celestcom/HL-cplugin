@@ -1,5 +1,5 @@
 #pragma once
-
+#include <stdint.h>
 
 #ifdef NSLOADER_EXPORTS
 #define NSLOADER_API __declspec(dllexport) 
@@ -7,51 +7,60 @@
 #define NSLOADER_API __declspec(dllimport) 
 #endif
 
-#define NSVR_VERSION "v0.3.0-rc1"
+#define NSLOADER_API_VERSION_MAJOR 0
+#define NSLOADER_API_VERSION_MINOR 3
+#define NSLOADER_API_VERSION ((NSLOADER_API_VERSION_MAJOR << 16) | NSLOADER_API_VERSION_MINOR)
 
-struct _NSVRPlugin;
-typedef struct _NSVRPlugin* NSVRPlugin;
 
 
-namespace NullSpaceDLL {
-	struct Quaternion {
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+	struct NSVR_Context;;
+	typedef struct NSVR_Context* NSVR_Context_t;
+
+	struct NSVR_Quaternion {
 		float w;
 		float x;
 		float y;
 		float z;
 	};
-	struct InteropTrackingUpdate {
-		Quaternion chest;
-		Quaternion left_upper_arm;
-		Quaternion left_forearm;
-		Quaternion right_upper_arm;
-		Quaternion right_forearm;
+	struct NSVR_InteropTrackingUpdate {
+		NSVR_Quaternion chest;
+		NSVR_Quaternion left_upper_arm;
+		NSVR_Quaternion left_forearm;
+		NSVR_Quaternion right_upper_arm;
+		NSVR_Quaternion right_forearm;
 	};
+
+	NSLOADER_API unsigned int __stdcall NSVR_GetVersion(void);
+	NSLOADER_API  int __stdcall NSVR_IsCompatibleDLL(void);
+
+	NSLOADER_API NSVR_Context_t* __stdcall NSVR_Create();
+	NSLOADER_API void __stdcall NSVR_Delete(NSVR_Context_t* ptr);
+
+	NSLOADER_API unsigned int __stdcall NSVR_GenHandle(NSVR_Context_t* ptr);
+	NSLOADER_API int  __stdcall NSVR_PollStatus(NSVR_Context_t* ptr);
+
+	NSLOADER_API void __stdcall NSVR_PollTracking(NSVR_Context_t* ptr, NSVR_InteropTrackingUpdate& q);
 	
+
+	NSLOADER_API void __stdcall NSVR_HandleCommand(NSVR_Context_t* ptr, uint32_t handle, uint16_t command);
+
+	NSLOADER_API char* __stdcall NSVR_GetError(NSVR_Context_t* ptr);
+
+	NSLOADER_API void __stdcall NSVR_FreeError(char* string);
+
+	NSLOADER_API int __stdcall NSVR_EngineCommand(NSVR_Context_t* ptr, uint16_t command);
+
+	NSLOADER_API int __stdcall NSVR_InitializeFromFilesystem(NSVR_Context_t* ptr, char* path);
+
+	NSLOADER_API void __stdcall NSVR_CreateHaptic(NSVR_Context_t* ptr, uint32_t handle, void* data, uint32_t size);
+
+	NSLOADER_API uint32_t __stdcall NSVR_TransmitEvents(NSVR_Context_t* ptr, void* data, uint32_t size);
+#ifdef __cplusplus
 }
+#endif
 
-extern "C" {
-	
-
-	NSLOADER_API NSVRPlugin __stdcall NSVR_Create();
-	NSLOADER_API void __stdcall NSVR_Delete(NSVRPlugin ptr);
-
-	NSLOADER_API unsigned int __stdcall NSVR_GenHandle(NSVRPlugin ptr);
-	NSLOADER_API int  __stdcall NSVR_PollStatus(NSVRPlugin ptr);
-
-	NSLOADER_API void __stdcall NSVR_PollTracking(NSVRPlugin ptr, NullSpaceDLL::InteropTrackingUpdate& q);
-	NSLOADER_API bool __stdcall NSVR_Load(NSVRPlugin ptr, LPSTR param, int fileType);
-	
-
-	NSLOADER_API void __stdcall NSVR_HandleCommand(NSVRPlugin ptr, unsigned int handle, short command);
-
-	NSLOADER_API char* __stdcall NSVR_GetError(NSVRPlugin ptr);
-
-	NSLOADER_API void __stdcall NSVR_FreeString(char* string);
-
-	NSLOADER_API bool __stdcall NSVR_EngineCommand(NSVRPlugin ptr, short command);
-
-	NSLOADER_API bool __stdcall NSVR_InitializeFromFilesystem(NSVRPlugin ptr, LPSTR path);
-
-	NSLOADER_API void __stdcall NSVR_CreateHaptic(NSVRPlugin ptr, unsigned int handle, void* data, unsigned int size);
-}

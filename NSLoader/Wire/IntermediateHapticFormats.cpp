@@ -186,3 +186,12 @@ std::vector<TinyEffect> NullSpace::EncodeTinyEffects(std::vector<Node*>& input)
 	}
 	return effects;
 }
+
+BasicHapticEvent::BasicHapticEvent(float time, float strength, float duration, uint32_t area, std::string effect) :
+	Time(time),
+	Strength(strength),
+	Duration(duration),
+	Area(area),
+	Effect(effect)
+
+{}

@@ -27,21 +27,24 @@
 #else 
 #include "../ExportedStructures.h" //MUST CHANGE TO ExportedStructures
 #endif
-struct Quaternion {
-	float w;
-	float x;
-	float y;
-	float z;
-	Quaternion(float x, float y, float z, float w) :w(w), x(x), y(y), z(z) {}
-	Quaternion() {}
-	friend std::ostream &operator<<(std::ostream &output,
-		const Quaternion &q) {
-		output << "(" << q.x << ", " << q.y << ", " << q.z << ", " << q.w << ")";
-		return output;
-	}
-};
+
+namespace NullSpace {
+	struct Quaternion {
+		float w;
+		float x;
+		float y;
+		float z;
+		Quaternion(float x, float y, float z, float w) :w(w), x(x), y(y), z(z) {}
+		Quaternion() {}
+		friend std::ostream &operator<<(std::ostream &output,
+			const Quaternion &q) {
+			output << "(" << q.x << ", " << q.y << ", " << q.z << ", " << q.w << ")";
+			return output;
+		}
+	};
 
 
+}
 
 
 namespace NullSpaceDLL {
@@ -84,7 +87,7 @@ class IEncoder {
 		virtual SuitStatus Encode(NullSpace::Communication::SuitStatus status) = 0;
 		virtual HandleCommandOffset Encode(NullSpaceDLL::HandleCommand h) = 0;
 		virtual EngineCommandOffset Encode(NullSpaceDLL::EngineCommand e) = 0;
-		virtual TinyEffectArrayOffset Encode(std::vector<Node*>& input) = 0;
+		virtual TinyEffectArrayOffset Encode(std::vector<NullSpace::Node*>& input) = 0;
 
 		virtual void Finalize(HandleCommandOffset, std::string, DataCallback) = 0;
 		virtual void Finalize(TrackOffset, DataCallback) = 0;
@@ -139,7 +142,7 @@ public:
 	EngineCommandOffset EncodingOperations::Encode(NullSpaceDLL::EngineCommand e) {
 		return NullSpace::HapticFiles::CreateEngineCommandData(_builder, e.Command);
 	}
-	TrackOffset EncodingOperations::Encode(const NullSpaceDLL::Quaternion& input) {
+	TrackOffset EncodingOperations::Encode(const NSVR_Quaternion& input) {
 		//todo: check if this stack variable is copied by flatbuffers
 		auto q = NullSpace::Communication::Quaternion(input.x, input.y, input.z, input.w);
 		return NullSpace::Communication::CreateTrackingUpdate(_builder, &q);
@@ -412,8 +415,8 @@ public:
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();
 	}
-	static NullSpaceDLL::InteropTrackingUpdate EncodingOperations::Decode(const NullSpace::Communication::TrackingUpdate* update) {
-		NullSpaceDLL::InteropTrackingUpdate t;
+	static NSVR_InteropTrackingUpdate EncodingOperations::Decode(const NullSpace::Communication::TrackingUpdate* update) {
+		NSVR_InteropTrackingUpdate t = {};
 		auto quat = update->chest();
 		t.chest.w = quat->w();
 		t.chest.x = quat->x();

@@ -65,7 +65,7 @@ void HapticsPlayer::Release(HapticHandle hh)
 	_outsideHandleToUUID.erase(_outsideHandleToUUID.find(hh));
 }
 
-void HapticsPlayer::Create(HapticHandle h, std::vector<TinyEffect> decoded)
+void HapticsPlayer::Create(HapticHandle h, std::vector<FlatbuffDecoder::SuitEvent> decoded)
 {
 	auto id = _uuidGen();
 

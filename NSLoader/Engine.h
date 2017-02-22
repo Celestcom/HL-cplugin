@@ -18,7 +18,7 @@ private:
 
 	std::unique_ptr<NodeDependencyResolver> _resolver;
 	NullSpace::Communication::SuitStatus _suitStatus;
-	NullSpaceDLL::InteropTrackingUpdate _tracking;
+	NSVR_InteropTrackingUpdate _tracking;
 	uint32_t _currentHandleId;
 	std::string _currentError;
 	std::unique_ptr<FlatbuffDecoder> _decoder;
@@ -49,7 +49,8 @@ public:
 	void SetTrackingEnabled(bool wantTracking);
 	void HandleCommand(unsigned int handle, short c);
 
-	void CreateHaptic(unsigned int handle, void* data, unsigned int size);
+//	void CreateHaptic(unsigned int handle, void* data, unsigned int size);
 	char* GetError();
+	uint32_t CreateEffect(void *data, unsigned int size);
 };
 
