@@ -102,18 +102,18 @@ void PlayableEffect::Update(float dt)
 	
 	auto current(_lastExecutedEffect);
 	while (current != _effects.end()) {
-		if (current->Time <= _time) {
+	//	if (current->Time <= _time) {
 	
-			_gen.NewEvent(AreaFlag(current->Area), current->Duration, current->Effect, current->Strength, _id);
-			std::advance(current, 1);
-			_lastExecutedEffect = current;
+			//_gen.NewEvent(AreaFlag(current->Area), current->Duration, current->Effect, current->Strength, _id);
+		//	std::advance(current, 1);
+		//	_lastExecutedEffect = current;
 
 
-		}
-		else {
-			_lastExecutedEffect = current;
-			break;
-		}
+		//}
+		//else {
+		//	_lastExecutedEffect = current;
+		//	break;
+		//}
 	}
 
 	if (_time >= GetTotalPlayTime()) {
@@ -142,7 +142,7 @@ bool PlayableEffect::IsPlaying() const
 
 PlayableInfo PlayableEffect::GetInfo() const
 {
-	return PlayableInfo(::GetTotalPlayTime(_effects), _time, _state == PlaybackState::PLAYING);
+	//return PlayableInfo(::GetTotalPlayTime(_effects), _time, _state == PlaybackState::PLAYING);
 }
 
 void PlayableEffect::Release()
@@ -168,3 +168,7 @@ void PlayableEffect::resume() {
 
 
 
+EventVisitor::EventVisitor(float time):m_time(time)
+{
+
+}

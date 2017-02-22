@@ -13,7 +13,20 @@ namespace NS {
 class BasicHapticEventVisitor : public boost::static_visitor<BasicHapticEvent> {
 public:
 	bool operator()(BasicHapticEvent& h, HapticEventGenerator& gen, boost::uuids::uuid id) {
+		if (h.Time)
 		gen.NewEvent(AreaFlag(h.Area), h.Duration, h.Effect, h.Strength, id);
+	}
+};
+
+class EventVisitor : public boost::static_visitor<> {
+private:
+	float m_time;
+public: 
+
+	EventVisitor(float time);
+	template <typename T>
+	void operator(T& operand) const {
+		return operand.Time <= m_time;
 	}
 };
 class PlayableEffect :
