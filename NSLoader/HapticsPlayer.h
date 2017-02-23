@@ -7,7 +7,10 @@
 #include "PriorityModel.h"
 #include "HapticEventGenerator.h"
 #include "Wire\FlatbuffDecoder.h"
+#include <mutex>
 typedef unsigned int HapticHandle;
+
+//todo: all misnamed now; must be a generic EventPlayer
 class HapticsPlayer
 {
 public:
@@ -41,7 +44,10 @@ public:
 private:
 	boost::hash<boost::uuids::uuid> uuid_hasher;
 	boost::uuids::random_generator _uuidGen;
+
+	std::mutex m_effectsMutex;
 	std::unordered_map<std::size_t, std::unique_ptr<IPlayable>> _effects;
+
 	PriorityModel _model; //order dependency (1)
 	HapticEventGenerator _generator; //order dependency (2)
 

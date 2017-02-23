@@ -4,31 +4,57 @@
 #include "HapticEvent.h"
 #include "HapticEventGenerator.h"
 #include "Wire\FlatbuffDecoder.h"
+
 namespace NS {
 	namespace Playable {
+		//implements Restart by calling Stop() followed by Play()
 		void Restart(const std::unique_ptr<IPlayable>&);
 	}
 }
 
-class BasicHapticEventVisitor : public boost::static_visitor<BasicHapticEvent> {
+//Responsible for calling the relevant components to execute each type of event
+class EventExecutor : public boost::static_visitor<> {
+private:
+	//Main ID of the effect
+	boost::uuids::uuid& m_id;
+	//all generators listed here. For now, we only have basic haptic effects.
+	HapticEventGenerator& m_basicHapticGenerator;
 public:
-	bool operator()(BasicHapticEvent& h, HapticEventGenerator& gen, boost::uuids::uuid id) {
-		if (h.Time)
-		gen.NewEvent(AreaFlag(h.Area), h.Duration, h.Effect, h.Strength, id);
-	}
+	EventExecutor(boost::uuids::uuid& id, HapticEventGenerator& basicHapticGenerator);
+
+	void operator()(BasicHapticEvent& hapticEvent);
 };
 
-class EventVisitor : public boost::static_visitor<> {
+//Responsible for summing up the duration of an effect
+class TotalPlaytimeVisitor : public boost::static_visitor<> {
+private:
+	float m_totalPlaytime;
+	//A basic effect needs a minimum duration, which in practice is about 0.25 seconds
+	const float m_fudgeFactor;
+public:
+	TotalPlaytimeVisitor();
+	template<typename T>
+	void operator()(T& operand) {
+		float thisEffectEndTime = std::max(0.0f, operand.Time + operand.Duration) + m_fudgeFactor;
+		m_totalPlaytime = std::max(m_totalPlaytime, thisEffectEndTime);
+	}
+
+	float TotalPlaytime();
+};
+
+//Responsible for checking if an event has expired
+class EventVisitor : public boost::static_visitor<bool> {
 private:
 	float m_time;
 public: 
-
 	EventVisitor(float time);
 	template <typename T>
-	void operator(T& operand) const {
+	bool operator()(T& operand) const {
 		return operand.Time <= m_time;
 	}
 };
+
+
 class PlayableEffect :
 	public IPlayable
 {

@@ -19,7 +19,7 @@ int main() {
 		(std::istreambuf_iterator<char>()));
 
 	auto handle = NSVR_GenHandle(ptr);
-	NSVR_CreateHaptic(ptr, handle, (void*)buffer.data(), buffer.size());
+	//NSVR_CreateHaptic(ptr, handle, (void*)buffer.data(), buffer.size());
 	NSVR_HandleCommand(ptr, handle, 0);
 	//while (true) {
 	//	int status = NSVR_PollStatus(ptr);

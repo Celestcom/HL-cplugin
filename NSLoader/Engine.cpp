@@ -33,12 +33,13 @@ void Engine::executeTimestep(const boost::system::error_code & ec)
 }
 
 Engine::Engine() :
-	
-	_decoder(std::make_unique<FlatbuffDecoder>()), 
+
+	_decoder(std::make_unique<FlatbuffDecoder>()),
 	_isEnginePlaying(true),
 	m_ioService(),
 	m_messenger(m_ioService.GetIOService()),
 	m_player(),
+	_currentHandleId(0),
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(10)),
 	m_hapticsExecutionTimer(m_ioService.GetIOService())
 {
@@ -71,7 +72,8 @@ int Engine::PollStatus()
 
 uint32_t Engine::GenHandle()
 {
-	return _currentHandleId++;
+	_currentHandleId += 1;
+	return _currentHandleId;
 }
 
 
@@ -201,9 +203,10 @@ uint32_t Engine::CreateEffect(void* data, unsigned int size)
 	if (NullSpace::Events::VerifySuitEventListBuffer(verifier)) {
 		auto encodedList = NullSpace::Events::GetSuitEventList(data);
 		auto decodedList = FlatbuffDecoder::Decode(encodedList);
-		
+		auto newHandle = GenHandle();
+		m_player.Create(newHandle, decodedList);
+		return newHandle;
 	}
 
 	return 0;
-	throw std::logic_error("The method or operation is not implemented.");
 }

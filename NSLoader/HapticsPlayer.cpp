@@ -21,6 +21,8 @@ HapticsPlayer::~HapticsPlayer()
 
 void HapticsPlayer::Play(HapticHandle hh)
 {
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
 	if (auto effect = toInternalUUID(hh)) {
 		effect.get()->Play();
 	}
@@ -28,6 +30,8 @@ void HapticsPlayer::Play(HapticHandle hh)
 
 void HapticsPlayer::Pause(HapticHandle hh)
 {
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
 	if (auto effect = toInternalUUID(hh)) {
 		effect.get()->Pause();
 	}
@@ -35,6 +39,8 @@ void HapticsPlayer::Pause(HapticHandle hh)
 
 void HapticsPlayer::Restart(HapticHandle hh)
 {
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
 	if (auto effect = toInternalUUID(hh)) {
 		NS::Playable::Restart(effect.get());
 	}
@@ -42,6 +48,8 @@ void HapticsPlayer::Restart(HapticHandle hh)
 
 void HapticsPlayer::Stop(HapticHandle hh)
 {
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
 	if (auto effect = toInternalUUID(hh)) {
 		effect.get()->Stop();
 	}
@@ -50,6 +58,8 @@ void HapticsPlayer::Stop(HapticHandle hh)
 
 void HapticsPlayer::Release(HapticHandle hh)
 {
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
 	//std::cout << "Got a new handle to release\n";
 
 	auto h = _outsideHandleToUUID[hh];
@@ -67,9 +77,12 @@ void HapticsPlayer::Release(HapticHandle hh)
 
 void HapticsPlayer::Create(HapticHandle h, std::vector<FlatbuffDecoder::SuitEvent> decoded)
 {
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
 	auto id = _uuidGen();
 
 	_outsideHandleToUUID[h] = id;
+
 	_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(decoded, _generator));
 }
 
@@ -101,8 +114,11 @@ bool EffectIsExpired(const std::unique_ptr<IPlayable> &p, bool isGlobalPause) {
 std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 {
 
-	for (auto& effect : _effects) {
-		effect.second->Update(dt);
+	{
+		std::lock_guard<std::mutex> guard(m_effectsMutex);
+		for (auto& effect : _effects) {
+			effect.second->Update(dt);
+		}
 	}
 
 	//mark & erase from _effects
@@ -129,6 +145,8 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 
 void HapticsPlayer::PlayAll()
 {
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
 	_paused = false;
 
 	
@@ -145,6 +163,8 @@ void HapticsPlayer::PlayAll()
 
 void HapticsPlayer::PauseAll()
 {
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
 	_paused = true;
 
 
@@ -158,8 +178,10 @@ void HapticsPlayer::PauseAll()
 
 void HapticsPlayer::ClearAll()
 {
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
 	for (auto& effect : _effects) {
-		effect.second->Pause();
+		effect.second->Stop();
 	}
 	_outsideHandleToUUID.clear();
 	_effects.clear();
@@ -177,5 +199,5 @@ boost::optional<const std::unique_ptr<IPlayable>&> HapticsPlayer::toInternalUUID
 	if (_effects.find(h) != _effects.end()) {
 		return _effects.at(h);
 	}
-	return boost::optional<const std::unique_ptr<IPlayable>&>();
+	
 }
