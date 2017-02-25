@@ -58,7 +58,7 @@ extern "C" {
 	NSLOADER_API int __stdcall NSVR_InitializeFromFilesystem(NSVR_Context_t* ptr, char* path);
 
 
-	NSLOADER_API uint32_t __stdcall NSVR_TransmitEvents(NSVR_Context_t* ptr, void* data, uint32_t size);
+	NSLOADER_API int __stdcall NSVR_TransmitEvents(NSVR_Context_t* ptr, uint32_t handle, void* data, uint32_t size);
 #ifdef __cplusplus
 }
 #endif

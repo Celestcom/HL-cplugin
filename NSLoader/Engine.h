@@ -51,6 +51,6 @@ public:
 
 //	void CreateHaptic(unsigned int handle, void* data, unsigned int size);
 	char* GetError();
-	uint32_t CreateEffect(void *data, unsigned int size);
+	int CreateEffect(uint32_t handle, void *data, unsigned int size);
 };
 

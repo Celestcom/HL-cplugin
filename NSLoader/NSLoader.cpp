@@ -79,12 +79,12 @@ NSLOADER_API NSVR_Context_t* __stdcall NSVR_Create()
 	  return AS_TYPE(Engine, ptr)->InitializeFromFilesystem(path);
  }
 
- NSLOADER_API uint32_t __stdcall NSVR_TransmitEvents(NSVR_Context_t* ptr, void * data, uint32_t size)
+ NSLOADER_API int __stdcall NSVR_TransmitEvents(NSVR_Context_t* ptr, uint32_t handle, void * data, uint32_t size)
  {
 
 	
 
 
-	 return AS_TYPE(Engine, ptr)->CreateEffect(data, size);
+	 return AS_TYPE(Engine, ptr)->CreateEffect(handle, data, size);
  }
 
