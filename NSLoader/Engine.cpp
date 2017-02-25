@@ -40,7 +40,7 @@ Engine::Engine() :
 	m_messenger(m_ioService.GetIOService()),
 	m_player(),
 	_currentHandleId(0),
-	m_hapticsExecutionInterval(boost::posix_time::milliseconds(10)),
+	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
 	m_hapticsExecutionTimer(m_ioService.GetIOService())
 {
 
@@ -197,15 +197,14 @@ char* Engine::GetError()
 	return newString;
 }
 
-uint32_t Engine::CreateEffect(void* data, unsigned int size)
+int Engine::CreateEffect(uint32_t handle, void* data, unsigned int size)
 {
 	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
 	if (NullSpace::Events::VerifySuitEventListBuffer(verifier)) {
 		auto encodedList = NullSpace::Events::GetSuitEventList(data);
 		auto decodedList = FlatbuffDecoder::Decode(encodedList);
-		auto newHandle = GenHandle();
-		m_player.Create(newHandle, decodedList);
-		return newHandle;
+		m_player.Create(handle, decodedList);
+		return 1;
 	}
 
 	return 0;
