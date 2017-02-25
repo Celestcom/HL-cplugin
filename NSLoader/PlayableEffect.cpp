@@ -112,14 +112,19 @@ void PlayableEffect::Update(float dt)
 		if (boost::apply_visitor(isTimeExpired, *current)) {
 			boost::apply_visitor(executeEvent, *current);
 			std::advance(current, 1);
-			_lastExecutedEffect = current;
 		}
 		else {
-			//_lastExecutedEffect = current; //<-- this is a noop? confirm
+			
 			break;
 		}
+//		else {
+			//_lastExecutedEffect = current; //<-- this is a noop? confirm
+		//	break;
+	//	}
 	
 	}
+
+	_lastExecutedEffect = current;
 
 	if (_time >= GetTotalPlayTime()) {
 		Stop();
