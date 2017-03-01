@@ -21,7 +21,14 @@ void Engine::scheduleTimestep()
 void Engine::executeTimestep(const boost::system::error_code & ec)
 {
 	if (!ec) {
-		//dt = total_ms * (1/1000) seconds 
+
+		//If we are paused, don't update anything
+		if (!_isEnginePlaying) {
+			scheduleTimestep();
+			return;
+		}
+
+		//Else, calculate delta time and grab the latest haptic commands
 		constexpr auto fraction_of_second = (1.0f / 1000.f);
 		auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
 		auto effectCommands = m_player.Update(dt);
@@ -59,19 +66,23 @@ bool Engine::InitializeFromFilesystem(LPSTR path) {
 
 Engine::~Engine()
 {
-	//EngineCommand(NullSpace::HapticFiles::EngineCommand_CLEAR_ALL);
 	m_ioService.Shutdown();
 }
 
 int Engine::PollStatus()
 {
 	Poll();
-	//return (int)_suitStatus;
-	return 1;
+	if (_suitStatus == Communication::SuitStatus_Connected) {
+		return 2; 
+	}
+	else {
+		return 0;
+	}
 }
 
 uint32_t Engine::GenHandle()
 {
+	//todo: bounds check
 	_currentHandleId += 1;
 	return _currentHandleId;
 }
@@ -80,6 +91,10 @@ uint32_t Engine::GenHandle()
 bool Engine::Poll() {
 	if (auto optionalResponse = m_messenger.ReadSuits()) {
 		auto suits = optionalResponse.get();
+		if ((std::time(nullptr) - suits.timestamp) > 1) {
+			_suitStatus = NullSpace::Communication::SuitStatus::SuitStatus_Disconnected;
+			return true;
+		}
 		for (int i = 0; i < 4; i++) {
 			if (suits.SuitsFound[i]) {
 				auto status  = suits.Suits[i].Status;
@@ -92,34 +107,34 @@ bool Engine::Poll() {
 			}
 		}
 	}
-	//return _wire.Receive(_suitStatus, _tracking);
 	return true;
 }
 
 
 
-bool Engine::GetPlayingStatus()
+
+bool Engine::EngineCommand(NSVR_EngineCommand command)
 {
-	return _isEnginePlaying;
-}
-
-
-
-bool Engine::EngineCommand(short command)
-{
-	if (command == NullSpace::HapticFiles::EngineCommand_PLAY_ALL) {
-		//update our cached state
-
+	switch (command) {
+	case NSVR_EngineCommand::RESUME_ALL:
 		_isEnginePlaying = true;
-	}
-	else if (command == NullSpace::HapticFiles::EngineCommand_PAUSE_ALL) {
-		//update our cached state
+		break;
+	case NSVR_EngineCommand::PAUSE_ALL:
 		_isEnginePlaying = false;
+		break;
+	case NSVR_EngineCommand::DESTROY_ALL:
+		m_player.ClearAll();
+		break;
+	case NSVR_EngineCommand::ENABLE_TRACKING:
+		//todo: implement
+		break;
+	case NSVR_EngineCommand::DISABLE_TRACKING:
+		//todo: implement
+		break;
+	default:
+		break;
 	}
-
-	//_wire.AquireEncodingLock();
-	//_wire.Send(_wire.Encoder->Encode(NullSpaceDLL::EngineCommand(command)));
-	//_wire.ReleaseEncodingLock();
+	
 	return true;
 }
 
@@ -127,28 +142,21 @@ bool Engine::EngineCommand(short command)
 
 
 
-void Engine::SetTrackingEnabled(bool wantTracking)
-{
-	//_wire.AquireEncodingLock();
-	//_wire.Send(_wire.Encoder->Encode(wantTracking));
-	//_wire.ReleaseEncodingLock();
 
-}
-
-void Engine::HandleCommand(unsigned int handle, short c)
+void Engine::HandleCommand(unsigned int handle, NSVR_HandleCommand c)
 {
 	HapticHandle h = HapticHandle(handle);
-	switch (NullSpace::HapticFiles::Command(c)) {
-	case NullSpace::HapticFiles::Command_PAUSE:
+	switch (c) {
+	case NSVR_HandleCommand::PAUSE:
 		m_player.Pause(h);
 		break;
-	case NullSpace::HapticFiles::Command_PLAY:
+	case NSVR_HandleCommand::PLAY:
 		m_player.Play(h);
 		break;
-	case NullSpace::HapticFiles::Command_RELEASE:
+	case NSVR_HandleCommand::RELEASE:
 		m_player.Release(h);
 		break;
-	case NullSpace::HapticFiles::Command_RESET:
+	case NSVR_HandleCommand::RESET:
 		m_player.Stop(h);
 		break;
 	default:
@@ -156,32 +164,6 @@ void Engine::HandleCommand(unsigned int handle, short c)
 	}
 	
 }
-
-////coming in as nodal formatted data..?
-//void Engine::CreateHaptic(unsigned int handle, void * data, unsigned int size)
-//{
-//	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
-//	if (NullSpace::HapticFiles::VerifyHapticPacketBuffer(verifier)) {
-//		
-//		auto packet = NullSpace::HapticFiles::GetHapticPacket(data);
-//		if (packet->packet_type() != NullSpace::HapticFiles::FileType::FileType_Node) {
-//			return;
-//		}
-//
-//		auto node = EncodingOperations::Decode(static_cast<const NullSpace::HapticFiles::Node*>(packet->packet()));
-//		
-//		//Push all values down, such as strength and time offset
-//		NullSpace::Propogate(node);
-//		//Pull out all effects
-//		auto effects = NullSpace::Flatten(node);
-//
-//		//Encode the nodes as TinyEffects for use in engine
-//		auto tinyEffects = NullSpace::EncodeTinyEffects(effects);
-//
-//
-//		//m_player.Create(handle, tinyEffects);
-//	}
-//}
 
 
 
