@@ -55,13 +55,6 @@ Engine::Engine() :
 	scheduleTimestep();
 }
 
-bool Engine::InitializeFromFilesystem(LPSTR path) {
-	//ideally we see if the filesystem exists first, and return a bool representing failure / throw an exception and 
-	//catch it, translate across the interop boundary
-	_resolver = std::make_unique<NodeDependencyResolver>(std::string(path));
-	return true;
-}
-
 
 
 Engine::~Engine()
@@ -72,7 +65,7 @@ Engine::~Engine()
 int Engine::PollStatus()
 {
 	Poll();
-	if (_suitStatus == Communication::SuitStatus_Connected) {
+	if (_suitStatus == NullSpace::Communication::SuitStatus_Connected) {
 		return 2; 
 	}
 	else {

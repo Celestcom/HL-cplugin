@@ -20,7 +20,7 @@ int main() {
 
 	auto handle = NSVR_GenHandle(ptr);
 	//NSVR_CreateHaptic(ptr, handle, (void*)buffer.data(), buffer.size());
-	NSVR_HandleCommand(ptr, handle, 0);
+//	NSVR_HandleCommand(ptr, handle, 0);
 	//while (true) {
 	//	int status = NSVR_PollStatus(ptr);
 	//	std::cout << status << '\n';

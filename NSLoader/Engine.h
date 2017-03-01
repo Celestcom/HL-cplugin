@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include "DependencyResolver.h"
 #include <iostream>
 
 #include "IoService.h"
@@ -16,7 +15,6 @@ class Engine
 private:
 	IoService m_ioService;
 
-	std::unique_ptr<NodeDependencyResolver> _resolver;
 	NullSpace::Communication::SuitStatus _suitStatus;
 	NSVR_InteropTrackingUpdate _tracking;
 	uint32_t _currentHandleId;
