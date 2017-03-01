@@ -41,15 +41,11 @@ public:
 	bool Poll();
 	int PollStatus();
 	uint32_t GenHandle();
-	bool InitializeFromFilesystem(LPSTR path);
-	//void PollTracking(NullSpaceDLL::InteropTrackingUpdate& q);
-	bool GetPlayingStatus();
-	bool EngineCommand(short command);
-	
-	void SetTrackingEnabled(bool wantTracking);
-	void HandleCommand(unsigned int handle, short c);
 
-//	void CreateHaptic(unsigned int handle, void* data, unsigned int size);
+	bool EngineCommand(NSVR_EngineCommand command);
+	
+	void HandleCommand(unsigned int handle, NSVR_HandleCommand);
+
 	char* GetError();
 	int CreateEffect(uint32_t handle, void *data, unsigned int size);
 };

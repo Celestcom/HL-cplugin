@@ -53,7 +53,7 @@ NSLOADER_API NSVR_Context_t* __stdcall NSVR_Create()
 
 
 
- NSLOADER_API void __stdcall NSVR_HandleCommand(NSVR_Context_t* ptr, uint32_t handle, uint16_t command)
+ NSLOADER_API void __stdcall NSVR_DoHandleCommand(NSVR_Context_t* ptr, uint32_t handle, NSVR_HandleCommand command)
  {
 	 return AS_TYPE(Engine, ptr)->HandleCommand(handle, command);
  }
@@ -69,15 +69,12 @@ NSLOADER_API NSVR_Context_t* __stdcall NSVR_Create()
 	 string = nullptr;
  }
 
- NSLOADER_API int __stdcall NSVR_EngineCommand(NSVR_Context_t* ptr, uint16_t command)
+ NSLOADER_API int __stdcall NSVR_DoEngineCommand(NSVR_Context_t* ptr, NSVR_EngineCommand command)
  {
 	  return AS_TYPE(Engine, ptr)->EngineCommand(command);
  }
 
- NSLOADER_API int __stdcall NSVR_InitializeFromFilesystem(NSVR_Context_t* ptr, char* path)
- {
-	  return AS_TYPE(Engine, ptr)->InitializeFromFilesystem(path);
- }
+ 
 
  NSLOADER_API int __stdcall NSVR_TransmitEvents(NSVR_Context_t* ptr, uint32_t handle, void * data, uint32_t size)
  {
