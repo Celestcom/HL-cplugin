@@ -8,7 +8,7 @@
 #endif
 
 #define NSLOADER_API_VERSION_MAJOR 0
-#define NSLOADER_API_VERSION_MINOR 3
+#define NSLOADER_API_VERSION_MINOR 4
 #define NSLOADER_API_VERSION ((NSLOADER_API_VERSION_MAJOR << 16) | NSLOADER_API_VERSION_MINOR)
 
 
@@ -19,7 +19,7 @@ extern "C" {
 #endif
 
 	struct NSVR_Context;
-	typedef struct NSVR_Context* NSVR_Context_t;
+	typedef struct NSVR_Context NSVR_Context_t;
 
 	struct NSVR_Quaternion {
 		float w;

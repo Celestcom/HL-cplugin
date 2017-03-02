@@ -37,6 +37,21 @@ boost::optional<SuitsConnectionInfo> ClientMessenger::ReadSuits()
 	return boost::optional<SuitsConnectionInfo>();
 }
 
+void ClientMessenger::WriteCommand(const NullSpaceIPC::DriverCommand & d)
+{
+	std::string binaryData;
+	d.SerializeToString(&binaryData);
+	if (m_commandStream) {
+		try {
+			m_commandStream->Push(binaryData.data(), d.ByteSize());
+		}
+		catch (const boost::interprocess::interprocess_exception& ec) {
+			//probably full queue
+			//should log
+		}
+	}
+}
+
 void ClientMessenger::WriteHaptics(const NullSpaceIPC::EffectCommand& e)
 {
 	std::string binaryData;
@@ -83,6 +98,8 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		m_hapticsStream = std::make_unique<WritableSharedQueue>("ns-haptics-data");
 		m_trackingData = std::make_unique<ReadableSharedObject<TrackingUpdate>>("ns-tracking-data");
 		m_suitConnectionInfo = std::make_unique<ReadableSharedObject<SuitsConnectionInfo>>("ns-suit-data");
+		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
+		
 		try {
 			m_logStream = std::make_unique<ReadableSharedQueue>("ns-logging-data");
 		}

@@ -22,11 +22,11 @@ void Engine::executeTimestep(const boost::system::error_code & ec)
 {
 	if (!ec) {
 
-		//If we are paused, don't update anything
-		if (!_isEnginePlaying) {
-			scheduleTimestep();
-			return;
-		}
+		////If we are paused, don't update anything
+		//if (!_isEnginePlaying) {
+		//	scheduleTimestep();
+		//	return;
+		//}
 
 		//Else, calculate delta time and grab the latest haptic commands
 		constexpr auto fraction_of_second = (1.0f / 1000.f);
@@ -110,19 +110,27 @@ bool Engine::EngineCommand(NSVR_EngineCommand command)
 {
 	switch (command) {
 	case NSVR_EngineCommand::RESUME_ALL:
-		_isEnginePlaying = true;
+		m_player.PlayAll();
 		break;
 	case NSVR_EngineCommand::PAUSE_ALL:
-		_isEnginePlaying = false;
+		m_player.PauseAll();
 		break;
 	case NSVR_EngineCommand::DESTROY_ALL:
 		m_player.ClearAll();
 		break;
 	case NSVR_EngineCommand::ENABLE_TRACKING:
-		//todo: implement
+		{
+		NullSpaceIPC::DriverCommand command;
+		command.set_command(NullSpaceIPC::DriverCommand_Command_ENABLE_TRACKING);
+		m_messenger.WriteCommand(command);
+		}
 		break;
 	case NSVR_EngineCommand::DISABLE_TRACKING:
-		//todo: implement
+		{
+		NullSpaceIPC::DriverCommand command;
+		command.set_command(NullSpaceIPC::DriverCommand_Command_DISABLE_TRACKING);
+		m_messenger.WriteCommand(command);
+		}
 		break;
 	default:
 		break;

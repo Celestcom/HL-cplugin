@@ -11,6 +11,7 @@
 #include <boost\chrono.hpp>
 
 #include "EffectCommand.pb.h"
+#include "DriverCommand.pb.h"
 using namespace boost::interprocess;
 using namespace NullSpace::SharedMemory;
 class ClientMessenger
@@ -20,6 +21,7 @@ public:
 	~ClientMessenger();
 	boost::optional<TrackingUpdate> ReadTracking();
 	boost::optional<SuitsConnectionInfo> ReadSuits();
+	void WriteCommand(const NullSpaceIPC::DriverCommand& d);
 	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
 
 private:
@@ -35,14 +37,18 @@ private:
 	//Get logging info from engine. Note: only one consumer can reliably get the debug info
 	std::unique_ptr<ReadableSharedQueue> m_logStream;
 
-	//Sentinal to see if the driver is running
+	//Sentinel to see if the driver is running
 	std::unique_ptr<ReadableSharedObject<std::time_t>> m_sentinel;
 
+	//Stream of commands to send to driver, such as ENABLE_TRACKING, DISABLE_TRACKING, etc.
+	std::unique_ptr<WritableSharedQueue> m_commandStream;
 
-	//We use a sentinal to see if the driver is responsive/exists
+
+
+	//We use a sentinel to see if the driver is responsive/exists
 	boost::asio::deadline_timer m_sentinelTimer;
 
-	//How often we read the sentinal
+	//How often we read the sentinel
 	boost::posix_time::milliseconds m_sentinelInterval;
 
 	//If currentTime - sentinalTime > m_sentinalTimeout, we say that we are disconnected
