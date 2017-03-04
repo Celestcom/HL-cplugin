@@ -56,6 +56,7 @@ public:
 				case NullSpace::Events::SuitEventType::SuitEventType_BasicHapticEvent:
 				{
 					auto e = static_cast<const NullSpace::Events::BasicHapticEvent*>(suitEvent->event());
+					assert(e->effect()->str() != "");
 					outEvents.push_back(
 						SuitEvent(BasicHapticEvent(e->time(), e->strength(), e->duration(), e->area(), e->effect()->str()))
 					);

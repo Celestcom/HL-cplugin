@@ -37,7 +37,7 @@ NSLOADER_API NSVR_Context_t* __stdcall NSVR_Create()
 
  NSLOADER_API void __stdcall NSVR_PollTracking(NSVR_Context_t* ptr, NSVR_InteropTrackingUpdate & q)
  {
-	// return reinterpret_cast<TestClass*>(ptr)->PollTracking(q);
+	 return AS_TYPE(Engine, ptr)->PollTracking(q);
  }
 
  NSLOADER_API void __stdcall NSVR_Delete(NSVR_Context_t* ptr)

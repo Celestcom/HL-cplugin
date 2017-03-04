@@ -12,31 +12,17 @@
 #include "HapticPacket_generated.h"
 #include "Wire\FlatbuffDecoder.h"
 #include <boost\bind.hpp>
-void Engine::scheduleTimestep()
+
+void Engine::executeTimestep()
 {
-	m_hapticsExecutionTimer.expires_from_now(m_hapticsExecutionInterval);
-	m_hapticsExecutionTimer.async_wait(boost::bind(&Engine::executeTimestep, this, boost::asio::placeholders::error));
-}
-
-void Engine::executeTimestep(const boost::system::error_code & ec)
-{
-	if (!ec) {
-
-		////If we are paused, don't update anything
-		//if (!_isEnginePlaying) {
-		//	scheduleTimestep();
-		//	return;
-		//}
-
-		//Else, calculate delta time and grab the latest haptic commands
-		constexpr auto fraction_of_second = (1.0f / 1000.f);
-		auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
-		auto effectCommands = m_player.Update(dt);
-		for (const auto& command : effectCommands) {
-			m_messenger.WriteHaptics(command);
-		}
-		scheduleTimestep();
+	
+	constexpr auto fraction_of_second = (1.0f / 1000.f);
+	auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
+	auto effectCommands = m_player.Update(dt);
+	for (const auto& command : effectCommands) {
+		m_messenger.WriteHaptics(command);
 	}
+	
 }
 
 Engine::Engine() :
@@ -48,17 +34,21 @@ Engine::Engine() :
 	m_player(),
 	_currentHandleId(0),
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
-	m_hapticsExecutionTimer(m_ioService.GetIOService())
+	m_hapticsExecutionTimer(m_ioService.GetIOService()),
+	m_hapticsTimestep(m_ioService.GetIOService(), m_hapticsExecutionInterval),
+	m_cachedTracking({})
 {
 
-
-	scheduleTimestep();
+	m_hapticsTimestep.SetEvent([this]() {executeTimestep(); });
+	m_hapticsTimestep.Start();
+	//scheduleTimestep();
 }
 
 
 
 Engine::~Engine()
 {
+	m_hapticsTimestep.Stop();
 	m_ioService.Shutdown();
 }
 
@@ -192,3 +182,27 @@ int Engine::CreateEffect(uint32_t handle, void* data, unsigned int size)
 
 	return 0;
 }
+
+
+void copyQuaternion(NSVR_Quaternion& lhs, const NullSpace::SharedMemory::Quaternion& rhs) {
+	lhs.w = rhs.w;
+	lhs.x = rhs.x;
+	lhs.y = rhs.y;
+	lhs.z = rhs.z;
+}
+
+void copyTracking(NSVR_InteropTrackingUpdate& lhs, const NullSpace::SharedMemory::TrackingUpdate& rhs) {
+	copyQuaternion(lhs.chest, rhs.chest);
+	copyQuaternion(lhs.left_upper_arm, rhs.left_upper_arm);
+	copyQuaternion(lhs.right_upper_arm, rhs.right_upper_arm);
+}
+
+void Engine::PollTracking(NSVR_InteropTrackingUpdate & q)
+{
+	q = m_cachedTracking;
+	if (auto trackingUpdate = m_messenger.ReadTracking()) {
+		copyTracking(q, *trackingUpdate);
+		m_cachedTracking = q;
+	}
+}
+

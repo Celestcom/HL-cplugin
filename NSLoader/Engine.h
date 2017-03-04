@@ -7,14 +7,29 @@
 #include "ClientMessenger.h"
 #include <boost\asio\deadline_timer.hpp>
 #include "HapticsPlayer.h"
+#include "ScheduledEvent.h"
 #pragma pack(1)
 
 
 class Engine
 {
+public:
+	Engine();
+	~Engine();
+	bool Poll();
+	int PollStatus();
+	uint32_t GenHandle();
+
+	bool EngineCommand(NSVR_EngineCommand command);
+
+	void HandleCommand(unsigned int handle, NSVR_HandleCommand);
+
+	char* GetError();
+	int CreateEffect(uint32_t handle, void *data, unsigned int size);
+	void __stdcall PollTracking(NSVR_InteropTrackingUpdate & q);
 private:
 	IoService m_ioService;
-
+	NSVR_InteropTrackingUpdate m_cachedTracking;
 	NullSpace::Communication::SuitStatus _suitStatus;
 	NSVR_InteropTrackingUpdate _tracking;
 	uint32_t _currentHandleId;
@@ -28,23 +43,9 @@ private:
 
 	boost::asio::deadline_timer m_hapticsExecutionTimer;
 	boost::posix_time::milliseconds m_hapticsExecutionInterval;
-	void scheduleTimestep();
-	void executeTimestep(const boost::system::error_code& ec);
+	void executeTimestep();
 
-public:
-	
+	ScheduledEvent m_hapticsTimestep;
 
-	Engine();
-	~Engine();
-	bool Poll();
-	int PollStatus();
-	uint32_t GenHandle();
-
-	bool EngineCommand(NSVR_EngineCommand command);
-	
-	void HandleCommand(unsigned int handle, NSVR_HandleCommand);
-
-	char* GetError();
-	int CreateEffect(uint32_t handle, void *data, unsigned int size);
 };
 

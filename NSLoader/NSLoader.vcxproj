@@ -188,6 +188,7 @@
     <ClInclude Include="JsonSerializer.h" />
     <ClInclude Include="NSLoader.h" />
     <ClInclude Include="Locator.h" />
+    <ClInclude Include="NSLoader_fwds.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PlayableEffect.h" />
     <ClInclude Include="PriorityModel.h" />
@@ -200,6 +201,7 @@
     <ClInclude Include="Wire\Wire.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\Driver\SharedCommunication\ScheduledEvent.cpp" />
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs\DriverCommand.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
