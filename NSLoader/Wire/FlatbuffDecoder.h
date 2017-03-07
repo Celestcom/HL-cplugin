@@ -17,6 +17,7 @@
 
 #include "NSLoader.h"
 #include <boost/variant.hpp>
+#include "Locator.h"
 class FlatbuffDecoder
 {
 public:
@@ -56,9 +57,20 @@ public:
 				case NullSpace::Events::SuitEventType::SuitEventType_BasicHapticEvent:
 				{
 					auto e = static_cast<const NullSpace::Events::BasicHapticEvent*>(suitEvent->event());
-					assert(e->effect()->str() != "");
+					float effectDuration = e->duration();
+					//SPECIAL CASE: DOOM BUZZ is continuous
+					//And if the duration isn't set, we need to cap it at something
+					//We could also do this inside the engine
+					//But this is a temporary hack until firmware is fixed
+					if (e->effect() == 666) {
+
+						if (effectDuration <= 0.0f) {
+							effectDuration = 0.2f;
+						}
+					}
+					auto effect = Locator::getTranslator().ToString(e->effect());
 					outEvents.push_back(
-						SuitEvent(BasicHapticEvent(e->time(), e->strength(), e->duration(), e->area(), e->effect()->str()))
+						SuitEvent(BasicHapticEvent(e->time(), e->strength(),  effectDuration, e->area(), effect))
 					);
 					break;
 				}

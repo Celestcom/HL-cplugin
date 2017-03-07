@@ -191,7 +191,8 @@ void EnumTranslator::init_familymap()
 		("short_double_sharp_tick", 13)
 		("transition_click", 14)
 		("transition_hum", 15)
-		("triple_click", 16);
+		("triple_click", 16)
+		("doom_buzz", 666);
 }
 void EnumTranslator::init_effects() {
 
