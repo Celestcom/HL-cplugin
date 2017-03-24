@@ -21,6 +21,34 @@ extern "C" {
 	struct NSVR_Context;
 	typedef struct NSVR_Context NSVR_Context_t;
 
+	struct NSVR_EventList;
+	typedef struct NSVR_EventList NSVR_EventList_t;
+
+	typedef enum NSVR_Effect_ {
+		Bump = 1,
+		Buzz = 2,
+		Click = 3,
+		Fuzz = 5,
+		Hum = 6,
+		Pulse = 8,
+		Tick = 11,
+		Double_Click = 4,
+		Triple_Click = 16,
+		NSVR_Effect_MAX = 4294967296
+	} NSVR_Effect;
+
+	struct NSVR_BasicHapticEvent {
+		float Time;
+		float Strength;
+		float Duration;
+		uint32_t Area;
+		NSVR_Effect Effect;
+	};
+
+	
+	typedef struct NSVR_BasicHapticEvent NSVR_BasicHapticEvent_t;
+
+
 	struct NSVR_Quaternion {
 		float w;
 		float x;
@@ -35,7 +63,7 @@ extern "C" {
 		NSVR_Quaternion right_forearm;
 	};
 
-
+	
 	enum NSVR_HandleCommand
 	{
 		PLAY = 0, PAUSE, RESET, RELEASE
@@ -89,7 +117,17 @@ extern "C" {
 	//Deallocates the memory pointed to by string. Only pass pointers returned by NSVR_GetError.
 	NSLOADER_API void __stdcall NSVR_FreeError(char* string);
 
-	
+	NSLOADER_API NSVR_EventList_t* __stdcall NSVR_EventList_Create(NSVR_Context_t* ptr);
+
+	NSLOADER_API void __stdcall NSVR_EventList_AddBasicHapticEvent(NSVR_EventList_t* listPtr, NSVR_BasicHapticEvent_t* eventPtr);
+
+	NSLOADER_API void __stdcall NSVR_EventList_Release(NSVR_EventList_t* listPtr);
+
+
+	NSLOADER_API void __stdcall NSVR_EventList_Transmit(NSVR_Context_t* ptr, NSVR_EventList_t* listPtr, uint32_t handle);
+
+	NSLOADER_API void __stdcall NSVR_BasicHapticEvent_Init(NSVR_BasicHapticEvent_t* h, float time, float strength, float duration, uint32_t area, NSVR_Effect effect);
+
 #ifdef __cplusplus
 }
 #endif

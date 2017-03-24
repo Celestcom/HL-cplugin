@@ -171,6 +171,7 @@
     <ClInclude Include="Encoder.h" />
     <ClInclude Include="Enums.h" />
     <ClInclude Include="EnumTranslator.h" />
+    <ClInclude Include="EventList.h" />
     <ClInclude Include="HapticArgs.h" />
     <ClInclude Include="HapticCache.h" />
     <ClInclude Include="HapticClasses.h" />
@@ -231,6 +232,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="EnumTranslator.cpp" />
+    <ClCompile Include="EventList.cpp" />
     <ClCompile Include="HapticArgs.cpp" />
     <ClCompile Include="HapticCache.cpp" />
     <ClCompile Include="HapticClasses.cpp" />

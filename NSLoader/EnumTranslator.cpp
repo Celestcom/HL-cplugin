@@ -126,12 +126,12 @@ std::string EnumTranslator::ToString(AreaFlag area) const
 	return _areaMap.left.at(area);
 }
 
-uint8_t EnumTranslator::ToEffectFamily(std::string effectFamily) const
+uint32_t EnumTranslator::ToEffectFamily(std::string effectFamily) const
 {
 	return _effectFamilyMap.left.at(effectFamily);
 }
 
-std::string EnumTranslator::ToString(uint8_t effectFamily) const
+std::string EnumTranslator::ToString(uint32_t effectFamily) const
 {
 	return _effectFamilyMap.right.at(effectFamily);
 }

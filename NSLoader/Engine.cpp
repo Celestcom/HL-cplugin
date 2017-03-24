@@ -12,7 +12,7 @@
 #include "HapticPacket_generated.h"
 #include "Wire\FlatbuffDecoder.h"
 #include <boost\bind.hpp>
-
+#include "EventList.h"
 void Engine::executeTimestep()
 {
 	
@@ -181,6 +181,18 @@ int Engine::CreateEffect(uint32_t handle, void* data, unsigned int size)
 	}
 
 	return 0;
+}
+
+int Engine::CreateEffect(EventList * list, uint32_t handle)
+{
+	if (list == nullptr) {
+		return -1;
+	}
+
+	m_player.Create(handle, list->Events());
+	return 1;
+
+
 }
 
 

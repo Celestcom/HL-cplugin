@@ -8,6 +8,7 @@
 #include <boost\asio\deadline_timer.hpp>
 #include "HapticsPlayer.h"
 #include "ScheduledEvent.h"
+#include "EventList.h"
 #pragma pack(1)
 
 
@@ -26,6 +27,7 @@ public:
 
 	char* GetError();
 	int CreateEffect(uint32_t handle, void *data, unsigned int size);
+	int CreateEffect(EventList* list, uint32_t handle);
 	void __stdcall PollTracking(NSVR_InteropTrackingUpdate & q);
 private:
 	IoService m_ioService;
