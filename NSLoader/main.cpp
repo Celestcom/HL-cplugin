@@ -18,7 +18,7 @@ int main() {
 		std::istreambuf_iterator<char>(input)),
 		(std::istreambuf_iterator<char>()));
 
-	auto handle = NSVR_GenHandle(ptr);
+//	auto handle = NSVR_GenHandle(ptr);
 	//NSVR_CreateHaptic(ptr, handle, (void*)buffer.data(), buffer.size());
 //	NSVR_HandleCommand(ptr, handle, 0);
 	//while (true) {
@@ -27,6 +27,6 @@ int main() {
 	//	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	//}
 	std::cin.get();
-	NSVR_Delete(ptr);
+//	NSVR_Delete(ptr);
 	return 0;
 }

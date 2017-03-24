@@ -65,6 +65,7 @@ struct BasicHapticEvent {
 	uint32_t Area;
 	std::string Effect;
 	BasicHapticEvent(float time, float strength, float duration, uint32_t area, std::string effect);
+	BasicHapticEvent();
 };
 template<typename T>
 struct TimeIndex {

@@ -195,3 +195,7 @@ BasicHapticEvent::BasicHapticEvent(float time, float strength, float duration, u
 	Effect(effect)
 
 {}
+
+BasicHapticEvent::BasicHapticEvent(): Time(0), Strength(1), Duration(0), Area(0), Effect("click")
+{
+}

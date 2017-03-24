@@ -1,19 +1,22 @@
 #include "stdafx.h"
 #include "EventList.h"
+#include "Wire/IntermediateHapticFormats.h"
 
 #include "NSLoader.h"
 #include "Locator.h"
+#include "Event.h"
 EventList::EventList()
 {
 }
 
-void EventList::AddEvent(NSVR_BasicHapticEvent_t * e)
-{
-	std::string result = Locator::getTranslator().ToString(e->Effect);
-	BasicHapticEvent clone(e->Time, e->Strength, e->Duration, e->Area, result);
-	
+int EventList::AddEvent(Event * e)
+{	
+	if (e == nullptr) {
+		return -1;
+	}
 	//take a copy
-	m_events.push_back(boost::variant<BasicHapticEvent>(std::move(clone)));
+	m_events.push_back(e->GetEvent());
+	return 1;
 }
 
 

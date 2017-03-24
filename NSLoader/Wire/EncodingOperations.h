@@ -415,8 +415,8 @@ public:
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();
 	}
-	static NSVR_InteropTrackingUpdate EncodingOperations::Decode(const NullSpace::Communication::TrackingUpdate* update) {
-		NSVR_InteropTrackingUpdate t = {};
+	static NSVR_TrackingUpdate EncodingOperations::Decode(const NullSpace::Communication::TrackingUpdate* update) {
+		NSVR_TrackingUpdate t = {};
 		auto quat = update->chest();
 		t.chest.w = quat->w();
 		t.chest.x = quat->x();

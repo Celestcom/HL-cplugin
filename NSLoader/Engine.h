@@ -28,12 +28,12 @@ public:
 	char* GetError();
 	int CreateEffect(uint32_t handle, void *data, unsigned int size);
 	int CreateEffect(EventList* list, uint32_t handle);
-	void __stdcall PollTracking(NSVR_InteropTrackingUpdate & q);
+	void __stdcall PollTracking(NSVR_TrackingUpdate & q);
 private:
 	IoService m_ioService;
-	NSVR_InteropTrackingUpdate m_cachedTracking;
+	NSVR_TrackingUpdate m_cachedTracking;
 	NullSpace::Communication::SuitStatus _suitStatus;
-	NSVR_InteropTrackingUpdate _tracking;
+	NSVR_TrackingUpdate _tracking;
 	uint32_t _currentHandleId;
 	std::string _currentError;
 	std::unique_ptr<FlatbuffDecoder> _decoder;

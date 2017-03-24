@@ -203,13 +203,13 @@ void copyQuaternion(NSVR_Quaternion& lhs, const NullSpace::SharedMemory::Quatern
 	lhs.z = rhs.z;
 }
 
-void copyTracking(NSVR_InteropTrackingUpdate& lhs, const NullSpace::SharedMemory::TrackingUpdate& rhs) {
+void copyTracking(NSVR_TrackingUpdate& lhs, const NullSpace::SharedMemory::TrackingUpdate& rhs) {
 	copyQuaternion(lhs.chest, rhs.chest);
 	copyQuaternion(lhs.left_upper_arm, rhs.left_upper_arm);
 	copyQuaternion(lhs.right_upper_arm, rhs.right_upper_arm);
 }
 
-void Engine::PollTracking(NSVR_InteropTrackingUpdate & q)
+void Engine::PollTracking(NSVR_TrackingUpdate & q)
 {
 	q = m_cachedTracking;
 	if (auto trackingUpdate = m_messenger.ReadTracking()) {
