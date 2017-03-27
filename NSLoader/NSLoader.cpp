@@ -88,7 +88,12 @@ NSLOADER_API NSVR_System* __stdcall NSVR_Create()
 
  NSLOADER_API NSVR_Event * __stdcall NSVR_Event_Create(NSVR_EventType type)
  {
-	 return AS_TYPE(NSVR_Event, new Event(type));
+	 switch (type) {
+	 case NSVR_EventType::BASIC_HAPTIC_EVENT:
+		 return AS_TYPE(NSVR_Event, new Event(NSVR_EventType::BASIC_HAPTIC_EVENT));
+	 default:
+		 return nullptr;
+	 }
  }
 
  NSLOADER_API void __stdcall NSVR_Event_Release(NSVR_Event * event)
