@@ -2,6 +2,9 @@
 #include "ParameterizedEvent.h"
 
 
+//Check that the string is null terminated and less than 32 characters. Not sure if this is appropriate.
+//Still evaluating
+//#define DO_VALIDATION
 
 bool validate(const char* key) {
 	const unsigned int max_key_len = 32;
@@ -12,9 +15,7 @@ bool validate(const char* key) {
 		if (key[i] == 0) //if null terminator 
 		{
 			return true;	
-		}
-
-		if (!isalnum(key[i])) {
+		}else if (!isalnum(key[i])) {
 			return false;
 		}
 	}
@@ -29,18 +30,22 @@ ParameterizedEvent::ParameterizedEvent()
 
 bool ParameterizedEvent::SetFloat(const char * key, float value)
 {
-	if (validate(key)) {
-		return doSetFloat(key, value);
+#ifdef DO_VALIDATION
+	if (!validate(key)) {
+		return false;
 	}
-	else { return false; }
+#endif
+	return doSetFloat(key, value);
 }
 
 bool ParameterizedEvent::SetInt(const char * key, int value)
 {
-	if (validate(key)) {
-		return doSetInt(key, value);
+#ifdef DO_VALIDATION
+	if (!validate(key)) {
+		return false;
 	}
-	else { return false; }
+#endif
+	return doSetInt(key, value);
 }
 
 
