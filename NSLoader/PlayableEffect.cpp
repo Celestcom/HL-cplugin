@@ -5,7 +5,6 @@
 #include <iostream>
 #include "PriorityModel.h"
 #include <iterator>
-#include <boost\uuid\random_generator.hpp>
 namespace NS {
 	namespace Playable {
 		void Restart(const std::unique_ptr<IPlayable>& playable) {
@@ -15,11 +14,11 @@ namespace NS {
 	}
 }
 
-PlayableEffect::PlayableEffect(std::vector<FlatbuffDecoder::SuitEvent> effects, HapticEventGenerator& gen) :
-	_effects(effects),
+PlayableEffect::PlayableEffect(std::vector<FlatbuffDecoder::SuitEvent> effects, HapticEventGenerator& gen, boost::uuids::random_generator& uuid) :
+	_effects(std::move(effects)),
 	_state(PlaybackState::IDLE),
 	_gen(gen),
-	_id(boost::uuids::random_generator()())
+	_id(uuid())
 {
 	assert(!_effects.empty());
 	reset();

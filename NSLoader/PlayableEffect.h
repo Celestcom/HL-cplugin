@@ -4,6 +4,7 @@
 #include "HapticEvent.h"
 #include "HapticEventGenerator.h"
 #include "Wire\FlatbuffDecoder.h"
+#include <boost\uuid\random_generator.hpp>
 
 namespace NS {
 	namespace Playable {
@@ -61,7 +62,7 @@ class PlayableEffect :
 public:
 	
 	//Precondition: the vector is not empty
-	PlayableEffect(std::vector<FlatbuffDecoder::SuitEvent> effects, HapticEventGenerator& gen);
+	PlayableEffect(std::vector<FlatbuffDecoder::SuitEvent> effects, HapticEventGenerator& gen, boost::uuids::random_generator&);
 	~PlayableEffect();
 
 	void Play() override;
