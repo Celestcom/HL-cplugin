@@ -125,7 +125,7 @@ NSLOADER_API NSVR_System* __stdcall NSVR_System_Create()
 	 return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(ParameterizedEvent, event));
  }
 
- NSLOADER_API NSVR_Result __stdcall NSVR_EventList_Transmit(NSVR_System * ptr, NSVR_EventList* listPtr, uint32_t handle)
+ NSLOADER_API NSVR_Result __stdcall NSVR_EventList_Bind(NSVR_System * ptr, NSVR_EventList* listPtr, uint32_t handle)
  {
 	 AS_TYPE(Engine, ptr)->CreateEffect(AS_TYPE(EventList,listPtr), handle);
 	 return 1;
