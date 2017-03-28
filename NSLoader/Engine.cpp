@@ -13,6 +13,7 @@
 #include "Wire\FlatbuffDecoder.h"
 #include <boost\bind.hpp>
 #include "EventList.h"
+#include <chrono>
 void Engine::executeTimestep()
 {
 	
@@ -48,19 +49,16 @@ Engine::Engine() :
 
 Engine::~Engine()
 {
+	m_player.ClearAll();
+	std::this_thread::sleep_for(std::chrono::milliseconds(25));
 	m_hapticsTimestep.Stop();
 	m_ioService.Shutdown();
 }
 
-int Engine::PollStatus()
+int Engine::PollStatus(NSVR_System_Status* status)
 {
-	Poll();
-	if (_suitStatus == NullSpace::Communication::SuitStatus_Connected) {
-		return 2; 
-	}
-	else {
-		return 0;
-	}
+	return Poll(status);
+	
 }
 
 uint32_t Engine::GenHandle()
@@ -71,21 +69,22 @@ uint32_t Engine::GenHandle()
 }
 
 
-bool Engine::Poll() {
+bool Engine::Poll(NSVR_System_Status* status) {
 	if (auto optionalResponse = m_messenger.ReadSuits()) {
 		auto suits = optionalResponse.get();
 		if ((std::time(nullptr) - suits.timestamp) > 1) {
-			_suitStatus = NullSpace::Communication::SuitStatus::SuitStatus_Disconnected;
+			status->ConnectedToService = 0;
+			status->ConnectedToSuit = 0;
 			return true;
 		}
+		status->ConnectedToService = 1;
+		status->ConnectedToSuit = 0;
+
 		for (int i = 0; i < 4; i++) {
 			if (suits.SuitsFound[i]) {
-				auto status  = suits.Suits[i].Status;
-				if (status == NullSpace::SharedMemory::Connected) {
-					_suitStatus = NullSpace::Communication::SuitStatus::SuitStatus_Connected;
-				}
-				else {
-					_suitStatus = NullSpace::Communication::SuitStatus::SuitStatus_Disconnected;
+				auto sStatus  = suits.Suits[i].Status;
+				if (sStatus == NullSpace::SharedMemory::Connected) {
+					status->ConnectedToSuit = true;
 				}
 			}
 		}

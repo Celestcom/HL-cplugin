@@ -9,6 +9,7 @@
 #include "HapticsPlayer.h"
 #include "ScheduledEvent.h"
 #include "EventList.h"
+#include "NSLoader.h"
 #pragma pack(1)
 
 
@@ -17,8 +18,8 @@ class Engine
 public:
 	Engine();
 	~Engine();
-	bool Poll();
-	int PollStatus();
+	bool Poll(NSVR_System_Status*);
+	int PollStatus(NSVR_System_Status*);
 	uint32_t GenHandle();
 
 	bool EngineCommand(NSVR_EngineCommand command);

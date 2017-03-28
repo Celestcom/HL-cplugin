@@ -5,17 +5,20 @@
 #include "NSLoader.h"
 #include "Locator.h"
 #include "Event.h"
+#include "ParameterizedEvent.h"
 EventList::EventList()
 {
 }
 
-int EventList::AddEvent(Event * e)
+int EventList::AddEvent(ParameterizedEvent * pe)
 {	
-	if (e == nullptr) {
+	if (pe == nullptr) {
 		return -1;
 	}
+	BasicHapticEvent* e = static_cast<BasicHapticEvent*>(pe);
+
 	//take a copy
-	m_events.push_back(e->GetEvent());
+	m_events.push_back(boost::variant<BasicHapticEvent>(*e));
 	return 1;
 }
 

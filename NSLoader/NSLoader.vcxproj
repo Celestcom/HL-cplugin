@@ -191,6 +191,7 @@
     <ClInclude Include="NSLoader.h" />
     <ClInclude Include="Locator.h" />
     <ClInclude Include="NSLoader_fwds.h" />
+    <ClInclude Include="ParameterizedEvent.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PlayableEffect.h" />
     <ClInclude Include="PriorityModel.h" />
@@ -250,6 +251,7 @@
     <ClCompile Include="Locator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NSLoader.cpp" />
+    <ClCompile Include="ParameterizedEvent.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PlayableEffect.cpp" />
     <ClCompile Include="PriorityModel.cpp" />

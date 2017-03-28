@@ -6,6 +6,7 @@
 #include "Engine.h"
 #include "EventList.h"
 #include "Event.h"
+#include "ParameterizedEvent.h"
 #define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
@@ -20,44 +21,31 @@ NSLOADER_API int _stdcall NSVR_IsCompatibleDLL(void)
 	return major == NSLOADER_API_VERSION_MAJOR;
 }
 
-NSLOADER_API void __stdcall NSVR_BasicHapticEvent_Init(NSVR_BasicHapticEvent_t * h, float time, float strength, float duration, uint32_t area, NSVR_Effect effect)
-{
 
-	if (!h) {
-		return;
-	}
-	h->Time = time;
-	h->Strength = strength;
-	h->Duration = duration;
-	h->Area = area;
-	h->Effect = effect;
 
-	
-
-}
-
-NSLOADER_API NSVR_System* __stdcall NSVR_Create()
+NSLOADER_API NSVR_System* __stdcall NSVR_System_Create()
 {
 	return AS_TYPE(NSVR_System, new Engine());
 }
 
- NSLOADER_API unsigned int __stdcall NSVR_GenHandle(NSVR_System* ptr)
+
+ NSLOADER_API unsigned int __stdcall NSVR_System_GenerateHandle(NSVR_System* ptr)
  {
 	 return AS_TYPE(Engine, ptr)->GenHandle();
 
  }
 
- NSLOADER_API int __stdcall NSVR_PollStatus(NSVR_System* ptr)
+ NSLOADER_API NSVR_Result __stdcall NSVR_System_PollStatus(NSVR_System* ptr, NSVR_System_Status* status)
  {
-	return AS_TYPE(Engine, ptr)->PollStatus();
+	return AS_TYPE(Engine, ptr)->PollStatus(status);
  }
 
- NSLOADER_API void __stdcall NSVR_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate & q)
+ NSLOADER_API void __stdcall NSVR_System_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate & q)
  {
 	 return AS_TYPE(Engine, ptr)->PollTracking(q);
  }
 
- NSLOADER_API void __stdcall NSVR_Delete(NSVR_System* ptr)
+ NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System* ptr)
  {
 	 if (!ptr) {
 		 return;
@@ -70,12 +58,12 @@ NSLOADER_API NSVR_System* __stdcall NSVR_Create()
 
 
 
- NSLOADER_API void __stdcall NSVR_DoHandleCommand(NSVR_System* ptr, uint32_t handle, NSVR_HandleCommand command)
+ NSLOADER_API void __stdcall NSVR_System_DoHandleCommand(NSVR_System* ptr, uint32_t handle, NSVR_HandleCommand command)
  {
 	 return AS_TYPE(Engine, ptr)->HandleCommand(handle, command);
  }
 
- NSLOADER_API char * __stdcall NSVR_GetError(NSVR_System* ptr)
+ NSLOADER_API char * __stdcall NSVR_System_GetError(NSVR_System* ptr)
  {
 	 return AS_TYPE(Engine, ptr)->GetError();
  }
@@ -90,7 +78,7 @@ NSLOADER_API NSVR_System* __stdcall NSVR_Create()
  {
 	 switch (type) {
 	 case NSVR_EventType::BASIC_HAPTIC_EVENT:
-		 return AS_TYPE(NSVR_Event, new Event(NSVR_EventType::BASIC_HAPTIC_EVENT));
+		 return AS_TYPE(NSVR_Event, new BasicHapticEvent());
 	 default:
 		 return nullptr;
 	 }
@@ -102,18 +90,18 @@ NSLOADER_API NSVR_System* __stdcall NSVR_Create()
 		 return;
 	 }
 
-	 delete AS_TYPE(Event, event);
+	 delete AS_TYPE(ParameterizedEvent, event);
 	 event = nullptr;
  }
 
  NSLOADER_API NSVR_Result __stdcall NSVR_Event_SetFloat(NSVR_Event * event, const char * key, float value)
  {
-	 return AS_TYPE(Event, event)->SetFloat(key, value);
+	 return AS_TYPE(ParameterizedEvent, event)->SetFloat(key, value);
  }
 
  NSLOADER_API NSVR_Result __stdcall NSVR_Event_SetInteger(NSVR_Event * event, const char * key, int value)
  {
-	 return AS_TYPE(Event, event)->SetInteger(key, value);
+	return AS_TYPE(ParameterizedEvent, event)->SetInt(key, value);
  }
 
  NSLOADER_API NSVR_EventList* __stdcall NSVR_EventList_Create()
@@ -134,7 +122,7 @@ NSLOADER_API NSVR_System* __stdcall NSVR_Create()
 
  NSLOADER_API NSVR_Result __stdcall NSVR_EventList_AddEvent(NSVR_EventList * list, NSVR_Event * event)
  {
-	 return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(Event, event));
+	 return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(ParameterizedEvent, event));
  }
 
  NSLOADER_API NSVR_Result __stdcall NSVR_EventList_Transmit(NSVR_System * ptr, NSVR_EventList* listPtr, uint32_t handle)
@@ -143,14 +131,14 @@ NSLOADER_API NSVR_System* __stdcall NSVR_Create()
 	 return 1;
  }
 
- NSLOADER_API int __stdcall NSVR_DoEngineCommand(NSVR_System* ptr, NSVR_EngineCommand command)
+ NSLOADER_API int __stdcall NSVR_System_DoEngineCommand(NSVR_System* ptr, NSVR_EngineCommand command)
  {
 	  return AS_TYPE(Engine, ptr)->EngineCommand(command);
  }
 
  
 
- NSLOADER_API int __stdcall NSVR_TransmitEvents(NSVR_System* ptr, uint32_t handle, void * data, uint32_t size)
+ NSLOADER_API int __stdcall NSVR_System_TransmitEvents(NSVR_System* ptr, uint32_t handle, void * data, uint32_t size)
  {
 
 	

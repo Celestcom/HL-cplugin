@@ -37,16 +37,6 @@ extern "C" {
 		NSVR_Effect_MAX = 4294967295
 	} NSVR_Effect;
 
-	struct NSVR_BasicHapticEvent {
-		float Time;
-		float Strength;
-		float Duration;
-		uint32_t Area;
-		NSVR_Effect Effect;
-	};
-
-	
-	typedef struct NSVR_BasicHapticEvent NSVR_BasicHapticEvent_t;
 
 
 	struct NSVR_Quaternion {
@@ -62,6 +52,13 @@ extern "C" {
 		NSVR_Quaternion right_upper_arm;
 		NSVR_Quaternion right_forearm;
 	};
+
+	struct NSVR_System_Status_ {
+		int ConnectedToService;
+		int ConnectedToSuit;
+	};
+
+	typedef struct NSVR_System_Status_ NSVR_System_Status;
 
 	struct NSVR_Event_;
 	typedef struct NSVR_Event_ NSVR_Event;
@@ -96,6 +93,7 @@ extern "C" {
 	//Creates a new instance of the plugin
 	NSLOADER_API NSVR_System* __stdcall NSVR_System_Create();
 
+
 	//Destroys the plugin, releasing memory allocated to it
 	NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System* ptr);
 
@@ -118,7 +116,7 @@ extern "C" {
 	NSLOADER_API NSVR_Result __stdcall NSVR_System_DoEngineCommand(NSVR_System* ptr, NSVR_EngineCommand command);
 
 	//Returns true if a suit is plugged in and the service is running, else false
-	NSLOADER_API int  __stdcall NSVR_System_PollStatus(NSVR_System* ptr);
+	NSLOADER_API NSVR_Result  __stdcall NSVR_System_PollStatus(NSVR_System* ptr, NSVR_System_Status* status);
 	
 	//Returns a structure containing quaternion tracking data
 	NSLOADER_API void __stdcall NSVR_System_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate& q);
@@ -146,7 +144,6 @@ extern "C" {
 	
 
 
-	//NSLOADER_API void __stdcall NSVR_BasicHapticEvent_Init(NSVR_BasicHapticEvent_t* h, float time, float strength, float duration, uint32_t area, NSVR_Effect effect);
 
 #ifdef __cplusplus
 }

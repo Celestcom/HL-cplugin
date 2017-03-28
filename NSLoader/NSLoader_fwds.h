@@ -23,3 +23,6 @@ enum NSVR_ConnectionStatus;
 
 
 typedef int32_t NSVR_Result;
+
+struct NSVR_System_Status_;
+typedef struct NSVR_System_Status_ NSVR_System_Status;

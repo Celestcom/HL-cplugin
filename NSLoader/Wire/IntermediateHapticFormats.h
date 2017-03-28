@@ -2,6 +2,8 @@
 #include <vector>
 #include "IJsonSerializable.h"
 #include <algorithm>
+#include "../ParameterizedEvent.h"
+
 
 
 enum class AreaFlag  : uint32_t {
@@ -58,7 +60,7 @@ struct TinyEffect {
 	std::string Effect;
 	TinyEffect(float time, float strength, float duration, std::string effect, unsigned int area) :Time(time), Strength(strength), Duration(duration), Effect(effect), Area(area) {}
 };
-struct BasicHapticEvent {
+struct BasicHapticEvent : public ParameterizedEvent {
 	float Time;
 	float Strength;
 	float Duration;
@@ -66,6 +68,9 @@ struct BasicHapticEvent {
 	std::string Effect;
 	BasicHapticEvent(float time, float strength, float duration, uint32_t area, std::string effect);
 	BasicHapticEvent();
+	bool doSetFloat(const char* key, float value) override;
+	bool doSetInt(const char* key, int value) override;
+
 };
 template<typename T>
 struct TimeIndex {
