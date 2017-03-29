@@ -4,6 +4,7 @@
 #include "Wire\IntermediateHapticFormats.h"
 #include "Enums.h"
 #include "EffectCommand.pb.h"
+#include <mutex>
 class PriorityModel
 {
 public:
@@ -25,5 +26,6 @@ public:
 	boost::optional<HapticEvent> Remove(AreaFlag area, boost::uuids::uuid e);
 private:
 	std::unordered_map<Location, HapticQueue> _model;
+	std::mutex m_modelMutex;
 };
 

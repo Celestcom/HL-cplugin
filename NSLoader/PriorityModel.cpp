@@ -19,6 +19,8 @@ for (uint32_t bit = 1; x >= bit; bit *=2) if (x & bit) switch(AreaFlag(bit))
 std::vector<NullSpaceIPC::EffectCommand> PriorityModel::Update(float dt)
 {
 	using namespace NullSpaceIPC;
+	std::lock_guard<std::mutex> guard(m_modelMutex);
+
 	for (auto& queue : _model) {
 		queue.second.Update(dt);
 	}
@@ -65,6 +67,8 @@ std::vector<NullSpaceIPC::EffectCommand> PriorityModel::Update(float dt)
 
 void PriorityModel::Clean(Location loc)
 {
+	std::lock_guard<std::mutex> guard(m_modelMutex);
+
 	_model[loc].Dirty = false;
 
 }
@@ -72,6 +76,8 @@ void PriorityModel::Clean(Location loc)
 
 boost::optional<HapticEvent> PriorityModel::Remove(AreaFlag area, boost::uuids::uuid e)
 {
+	std::lock_guard<std::mutex> guard(m_modelMutex);
+
 
 	boost::optional<HapticEvent> removedEffect;
 	//This is actually a loop to extract out the individual masks from the area flag
@@ -136,6 +142,7 @@ boost::optional<HapticEvent> PriorityModel::Remove(AreaFlag area, boost::uuids::
 
 boost::optional<boost::uuids::uuid> PriorityModel::Put(AreaFlag area, HapticEvent e)
 {
+	std::lock_guard<std::mutex> guard(m_modelMutex);
 
 	START_BITMASK_SWITCH(uint32_t(area)) 
 	{
