@@ -28,6 +28,12 @@ PlayableEffect::PlayableEffect(std::vector<FlatbuffDecoder::SuitEvent> effects, 
 
 PlayableEffect::~PlayableEffect()
 {
+	try {
+		_gen.Remove(_id);
+	}
+	catch (const std::exception& e) {
+		//todo: NEED TO LOG
+	}
 }
 
 void PlayableEffect::Play()

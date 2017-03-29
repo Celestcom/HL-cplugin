@@ -69,7 +69,8 @@ void HapticEventGenerator::Remove(boost::uuids::uuid id)
 			_model.Remove(generatedEvent.Area, id);
 		}
 
-		_events.at(uuid_hasher(id)).clear();
+		//_events.at(uuid_hasher(id)).clear();
+		_events.erase(uuid_hasher(id));
 
 	}
 }

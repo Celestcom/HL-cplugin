@@ -79,11 +79,20 @@ void HapticsPlayer::Create(HapticHandle h, std::vector<FlatbuffDecoder::SuitEven
 {
 	std::lock_guard<std::mutex> guard(m_effectsMutex);
 
-	auto id = _uuidGen();
+	if (_outsideHandleToUUID.find(h) != _outsideHandleToUUID.end()) {
+		auto id = _outsideHandleToUUID[h];
+		_effects[uuid_hasher(id)]->Stop();
+		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), _generator, _uuidGen));
 
-	_outsideHandleToUUID[h] = id;
+	}
+	else {
+		auto id = _uuidGen();
 
-	_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), _generator, _uuidGen));
+		_outsideHandleToUUID[h] = id;
+
+		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), _generator, _uuidGen));
+	}
+
 }
 
 PriorityModel & HapticsPlayer::GetModel()
