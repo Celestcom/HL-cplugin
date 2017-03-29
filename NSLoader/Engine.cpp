@@ -208,12 +208,25 @@ void copyTracking(NSVR_TrackingUpdate& lhs, const NullSpace::SharedMemory::Track
 	copyQuaternion(lhs.right_upper_arm, rhs.right_upper_arm);
 }
 
-void Engine::PollTracking(NSVR_TrackingUpdate & q)
+void Engine::PollTracking(NSVR_TrackingUpdate* q)
 {
-	q = m_cachedTracking;
+	
 	if (auto trackingUpdate = m_messenger.ReadTracking()) {
-		copyTracking(q, *trackingUpdate);
-		m_cachedTracking = q;
+		copyTracking(*q, *trackingUpdate);
+		//m_cachedTracking = q;
 	}
+}
+
+int Engine::PollLogs(NSVR_LogEntry * entry)
+{
+	if (auto logEntry = m_messenger.ReadLog()) {
+		auto str = *logEntry;
+		entry->Length = str.length();
+		strncpy_s(entry->Message, 512, str.c_str(), 512);
+		entry->Message[511] = '\0';
+		return 2;
+	}
+
+	return 1;
 }
 

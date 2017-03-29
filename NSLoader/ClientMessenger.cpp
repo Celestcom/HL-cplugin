@@ -68,6 +68,22 @@ void ClientMessenger::WriteHaptics(const NullSpaceIPC::EffectCommand& e)
 	
 }
 
+boost::optional<std::string> ClientMessenger::ReadLog()
+{
+	if (m_logStream) {
+		std::vector<unsigned char> chars = m_logStream->Pop();
+		if (chars.empty()) {
+			return boost::optional<std::string>();
+		}
+		std::string resultString(chars.begin(), chars.end());
+		
+		return resultString;
+	}
+
+	return boost::optional<std::string>();
+
+}
+
 
 void ClientMessenger::startAttemptEstablishConnection()
 {

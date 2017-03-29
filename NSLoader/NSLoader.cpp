@@ -40,7 +40,7 @@ NSLOADER_API NSVR_System* __stdcall NSVR_System_Create()
 	return AS_TYPE(Engine, ptr)->PollStatus(status);
  }
 
- NSLOADER_API void __stdcall NSVR_System_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate & q)
+ NSLOADER_API void __stdcall NSVR_System_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate* q)
  {
 	 return AS_TYPE(Engine, ptr)->PollTracking(q);
  }

@@ -93,7 +93,6 @@ extern "C" {
 	//Creates a new instance of the plugin
 	NSLOADER_API NSVR_System* __stdcall NSVR_System_Create();
 
-
 	//Destroys the plugin, releasing memory allocated to it
 	NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System* ptr);
 
@@ -116,7 +115,7 @@ extern "C" {
 	NSLOADER_API NSVR_Result  __stdcall NSVR_System_PollStatus(NSVR_System* ptr, NSVR_System_Status* status);
 	
 	//Returns a structure containing quaternion tracking data
-	NSLOADER_API void __stdcall NSVR_System_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate& q);
+	NSLOADER_API void __stdcall NSVR_System_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate* q);
 	
 	//Retrieves a newly-allocated string containing the latest error information. 
 	//Must be deallocated using NSVR_FreeError

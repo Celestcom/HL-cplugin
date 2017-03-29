@@ -23,6 +23,7 @@ public:
 	boost::optional<SuitsConnectionInfo> ReadSuits();
 	void WriteCommand(const NullSpaceIPC::DriverCommand& d);
 	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
+	boost::optional<std::string> ReadLog();
 
 private:
 	//Write haptics to the suit using this shared queue

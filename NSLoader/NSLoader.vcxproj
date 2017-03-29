@@ -86,7 +86,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>ZMQ_STATIC;WIN32;_DEBUG;_WINDOWS;_USRDLL;NSLOADER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>INTERNAL_TOOL;ZMQ_STATIC;WIN32;_DEBUG;_WINDOWS;_USRDLL;NSLOADER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\NullSpace Team\Documents\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs;D:\protobuf-3.0.0\cmake\build\solution\include;C:\Users\NullSpace Team\Documents\NS_Unreal_SDK\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;C:\Users\NullSpace Team\Documents\NS_Unreal_SDK\NS_Unreal_SDK\flatbuff_defs;C:\Program Files (x86)\flatbuffers\include;C:\Users\NullSpace Team\Documents\Visual Studio 2015\Projects\NSLoader\NSLoader\json;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>-D_SCL_SECURE_NO_WARNINGS %(AdditionalOptions)</AdditionalOptions>
@@ -191,6 +191,7 @@
     <ClInclude Include="NSLoader.h" />
     <ClInclude Include="Locator.h" />
     <ClInclude Include="NSLoader_fwds.h" />
+    <ClInclude Include="NSLoader_Internal.h" />
     <ClInclude Include="ParameterizedEvent.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PlayableEffect.h" />
@@ -251,6 +252,7 @@
     <ClCompile Include="Locator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="NSLoader.cpp" />
+    <ClCompile Include="NSLoader_Internal.cpp" />
     <ClCompile Include="ParameterizedEvent.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PlayableEffect.cpp" />

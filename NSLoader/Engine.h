@@ -10,6 +10,8 @@
 #include "ScheduledEvent.h"
 #include "EventList.h"
 #include "NSLoader.h"
+
+#include "NSLoader_Internal.h"
 #pragma pack(1)
 
 
@@ -29,7 +31,9 @@ public:
 	char* GetError();
 	int CreateEffect(uint32_t handle, void *data, unsigned int size);
 	int CreateEffect(EventList* list, uint32_t handle);
-	void __stdcall PollTracking(NSVR_TrackingUpdate & q);
+	void __stdcall PollTracking(NSVR_TrackingUpdate* q);
+
+	int PollLogs(NSVR_LogEntry* entry);
 private:
 	IoService m_ioService;
 	NSVR_TrackingUpdate m_cachedTracking;
