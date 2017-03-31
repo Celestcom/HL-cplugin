@@ -26,12 +26,12 @@ public:
 
 	bool EngineCommand(NSVR_EngineCommand command);
 
-	void HandleCommand(unsigned int handle, NSVR_HandleCommand);
+	void HandleCommand(unsigned int handle, NSVR_PlaybackCommand);
 
-	char* GetError();
+	void GetError(NSVR_ErrorInfo* errorInfo);
 	int CreateEffect(uint32_t handle, void *data, unsigned int size);
 	int CreateEffect(EventList* list, uint32_t handle);
-	void __stdcall PollTracking(NSVR_TrackingUpdate* q);
+	int  PollTracking(NSVR_TrackingUpdate* q);
 
 	int PollLogs(NSVR_LogEntry* entry);
 private:

@@ -173,6 +173,7 @@
     <ClInclude Include="EnumTranslator.h" />
     <ClInclude Include="Event.h" />
     <ClInclude Include="EventList.h" />
+    <ClInclude Include="ExceptionSafeCall.h" />
     <ClInclude Include="HapticArgs.h" />
     <ClInclude Include="HapticCache.h" />
     <ClInclude Include="HapticClasses.h" />
@@ -190,11 +191,13 @@
     <ClInclude Include="JsonSerializer.h" />
     <ClInclude Include="NSLoader.h" />
     <ClInclude Include="Locator.h" />
+    <ClInclude Include="NSLoader_Errors.h" />
     <ClInclude Include="NSLoader_fwds.h" />
     <ClInclude Include="NSLoader_Internal.h" />
     <ClInclude Include="ParameterizedEvent.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PlayableEffect.h" />
+    <ClInclude Include="PlaybackHandle.h" />
     <ClInclude Include="PriorityModel.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -256,6 +259,7 @@
     <ClCompile Include="ParameterizedEvent.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PlayableEffect.cpp" />
+    <ClCompile Include="PlaybackHandle.cpp" />
     <ClCompile Include="PriorityModel.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

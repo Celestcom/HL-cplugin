@@ -129,6 +129,15 @@
     <ClInclude Include="NSLoader_Internal.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="NSLoader_Errors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaybackHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExceptionSafeCall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -225,6 +234,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="NSLoader_Internal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlaybackHandle.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,7 +5,7 @@
 Event::Event(NSVR_EventType eventType)
 {
 	switch (eventType) {
-	case NSVR_EventType::BASIC_HAPTIC_EVENT:
+	case NSVR_EventType::NSVR_EventType_BasicHapticEvent:
 		m_event = boost::variant<BasicHapticEvent>(BasicHapticEvent());
 		break;
 	default:

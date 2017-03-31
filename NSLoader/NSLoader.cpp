@@ -7,8 +7,25 @@
 #include "EventList.h"
 #include "Event.h"
 #include "ParameterizedEvent.h"
+#include "PlaybackHandle.h"
+#include "ExceptionSafeCall.h"
+
 #define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
+
+
+//comment this line if you want to disable argument null checking. Profile really hard before doing this.
+#define NULL_ARGUMENT_CHECKS
+
+
+
+#ifdef NULL_ARGUMENT_CHECKS
+#define RETURN_IF_NULL(ptr) do { if (ptr == nullptr) { return (NSVR_Result) NSVR_Error_NullArgument; }} while (0)
+#else
+#define RETURN_IF_NULL(ptr)
+#endif
+
+
 
 NSLOADER_API unsigned int __stdcall NSVR_GetVersion(void)
 {
@@ -22,128 +39,164 @@ NSLOADER_API int _stdcall NSVR_IsCompatibleDLL(void)
 }
 
 
-
-NSLOADER_API NSVR_System* __stdcall NSVR_System_Create()
+NSLOADER_API NSVR_Result __stdcall NSVR_System_Create(NSVR_System** systemPtr)
 {
-	return AS_TYPE(NSVR_System, new Engine());
+	return ExceptionGuard([&] { *systemPtr = AS_TYPE(NSVR_System, new Engine()); });
 }
 
-
- NSLOADER_API unsigned int __stdcall NSVR_System_GenerateHandle(NSVR_System* ptr)
- {
-	 return AS_TYPE(Engine, ptr)->GenHandle();
-
- }
+NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System** ptr)
+{	
+	delete AS_TYPE(Engine, *ptr);
+	*ptr = nullptr;
+}
 
  NSLOADER_API NSVR_Result __stdcall NSVR_System_PollStatus(NSVR_System* ptr, NSVR_System_Status* status)
  {
-	return AS_TYPE(Engine, ptr)->PollStatus(status);
+	 RETURN_IF_NULL(ptr);
+	 RETURN_IF_NULL(status);
+
+	 return ExceptionGuard([&] { 
+		return AS_TYPE(Engine, ptr)->PollStatus(status);
+		
+	 });
  }
 
- NSLOADER_API void __stdcall NSVR_System_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate* q)
+ NSLOADER_API NSVR_Result __stdcall NSVR_System_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate* q)
  {
-	 return AS_TYPE(Engine, ptr)->PollTracking(q);
+	 RETURN_IF_NULL(ptr);
+	 RETURN_IF_NULL(q);
+
+	 return ExceptionGuard([&]{
+		return AS_TYPE(Engine, ptr)->PollTracking(q);
+		
+	 });
+	
  }
 
- NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System* ptr)
+
+
+ NSLOADER_API NSVR_Result  __stdcall NSVR_System_GetError(NSVR_System* ptr, NSVR_ErrorInfo* errorInfo)
  {
-	 if (!ptr) {
-		 return;
-	 }
-	 delete AS_TYPE(Engine,ptr);
+	 RETURN_IF_NULL(ptr);
+	 RETURN_IF_NULL(errorInfo);
+
+	 return ExceptionGuard([&] {
+		 AS_TYPE(Engine, ptr)->GetError(errorInfo);
+	 });
  }
 
 
-
-
-
-
- NSLOADER_API void __stdcall NSVR_System_DoHandleCommand(NSVR_System* ptr, uint32_t handle, NSVR_HandleCommand command)
+ NSLOADER_API NSVR_Result __stdcall NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType type)
  {
-	 return AS_TYPE(Engine, ptr)->HandleCommand(handle, command);
+	
+	 return ExceptionGuard([&] {
+		 switch (type) {
+		 case NSVR_EventType::NSVR_EventType_BasicHapticEvent:
+			 *eventPtr = AS_TYPE(NSVR_Event, new BasicHapticEvent());
+		 default:
+			 return (NSVR_Result) NSVR_Error_InvalidEventType;
+		 }
+
+		 return (NSVR_Result) NSVR_Success_Unqualified;
+	 });
  }
 
- NSLOADER_API char * __stdcall NSVR_System_GetError(NSVR_System* ptr)
+ NSLOADER_API void __stdcall NSVR_Event_Release(NSVR_Event ** eventPtr)
  {
-	 return AS_TYPE(Engine, ptr)->GetError();
- }
-
- NSLOADER_API void __stdcall NSVR_FreeError(char * string)
- {
-	 delete[] string;
-	 string = nullptr;
- }
-
- NSLOADER_API NSVR_Event * __stdcall NSVR_Event_Create(NSVR_EventType type)
- {
-	 switch (type) {
-	 case NSVR_EventType::BASIC_HAPTIC_EVENT:
-		 return AS_TYPE(NSVR_Event, new BasicHapticEvent());
-	 default:
-		 return nullptr;
-	 }
- }
-
- NSLOADER_API void __stdcall NSVR_Event_Release(NSVR_Event * event)
- {
-	 if (event == nullptr) {
-		 return;
-	 }
-
-	 delete AS_TYPE(ParameterizedEvent, event);
-	 event = nullptr;
+	 delete AS_TYPE(ParameterizedEvent, *eventPtr);
+	 *eventPtr = nullptr;
  }
 
  NSLOADER_API NSVR_Result __stdcall NSVR_Event_SetFloat(NSVR_Event * event, const char * key, float value)
  {
-	 return AS_TYPE(ParameterizedEvent, event)->SetFloat(key, value);
+	 RETURN_IF_NULL(event);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(ParameterizedEvent, event)->SetFloat(key, value);
+	 });
  }
 
  NSLOADER_API NSVR_Result __stdcall NSVR_Event_SetInteger(NSVR_Event * event, const char * key, int value)
  {
-	return AS_TYPE(ParameterizedEvent, event)->SetInt(key, value);
+	 RETURN_IF_NULL(event);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(ParameterizedEvent, event)->SetInt(key, value);
+	 });
  }
 
- NSLOADER_API NSVR_EventList* __stdcall NSVR_EventList_Create()
+ NSLOADER_API NSVR_Result  __stdcall NSVR_Timeline_Create(NSVR_Timeline** timelinePtr, NSVR_System* systemPtr)
  {
-	 return AS_TYPE(NSVR_EventList, new EventList());
+	 RETURN_IF_NULL(systemPtr);
+
+	 return ExceptionGuard([&] {
+		 *timelinePtr = AS_TYPE(NSVR_Timeline, new EventList(AS_TYPE(Engine, systemPtr)));
+	 });
  }
 
  
 
- NSLOADER_API void __stdcall NSVR_EventList_Release(NSVR_EventList * listPtr)
+ NSLOADER_API void __stdcall NSVR_Timeline_Release(NSVR_Timeline ** listPtr)
  {
-	 if (listPtr == nullptr) {
-		 return;
-	 }
-	 delete AS_TYPE(EventList, listPtr);
-	 listPtr = nullptr;
+	delete AS_TYPE(EventList, *listPtr);
+	*listPtr = nullptr;
  }
 
- NSLOADER_API NSVR_Result __stdcall NSVR_EventList_AddEvent(NSVR_EventList * list, NSVR_Event * event)
+ NSLOADER_API NSVR_Result __stdcall NSVR_Timeline_AddEvent(NSVR_Timeline * list, NSVR_Event * event)
  {
-	 return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(ParameterizedEvent, event));
+	 RETURN_IF_NULL(list);
+	 RETURN_IF_NULL(event);
+
+	 return ExceptionGuard([&] {
+		return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(ParameterizedEvent, event));
+	 });
  }
 
- NSLOADER_API NSVR_Result __stdcall NSVR_EventList_Bind(NSVR_System * ptr, NSVR_EventList* listPtr, uint32_t handle)
+
+ NSLOADER_API NSVR_Result  __stdcall NSVR_PlaybackHandle_Create(NSVR_PlaybackHandle ** handlePtr)
  {
-	 AS_TYPE(Engine, ptr)->CreateEffect(AS_TYPE(EventList,listPtr), handle);
-	 return 1;
+
+	 return ExceptionGuard([&] {
+		 *handlePtr = AS_TYPE(NSVR_PlaybackHandle, new PlaybackHandle());
+	 });
+}
+
+ NSLOADER_API NSVR_Result  __stdcall NSVR_PlaybackHandle_Bind(NSVR_PlaybackHandle * handlePtr, NSVR_Timeline * timelinePtr)
+ {
+	 RETURN_IF_NULL(handlePtr);
+	 RETURN_IF_NULL(timelinePtr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(PlaybackHandle, handlePtr)->Bind(AS_TYPE(EventList, timelinePtr));
+	 });
  }
+
+ NSLOADER_API NSVR_Result __stdcall NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle * handlePtr, NSVR_PlaybackCommand command)
+ {
+	 RETURN_IF_NULL(handlePtr);
+
+	 return ExceptionGuard([&] {
+		return AS_TYPE(PlaybackHandle, handlePtr)->Command(command);
+	 });
+ }
+
+ NSLOADER_API void __stdcall NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr)
+ {
+	delete AS_TYPE(PlaybackHandle, *handlePtr);
+	 *handlePtr = nullptr; 
+ }
+
+
 
  NSLOADER_API int __stdcall NSVR_System_DoEngineCommand(NSVR_System* ptr, NSVR_EngineCommand command)
  {
-	  return AS_TYPE(Engine, ptr)->EngineCommand(command);
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(command);
+	 });
  }
 
  
 
- NSLOADER_API int __stdcall NSVR_System_TransmitEvents(NSVR_System* ptr, uint32_t handle, void * data, uint32_t size)
- {
-
-	
-
-
-	 return AS_TYPE(Engine, ptr)->CreateEffect(handle, data, size);
- }
 

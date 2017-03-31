@@ -98,23 +98,23 @@ bool Engine::Poll(NSVR_System_Status* status) {
 bool Engine::EngineCommand(NSVR_EngineCommand command)
 {
 	switch (command) {
-	case NSVR_EngineCommand::RESUME_ALL:
+	case NSVR_EngineCommand::NSVR_EngineCommand_ResumeAll:
 		m_player.PlayAll();
 		break;
-	case NSVR_EngineCommand::PAUSE_ALL:
+	case NSVR_EngineCommand::NSVR_EngineCommand_PauseAll:
 		m_player.PauseAll();
 		break;
-	case NSVR_EngineCommand::DESTROY_ALL:
+	case NSVR_EngineCommand::NSVR_EngineCommand_DestroyAll:
 		m_player.ClearAll();
 		break;
-	case NSVR_EngineCommand::ENABLE_TRACKING:
+	case NSVR_EngineCommand::NSVR_EngineCommand_EnableTracking:
 		{
 		NullSpaceIPC::DriverCommand command;
 		command.set_command(NullSpaceIPC::DriverCommand_Command_ENABLE_TRACKING);
 		m_messenger.WriteCommand(command);
 		}
 		break;
-	case NSVR_EngineCommand::DISABLE_TRACKING:
+	case NSVR_EngineCommand::NSVR_EngineCommand_DisableTracking:
 		{
 		NullSpaceIPC::DriverCommand command;
 		command.set_command(NullSpaceIPC::DriverCommand_Command_DISABLE_TRACKING);
@@ -133,20 +133,20 @@ bool Engine::EngineCommand(NSVR_EngineCommand command)
 
 
 
-void Engine::HandleCommand(unsigned int handle, NSVR_HandleCommand c)
+void Engine::HandleCommand(unsigned int handle, NSVR_PlaybackCommand c)
 {
 	HapticHandle h = HapticHandle(handle);
 	switch (c) {
-	case NSVR_HandleCommand::PAUSE:
+	case NSVR_PlaybackCommand::NSVR_PlaybackCommand_Pause:
 		m_player.Pause(h);
 		break;
-	case NSVR_HandleCommand::PLAY:
+	case NSVR_PlaybackCommand::NSVR_PlaybackCommand_Play:
 		m_player.Play(h);
 		break;
-	case NSVR_HandleCommand::RELEASE:
+	case 3: //release
 		m_player.Release(h);
 		break;
-	case NSVR_HandleCommand::RESET:
+	case NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset:
 		m_player.Stop(h);
 		break;
 	default:
@@ -157,16 +157,11 @@ void Engine::HandleCommand(unsigned int handle, NSVR_HandleCommand c)
 
 
 
-char* Engine::GetError()
+void Engine::GetError(NSVR_ErrorInfo* errorInfo)
 {
-	const char* sampleString = _currentError.c_str();
-	std::size_t len = strlen(sampleString) + sizeof(char);
-	char* newString = new char[len];
-	newString[len - 1] = 0;
-	strcpy_s(newString, len, sampleString);
-
-
-	return newString;
+	strncpy_s(errorInfo->ErrorString, 512, _currentError.c_str(), 512);
+	errorInfo->ErrorString[511] = '\0';
+	//todo: Keep track of LastResult as well
 }
 
 int Engine::CreateEffect(uint32_t handle, void* data, unsigned int size)
@@ -208,12 +203,15 @@ void copyTracking(NSVR_TrackingUpdate& lhs, const NullSpace::SharedMemory::Track
 	copyQuaternion(lhs.right_upper_arm, rhs.right_upper_arm);
 }
 
-void Engine::PollTracking(NSVR_TrackingUpdate* q)
+int Engine::PollTracking(NSVR_TrackingUpdate* q)
 {
 	
 	if (auto trackingUpdate = m_messenger.ReadTracking()) {
 		copyTracking(*q, *trackingUpdate);
-		//m_cachedTracking = q;
+		return NSVR_Success_Unqualified;
+	}
+	else {
+		return NSVR_Success_NoDataAvailable;
 	}
 }
 
@@ -224,9 +222,10 @@ int Engine::PollLogs(NSVR_LogEntry * entry)
 		entry->Length = str.length();
 		strncpy_s(entry->Message, 512, str.c_str(), 512);
 		entry->Message[511] = '\0';
-		return 2;
+		return NSVR_Success_Unqualified;
 	}
-
-	return 1;
+	else {
+		return NSVR_Success_NoDataAvailable;
+	}
 }
 

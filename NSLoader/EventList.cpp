@@ -6,7 +6,8 @@
 #include "Locator.h"
 #include "Event.h"
 #include "ParameterizedEvent.h"
-EventList::EventList()
+#include "Engine.h"
+EventList::EventList(Engine* enginePtr):m_engine(enginePtr)
 {
 }
 
@@ -25,6 +26,11 @@ int EventList::AddEvent(ParameterizedEvent * pe)
 
 EventList::~EventList()
 {
+}
+
+Engine * EventList::EnginePtr()
+{
+	return m_engine;
 }
 
 std::vector<boost::variant<BasicHapticEvent>> EventList::Events()
