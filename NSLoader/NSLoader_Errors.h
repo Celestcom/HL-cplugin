@@ -28,6 +28,7 @@ typedef enum NSVR_SuccessTypes_ {
 	/* Polling data */
 	NSVR_Success_NoDataAvailable = 1000,
 
+	
 } NSVR_SuccessTypes;
 
 typedef enum NSVR_ErrorTypes_ {
@@ -39,5 +40,11 @@ typedef enum NSVR_ErrorTypes_ {
 
 	/* Creation errors */
 	NSVR_Error_InvalidEventType = -2000,
+
+	/* Device errors*/
+	NSVR_Error_NoDevicePresent = -3000,
+
+	/* Service errors*/
+	NSVR_Error_ServiceDisconnected = -4000,
 } NSVR_ErrorTypes;
 

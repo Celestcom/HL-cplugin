@@ -24,9 +24,13 @@ extern "C" {
 
 	NSLOADER_INTERNAL_API NSVR_Result __stdcall NSVR_System_PollLogs(NSVR_System* system, NSVR_LogEntry* entry);
 
-
+	typedef struct NSVR_SystemStats_ {
+		unsigned int NumLiveEffects;
+		unsigned int NumOrphanedEffects;
+	} NSVR_SystemStats;
 	
 
+	NSLOADER_INTERNAL_API NSVR_Result __stdcall NSVR_System_GetStats(NSVR_System* system, NSVR_SystemStats* ptr);
 #ifdef __cplusplus
 }
 #endif

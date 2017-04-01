@@ -6,6 +6,9 @@
 #include "NSLoader.h"
 int PlaybackHandle::Bind(EventList * eventListPtr)
 {
+	if (m_engine != nullptr) {
+		m_engine->HandleCommand(m_handle, NSVR_PlaybackCommand(3));
+	}
 	m_engine = eventListPtr->EnginePtr();
 	m_handle = m_engine->GenHandle();
 

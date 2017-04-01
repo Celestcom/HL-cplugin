@@ -14,6 +14,13 @@
 #include "NSLoader_Internal.h"
 #pragma pack(1)
 
+typedef enum NSVR_EngineCommand_ {
+	NSVR_EngineCommand_ResumeAll = 1,
+	NSVR_EngineCommand_PauseAll,
+	NSVR_EngineCommand_DestroyAll,
+	NSVR_EngineCommand_EnableTracking,
+	NSVR_EngineCommand_DisableTracking
+} NSVR_EngineCommand;
 
 class Engine
 {
@@ -21,9 +28,9 @@ public:
 	Engine();
 	~Engine();
 	bool Poll(NSVR_System_Status*);
-	int PollStatus(NSVR_System_Status*);
+	int PollStatus(NSVR_ServiceInfo*);
 	uint32_t GenHandle();
-
+	int PollDevice(NSVR_DeviceInfo *);
 	bool EngineCommand(NSVR_EngineCommand command);
 
 	void HandleCommand(unsigned int handle, NSVR_PlaybackCommand);

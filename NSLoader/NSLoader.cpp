@@ -26,7 +26,6 @@
 #endif
 
 
-
 NSLOADER_API unsigned int __stdcall NSVR_GetVersion(void)
 {
 	return NSLOADER_API_VERSION;
@@ -38,6 +37,25 @@ NSLOADER_API int _stdcall NSVR_IsCompatibleDLL(void)
 	return major == NSLOADER_API_VERSION_MAJOR;
 }
 
+NSLOADER_API NSVR_Result __stdcall NSVR_System_GetServiceInfo(NSVR_System * systemPtr, NSVR_ServiceInfo * infoPtr)
+{
+	RETURN_IF_NULL(systemPtr);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, systemPtr)->PollStatus(infoPtr);
+	});
+
+}
+
+
+NSLOADER_API NSVR_Result __stdcall NSVR_System_GetDeviceInfo(NSVR_System * systemPtr, NSVR_DeviceInfo * infoPtr)
+{
+	RETURN_IF_NULL(systemPtr);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, systemPtr)->PollDevice(infoPtr);
+	});
+}
 
 NSLOADER_API NSVR_Result __stdcall NSVR_System_Create(NSVR_System** systemPtr)
 {
@@ -61,16 +79,62 @@ NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System** ptr)
 	 });
  }
 
- NSLOADER_API NSVR_Result __stdcall NSVR_System_PollTracking(NSVR_System* ptr, NSVR_TrackingUpdate* q)
+ NSLOADER_API NSVR_Result __stdcall NSVR_System_Haptics_Pause(NSVR_System* ptr)
  {
 	 RETURN_IF_NULL(ptr);
-	 RETURN_IF_NULL(q);
 
-	 return ExceptionGuard([&]{
-		return AS_TYPE(Engine, ptr)->PollTracking(q);
-		
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_PauseAll);
 	 });
-	
+ }
+
+ NSLOADER_API NSVR_Result __stdcall NSVR_System_Haptics_Resume(NSVR_System* ptr)
+ {
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_ResumeAll);
+	 });
+ }
+
+ NSLOADER_API NSVR_Result __stdcall NSVR_System_Haptics_Destroy(NSVR_System* ptr)
+ {
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_DestroyAll);
+	 });
+ }
+
+
+
+ NSLOADER_API NSVR_Result __stdcall NSVR_System_Tracking_Poll(NSVR_System * ptr, NSVR_TrackingUpdate * updatePtr)
+ {
+	 RETURN_IF_NULL(ptr);
+	 RETURN_IF_NULL(updatePtr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->PollTracking(updatePtr);
+
+	 });
+ }
+
+ NSLOADER_API NSVR_Result __stdcall NSVR_System_Tracking_Enable(NSVR_System * ptr)
+ {
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_EnableTracking);
+	 });
+ }
+
+ NSLOADER_API NSVR_Result __stdcall NSVR_System_Tracking_Disable(NSVR_System * ptr)
+ {
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_DisableTracking);
+	 });
  }
 
 
@@ -152,6 +216,18 @@ NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System** ptr)
 	 });
  }
 
+ NSLOADER_API NSVR_Result __stdcall NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSVR_PlaybackHandle * handlePtr)
+ {
+	 RETURN_IF_NULL(timelinePtr);
+	 RETURN_IF_NULL(handlePtr);
+
+	 return ExceptionGuard([&] {
+
+		 return AS_TYPE(PlaybackHandle, handlePtr)->Bind(AS_TYPE(EventList, timelinePtr));
+		 
+	 });
+ }
+
 
  NSLOADER_API NSVR_Result  __stdcall NSVR_PlaybackHandle_Create(NSVR_PlaybackHandle ** handlePtr)
  {
@@ -188,15 +264,5 @@ NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System** ptr)
 
 
 
- NSLOADER_API int __stdcall NSVR_System_DoEngineCommand(NSVR_System* ptr, NSVR_EngineCommand command)
- {
-	 RETURN_IF_NULL(ptr);
-
-	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->EngineCommand(command);
-	 });
- }
-
- 
 
 

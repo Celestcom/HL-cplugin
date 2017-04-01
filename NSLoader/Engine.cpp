@@ -55,9 +55,22 @@ Engine::~Engine()
 	m_ioService.Shutdown();
 }
 
-int Engine::PollStatus(NSVR_System_Status* status)
+int Engine::PollStatus(NSVR_ServiceInfo* info)
 {
-	return Poll(status);
+	if (auto optionalResponse = m_messenger.ReadSuits()) {
+		auto suits = optionalResponse.get();
+		if ((std::time(nullptr) - suits.timestamp) > 1) {
+			return NSVR_Error_ServiceDisconnected;
+		}
+		else {
+			//here, we'd fill in the info struct. 
+			//making sure to check for nullptr, which signals "we don't care about the details"
+			return NSVR_Success_Unqualified;
+		}
+	}
+
+	return NSVR_Error_ServiceDisconnected;
+
 	
 }
 
@@ -66,6 +79,33 @@ uint32_t Engine::GenHandle()
 	//todo: bounds check
 	_currentHandleId += 1;
 	return _currentHandleId;
+}
+
+int Engine::PollDevice(NSVR_DeviceInfo * device)
+{
+	//when polling for devices, we want to either fill in the device info struct or return an error if no devices present.
+	
+	if (auto optionalResponse = m_messenger.ReadSuits()) {
+		auto suits = optionalResponse.get();
+		if ((std::time(nullptr) - suits.timestamp) > 1) {
+			return NSVR_Error_ServiceDisconnected;
+		}
+		for (int i = 0; i < 4; i++) {
+			if (suits.SuitsFound[i]) {
+				auto sStatus = suits.Suits[i].Status;
+				if (sStatus == NullSpace::SharedMemory::Connected) {
+					//here, we'd make sure to check if device == nullptr if we were filling the struct.
+					//The user doesn't care about the results, so we just return success.
+
+
+					return NSVR_Success_Unqualified;
+				}
+			}
+		}
+		return NSVR_Error_NoDevicePresent;
+	} 
+
+	return NSVR_Error_ServiceDisconnected;
 }
 
 
