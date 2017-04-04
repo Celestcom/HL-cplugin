@@ -100,6 +100,16 @@ PriorityModel & HapticsPlayer::GetModel()
 	return _model;
 }
 
+int HapticsPlayer::NumLiveEffects()
+{
+	return _effects.size();
+}
+
+int HapticsPlayer::NumOrphanedEffects()
+{
+	return _releasedEffects.size();
+}
+
 
 
 
@@ -122,12 +132,11 @@ bool EffectIsExpired(const std::unique_ptr<IPlayable> &p, bool isGlobalPause) {
 
 std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 {
+	m_effectsMutex.lock();
 
-	{
-		std::lock_guard<std::mutex> guard(m_effectsMutex);
-		for (auto& effect : _effects) {
-			effect.second->Update(dt);
-		}
+	
+	for (auto& effect : _effects) {
+		effect.second->Update(dt);
 	}
 
 	//mark & erase from _effects
@@ -148,6 +157,8 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 	});
 	_releasedEffects.erase(toRemove, _releasedEffects.end());
 
+	m_effectsMutex.unlock();
+	
 	return _model.Update(dt);
 }
 

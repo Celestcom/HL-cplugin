@@ -6,6 +6,7 @@
 #include "NSLoader.h"
 int PlaybackHandle::Bind(EventList * eventListPtr)
 {
+	//todo: This should do sorting automatically by time
 	if (m_engine != nullptr) {
 		m_engine->HandleCommand(m_handle, NSVR_PlaybackCommand(3));
 	}

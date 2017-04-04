@@ -3,6 +3,8 @@
 
 #include "NSLoader_fwds.h"
 
+#define INTERNAL_TOOL
+
 #ifdef INTERNAL_TOOL
 	#ifdef NSLOADER_EXPORTS
 	#define NSLOADER_INTERNAL_API __declspec(dllexport) 
@@ -17,10 +19,12 @@
 extern "C" {
 #endif
 
-	struct NSVR_LogEntry {
+	typedef struct NSVR_LogEntry_ {
 		char Message[512];
 		uint32_t Length; 
-	};
+	} NSVR_LogEntry;
+
+
 
 	NSLOADER_INTERNAL_API NSVR_Result __stdcall NSVR_System_PollLogs(NSVR_System* system, NSVR_LogEntry* entry);
 

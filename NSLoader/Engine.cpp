@@ -109,29 +109,6 @@ int Engine::PollDevice(NSVR_DeviceInfo * device)
 }
 
 
-bool Engine::Poll(NSVR_System_Status* status) {
-	if (auto optionalResponse = m_messenger.ReadSuits()) {
-		auto suits = optionalResponse.get();
-		if ((std::time(nullptr) - suits.timestamp) > 1) {
-			status->ConnectedToService = 0;
-			status->ConnectedToSuit = 0;
-			return true;
-		}
-		status->ConnectedToService = 1;
-		status->ConnectedToSuit = 0;
-
-		for (int i = 0; i < 4; i++) {
-			if (suits.SuitsFound[i]) {
-				auto sStatus  = suits.Suits[i].Status;
-				if (sStatus == NullSpace::SharedMemory::Connected) {
-					status->ConnectedToSuit = true;
-				}
-			}
-		}
-	}
-	return true;
-}
-
 
 
 
@@ -166,6 +143,13 @@ bool Engine::EngineCommand(NSVR_EngineCommand command)
 	}
 	
 	return true;
+}
+
+int Engine::GetEngineStats(NSVR_SystemStats * stats)
+{
+	stats->NumLiveEffects = m_player.NumLiveEffects();
+	stats->NumOrphanedEffects = m_player.NumOrphanedEffects();
+	return NSVR_Success_Unqualified;
 }
 
 

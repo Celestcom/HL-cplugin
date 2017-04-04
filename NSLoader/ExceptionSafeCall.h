@@ -3,10 +3,9 @@
 
 template<typename T> NSVR_Result ExceptionGuard(T&& t) {
 	try {
-		t();
-		return NSVR_Success_Unqualified;
+		return t();
 	}
 	catch (const std::exception& e) {
-		return -1;
+		return NSVR_Error_Unknown;
 	}
 }

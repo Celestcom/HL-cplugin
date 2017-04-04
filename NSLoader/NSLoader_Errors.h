@@ -35,9 +35,10 @@ typedef enum NSVR_ErrorTypes_ {
 
 
 	/* General errors*/
-	NSVR_Error_NullArgument = -1000,
-	NSVR_Error_InvalidArgument = -1001,
-
+	NSVR_Error_Unknown = -1000,
+	NSVR_Error_NullArgument = -1001,
+	NSVR_Error_InvalidArgument = -1002,
+	
 	/* Creation errors */
 	NSVR_Error_InvalidEventType = -2000,
 
@@ -46,5 +47,8 @@ typedef enum NSVR_ErrorTypes_ {
 
 	/* Service errors*/
 	NSVR_Error_ServiceDisconnected = -4000,
+
+
+
 } NSVR_ErrorTypes;
 

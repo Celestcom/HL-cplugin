@@ -59,7 +59,7 @@ NSLOADER_API NSVR_Result __stdcall NSVR_System_GetDeviceInfo(NSVR_System * syste
 
 NSLOADER_API NSVR_Result __stdcall NSVR_System_Create(NSVR_System** systemPtr)
 {
-	return ExceptionGuard([&] { *systemPtr = AS_TYPE(NSVR_System, new Engine()); });
+	return ExceptionGuard([&] { *systemPtr = AS_TYPE(NSVR_System, new Engine()); return NSVR_Success_Unqualified; });
 }
 
 NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System** ptr)
@@ -68,16 +68,6 @@ NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System** ptr)
 	*ptr = nullptr;
 }
 
- NSLOADER_API NSVR_Result __stdcall NSVR_System_PollStatus(NSVR_System* ptr, NSVR_System_Status* status)
- {
-	 RETURN_IF_NULL(ptr);
-	 RETURN_IF_NULL(status);
-
-	 return ExceptionGuard([&] { 
-		return AS_TYPE(Engine, ptr)->PollStatus(status);
-		
-	 });
- }
 
  NSLOADER_API NSVR_Result __stdcall NSVR_System_Haptics_Pause(NSVR_System* ptr)
  {
@@ -146,6 +136,7 @@ NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System** ptr)
 
 	 return ExceptionGuard([&] {
 		 AS_TYPE(Engine, ptr)->GetError(errorInfo);
+		 return NSVR_Success_Unqualified;
 	 });
  }
 
@@ -195,6 +186,7 @@ NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System** ptr)
 
 	 return ExceptionGuard([&] {
 		 *timelinePtr = AS_TYPE(NSVR_Timeline, new EventList(AS_TYPE(Engine, systemPtr)));
+		 return NSVR_Success_Unqualified;
 	 });
  }
 
@@ -234,6 +226,7 @@ NSLOADER_API void __stdcall NSVR_System_Release(NSVR_System** ptr)
 
 	 return ExceptionGuard([&] {
 		 *handlePtr = AS_TYPE(NSVR_PlaybackHandle, new PlaybackHandle());
+		 return NSVR_Success_Unqualified;
 	 });
 }
 

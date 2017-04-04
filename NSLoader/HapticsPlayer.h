@@ -35,7 +35,8 @@ public:
 
 	PriorityModel& GetModel();
 
-	
+	int NumLiveEffects();
+	int NumOrphanedEffects();
 
 	void PlayAll();
 	void PauseAll();

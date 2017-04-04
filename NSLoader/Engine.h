@@ -27,12 +27,11 @@ class Engine
 public:
 	Engine();
 	~Engine();
-	bool Poll(NSVR_System_Status*);
 	int PollStatus(NSVR_ServiceInfo*);
 	uint32_t GenHandle();
 	int PollDevice(NSVR_DeviceInfo *);
 	bool EngineCommand(NSVR_EngineCommand command);
-
+	int GetEngineStats(NSVR_SystemStats* stats);
 	void HandleCommand(unsigned int handle, NSVR_PlaybackCommand);
 
 	void GetError(NSVR_ErrorInfo* errorInfo);
