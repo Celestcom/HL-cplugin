@@ -138,6 +138,9 @@
     <ClInclude Include="ExceptionSafeCall.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs\DriverCommand.pb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

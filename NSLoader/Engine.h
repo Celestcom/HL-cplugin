@@ -40,6 +40,11 @@ public:
 	int  PollTracking(NSVR_TrackingUpdate* q);
 
 	int PollLogs(NSVR_LogEntry* entry);
+
+	int EnableAudio(NSVR_AudioOptions* options);
+	int DisableAudio();
+
+	int SubmitRawCommand(uint8_t* buffer, int length);
 private:
 	IoService m_ioService;
 	NSVR_TrackingUpdate m_cachedTracking;

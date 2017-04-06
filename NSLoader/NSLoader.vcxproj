@@ -166,6 +166,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs\DriverCommand.pb.h" />
     <ClInclude Include="AreaParser.h" />
     <ClInclude Include="ClientMessenger.h" />
     <ClInclude Include="Encoder.h" />
