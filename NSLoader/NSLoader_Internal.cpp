@@ -11,7 +11,6 @@
 //comment this line if you want to disable argument null checking. Profile really hard before doing this.
 #define NULL_ARGUMENT_CHECKS
 
-#define NSVR_RETURN_INTERNAL(ReturnType) NSLOADER_INTERNAL_API ReturnType __stdcall
 
 
 #ifdef NULL_ARGUMENT_CHECKS
@@ -67,5 +66,14 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_System_SubmitRawCommand(NSVR_System * sys
 
 	return ExceptionGuard([&] {
 		return AS_TYPE(Engine, system)->SubmitRawCommand(buffer, length);
+	});
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_System_DumpDeviceDiagnostics(NSVR_System* systemPtr)
+{
+	RETURN_IF_NULL(systemPtr);
+	
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, systemPtr)->DumpDeviceDiagnostics();
 	});
 }

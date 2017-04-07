@@ -27,6 +27,14 @@ void Engine::executeTimestep()
 	
 }
 
+int Engine::DumpDeviceDiagnostics()
+{
+	NullSpaceIPC::DriverCommand command;
+	command.set_command(NullSpaceIPC::DriverCommand_Command_DUMP_DEVICE_DIAGNOSTICS);
+	m_messenger.WriteCommand(command);
+	return NSVR_Success_Unqualified;
+}
+
 Engine::Engine() :
 
 	_decoder(std::make_unique<FlatbuffDecoder>()),
@@ -43,7 +51,6 @@ Engine::Engine() :
 
 	m_hapticsTimestep.SetEvent([this]() {executeTimestep(); });
 	m_hapticsTimestep.Start();
-	//scheduleTimestep();
 }
 
 
@@ -58,16 +65,10 @@ Engine::~Engine()
 
 int Engine::PollStatus(NSVR_ServiceInfo* info)
 {
-	if (auto optionalResponse = m_messenger.ReadSuits()) {
-		auto suits = optionalResponse.get();
-		if ((std::time(nullptr) - suits.timestamp) > 1) {
-			return NSVR_Error_ServiceDisconnected;
-		}
-		else {
-			//here, we'd fill in the info struct. 
-			//making sure to check for nullptr, which signals "we don't care about the details"
+	if (m_messenger.ConnectedToService(info)) {
+	
 			return NSVR_Success_Unqualified;
-		}
+		
 	}
 
 	return NSVR_Error_ServiceDisconnected;

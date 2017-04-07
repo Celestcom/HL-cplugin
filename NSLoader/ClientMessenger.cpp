@@ -3,15 +3,20 @@
 //#include "Locator.h"
 #include <boost\bind.hpp>
 #include "EffectCommand.pb.h"
+
+#include "NSLoader.h"
+
+using namespace NullSpace::SharedMemory;
 ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 
 	m_sentinelTimer(io),
 	m_sentinelInterval(500),
-	m_sentinalTimeout(1000)
+	m_sentinalTimeout(1000),
+	m_connectedToService(false)
 {
 	//First time we attempt to establish connection, do it with zero delay
 	m_sentinelTimer.expires_from_now(boost::posix_time::millisec(0));
-	m_sentinelTimer.async_wait(boost::bind(&ClientMessenger::attemptEstablishConnection, this, boost::asio::placeholders::error));
+	m_sentinelTimer.async_wait([&](auto error) {attemptEstablishConnection(error); });
 
 }
 
@@ -84,6 +89,22 @@ boost::optional<std::string> ClientMessenger::ReadLog()
 
 }
 
+bool ClientMessenger::ConnectedToService(NSVR_ServiceInfo* info)
+{
+
+	if (m_connectedToService) {
+		if (info != nullptr) {
+			info->ServiceMajor = 0;
+			info->ServiceMinor = 0;
+		}
+		return true;
+	}
+	
+	
+	return false;
+	
+}
+
 
 void ClientMessenger::startAttemptEstablishConnection()
 {
@@ -144,7 +165,7 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 void ClientMessenger::startMonitorConnection()
 {
 	m_sentinelTimer.expires_from_now(m_sentinelInterval);
-	m_sentinelTimer.async_wait(boost::bind(&ClientMessenger::monitorConnection, this, boost::asio::placeholders::error));
+	m_sentinelTimer.async_wait([&](auto error) { monitorConnection(error); });
 }
 
 void ClientMessenger::monitorConnection(const boost::system::error_code & ec)
@@ -159,12 +180,14 @@ void ClientMessenger::monitorConnection(const boost::system::error_code & ec)
 		);
 
 		if (time <= m_sentinalTimeout) {
+			m_connectedToService = true;
 			//we are connected, so keep monitoring
 			//Locator::Logger().Log("ClientMessenger", "All good!");
 
 			startMonitorConnection();
 		}
 		else {
+			m_connectedToService = false;
 			startAttemptEstablishConnection();
 		}
 	}

@@ -65,5 +65,7 @@ private:
 
 	ScheduledEvent m_hapticsTimestep;
 
+public:
+	int DumpDeviceDiagnostics();
 };
 

@@ -12,28 +12,33 @@
 
 #include "EffectCommand.pb.h"
 #include "DriverCommand.pb.h"
+
+typedef struct NSVR_ServiceInfo_ NSVR_ServiceInfo;
 using namespace boost::interprocess;
-using namespace NullSpace::SharedMemory;
 class ClientMessenger
 {
 public:
 	ClientMessenger(boost::asio::io_service&);
 	~ClientMessenger();
-	boost::optional<TrackingUpdate> ReadTracking();
-	boost::optional<SuitsConnectionInfo> ReadSuits();
+
+	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
+	boost::optional<NullSpace::SharedMemory::SuitsConnectionInfo> ReadSuits();
 	void WriteCommand(const NullSpaceIPC::DriverCommand& d);
 	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
 	boost::optional<std::string> ReadLog();
+
+	bool ConnectedToService(NSVR_ServiceInfo* info);
 
 private:
 	//Write haptics to the suit using this shared queue
 	std::unique_ptr<WritableSharedQueue> m_hapticsStream;
 
 	//Read the most up-to-date tracking data from this object
-	std::unique_ptr<ReadableSharedObject<TrackingUpdate>> m_trackingData;
+	std::unique_ptr<ReadableSharedObject<NullSpace::SharedMemory::TrackingUpdate>> m_trackingData;
 
 	//Read the most up-to-date suit connection information from this object
-	std::unique_ptr<ReadableSharedObject<SuitsConnectionInfo>> m_suitConnectionInfo;
+	// 
+	std::unique_ptr<ReadableSharedObject<NullSpace::SharedMemory::SuitsConnectionInfo>> m_suitConnectionInfo;
 
 	//Get logging info from engine. Note: only one consumer can reliably get the debug info
 	std::unique_ptr<ReadableSharedQueue> m_logStream;
@@ -58,11 +63,14 @@ private:
 
 
 	void startAttemptEstablishConnection();
+
 	void attemptEstablishConnection(const boost::system::error_code& ec);
 
 	void startMonitorConnection();
 	void monitorConnection(const boost::system::error_code& ec);
 
 	Encoder m_encoder;
+
+	bool m_connectedToService;
 };
 
