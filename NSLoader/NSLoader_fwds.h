@@ -24,3 +24,5 @@ typedef struct NSVR_DeviceInfo_  NSVR_DeviceInfo;
 
 
 typedef struct NSVR_ServiceInfo_  NSVR_ServiceInfo;
+
+typedef struct NSVR_PlaybackHandle_ NSVR_PlaybackHandle;
