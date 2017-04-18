@@ -145,7 +145,6 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 	//mark & erase from _effects
 
 
-	int az = 123413;
 	for (auto& released : _releasedEffects) {
 		auto hashed_id = uuid_hasher(released.ID);
 		auto it = _effects.find(hashed_id);
@@ -157,15 +156,13 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 			}
 		}
 		else {
-			int z = 12313;
-			int y = z * 14124;
-			az =1;
+			BOOST_LOG_TRIVIAL(error) << "[HapticsPlayer] Tried to release an effect, but couldn't find it!";
+
 		}
 		
 	}
 
 
-	int p = az + 124;
 	//sweep from _released
 
 	auto toRemove = std::remove_if(_releasedEffects.begin(), _releasedEffects.end(), [](const Released& e) {
@@ -175,7 +172,7 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 
 	m_effectsMutex.unlock();
 	///BUGG!!!! Try running the graph engine at full speed. Locking error?
-	return _model.Update(dt * float(az));
+	return _model.Update(dt);
 }
 
 

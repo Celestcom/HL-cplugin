@@ -51,7 +51,15 @@ Engine::Engine() :
 	m_cachedTracking({})
 {
 
-	m_hapticsTimestep.SetEvent([this]() {executeTimestep(); });
+	m_hapticsTimestep.SetEvent([this]() {
+		try {
+			executeTimestep();
+		}
+		catch (const std::exception& e) {
+			BOOST_LOG_TRIVIAL(error) << "[PluginMain] Fatal error executing timestep: " << e.what();
+
+		}
+	});
 	m_hapticsTimestep.Start();
 
 	using namespace boost::log;
@@ -64,6 +72,9 @@ Engine::Engine() :
 	//sink->locked_backend()->Provide(&m_messenger, m_ioService.GetIOService());
 
 	core::get()->add_sink(sink);
+
+	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
+
 }
 
 
