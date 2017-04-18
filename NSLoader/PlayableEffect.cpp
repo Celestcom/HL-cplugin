@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "PlayableEffect.h"
 #include "Locator.h"
-#include "Wire\IntermediateHapticFormats.h"
 #include <iostream>
+#include "SuitEvent.h"
 #include "PriorityModel.h"
 #include <iterator>
 namespace NS {
@@ -14,7 +14,7 @@ namespace NS {
 	}
 }
 
-PlayableEffect::PlayableEffect(std::vector<FlatbuffDecoder::SuitEvent> effects, HapticEventGenerator& gen, boost::uuids::random_generator& uuid) :
+PlayableEffect::PlayableEffect(std::vector<SuitEvent> effects, HapticEventGenerator& gen, boost::uuids::random_generator& uuid) :
 	_effects(std::move(effects)),
 	_state(PlaybackState::IDLE),
 	_gen(gen),
@@ -31,7 +31,7 @@ PlayableEffect::~PlayableEffect()
 	try {
 		_gen.Remove(_id);
 	}
-	catch (const std::exception& e) {
+	catch (const std::exception&) {
 		//todo: NEED TO LOG
 	}
 }

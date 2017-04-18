@@ -1,9 +1,8 @@
 #pragma once
 #include "IPlayable.h"
-#include "Wire\IntermediateHapticFormats.h"
 #include "HapticEvent.h"
 #include "HapticEventGenerator.h"
-#include "Wire\FlatbuffDecoder.h"
+#include "SuitEvent.h"
 #include <boost\uuid\random_generator.hpp>
 
 namespace NS {
@@ -62,7 +61,7 @@ class PlayableEffect :
 public:
 	
 	//Precondition: the vector is not empty
-	PlayableEffect(std::vector<FlatbuffDecoder::SuitEvent> effects, HapticEventGenerator& gen, boost::uuids::random_generator&);
+	PlayableEffect(std::vector<SuitEvent> effects, HapticEventGenerator& gen, boost::uuids::random_generator&);
 	~PlayableEffect();
 
 	void Play() override;
@@ -88,8 +87,8 @@ private:
 	float _time;
 	HapticEventGenerator& _gen;
 
-	std::vector<FlatbuffDecoder::SuitEvent>::iterator _lastExecutedEffect;
-	std::vector<FlatbuffDecoder::SuitEvent> _effects;
+	std::vector<SuitEvent>::iterator _lastExecutedEffect;
+	std::vector<SuitEvent> _effects;
 	boost::uuids::uuid _id;
 
 	void reset();

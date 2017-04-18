@@ -6,7 +6,7 @@
 #include "IPlayable.h"
 #include "PriorityModel.h"
 #include "HapticEventGenerator.h"
-#include "Wire\FlatbuffDecoder.h"
+#include "SuitEvent.h"
 #include <mutex>
 typedef unsigned int HapticHandle;
 
@@ -31,7 +31,7 @@ public:
 	void Restart(HapticHandle h);
 	void Stop(HapticHandle h);
 	void Release(HapticHandle h);
-	void Create(HapticHandle h, std::vector<FlatbuffDecoder::SuitEvent>);
+	void Create(HapticHandle h, std::vector<SuitEvent>);
 
 	PriorityModel& GetModel();
 

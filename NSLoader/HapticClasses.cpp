@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "HapticClasses.h"
-#include "Wire\IntermediateHapticFormats.h"
 
 HapticEffect::HapticEffect(::Effect effect, ::Location loc, float duration, float time, unsigned int priority) :
 	Effect(effect),

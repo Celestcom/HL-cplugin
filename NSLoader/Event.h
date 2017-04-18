@@ -1,9 +1,8 @@
 #pragma once
-#include "Wire\IntermediateHapticFormats.h"
 #include <boost\variant.hpp>
 
 #include "NSLoader.h"
-
+#include "SuitEvent.h"
 class Event
 {
 public:

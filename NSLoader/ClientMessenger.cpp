@@ -50,7 +50,7 @@ void ClientMessenger::WriteCommand(const NullSpaceIPC::DriverCommand & d)
 		try {
 			m_commandStream->Push(binaryData.data(), d.ByteSize());
 		}
-		catch (const boost::interprocess::interprocess_exception& ec) {
+		catch (const boost::interprocess::interprocess_exception&) {
 			//probably full queue
 			//should log
 		}
@@ -65,7 +65,7 @@ void ClientMessenger::WriteHaptics(const NullSpaceIPC::EffectCommand& e)
 		try {
 			m_hapticsStream->Push(binaryData.data(), e.ByteSize());
 		}
-		catch (const boost::interprocess::interprocess_exception& ec) {
+		catch (const boost::interprocess::interprocess_exception&) {
 			//probably full queue, which means the server isn't reading fast enough!
 			//should log
 		}
@@ -112,14 +112,14 @@ void ClientMessenger::startAttemptEstablishConnection()
 	m_sentinelTimer.async_wait(boost::bind(&ClientMessenger::attemptEstablishConnection, this, boost::asio::placeholders::error));
 }
 
-void ClientMessenger::attemptEstablishConnection(const boost::system::error_code & ec)
+void ClientMessenger::attemptEstablishConnection(const boost::system::error_code &)
 {
 	try {
 		//Locator::Logger().Log("ClientMessenger", "Attempting to create Sentinel Shared Object", LogLevel::Info);
 		m_sentinel = std::make_unique<ReadableSharedObject<std::time_t>>("ns-sentinel");
 
 	}
-	catch (const boost::interprocess::interprocess_exception& ec) {
+	catch (const boost::interprocess::interprocess_exception&) {
 	//	Locator::Logger().Log("ClientMessenger", "Failed to create Sentinal Shared Object", LogLevel::Error);
 
 		//the shared memory object doesn't exist yet? Try again
@@ -136,20 +136,14 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		m_trackingData = std::make_unique<ReadableSharedObject<TrackingUpdate>>("ns-tracking-data");
 		m_suitConnectionInfo = std::make_unique<ReadableSharedObject<SuitsConnectionInfo>>("ns-suit-data");
 		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
-		
-		try {
-			m_logStream = std::make_unique<ReadableSharedQueue>("ns-logging-data");
-		}
-		catch (const boost::interprocess::interprocess_exception& ec) {
-			//we don't care if we can't instantiate the logger.
-			//The engine may not create it if it is not in debug mode
-		}
+		m_logStream = std::make_unique<ReadableSharedQueue>("ns-logging-data");
 
+	
 		//Everything setup successfully? Monitor the connection!
 		startMonitorConnection();
 
 	}
-	catch (const boost::interprocess::interprocess_exception& ec) {
+	catch (const boost::interprocess::interprocess_exception&) {
 		//Locator::Logger().Log("ClientMessenger", "Failed to create all the other shared objects", LogLevel::Error);
 
 		//somehow failed to make these shared objects.

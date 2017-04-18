@@ -59,6 +59,7 @@ void HapticsPlayer::Stop(HapticHandle hh)
 void HapticsPlayer::Release(HapticHandle hh)
 {
 	std::lock_guard<std::mutex> guard(m_effectsMutex);
+	
 
 	//std::cout << "Got a new handle to release\n";
 
@@ -75,7 +76,7 @@ void HapticsPlayer::Release(HapticHandle hh)
 	_outsideHandleToUUID.erase(_outsideHandleToUUID.find(hh));
 }
 
-void HapticsPlayer::Create(HapticHandle h, std::vector<FlatbuffDecoder::SuitEvent> decoded)
+void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
 {
 	std::lock_guard<std::mutex> guard(m_effectsMutex);
 
@@ -129,7 +130,9 @@ bool EffectIsExpired(const std::unique_ptr<IPlayable> &p, bool isGlobalPause) {
 	}
 	*/
 }
-
+int compute(int p) {
+	return p * 123123;
+}
 std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 {
 	m_effectsMutex.lock();
@@ -141,15 +144,28 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 
 	//mark & erase from _effects
 
+
+	int az = 123413;
 	for (auto& released : _releasedEffects) {
-		if (EffectIsExpired(_effects.at(uuid_hasher(released.ID)), _paused)) {
-			released.NeedsSweep = true;
-			_effects.at(uuid_hasher(released.ID))->Release();
-			_effects.erase(uuid_hasher(released.ID));
-			//	std::cout << "Hey, found an expired released handle, deleting from effects\n";
+		auto hashed_id = uuid_hasher(released.ID);
+		auto it = _effects.find(hashed_id);
+		if (it != _effects.end()) {
+			if (EffectIsExpired(it->second, _paused)) {
+				released.NeedsSweep = true;
+				it->second->Release();
+				_effects.erase(it);
+			}
 		}
+		else {
+			int z = 12313;
+			int y = z * 14124;
+			az =1;
+		}
+		
 	}
 
+
+	int p = az + 124;
 	//sweep from _released
 
 	auto toRemove = std::remove_if(_releasedEffects.begin(), _releasedEffects.end(), [](const Released& e) {
@@ -158,8 +174,8 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 	_releasedEffects.erase(toRemove, _releasedEffects.end());
 
 	m_effectsMutex.unlock();
-	
-	return _model.Update(dt);
+	///BUGG!!!! Try running the graph engine at full speed. Locking error?
+	return _model.Update(dt * float(az));
 }
 
 
@@ -220,4 +236,5 @@ boost::optional<const std::unique_ptr<IPlayable>&> HapticsPlayer::toInternalUUID
 		return _effects.at(h);
 	}
 	
+	return boost::optional<const std::unique_ptr<IPlayable>&>();
 }

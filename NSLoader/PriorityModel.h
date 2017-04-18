@@ -1,7 +1,6 @@
 #pragma once
 #include <unordered_map>
 #include "HapticQueue.h"
-#include "Wire\IntermediateHapticFormats.h"
 #include "Enums.h"
 #include "EffectCommand.pb.h"
 #include <mutex>

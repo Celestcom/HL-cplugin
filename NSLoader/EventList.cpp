@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "EventList.h"
-#include "Wire/IntermediateHapticFormats.h"
 
 #include "NSLoader.h"
 #include "Locator.h"

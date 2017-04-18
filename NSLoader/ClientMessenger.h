@@ -1,5 +1,4 @@
 #pragma once
-#include <boost/interprocess/ipc/message_queue.hpp>
 
 #include "ReadableSharedQueue.h"
 #include "ReadableSharedObject.h"
@@ -14,7 +13,6 @@
 #include "DriverCommand.pb.h"
 
 typedef struct NSVR_ServiceInfo_ NSVR_ServiceInfo;
-using namespace boost::interprocess;
 class ClientMessenger
 {
 public:

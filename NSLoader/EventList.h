@@ -1,7 +1,6 @@
 #pragma once
 
 #include <boost\variant.hpp>
-#include "Wire\IntermediateHapticFormats.h"
 #include "Event.h"
 
 class ParameterizedEvent;

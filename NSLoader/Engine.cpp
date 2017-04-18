@@ -1,8 +1,6 @@
 ﻿#include "stdafx.h"
 #include "Engine.h"
-#include "HapticFileInfo.h"
 #include "Enums.h"
-#include "flatbuffers\flatbuffers.h"
 
 #include "Sequence_generated.h"
 #include "Pattern_generated.h"
@@ -10,11 +8,16 @@
 #include "HapticEffect_generated.h"
 #include "HapticFrame_generated.h"
 #include "HapticPacket_generated.h"
-#include "Wire\FlatbuffDecoder.h"
 #include <boost\bind.hpp>
 #include "EventList.h"
 #include "NSLoader_Internal.h"
 #include <chrono>
+
+#include <boost/log/core.hpp>
+#include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/trivial.hpp>
+#include "MyTestLog.h"
+
 void Engine::executeTimestep()
 {
 	
@@ -37,7 +40,6 @@ int Engine::DumpDeviceDiagnostics()
 
 Engine::Engine() :
 
-	_decoder(std::make_unique<FlatbuffDecoder>()),
 	_isEnginePlaying(true),
 	m_ioService(),
 	m_messenger(m_ioService.GetIOService()),
@@ -51,6 +53,17 @@ Engine::Engine() :
 
 	m_hapticsTimestep.SetEvent([this]() {executeTimestep(); });
 	m_hapticsTimestep.Start();
+
+	using namespace boost::log;
+	m_log = boost::make_shared<MyTestLog>();
+	m_log->Provide(&m_messenger, m_ioService.GetIOService());
+	typedef sinks::synchronous_sink<MyTestLog> sink_t;
+
+	boost::shared_ptr<sink_t> sink(new sink_t(m_log));
+	
+	//sink->locked_backend()->Provide(&m_messenger, m_ioService.GetIOService());
+
+	core::get()->add_sink(sink);
 }
 
 
@@ -190,18 +203,6 @@ void Engine::GetError(NSVR_ErrorInfo* errorInfo)
 	//todo: Keep track of LastResult as well
 }
 
-int Engine::CreateEffect(uint32_t handle, void* data, unsigned int size)
-{
-	flatbuffers::Verifier verifier(reinterpret_cast<uint8_t*>(data), size);
-	if (NullSpace::Events::VerifySuitEventListBuffer(verifier)) {
-		auto encodedList = NullSpace::Events::GetSuitEventList(data);
-		auto decodedList = FlatbuffDecoder::Decode(encodedList);
-		m_player.Create(handle, decodedList);
-		return 1;
-	}
-
-	return 0;
-}
 
 int Engine::CreateEffect(EventList * list, uint32_t handle)
 {
@@ -243,7 +244,7 @@ int Engine::PollTracking(NSVR_TrackingUpdate* q)
 
 int Engine::PollLogs(NSVR_LogEntry * entry)
 {
-	if (auto logEntry = m_messenger.ReadLog()) {
+	if (auto logEntry = m_log->Poll()) {
 		auto str = *logEntry;
 		entry->Length = str.length();
 		strncpy_s(entry->Message, 512, str.c_str(), 512);

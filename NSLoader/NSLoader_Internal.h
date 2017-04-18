@@ -3,7 +3,6 @@
 
 #include "NSLoader_fwds.h"
 
-#define INTERNAL_TOOL
 
 #ifdef INTERNAL_TOOL
 	#ifdef NSLOADER_EXPORTS

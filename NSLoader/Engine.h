@@ -3,14 +3,14 @@
 #include <iostream>
 
 #include "IoService.h"
-#include "Wire\FlatbuffDecoder.h"
+//#include "Wire\FlatbuffDecoder.h"
 #include "ClientMessenger.h"
 #include <boost\asio\deadline_timer.hpp>
 #include "HapticsPlayer.h"
 #include "ScheduledEvent.h"
 #include "EventList.h"
 #include "NSLoader.h"
-
+#include "MyTestLog.h"
 #include "NSLoader_Internal.h"
 #pragma pack(1)
 
@@ -35,7 +35,6 @@ public:
 	void HandleCommand(unsigned int handle, NSVR_PlaybackCommand);
 
 	void GetError(NSVR_ErrorInfo* errorInfo);
-	int CreateEffect(uint32_t handle, void *data, unsigned int size);
 	int CreateEffect(EventList* list, uint32_t handle);
 	int  PollTracking(NSVR_TrackingUpdate* q);
 
@@ -48,11 +47,9 @@ public:
 private:
 	IoService m_ioService;
 	NSVR_TrackingUpdate m_cachedTracking;
-	NullSpace::Communication::SuitStatus _suitStatus;
 	NSVR_TrackingUpdate _tracking;
 	uint32_t _currentHandleId;
 	std::string _currentError;
-	std::unique_ptr<FlatbuffDecoder> _decoder;
 	bool _isEnginePlaying;
 	ClientMessenger m_messenger;
 
@@ -64,6 +61,8 @@ private:
 	void executeTimestep();
 
 	ScheduledEvent m_hapticsTimestep;
+
+	boost::shared_ptr<MyTestLog> m_log;
 
 public:
 	int DumpDeviceDiagnostics();

@@ -42,7 +42,7 @@ void IoService::start() {
 					break;
 				}
 			}
-			catch (boost::system::system_error& ec) {
+			catch (boost::system::system_error&) {
 			//	std::cout << "BIG ERROR\n";
 			}
 		}
@@ -65,7 +65,7 @@ void IoService::start() {
 				_isReset.store(true);
 				_doneResettingIO.notify_one();
 			}
-			catch (boost::system::system_error& e) {
+			catch (boost::system::system_error&) {
 			//	std::cout <<"WTF\n";
 			}
 
