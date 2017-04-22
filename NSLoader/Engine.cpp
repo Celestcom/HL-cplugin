@@ -81,10 +81,15 @@ Engine::Engine() :
 
 Engine::~Engine()
 {
-	m_player.ClearAll();
-	std::this_thread::sleep_for(std::chrono::milliseconds(25));
-	m_hapticsTimestep.Stop();
-	m_ioService.Shutdown();
+	try {
+		m_player.ClearAll();
+		std::this_thread::sleep_for(std::chrono::milliseconds(25));
+		m_hapticsTimestep.Stop();
+		m_ioService.Shutdown();
+	}
+	catch (const std::exception&) {
+
+	}
 }
 
 int Engine::PollStatus(NSVR_ServiceInfo* info)

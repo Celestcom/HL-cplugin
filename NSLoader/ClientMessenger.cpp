@@ -17,7 +17,7 @@ ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 	//First time we attempt to establish connection, do it with zero delay
 	m_sentinelTimer.expires_from_now(boost::posix_time::millisec(0));
 	m_sentinelTimer.async_wait([&](auto error) {attemptEstablishConnection(error); });
-
+	static_assert(sizeof(std::time_t) == 8, "Time is wrong size");
 }
 
 
@@ -136,14 +136,24 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		m_trackingData = std::make_unique<ReadableSharedObject<TrackingUpdate>>("ns-tracking-data");
 		m_suitConnectionInfo = std::make_unique<ReadableSharedObject<SuitsConnectionInfo>>("ns-suit-data");
 		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
-		m_logStream = std::make_unique<ReadableSharedQueue>("ns-logging-data");
+	}
+	catch (const boost::interprocess::interprocess_exception& e) {
+		BOOST_LOG_TRIVIAL(error) << "Failed to make shared objects: " << e.what();
+		//Locator::Logger().Log("ClientMessenger", "Failed to create all the other shared objects", LogLevel::Error);
+
+		//somehow failed to make these shared objects.
+		//for now, until we know what types of errors these are, try again
+		startAttemptEstablishConnection();
+		return;
+	}
+	try {
+		//m_logStream = std::make_unique<ReadableSharedQueue>("ns-logging-data");
 
 	
-		//Everything setup successfully? Monitor the connection!
-		startMonitorConnection();
-
+		
 	}
-	catch (const boost::interprocess::interprocess_exception&) {
+	catch (const boost::interprocess::interprocess_exception& e) {
+		BOOST_LOG_TRIVIAL(error) << "Failed to make shared objects: " << e.what();
 		//Locator::Logger().Log("ClientMessenger", "Failed to create all the other shared objects", LogLevel::Error);
 
 		//somehow failed to make these shared objects.
@@ -152,6 +162,8 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		return;
 	}
 
+	//Everything setup successfully? Monitor the connection!
+	startMonitorConnection();
 
 	
 }
