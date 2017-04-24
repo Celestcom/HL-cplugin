@@ -11,7 +11,7 @@ ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 
 	m_sentinelTimer(io),
 	m_sentinelInterval(500),
-	m_sentinalTimeout(1000),
+	m_sentinalTimeout(2000),
 	m_connectedToService(false)
 {
 	//First time we attempt to establish connection, do it with zero delay
@@ -115,12 +115,10 @@ void ClientMessenger::startAttemptEstablishConnection()
 void ClientMessenger::attemptEstablishConnection(const boost::system::error_code &)
 {
 	try {
-		//Locator::Logger().Log("ClientMessenger", "Attempting to create Sentinel Shared Object", LogLevel::Info);
 		m_sentinel = std::make_unique<ReadableSharedObject<std::time_t>>("ns-sentinel");
 
 	}
 	catch (const boost::interprocess::interprocess_exception&) {
-	//	Locator::Logger().Log("ClientMessenger", "Failed to create Sentinal Shared Object", LogLevel::Error);
 
 		//the shared memory object doesn't exist yet? Try again
 		startAttemptEstablishConnection();
@@ -147,7 +145,7 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		return;
 	}
 	try {
-		//m_logStream = std::make_unique<ReadableSharedQueue>("ns-logging-data");
+		m_logStream = std::make_unique<ReadableSharedQueue>("ns-logging-data");
 
 	
 		
