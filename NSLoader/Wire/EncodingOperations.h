@@ -1,6 +1,9 @@
 #pragma once
 #define NOMINMAX
 #include "flatbuffers\flatbuffers.h"
+
+#include "TinyEffect_generated.h"
+#include "TinyEffectArray_generated.h"
 #include "HapticEffect_generated.h"
 #include "HapticFrame_generated.h"
 #include "HapticPacket_generated.h"
@@ -12,32 +15,36 @@
 #include "TrackingUpdate_generated.h"
 #include "IntermediateHapticFormats.h"
 
+
 #include "MixedHapticFrame_generated.h"
 #include "MixedPattern_generated.h"
 #include "MixedSequence_generated.h"
 #include <mutex>
-
+#include "Locator.h"
 //need to include the quaternion structures a better way
 #ifndef IS_ENGINE
 #include "NSLoader.h"
 #else 
-#include "ExportedStructures.h"
+#include "../ExportedStructures.h" //MUST CHANGE TO ExportedStructures
 #endif
-struct Quaternion {
-	float w;
-	float x;
-	float y;
-	float z;
-	Quaternion(float x, float y, float z, float w) :w(w), x(x), y(y), z(z) {}
-	Quaternion() {}
-	friend std::ostream &operator<<(std::ostream &output,
-		const Quaternion &q) {
-		output << "(" << q.x << ", " << q.y << ", " << q.z << ", " << q.w << ")";
-		return output;
-	}
-};
+
+namespace NullSpace {
+	struct Quaternion {
+		float w;
+		float x;
+		float y;
+		float z;
+		Quaternion(float x, float y, float z, float w) :w(w), x(x), y(y), z(z) {}
+		Quaternion() {}
+		friend std::ostream &operator<<(std::ostream &output,
+			const Quaternion &q) {
+			output << "(" << q.x << ", " << q.y << ", " << q.z << ", " << q.w << ")";
+			return output;
+		}
+	};
 
 
+}
 
 
 namespace NullSpaceDLL {
@@ -67,7 +74,8 @@ template<
 	typename TrackOffset,
 	typename HandleCommandOffset,
 	typename EngineCommandOffset,
-	typename NodeOffset>
+	typename NodeOffset,
+typename TinyEffectArrayOffset>
 
 class IEncoder {
 	public:
@@ -79,7 +87,7 @@ class IEncoder {
 		virtual SuitStatus Encode(NullSpace::Communication::SuitStatus status) = 0;
 		virtual HandleCommandOffset Encode(NullSpaceDLL::HandleCommand h) = 0;
 		virtual EngineCommandOffset Encode(NullSpaceDLL::EngineCommand e) = 0;
-
+		virtual TinyEffectArrayOffset Encode(std::vector<NullSpace::Node*>& input) = 0;
 
 		virtual void Finalize(HandleCommandOffset, std::string, DataCallback) = 0;
 		virtual void Finalize(TrackOffset, DataCallback) = 0;
@@ -88,6 +96,7 @@ class IEncoder {
 		virtual void Finalize(ClientStatus, DataCallback) = 0;
 		virtual void Finalize(SuitStatus, DataCallback) = 0;
 		virtual void Finalize(EngineCommandOffset, std::string, DataCallback) = 0;
+		virtual void Finalize(uint32_t handle, TinyEffectArrayOffset input, DataCallback callback) = 0;
 };
 
 
@@ -98,8 +107,9 @@ typedef struct flatbuffers::Offset<NullSpace::Communication::ClientStatusUpdate>
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::HandleCommand> HandleCommandOffset;
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::EngineCommandData> EngineCommandOffset;
 typedef struct flatbuffers::Offset<NullSpace::HapticFiles::Node> NodeOffset;
+typedef struct flatbuffers::Offset<NullSpace::HapticFiles::TinyEffectArray> TinyEffectArrayOffset;
 
-class EncodingOperations : public IEncoder<ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset, NodeOffset>
+class EncodingOperations : public IEncoder<ImuOffset, ClientOffset, StatusOffset, TrackOffset, HandleCommandOffset, EngineCommandOffset, NodeOffset, TinyEffectArrayOffset>
 {
 private:
 	flatbuffers::FlatBufferBuilder _builder;
@@ -132,18 +142,10 @@ public:
 	EngineCommandOffset EncodingOperations::Encode(NullSpaceDLL::EngineCommand e) {
 		return NullSpace::HapticFiles::CreateEngineCommandData(_builder, e.Command);
 	}
-	TrackOffset EncodingOperations::Encode(const std::vector<std::tuple<Imu, Quaternion>>& tuples) {
-
-		std::vector<NullSpace::Communication::Quaternion> outQuats;
-		for (const auto& pair : tuples) {
-			Imu id;
-			Quaternion quat;
-			std::tie(id, quat) = pair;
-			outQuats.push_back(NullSpace::Communication::Quaternion(NullSpace::Communication::ImuId(id), quat.x, quat.y, quat.z, quat.w)
-			);
-		}
-		auto finalQuats = _builder.CreateVectorOfStructs(outQuats);
-		return NullSpace::Communication::CreateTrackingUpdate(_builder, finalQuats);
+	TrackOffset EncodingOperations::Encode(const NSVR_Quaternion& input) {
+		//todo: check if this stack variable is copied by flatbuffers
+		auto q = NullSpace::Communication::Quaternion(input.x, input.y, input.z, input.w);
+		return NullSpace::Communication::CreateTrackingUpdate(_builder, &q);
 	}
 	
 	
@@ -208,6 +210,28 @@ public:
 		nodeBuilder.add_type(NullSpace::HapticFiles::NodeType_Experience);
 		return nodeBuilder.Finish();
 	}
+	flatbuffers::Offset<NullSpace::HapticFiles::TinyEffect> EncodingOperations::Encode(const Node* input) {
+		
+		NullSpace::HapticFiles::TinyEffectBuilder effectBuilder(_builder);
+		effectBuilder.add_duration(input->Duration);
+		//todo: ADD REAL EFFECT HERE
+		effectBuilder.add_effect(Locator::getTranslator().ToEffectFamily(input->Effect));
+		effectBuilder.add_strength(input->Strength);
+		effectBuilder.add_time(input->Time);
+		effectBuilder.add_area(input->Area);
+		return effectBuilder.Finish();
+	}
+	TinyEffectArrayOffset EncodingOperations::Encode(std::vector<Node*>& input) {
+		std::vector<flatbuffers::Offset<NullSpace::HapticFiles::TinyEffect>> effects;
+		for (const auto& child : input) {
+			effects.push_back(Encode(child));
+		}
+		auto effectsOffset = _builder.CreateVector(effects);
+
+		return NullSpace::HapticFiles::CreateTinyEffectArray(_builder, effectsOffset);
+
+
+	}
 	NodeOffset EncodingOperations::Encode(const Node& input) {
 		//Base case
 		if (input.Type == Node::EffectType::Effect) {
@@ -261,7 +285,10 @@ public:
 		}
 		_builder.Clear();
 	}
-
+	void EncodingOperations::Finalize(uint32_t handle, TinyEffectArrayOffset input, DataCallback callback) {
+		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString("tinyeffectarray"), NullSpace::HapticFiles::FileType_TinyEffectArray, input.Union(), handle);
+		_finalize(packet, callback);
+	}
 	void EncodingOperations::Finalize(uint32_t handle, NodeOffset input, std::string name, DataCallback callback) {
 		auto packet = NullSpace::HapticFiles::CreateHapticPacket(_builder, _builder.CreateString(name), NullSpace::HapticFiles::FileType_Node, input.Union(), handle);
 		_finalize(packet, callback);
@@ -338,6 +365,30 @@ public:
 		}
 		return atoms;
 	}
+	static NullSpace::Node EncodingOperations::Decode(const NullSpace::HapticFiles::Node* node) {
+		Node rootNode;
+		//common attributes 
+		rootNode.Type = Node::EffectType(node->type());
+		rootNode.Strength = node->strength();
+		rootNode.Time = node->time();
+
+		if (rootNode.Type == Node::EffectType::Effect) {
+			rootNode.Duration = node->duration();
+			rootNode.Effect = node->effect()->str();
+		}
+		if (rootNode.Type == Node::EffectType::Sequence) {
+			rootNode.Area = node->area();
+		}
+		if (node->children() != nullptr && node->children()->size() > 0) {
+			for (const auto& child : *node->children()) {
+				rootNode.Children.push_back(Decode(child));
+			}
+		}
+		
+		
+		return rootNode;
+
+	}
 	static bool EncodingOperations::Decode(const NullSpace::HapticFiles::Tracking* tracking) {
 		return tracking->enable();
 	}
@@ -350,50 +401,28 @@ public:
 	}
 
 
-
-
+	/*
+	static std::vector<TinyEffect> EncodingOperations::Decode(const NullSpace::HapticFiles::TinyEffectArray* effects) {
+		std::vector<TinyEffect> result;
+		result.reserve(effects->effects()->size());
+		for (const auto& effect : *effects->effects()) {
+			result.push_back(TinyEffect(effect->time(), effect->strength(), effect->duration(), effect->, effect->area()));
+		}
+		return result;
+	}
+	*/
 
 
 	static NullSpace::Communication::SuitStatus EncodingOperations::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();
 	}
-	static NullSpaceDLL::InteropTrackingUpdate EncodingOperations::Decode(const NullSpace::Communication::TrackingUpdate* update) {
-	
-		NullSpaceDLL::InteropTrackingUpdate t = { 0 };
-		auto encodedQuats = update->quaternions();
-		std::vector<std::tuple<Imu, NullSpaceDLL::Quaternion>> decodedQuats;
-		for (const auto& ec : *encodedQuats) {
-			NullSpaceDLL::Quaternion q;
-	
-			q.x = ec->x();
-			q.y = ec->y();
-			q.z = ec->z();
-			q.w = ec->w();
-			decodedQuats.push_back(std::make_tuple<Imu, NullSpaceDLL::Quaternion>(Imu(ec->id()), std::move(q)));
-		}
-		
-		
-		for (const auto& quat : decodedQuats) {
-			switch (std::get<0>(quat)) {
-			case Imu::Chest:
-				t.chest = std::get<1>(quat);
-				break;
-			case Imu::Left_Forearm:
-				t.left_forearm = std::get<1>(quat);
-				break;
-			case Imu::Left_Upper_Arm:
-				t.left_upper_arm = std::get<1>(quat);
-				break;
-			case Imu::Right_Forearm:
-				t.right_forearm = std::get<1>(quat);
-				break;
-			case Imu::Right_Upper_Arm:
-				t.right_upper_arm = std::get<1>(quat);
-				break;
-			default:
-				break;
-			}
-		}
+	static NSVR_TrackingUpdate EncodingOperations::Decode(const NullSpace::Communication::TrackingUpdate* update) {
+		NSVR_TrackingUpdate t = {};
+		auto quat = update->chest();
+		t.chest.w = quat->w();
+		t.chest.x = quat->x();
+		t.chest.y = quat->y();
+		t.chest.z = quat->z();
 		return t;
 	}
 

@@ -3,81 +3,277 @@
 
 #include "stdafx.h"
 #include "NSLoader.h"
-#include "TestClass.h"
+#include "Engine.h"
+#include "EventList.h"
+#include "Event.h"
+#include "ParameterizedEvent.h"
+#include "PlaybackHandle.h"
+#include "ExceptionSafeCall.h"
 
- NSVRPlugin __stdcall NSVR_Create()
+#define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
+#define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
+
+
+//comment this line if you want to disable argument null checking. Profile really hard before doing this.
+#define NULL_ARGUMENT_CHECKS
+
+
+
+
+#ifdef NULL_ARGUMENT_CHECKS
+#define RETURN_IF_NULL(ptr) do { if (ptr == nullptr) { return (NSVR_Result) NSVR_Error_NullArgument; }} while (0)
+#else
+#define RETURN_IF_NULL(ptr)
+#endif
+
+
+NSVR_RETURN(unsigned int) NSVR_Version_Get(void)
 {
-	return reinterpret_cast<NSVRPlugin>(new TestClass());
+	return NSLOADER_API_VERSION;
 }
 
- NSLOADER_API unsigned int __stdcall NSVR_GenHandle(NSVRPlugin ptr)
- {
-	 return reinterpret_cast<TestClass*>(ptr)->GenHandle();
+NSVR_RETURN(int) NSVR_Version_IsCompatibleDLL(void)
+{
+	unsigned int major = NSVR_Version_Get() >> 16;
+	return major == NSLOADER_API_VERSION_MAJOR;
+}
 
+NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System * systemPtr, NSVR_ServiceInfo * infoPtr)
+{
+	RETURN_IF_NULL(systemPtr);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, systemPtr)->PollStatus(infoPtr);
+	});
+
+}
+
+
+NSVR_RETURN(NSVR_Result) NSVR_System_GetDeviceInfo(NSVR_System * systemPtr, NSVR_DeviceInfo * infoPtr)
+{
+	RETURN_IF_NULL(systemPtr);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, systemPtr)->PollDevice(infoPtr);
+	});
+}
+
+NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr)
+{
+	return ExceptionGuard([&] { *systemPtr = AS_TYPE(NSVR_System, new Engine()); return NSVR_Success_Unqualified; });
+}
+
+NSVR_RETURN(int) NSVR_Version_HasFeature(const char * feature)
+{
+	static std::set<std::string> features;
+
+	if (features.empty())
+	{
+		//cache the feature list
+		//features.insert("TRACKING");
+		//features.insert("STREAMING");
+		//whatever
+	}
+
+	return features.find(feature) != features.end();
+}
+
+NSVR_RETURN(void) NSVR_System_Release(NSVR_System** ptr)
+{	
+	delete AS_TYPE(Engine, *ptr);
+	*ptr = nullptr;
+}
+
+
+NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Pause(NSVR_System* ptr)
+ {
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_PauseAll);
+	 });
  }
 
- NSLOADER_API int __stdcall NSVR_PollStatus(NSVRPlugin ptr)
+NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Resume(NSVR_System* ptr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->PollStatus();
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_ResumeAll);
+	 });
  }
 
- NSLOADER_API void __stdcall NSVR_PollTracking(NSVRPlugin ptr, NullSpaceDLL::InteropTrackingUpdate & q)
+NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Destroy(NSVR_System* ptr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->PollTracking(q);
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_DestroyAll);
+	 });
  }
 
- NSLOADER_API void __stdcall NSVR_Delete(NSVRPlugin ptr)
+
+
+NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Poll(NSVR_System * ptr, NSVR_TrackingUpdate * updatePtr)
  {
-	 delete reinterpret_cast<TestClass*>(ptr);
+	 RETURN_IF_NULL(ptr);
+	 RETURN_IF_NULL(updatePtr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->PollTracking(updatePtr);
+
+	 });
  }
 
- NSLOADER_API bool __stdcall NSVR_CreateSequence(NSVRPlugin ptr, unsigned int handle, LPSTR name, unsigned int loc)
+NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Enable(NSVR_System * ptr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->CreateSequence(handle, name, loc);
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_EnableTracking);
+	 });
  }
 
- NSLOADER_API bool __stdcall NSVR_Load(NSVRPlugin ptr, LPSTR param, int fileType)
+NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Disable(NSVR_System * ptr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->Load(param, fileType);
+	 RETURN_IF_NULL(ptr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_DisableTracking);
+	 });
  }
 
- NSLOADER_API bool __stdcall NSVR_CreatePattern(NSVRPlugin ptr, unsigned int handle, LPSTR name)
+
+
+NSVR_RETURN(NSVR_Result) NSVR_System_GetError(NSVR_System* ptr, NSVR_ErrorInfo* errorInfo)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->CreatePattern(handle, name);
+	 RETURN_IF_NULL(ptr);
+	 RETURN_IF_NULL(errorInfo);
+
+	 return ExceptionGuard([&] {
+		 AS_TYPE(Engine, ptr)->GetError(errorInfo);
+		 return NSVR_Success_Unqualified;
+	 });
  }
 
- NSLOADER_API bool __stdcall NSVR_CreateExperience(NSVRPlugin ptr, unsigned int handle, LPSTR name)
+
+NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType type)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->CreateExperience(handle, name);
+	
+	 return ExceptionGuard([&] {
+		 switch (type) {
+		 case NSVR_EventType::NSVR_EventType_BasicHapticEvent:
+			 *eventPtr = AS_TYPE(NSVR_Event, new BasicHapticEvent());
+		 default:
+			 return (NSVR_Result) NSVR_Error_InvalidEventType;
+		 }
+
+		 return (NSVR_Result) NSVR_Success_Unqualified;
+	 });
  }
 
- NSLOADER_API void __stdcall NSVR_HandleCommand(NSVRPlugin ptr, unsigned int handle, short command)
+NSVR_RETURN(void) NSVR_Event_Release(NSVR_Event ** eventPtr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->HandleCommand(handle, command);
+	 delete AS_TYPE(ParameterizedEvent, *eventPtr);
+	 *eventPtr = nullptr;
  }
 
- NSLOADER_API char * __stdcall NSVR_GetError(NSVRPlugin ptr)
+NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event * event, const char * key, float value)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->GetError();
+	 RETURN_IF_NULL(event);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(ParameterizedEvent, event)->SetFloat(key, value);
+	 });
  }
 
- NSLOADER_API void __stdcall NSVR_FreeString(char * string)
+NSVR_RETURN(NSVR_Result)NSVR_Event_SetInteger(NSVR_Event * event, const char * key, int value)
  {
-	 delete[] string;
+	 RETURN_IF_NULL(event);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(ParameterizedEvent, event)->SetInt(key, value);
+	 });
  }
 
- NSLOADER_API bool __stdcall NSVR_EngineCommand(NSVRPlugin ptr, short command)
+NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr, NSVR_System* systemPtr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->EngineCommand(command);
+	 RETURN_IF_NULL(systemPtr);
+
+	 return ExceptionGuard([&] {
+		 *timelinePtr = AS_TYPE(NSVR_Timeline, new EventList(AS_TYPE(Engine, systemPtr)));
+		 return NSVR_Success_Unqualified;
+	 });
  }
 
- NSLOADER_API bool __stdcall NSVR_InitializeFromFilesystem(NSVRPlugin ptr, LPSTR path)
+ 
+
+NSVR_RETURN(void) NSVR_Timeline_Release(NSVR_Timeline ** listPtr)
  {
-	 return reinterpret_cast<TestClass*>(ptr)->InitializeFromFilesystem(path);
+	delete AS_TYPE(EventList, *listPtr);
+	*listPtr = nullptr;
  }
 
- NSLOADER_API void __stdcall NSVR_CreateHaptic(NSVRPlugin ptr, unsigned int handle, void * data, unsigned int size)
+NSVR_RETURN(NSVR_Result) NSVR_Timeline_AddEvent(NSVR_Timeline * list, NSVR_Event * event)
  {
-	 reinterpret_cast<TestClass*>(ptr)->CreateHaptic(handle, data, size);
+	 RETURN_IF_NULL(list);
+	 RETURN_IF_NULL(event);
+
+	 return ExceptionGuard([&] {
+		return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(ParameterizedEvent, event));
+	 });
  }
+
+NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSVR_PlaybackHandle * handlePtr)
+ {
+	 RETURN_IF_NULL(timelinePtr);
+	 RETURN_IF_NULL(handlePtr);
+
+	 return ExceptionGuard([&] {
+
+		 return AS_TYPE(PlaybackHandle, handlePtr)->Bind(AS_TYPE(EventList, timelinePtr));
+		 
+	 });
+ }
+
+
+NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_Create(NSVR_PlaybackHandle ** handlePtr)
+ {
+
+	 return ExceptionGuard([&] {
+		 *handlePtr = AS_TYPE(NSVR_PlaybackHandle, new PlaybackHandle());
+		 return NSVR_Success_Unqualified;
+	 });
+
+	 
+}
+
+NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_Bind(NSVR_PlaybackHandle * handlePtr, NSVR_Timeline * timelinePtr)
+ {
+	 RETURN_IF_NULL(handlePtr);
+	 RETURN_IF_NULL(timelinePtr);
+
+	 return ExceptionGuard([&] {
+		 return AS_TYPE(PlaybackHandle, handlePtr)->Bind(AS_TYPE(EventList, timelinePtr));
+	 });
+ }
+
+NSVR_RETURN(NSVR_Result)NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle * handlePtr, NSVR_PlaybackCommand command)
+ {
+	 RETURN_IF_NULL(handlePtr);
+
+	 return ExceptionGuard([&] {
+		return AS_TYPE(PlaybackHandle, handlePtr)->Command(command);
+	 });
+ }
+
+NSVR_RETURN(void) NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr)
+ {
+	delete AS_TYPE(PlaybackHandle, *handlePtr);
+	 *handlePtr = nullptr; 
+ }
+
+
+
+
 

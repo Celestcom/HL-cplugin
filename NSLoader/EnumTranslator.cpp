@@ -105,6 +105,7 @@ EnumTranslator::EnumTranslator() {
 	init_sides();
 	init_json_locations();
 	init_areas();
+	init_familymap();
 }
 
 AreaFlag EnumTranslator::ToArea(std::string area, AreaFlag defaultArea) const
@@ -123,6 +124,16 @@ AreaFlag EnumTranslator::ToArea(std::string area) const
 std::string EnumTranslator::ToString(AreaFlag area) const
 {
 	return _areaMap.left.at(area);
+}
+
+uint32_t EnumTranslator::ToEffectFamily(std::string effectFamily) const
+{
+	return _effectFamilyMap.left.at(effectFamily);
+}
+
+std::string EnumTranslator::ToString(uint32_t effectFamily) const
+{
+	return _effectFamilyMap.right.at(effectFamily);
 }
 
 EnumTranslator::~EnumTranslator()
@@ -161,6 +172,27 @@ void EnumTranslator::init_areas()
 		(AreaFlag::Mid_Ab_Both, "Mid_Ab_Both")
 		(AreaFlag::Lower_Ab_Both, "Lower_Ab_Both");
 
+}
+void EnumTranslator::init_familymap()
+{
+	boost::assign::insert(_effectFamilyMap)
+		("bump", 1)
+		("buzz", 2)
+		("click", 3)
+		("double_click", 4)
+		("fuzz", 5)
+		("hum", 6)
+		("long_double_sharp_tick", 7)
+		("pulse", 8)
+		("pulse_sharp", 9)
+		("sharp_click", 10)
+		("sharp_tick", 11)
+		("short_double_click", 12)
+		("short_double_sharp_tick", 13)
+		("transition_click", 14)
+		("transition_hum", 15)
+		("triple_click", 16)
+		("doom_buzz", 666);
 }
 void EnumTranslator::init_effects() {
 

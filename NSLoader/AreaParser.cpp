@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "AreaParser.h"
 #include "Locator.h"
+#include "AreaFlags.h"
 #include <boost/algorithm/string.hpp>
 AreaParser::AreaParser(std::string tokens):_area(AreaFlag::None)
 {

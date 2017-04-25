@@ -9,16 +9,20 @@
 #include "EnginePacket_generated.h"
 #include "SuitStatusUpdate_generated.h"
 #include "TrackingUpdate_generated.h"
-#include "IntermediateHapticFormats.h"
-
+#include "Events_generated.h"
 #include "MixedHapticFrame_generated.h"
 #include "MixedPattern_generated.h"
 #include "MixedSequence_generated.h"
 
-#include "EncodingOperations.h"
+#include "NSLoader.h"
+#include <boost/variant.hpp>
+#include "Locator.h"
 class FlatbuffDecoder
 {
 public:
+
+
+
 	FlatbuffDecoder() {}
 	~FlatbuffDecoder() {}
 
@@ -27,21 +31,15 @@ public:
 	}
 
 
-	static NullSpaceDLL::HandleCommand FlatbuffDecoder::Decode(const NullSpace::HapticFiles::HandleCommand* command) {
-		return NullSpaceDLL::HandleCommand(command->handle(), command->command());
-	}
 
-
-
-
-
+	
 
 
 	static NullSpace::Communication::SuitStatus FlatbuffDecoder::Decode(const NullSpace::Communication::SuitStatusUpdate* update) {
 		return update->status();
 	}
-	static NullSpaceDLL::InteropTrackingUpdate FlatbuffDecoder::Decode(const NullSpace::Communication::TrackingUpdate* update) {
-		NullSpaceDLL::InteropTrackingUpdate t;
+	static NSVR_TrackingUpdate FlatbuffDecoder::Decode(const NullSpace::Communication::TrackingUpdate* update) {
+		NSVR_TrackingUpdate t = {};
 
 
 		for (const auto& q : *update->quaternions()) {

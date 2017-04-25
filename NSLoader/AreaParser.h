@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include <string>
-#include "Wire\IntermediateHapticFormats.h"
+#include "AreaFlags.h"
 
 class AreaParser
 {

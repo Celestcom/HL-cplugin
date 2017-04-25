@@ -24,12 +24,6 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TestClass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DependencyResolver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Enums.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -40,9 +34,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HapticDirectoryTools.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="HapticFileInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HexUtils.h">
@@ -57,13 +48,7 @@
     <ClInclude Include="Locator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Parser.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NSLoader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ITimeOffset.h">
@@ -75,22 +60,82 @@
     <ClInclude Include="EnumTranslator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="zmq.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Wire\Wire.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Wire\EncodingOperations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Wire\IntermediateHapticFormats.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AreaParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Wire\FlatbuffDecoder.h">
+    <ClInclude Include="ClientMessenger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Encoder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IoService.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HapticsPlayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PriorityModel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IPlayable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HapticEventGenerator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayableEffect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HapticEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HapticQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NSLoader_fwds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EventList.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Event.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ParameterizedEvent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NSLoader_Internal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NSLoader_Errors.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaybackHandle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ExceptionSafeCall.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs\DriverCommand.pb.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MyTestLog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AreaFlags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SuitEvent.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -104,12 +149,6 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TestClass.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DependencyResolver.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="HapticCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -119,22 +158,13 @@
     <ClCompile Include="HapticDirectoryTools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="HapticFileInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="HexUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="jsoncpp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Loader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Locator.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Parser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="HapticArgs.cpp">
@@ -143,10 +173,67 @@
     <ClCompile Include="EnumTranslator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Wire\IntermediateHapticFormats.cpp">
+    <ClCompile Include="AreaParser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AreaParser.cpp">
+    <ClCompile Include="ClientMessenger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IoService.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HapticsPlayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HapticEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HapticEventGenerator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlayableEffect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="HapticQueue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PriorityModel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs\EffectCommand.pb.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs\DriverCommand.pb.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\Driver\SharedCommunication\ScheduledEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EventList.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Event.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ParameterizedEvent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="NSLoader_Internal.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PlaybackHandle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MyTestLog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SuitEvent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
