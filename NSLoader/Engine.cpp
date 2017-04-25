@@ -262,7 +262,7 @@ int Engine::PollLogs(NSVR_LogEntry * entry)
 {
 	if (auto logEntry = m_log->Poll()) {
 		auto str = *logEntry;
-		entry->Length = (uint32_t) str.length();
+		entry->Length = static_cast<uint32_t>(str.length());
 		strncpy_s(entry->Message, 512, str.c_str(), 512);
 		entry->Message[511] = '\0';
 		return NSVR_Success_Unqualified;
