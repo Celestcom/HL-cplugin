@@ -15,7 +15,7 @@ PatternArgs::~PatternArgs()
 {
 }
 
-int PatternArgs::GetCombinedHash() const
+std::size_t PatternArgs::GetCombinedHash() const 
 {
 	std::size_t s = 17;
     hash_combine(s, this->Name, this->Side);
@@ -30,7 +30,7 @@ SequenceArgs::~SequenceArgs()
 {
 }
 
-int SequenceArgs::GetCombinedHash() const
+std::size_t SequenceArgs::GetCombinedHash() const 
 {
 	std::size_t s = 17;
 	hash_combine(s, this->Name, this->Location, this->Strength);
@@ -45,7 +45,7 @@ ExperienceArgs::~ExperienceArgs()
 {
 }
 
-int ExperienceArgs::GetCombinedHash() const
+std::size_t ExperienceArgs::GetCombinedHash() const 
 {
 	std::size_t s = 17;
 	hash_combine(s, this->Name, this->Side);

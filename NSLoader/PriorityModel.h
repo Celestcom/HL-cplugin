@@ -2,7 +2,12 @@
 #include <unordered_map>
 #include "HapticQueue.h"
 #include "Enums.h"
+
+#pragma warning(push)
+#pragma warning(disable : 4267)
 #include "EffectCommand.pb.h"
+#pragma warning(pop)
+
 #include <mutex>
 class PriorityModel
 {

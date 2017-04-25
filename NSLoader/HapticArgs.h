@@ -19,7 +19,7 @@ public:
 	{
 	}
 
-	virtual int GetCombinedHash() const = 0;
+	virtual std::size_t GetCombinedHash() const = 0;
 	virtual std::string ToString() const = 0;
 
 };
@@ -31,7 +31,7 @@ public:
 	~PatternArgs();
 	Side Side;
 	std::string Name;
-	int GetCombinedHash() const override;
+	std::size_t GetCombinedHash() const override;
 	std::string ToString() const override {
 		return Name;
 	}
@@ -46,7 +46,7 @@ public:
 	AreaFlag Location;
 	float Strength;
 	std::string Name;
-	int GetCombinedHash() const override;
+	std::size_t GetCombinedHash() const override;
 	std::string ToString() const override {
 		return Name;
 	}
@@ -59,7 +59,7 @@ public:
 	~ExperienceArgs();
 	Side Side;
 	std::string Name;
-	int GetCombinedHash() const override;
+	std::size_t GetCombinedHash() const override;
 	std::string ToString() const override {
 		return Name;
 	}

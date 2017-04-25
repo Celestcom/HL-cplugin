@@ -178,8 +178,8 @@ bool Engine::EngineCommand(NSVR_EngineCommand command)
 
 int Engine::GetEngineStats(NSVR_SystemStats * stats)
 {
-	stats->NumLiveEffects = m_player.NumLiveEffects();
-	stats->NumOrphanedEffects = m_player.NumOrphanedEffects();
+	stats->NumLiveEffects = static_cast<unsigned int>(m_player.NumLiveEffects());
+	stats->NumOrphanedEffects = static_cast<unsigned int>(m_player.NumOrphanedEffects());
 	return NSVR_Success_Unqualified;
 }
 

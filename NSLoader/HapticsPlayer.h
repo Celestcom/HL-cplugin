@@ -35,8 +35,8 @@ public:
 
 	PriorityModel& GetModel();
 
-	int NumLiveEffects();
-	int NumOrphanedEffects();
+	std::size_t NumLiveEffects();
+	std::size_t NumOrphanedEffects();
 
 	void PlayAll();
 	void PauseAll();

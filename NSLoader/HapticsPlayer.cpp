@@ -101,12 +101,12 @@ PriorityModel & HapticsPlayer::GetModel()
 	return _model;
 }
 
-int HapticsPlayer::NumLiveEffects()
+std::size_t HapticsPlayer::NumLiveEffects()
 {
 	return _effects.size();
 }
 
-int HapticsPlayer::NumOrphanedEffects()
+std::size_t HapticsPlayer::NumOrphanedEffects()
 {
 	return _releasedEffects.size();
 }

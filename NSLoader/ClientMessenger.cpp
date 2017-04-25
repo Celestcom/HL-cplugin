@@ -2,7 +2,12 @@
 #include "ClientMessenger.h"
 //#include "Locator.h"
 #include <boost\bind.hpp>
+
+
+#pragma warning(push)
+#pragma warning(disable: 4267)
 #include "EffectCommand.pb.h"
+#pragma warning(pop)
 
 #include "NSLoader.h"
 

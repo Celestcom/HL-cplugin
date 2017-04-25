@@ -9,8 +9,11 @@
 #include <boost\asio.hpp>
 #include <boost\chrono.hpp>
 
+#pragma warning(push)
+#pragma warning(disable : 4267)
 #include "EffectCommand.pb.h"
 #include "DriverCommand.pb.h"
+#pragma warning(pop)
 
 typedef struct NSVR_ServiceInfo_ NSVR_ServiceInfo;
 class ClientMessenger
