@@ -2,12 +2,6 @@
 #include "Engine.h"
 #include "Enums.h"
 
-#include "Sequence_generated.h"
-#include "Pattern_generated.h"
-
-#include "HapticEffect_generated.h"
-#include "HapticFrame_generated.h"
-#include "HapticPacket_generated.h"
 #include <boost\bind.hpp>
 #include "EventList.h"
 #include "NSLoader_Internal.h"

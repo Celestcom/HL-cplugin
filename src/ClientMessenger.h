@@ -4,7 +4,7 @@
 #include "ReadableSharedObject.h"
 #include "WritableSharedQueue.h"
 #include "SharedTypes.h"
-#include "Encoder.h"
+//#include "Encoder.h"
 #include <boost\optional.hpp>
 #include <boost\asio.hpp>
 #include <boost\chrono.hpp>
@@ -70,7 +70,7 @@ private:
 	void startMonitorConnection();
 	void monitorConnection(const boost::system::error_code& ec);
 
-	Encoder m_encoder;
+//	Encoder m_encoder;
 
 	bool m_connectedToService;
 };

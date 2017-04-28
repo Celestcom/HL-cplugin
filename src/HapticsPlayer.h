@@ -8,6 +8,7 @@
 #include "HapticEventGenerator.h"
 #include "SuitEvent.h"
 #include <mutex>
+
 typedef unsigned int HapticHandle;
 
 //todo: all misnamed now; must be a generic EventPlayer
