@@ -10,7 +10,8 @@ using namespace std;
 HapticsPlayer::HapticsPlayer():
 	_model(), 
 	_paused(false),
-	_generator(_model)
+	_generator(_model),
+	m_effectsMutex()
 {
 	
 }
@@ -135,7 +136,7 @@ int compute(int p) {
 }
 std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 {
-	m_effectsMutex.lock();
+	std::lock_guard<std::mutex> lock_guard(m_effectsMutex);
 
 	
 	for (auto& effect : _effects) {
@@ -170,7 +171,6 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 	});
 	_releasedEffects.erase(toRemove, _releasedEffects.end());
 
-	m_effectsMutex.unlock();
 	///BUGG!!!! Try running the graph engine at full speed. Locking error?
 	return _model.Update(dt);
 }
@@ -228,6 +228,7 @@ void HapticsPlayer::ClearAll()
 
 boost::optional<const std::unique_ptr<IPlayable>&> HapticsPlayer::toInternalUUID(HapticHandle hh)
 {
+	
 	auto h = uuid_hasher(_outsideHandleToUUID[hh]);
 	if (_effects.find(h) != _effects.end()) {
 		return _effects.at(h);
