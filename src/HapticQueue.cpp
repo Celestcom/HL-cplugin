@@ -131,6 +131,17 @@ HapticEvent* HapticQueue::GetNextEvent()
 	return nullptr;
 }
 
+uint16_t HapticQueue::GetIntensity() const
+{
+	if (_queue.empty()) {
+		return 0;
+	}
+
+
+	const auto& top = _queue[0];
+	return static_cast<uint16_t>(top.second.Strength * 255);
+}
+
 
 
 

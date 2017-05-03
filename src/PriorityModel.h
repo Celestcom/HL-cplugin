@@ -28,6 +28,8 @@ public:
 	void Clean(Location loc);
 	boost::optional<boost::uuids::uuid> Put(AreaFlag area, HapticEvent e);
 	boost::optional<HapticEvent> Remove(AreaFlag area, boost::uuids::uuid e);
+
+	std::vector<std::pair<AreaFlag, uint16_t>> GetIntensities() const;
 private:
 	std::unordered_map<Location, HapticQueue> _model;
 	std::mutex m_modelMutex;

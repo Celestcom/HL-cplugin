@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "IoService.h"
-//#include "Wire\FlatbuffDecoder.h"
 #include "ClientMessenger.h"
 #include <boost\asio\deadline_timer.hpp>
 #include "HapticsPlayer.h"
@@ -44,6 +43,12 @@ public:
 	int DisableAudio();
 
 	int SubmitRawCommand(uint8_t* buffer, int length);
+
+	int Sample(uint16_t* strengths, uint32_t* areas, int length, int* resultCount);
+
+	int DumpDeviceDiagnostics();
+	int SetStrengths(uint16_t* strengths, uint32_t* areas, int length);
+
 private:
 	IoService m_ioService;
 	NSVR_TrackingUpdate m_cachedTracking;
@@ -53,7 +58,6 @@ private:
 	bool _isEnginePlaying;
 	ClientMessenger m_messenger;
 
-	//haptics playing 
 	HapticsPlayer m_player;
 
 	boost::asio::deadline_timer m_hapticsExecutionTimer;
@@ -64,7 +68,7 @@ private:
 
 	boost::shared_ptr<MyTestLog> m_log;
 
-public:
-	int DumpDeviceDiagnostics();
+
+	
 };
 

@@ -8,7 +8,7 @@
 
 
 //The null stuff should be put in one place probably
-//comment this line if you want to disable argument null checking. Profile really hard before doing this.
+//comment this line if you want to disable argument null checking. Think really hard before doing this.
 #define NULL_ARGUMENT_CHECKS
 
 
@@ -76,4 +76,38 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_System_DumpDeviceDiagnostics(NSVR_System*
 	return ExceptionGuard([&] {
 		return AS_TYPE(Engine, systemPtr)->DumpDeviceDiagnostics();
 	});
+}
+
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Sample(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, int length, int* resultCount )
+{
+	RETURN_IF_NULL(systemPtr);
+	RETURN_IF_NULL(strengths);
+	RETURN_IF_NULL(areas);
+	RETURN_IF_NULL(resultCount);
+
+	if (length < 16) {
+		return NSVR_Error_InvalidArgument;
+	}
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, systemPtr)->Sample(strengths, areas, length, resultCount);
+	});
+
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, int length)
+{
+	RETURN_IF_NULL(systemPtr);
+	RETURN_IF_NULL(strengths);
+	RETURN_IF_NULL(areas);
+
+	if (length < 0) {
+		return NSVR_Error_InvalidArgument;
+	}
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, systemPtr)->SetStrengths(strengths, areas, length);
+	});
+
 }

@@ -32,6 +32,11 @@ int Engine::DumpDeviceDiagnostics()
 	return NSVR_Success_Unqualified;
 }
 
+int Engine::SetStrengths(uint16_t* strengths, uint32_t* areas, int length)
+{
+	throw std::logic_error("The method or operation is not implemented.");
+}
+
 Engine::Engine() :
 
 	_isEnginePlaying(true),
@@ -75,6 +80,9 @@ Engine::Engine() :
 
 Engine::~Engine()
 {
+
+	boost::log::core::get()->remove_all_sinks();
+
 	try {
 		m_player.ClearAll();
 		std::this_thread::sleep_for(std::chrono::milliseconds(25));
@@ -301,6 +309,25 @@ int Engine::SubmitRawCommand(uint8_t * buffer, int length)
 	command.set_command(NullSpaceIPC::DriverCommand_Command_RAW_COMMAND);
 	command.set_raw_command(buffer, length);
 	m_messenger.WriteCommand(command);
+	return NSVR_Success_Unqualified;
+}
+
+int Engine::Sample(uint16_t * strengths, uint32_t * areas, int length, int * resultCount)
+{
+
+	std::vector<std::pair<AreaFlag, uint16_t>> intensities = m_player.GetIntensities();
+
+	for (std::size_t i = 0; i < intensities.size(); i++) {
+		AreaFlag loc = std::get<0>(intensities[i]);
+		uint16_t strength = std::get<1>(intensities[i]);
+
+		strengths[i] = strength;
+		areas[i] = static_cast<uint32_t>(loc);
+
+	}
+
+	*resultCount = intensities.size();
+
 	return NSVR_Success_Unqualified;
 }
 

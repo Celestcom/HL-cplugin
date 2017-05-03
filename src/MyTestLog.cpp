@@ -11,7 +11,7 @@ MyTestLog::MyTestLog()
 
 MyTestLog::~MyTestLog()
 {
-	m_readDriverLogs->Stop();
+	//m_readDriverLogs->Stop();
 }
 
 void MyTestLog::consume(const boost::log::record_view& msg)

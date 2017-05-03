@@ -106,6 +106,7 @@ EnumTranslator::EnumTranslator() {
 	init_json_locations();
 	init_areas();
 	init_familymap();
+	init_locarea_map();
 }
 
 AreaFlag EnumTranslator::ToArea(std::string area, AreaFlag defaultArea) const
@@ -134,6 +135,11 @@ uint32_t EnumTranslator::ToEffectFamily(std::string effectFamily) const
 std::string EnumTranslator::ToString(uint32_t effectFamily) const
 {
 	return _effectFamilyMap.right.at(effectFamily);
+}
+
+AreaFlag EnumTranslator::ToArea(Location loc) const
+{
+	return _locationAreaMap.left.at(loc);
 }
 
 EnumTranslator::~EnumTranslator()
@@ -194,6 +200,29 @@ void EnumTranslator::init_familymap()
 		("triple_click", 16)
 		("doom_buzz", 666);
 }
+
+void EnumTranslator::init_locarea_map()
+{
+	boost::assign::insert(_locationAreaMap)
+		(Location::Forearm_Left, AreaFlag::Forearm_Left)
+		(Location::Upper_Arm_Left, AreaFlag::Upper_Arm_Left)
+		(Location::Shoulder_Left, AreaFlag::Shoulder_Left)
+		(Location::Upper_Back_Left, AreaFlag::Back_Left)
+		(Location::Chest_Left, AreaFlag::Chest_Left)
+		(Location::Upper_Ab_Left, AreaFlag::Upper_Ab_Left)
+		(Location::Mid_Ab_Left, AreaFlag::Mid_Ab_Left)
+		(Location::Lower_Ab_Left, AreaFlag::Lower_Ab_Left)
+		(Location::Forearm_Right, AreaFlag::Forearm_Right)
+		(Location::Upper_Arm_Right, AreaFlag::Upper_Arm_Right)
+		(Location::Shoulder_Right, AreaFlag::Shoulder_Right)
+		(Location::Upper_Back_Right, AreaFlag::Back_Right)
+		(Location::Chest_Right, AreaFlag::Chest_Right)
+		(Location::Upper_Ab_Right, AreaFlag::Upper_Ab_Right)
+		(Location::Mid_Ab_Right, AreaFlag::Mid_Ab_Right)
+		(Location::Lower_Ab_Right, AreaFlag::Lower_Ab_Right);
+}
+
+
 void EnumTranslator::init_effects() {
 
 	boost::assign::insert(_effectMap)

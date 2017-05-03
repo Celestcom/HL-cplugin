@@ -116,7 +116,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -138,7 +138,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -160,7 +160,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -184,7 +184,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -241,14 +241,19 @@
     <ClInclude Include="..\src\zmq_addon.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\Driver\SharedCommunication\ScheduledEvent.cpp" />
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs\DriverCommand.pb.cc">
+    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\NS_Unreal_SDK\protobuff_defs\EffectCommand.pb.cc">
+    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\DriverCommand.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\EffectCommand.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>

@@ -42,6 +42,9 @@ public:
 	void PlayAll();
 	void PauseAll();
 	void ClearAll();
+
+
+	std::vector<std::pair<AreaFlag, uint16_t>> GetIntensities() const;
 	
 private:
 	boost::hash<boost::uuids::uuid> uuid_hasher;

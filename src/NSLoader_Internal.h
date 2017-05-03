@@ -3,7 +3,7 @@
 
 #include "NSLoader_fwds.h"
 
-
+#define INTERNAL_TOOL
 #ifdef INTERNAL_TOOL
 	#ifdef NSLOADER_EXPORTS
 	#define NSLOADER_INTERNAL_API __declspec(dllexport) 
@@ -48,6 +48,12 @@ extern "C" {
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_System_SubmitRawCommand(NSVR_System* system, uint8_t* buffer, int length);
 
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_System_DumpDeviceDiagnostics(NSVR_System* system);
+
+
+	/* Immediate API */
+
+	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Sample(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas,  int length, int* resultCount);
+	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, int length);
 
 #ifdef __cplusplus
 }

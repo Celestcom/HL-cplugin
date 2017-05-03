@@ -1,8 +1,30 @@
 #include "stdafx.h"
 #include "PriorityModel.h"
 #include "HapticEvent.h"
+#include "Locator.h"
 PriorityModel::PriorityModel()
 {
+	std::vector<Location> locs = {
+		Location::Forearm_Left,
+		Location::Upper_Arm_Left,
+		Location::Shoulder_Left,
+		Location::Upper_Back_Left,
+		Location::Chest_Left,
+		Location::Upper_Ab_Left,
+		Location::Mid_Ab_Left,
+		Location::Lower_Ab_Left,
+		Location::Forearm_Right,
+		Location::Upper_Arm_Right,
+		Location::Shoulder_Right,
+		Location::Upper_Back_Right,
+		Location::Chest_Right,
+		Location::Upper_Ab_Right,
+		Location::Mid_Ab_Right,
+		Location::Lower_Ab_Right,
+	};
+	for (Location loc : locs) {
+		_model[loc] = HapticQueue();
+	}
 }
 
 
@@ -139,6 +161,34 @@ boost::optional<HapticEvent> PriorityModel::Remove(AreaFlag area, boost::uuids::
 }
 
 
+
+std::vector<std::pair<AreaFlag, uint16_t>> PriorityModel::GetIntensities() const
+{
+	std::vector<Location> locs = {
+		Location::Forearm_Left,
+		Location::Upper_Arm_Left,
+		Location::Shoulder_Left,
+		Location::Upper_Back_Left,
+		Location::Chest_Left,
+		Location::Upper_Ab_Left,
+		Location::Mid_Ab_Left,
+		Location::Lower_Ab_Left,
+		Location::Forearm_Right,
+		Location::Upper_Arm_Right,
+		Location::Shoulder_Right,
+		Location::Upper_Back_Right,
+		Location::Chest_Right,
+		Location::Upper_Ab_Right,
+		Location::Mid_Ab_Right,
+		Location::Lower_Ab_Right,
+	};
+
+	std::vector<std::pair<AreaFlag, uint16_t>> intensities;
+	for (Location loc : locs) {
+		intensities.push_back(std::make_pair(Locator::getTranslator().ToArea(loc), _model.at(loc).GetIntensity()));
+	}
+	return intensities;
+}
 
 boost::optional<boost::uuids::uuid> PriorityModel::Put(AreaFlag area, HapticEvent e)
 {

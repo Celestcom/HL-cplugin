@@ -17,9 +17,9 @@ project "Plugin"
 	
 	-- dependencies
 	protobuf_incl_dir = "D:/protobuf-3.0.0/cmake/build/solution/include"
-	shared_comms_incl_dir = "C:/Users/NullSpace Team/Documents/NS_Unreal_SDK/Driver/SharedCommunication"
+	shared_comms_incl_dir = "C:/Users/NullSpace Team/Documents/NS_Unreal_SDK/src/Driver/SharedCommunication"
 	boost_incl_dir = "D:/Libraries/boost/boost_1_61_0"
-	protobuf_def_incl_dir = "C:/Users/NullSpace Team/Documents/NS_Unreal_SDK/NS_Unreal_SDK/protobuff_defs"
+	protobuf_def_incl_dir = "C:/Users/NullSpace Team/Documents/NS_Unreal_SDK/src/Driver/protobuff_defs"
 		disablewarnings {"4800"}
 
 
@@ -66,6 +66,7 @@ project "Plugin"
 	filter {"files:**.pb.cc"}
 		flags {'NoPCH'}
 	filter {"files:**ScheduledEvent.cpp"}
+		flags {'NoPCH'}
 
 
 	-- input: libprotobuf
