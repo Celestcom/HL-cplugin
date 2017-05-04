@@ -19,7 +19,7 @@ boost::optional<boost::uuids::uuid> HapticQueue::Put(unsigned int priority, Hapt
 	assert(pair.second.Handle == effect.Handle);
 	if (_queue.size() == 0)
 	{
-		//std::cout << "Adding effect " << int(effect.Effect) << " to queue" << "\n";
+		//std::cout << "Adding effect " << int(effect.RequestedEffectFamily) << " to queue" << "\n";
 		_queue.push_back(pair);
 		if (effect.DurationType() != Duration::OneShot) {
 			return effect.Handle;
@@ -33,13 +33,13 @@ boost::optional<boost::uuids::uuid> HapticQueue::Put(unsigned int priority, Hapt
 		auto iter = std::lower_bound(_queue.begin(), _queue.end(), pair, [](const PriorityPair& lhs, const PriorityPair& rhs) {
 			return lhs.first < rhs.first;
 		});
-		//std::cout << "Adding effect " << int(effect.Effect) << " to queue" << "\n";
+		//std::cout << "Adding effect " << int(effect.RequestedEffectFamily) << " to queue" << "\n";
 
 		_queue.insert(iter, pair);
 		return effect.Handle;
 	}
 	else {
-		//std::cout << "NOT ADDING " << int(effect.Effect) << " to queue" << "\n";
+		//std::cout << "NOT ADDING " << int(effect.RequestedEffectFamily) << " to queue" << "\n";
 		return boost::optional<boost::uuids::uuid>();
 	}
 }
@@ -131,16 +131,15 @@ HapticEvent* HapticQueue::GetNextEvent()
 	return nullptr;
 }
 
-uint16_t HapticQueue::GetIntensity() const
+boost::optional<HapticEvent> HapticQueue::PeekNextEvent() const
 {
 	if (_queue.empty()) {
-		return 0;
+		return boost::optional<HapticEvent>();
 	}
 
-
-	const auto& top = _queue[0];
-	return static_cast<uint16_t>(top.second.Strength * 255);
+	return _queue.at(0).second;
 }
+
 
 
 

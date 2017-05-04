@@ -13,7 +13,7 @@ class HapticEventGenerator
 public:
 	HapticEventGenerator(PriorityModel& model);
 	~HapticEventGenerator();
-	void NewEvent(AreaFlag area, float duration, std::string effect, float strength, boost::uuids::uuid id);
+	void NewEvent(AreaFlag area, float duration, uint32_t effect, float strength, boost::uuids::uuid id);
 	void Resume(boost::uuids::uuid id);
 	void Pause(boost::uuids::uuid id);
 	void Remove(boost::uuids::uuid id);

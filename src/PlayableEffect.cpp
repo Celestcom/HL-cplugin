@@ -198,7 +198,7 @@ EventExecutor::EventExecutor(boost::uuids::uuid & id, HapticEventGenerator& basi
 
 void EventExecutor::operator()(BasicHapticEvent & h)
 {
-	m_basicHapticGenerator.NewEvent(AreaFlag(h.Area), h.Duration, h.Effect, h.Strength, m_id);
+	m_basicHapticGenerator.NewEvent(AreaFlag(h.Area), h.Duration, h.RequestedEffectFamily, h.Strength, m_id);
 }
 
 TotalPlaytimeVisitor::TotalPlaytimeVisitor():

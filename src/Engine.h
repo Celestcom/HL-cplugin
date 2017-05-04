@@ -44,7 +44,7 @@ public:
 
 	int SubmitRawCommand(uint8_t* buffer, int length);
 
-	int Sample(uint16_t* strengths, uint32_t* areas, int length, int* resultCount);
+	int Sample(uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount);
 
 	int DumpDeviceDiagnostics();
 	int SetStrengths(uint16_t* strengths, uint32_t* areas, int length);

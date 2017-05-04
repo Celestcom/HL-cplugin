@@ -221,9 +221,9 @@ void HapticsPlayer::ClearAll()
 	_releasedEffects.clear();
 }
 
-std::vector<std::pair<AreaFlag, uint16_t>> HapticsPlayer::GetIntensities() const
+std::vector<PriorityModel::EffectInfo> HapticsPlayer::GetEffectInfo() const
 {
-	return _model.GetIntensities();
+	return _model.GetEffectInfo();
 }
 
 

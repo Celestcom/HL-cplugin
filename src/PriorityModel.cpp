@@ -162,7 +162,7 @@ boost::optional<HapticEvent> PriorityModel::Remove(AreaFlag area, boost::uuids::
 
 
 
-std::vector<std::pair<AreaFlag, uint16_t>> PriorityModel::GetIntensities() const
+std::vector<PriorityModel::EffectInfo> PriorityModel::GetEffectInfo() const
 {
 	std::vector<Location> locs = {
 		Location::Forearm_Left,
@@ -183,9 +183,14 @@ std::vector<std::pair<AreaFlag, uint16_t>> PriorityModel::GetIntensities() const
 		Location::Lower_Ab_Right,
 	};
 
-	std::vector<std::pair<AreaFlag, uint16_t>> intensities;
+	std::vector<EffectInfo> intensities;
 	for (Location loc : locs) {
-		intensities.push_back(std::make_pair(Locator::getTranslator().ToArea(loc), _model.at(loc).GetIntensity()));
+		
+		if (auto optionalEvent = _model.at(loc).PeekNextEvent()) {
+			auto realEvent = *optionalEvent;
+			intensities.push_back(EffectInfo(static_cast<uint16_t>(realEvent.Strength * 255), realEvent.Effect, Locator::getTranslator().ToArea(loc)));
+		}
+		
 	}
 	return intensities;
 }

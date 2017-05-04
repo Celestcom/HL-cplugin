@@ -52,7 +52,7 @@ extern "C" {
 
 	/* Immediate API */
 
-	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Sample(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas,  int length, int* resultCount);
+	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Sample(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount);
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, int length);
 
 #ifdef __cplusplus

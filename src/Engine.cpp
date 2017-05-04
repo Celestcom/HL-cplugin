@@ -312,21 +312,22 @@ int Engine::SubmitRawCommand(uint8_t * buffer, int length)
 	return NSVR_Success_Unqualified;
 }
 
-int Engine::Sample(uint16_t * strengths, uint32_t * areas, int length, int * resultCount)
+int Engine::Sample(uint16_t * strengths, uint32_t * areas, uint32_t* families, int length, unsigned int * resultCount)
 {
 
-	std::vector<std::pair<AreaFlag, uint16_t>> intensities = m_player.GetIntensities();
+	std::vector<PriorityModel::EffectInfo> effectInfo = m_player.GetEffectInfo();
 
-	for (std::size_t i = 0; i < intensities.size(); i++) {
-		AreaFlag loc = std::get<0>(intensities[i]);
-		uint16_t strength = std::get<1>(intensities[i]);
-
-		strengths[i] = strength;
-		areas[i] = static_cast<uint32_t>(loc);
+	std::size_t max_num_effects = std::min<std::size_t>(length, effectInfo.size());
+	for (std::size_t i = 0; i < max_num_effects; i++) {
+		const auto& effect = effectInfo[i];
+	
+		strengths[i] = effect.strength;
+		families[i] = effect.family;
+		areas[i] = static_cast<uint32_t>(effect.area);
 
 	}
 
-	*resultCount = intensities.size();
+	*resultCount = effectInfo.size();
 
 	return NSVR_Success_Unqualified;
 }

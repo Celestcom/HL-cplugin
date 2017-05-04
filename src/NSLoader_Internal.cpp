@@ -79,7 +79,7 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_System_DumpDeviceDiagnostics(NSVR_System*
 }
 
 
-NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Sample(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, int length, int* resultCount )
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Sample(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount)
 {
 	RETURN_IF_NULL(systemPtr);
 	RETURN_IF_NULL(strengths);
@@ -91,7 +91,7 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Sample(NSVR_System* systemPtr, 
 	}
 
 	return ExceptionGuard([&] {
-		return AS_TYPE(Engine, systemPtr)->Sample(strengths, areas, length, resultCount);
+		return AS_TYPE(Engine, systemPtr)->Sample(strengths, areas, families, length, resultCount);
 	});
 
 }
