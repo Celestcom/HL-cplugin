@@ -6,12 +6,15 @@ Time(time),
 Strength(strength),
 Duration(duration),
 Area(area),
-Effect(effect)
+ParsedEffectFamily(effect)
 
 {}
 
-BasicHapticEvent::BasicHapticEvent() : ParameterizedEvent(), Time(0), Strength(1), Duration(0), Area(0), Effect("click")
+BasicHapticEvent::BasicHapticEvent() : ParameterizedEvent(), Time(0), Strength(1), Duration(0), Area(0)
 {
+	ParsedEffectFamily = "click";
+	RequestedEffectFamily = Locator::getTranslator().ToEffectFamily(ParsedEffectFamily);
+
 }
 
 
@@ -41,8 +44,9 @@ bool BasicHapticEvent::doSetInt(const char * key, int value)
 		return true;
 	}
 	else if (strcmp("effect", key) == 0) {
-		std::string effect = Locator::getTranslator().ToString(uint32_t(value));
-		this->Effect = effect;
+		std::string effect = Locator::getTranslator().ToString(value);
+		this->ParsedEffectFamily = effect;
+		this->RequestedEffectFamily = value;
 		return true;
 	}
 

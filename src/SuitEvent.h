@@ -7,7 +7,8 @@ struct BasicHapticEvent : public ParameterizedEvent {
 	float Strength;
 	float Duration;
 	uint32_t Area;
-	std::string Effect;
+	std::string ParsedEffectFamily;
+	uint32_t RequestedEffectFamily;
 	BasicHapticEvent(float time, float strength, float duration, uint32_t area, std::string effect);
 	BasicHapticEvent();
 	bool doSetFloat(const char* key, float value) override;

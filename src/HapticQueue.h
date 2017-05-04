@@ -16,7 +16,8 @@ public:
 	void Clear();
 	boost::optional<HapticEvent> Remove(boost::uuids::uuid);
 	HapticEvent* GetNextEvent();
-	uint16_t GetIntensity() const;
+	
+	boost::optional<HapticEvent> PeekNextEvent() const;
 	
 private:
 	//todo: CHANGE PRIORITY MULTIPLICATION!!
