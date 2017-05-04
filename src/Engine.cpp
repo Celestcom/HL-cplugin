@@ -228,6 +228,7 @@ int Engine::CreateEffect(EventList * list, uint32_t handle)
 		return -1;
 	}
 
+
 	m_player.Create(handle, list->Events());
 	return 1;
 
