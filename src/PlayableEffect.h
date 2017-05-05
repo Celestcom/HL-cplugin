@@ -3,6 +3,8 @@
 #include "HapticEvent.h"
 #include "HapticEventGenerator.h"
 #include "SuitEvent.h"
+#include "EventRegistry.h"
+#include <set>
 #include <boost\uuid\random_generator.hpp>
 
 namespace NS {
@@ -17,10 +19,9 @@ class EventExecutor : public boost::static_visitor<> {
 private:
 	//Main ID of the effect
 	boost::uuids::uuid& m_id;
-	//all generators listed here. For now, we only have basic haptic effects.
-	HapticEventGenerator& m_basicHapticGenerator;
+	EventRegistry& m_registry;
 public:
-	EventExecutor(boost::uuids::uuid& id, HapticEventGenerator& basicHapticGenerator);
+	EventExecutor(boost::uuids::uuid& id, EventRegistry& registry);
 
 	void operator()(BasicHapticEvent& hapticEvent);
 };
@@ -61,7 +62,7 @@ class PlayableEffect :
 public:
 	
 	//Precondition: the vector is not empty
-	PlayableEffect(std::vector<SuitEvent> effects, HapticEventGenerator& gen, boost::uuids::random_generator&);
+	PlayableEffect(std::vector<SuitEvent> effects, EventRegistry& reg, boost::uuids::random_generator&);
 	~PlayableEffect();
 
 	void Play() override;
@@ -85,8 +86,9 @@ private:
 	PlaybackState _state;
 
 	float _time;
-	HapticEventGenerator& _gen;
-
+	EventRegistry& m_registry;
+	
+	std::set<std::weak_ptr<HardwareDriver>> m_activeDrivers;
 	std::vector<SuitEvent>::iterator _lastExecutedEffect;
 	std::vector<SuitEvent> _effects;
 	boost::uuids::uuid _id;

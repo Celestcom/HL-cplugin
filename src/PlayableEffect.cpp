@@ -4,6 +4,7 @@
 #include <iostream>
 #include "SuitEvent.h"
 #include "PriorityModel.h"
+#include "NSLoader.h"
 #include <iterator>
 namespace NS {
 	namespace Playable {
@@ -14,10 +15,10 @@ namespace NS {
 	}
 }
 
-PlayableEffect::PlayableEffect(std::vector<SuitEvent> effects, HapticEventGenerator& gen, boost::uuids::random_generator& uuid) :
+PlayableEffect::PlayableEffect(std::vector<SuitEvent> effects,EventRegistry& reg, boost::uuids::random_generator& uuid) :
 	_effects(std::move(effects)),
 	_state(PlaybackState::IDLE),
-	_gen(gen),
+	m_registry(reg),
 	_id(uuid())
 {
 	assert(!_effects.empty());
@@ -28,12 +29,8 @@ PlayableEffect::PlayableEffect(std::vector<SuitEvent> effects, HapticEventGenera
 
 PlayableEffect::~PlayableEffect()
 {
-	try {
-		_gen.Remove(_id);
-	}
-	catch (const std::exception&) {
-		//todo: NEED TO LOG
-	}
+	//shouldn't have to do this anymore if you call Stop first
+	//if necessary, we go through activeConsumers and stop everything
 }
 
 void PlayableEffect::Play()
@@ -109,24 +106,24 @@ void PlayableEffect::Update(float dt)
 	//this visitor returns true if the event is expired and should be executed
 	EventVisitor isTimeExpired(_time);
 
-	//this visitor actually executes the event
-	EventExecutor executeEvent(_id, _gen);
+	
 
 
 	while (current != _effects.end()) {
 		if (boost::apply_visitor(isTimeExpired, *current)) {
-			boost::apply_visitor(executeEvent, *current);
+			//region = *current->region;
+			auto consumers = m_registry.GetEventDrivers("body"); //placeholder
+			std::for_each(consumers->begin(), consumers->end(), [](auto& consumer) {
+				
+				consumer->createRetained(m_id, *current);
+				m_activeDrivers.insert(std::weak_ptr<HapticDriver>(consumer));
+			});
 			std::advance(current, 1);
 		}
 		else {
 			
 			break;
 		}
-//		else {
-			//_lastExecutedEffect = current; //<-- this is a noop? confirm
-		//	break;
-	//	}
-	
 	}
 
 	_lastExecutedEffect = current;
@@ -164,23 +161,60 @@ PlayableInfo PlayableEffect::GetInfo() const
 
 void PlayableEffect::Release()
 {
-	_gen.Remove(_id);
+	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
+		try {
+			auto p = hd.lock();
+			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
+		}
+		catch (std::bad_weak_ptr) {
+			//the driver was removed, probably physically, so we don't need to worry about it
+		}
+	});
 }
 
 void PlayableEffect::reset()
 {
 	_time = 0;
 	_lastExecutedEffect = _effects.begin();
-	_gen.Remove(_id);
+	
+
+	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
+		try {
+			auto p = hd.lock();
+			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
+		}
+		catch (std::bad_weak_ptr) {
+			//the driver was removed, probably physically, so we don't need to worry about it
+		}
+	});
 }
 
 void PlayableEffect::pause()
 {
-	_gen.Pause(_id);
+	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
+		try {
+			auto p = hd.lock();
+			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Pause);
+		}
+		catch (std::bad_weak_ptr) {
+			//the driver was removed, probably physically, so we don't need to worry about it
+		}
+	});
 }
 
 void PlayableEffect::resume() {
-	_gen.Resume(_id);
+	//Now here's an interesting case. What if they unplug and switch suits with an effect paused? We want to resume on the new hardware right?
+	//So if we fail to obtain the ptr, we should probably re-try to put this on a new set of drivers! But not now.
+
+	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
+		try {
+			auto p = hd.lock();
+			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Play);
+		}
+		catch (std::bad_weak_ptr) {
+			//the driver was removed, probably physically, so we don't need to worry about it
+		}
+	});
 }
 
 
@@ -190,15 +224,16 @@ EventVisitor::EventVisitor(float time):m_time(time)
 
 }
 
-EventExecutor::EventExecutor(boost::uuids::uuid & id, HapticEventGenerator& basicGen):
+EventExecutor::EventExecutor(boost::uuids::uuid & id, EventRegistry& registry):
 	m_id(id), 
-	m_basicHapticGenerator(basicGen)
+	m_registry(registry)
 {
 }
 
 void EventExecutor::operator()(BasicHapticEvent & h)
 {
-	m_basicHapticGenerator.NewEvent(AreaFlag(h.Area), h.Duration, h.RequestedEffectFamily, h.Strength, m_id);
+	auto consumers = m_registry.GetEventDrivers("body"); // todo: needs actual region
+//	std::for_each(consumers->begin(), consumers->end(), [](auto& consumer) {consumer->createRetained()}
 }
 
 TotalPlaytimeVisitor::TotalPlaytimeVisitor():

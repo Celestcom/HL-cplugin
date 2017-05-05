@@ -1,15 +1,9 @@
 #pragma once
-#include <vector>
-#include "SuitEvent.h"
-#include "NSLoader_fwds.h"
+#include "EventRegistry.h"
 
-struct ImmediateArgs {
-	uint32_t location;
-	float strength;
-};
+
 class IHapticDevice {
 public:
-	virtual void CreateRetained(uint32_t handle, std::vector<SuitEvent> events) {}
-	virtual void ControlRetained(uint32_t handle, NSVR_PlaybackCommand command) {}
-	virtual void Immediate(const std::vector<ImmediateArgs>& args) {}
+	virtual void RegisterDrivers(EventRegistry& registry) = 0;
+	virtual void UnregisterDrivers(EventRegistry& registry) = 0;
 };
