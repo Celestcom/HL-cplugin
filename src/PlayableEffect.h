@@ -7,6 +7,13 @@
 #include <set>
 #include <boost\uuid\random_generator.hpp>
 
+
+template<typename T>
+struct weak_ptr_less_than {
+	bool operator() (const std::weak_ptr<T>& lhs, const std::weak_ptr<T>& rhs) const {
+		return lhs.expired() || (!rhs.expired() && *lhs.lock() < *rhs.lock());
+	}
+};
 namespace NS {
 	namespace Playable {
 		//implements Restart by calling Stop() followed by Play()
@@ -88,7 +95,7 @@ private:
 	float _time;
 	EventRegistry& m_registry;
 	
-	std::set<std::weak_ptr<HardwareDriver>> m_activeDrivers;
+	std::set<std::weak_ptr<HardwareDriver>,weak_ptr_less_than<HardwareDriver>> m_activeDrivers;
 	std::vector<SuitEvent>::iterator _lastExecutedEffect;
 	std::vector<SuitEvent> _effects;
 	boost::uuids::uuid _id;

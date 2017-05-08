@@ -11,7 +11,8 @@
 #include <boost/log/sinks/sync_frontend.hpp>
 #include <boost/log/trivial.hpp>
 #include "MyTestLog.h"
-
+#include "IHapticDevice.h"
+#include "HardlightDevice.h"
 void Engine::executeTimestep()
 {
 	
@@ -42,7 +43,8 @@ Engine::Engine() :
 	_isEnginePlaying(true),
 	m_ioService(),
 	m_messenger(m_ioService.GetIOService()),
-	m_player(),
+	m_registry(),
+	m_player(m_registry),
 	_currentHandleId(0),
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
 	m_hapticsExecutionTimer(m_ioService.GetIOService()),
@@ -74,6 +76,9 @@ Engine::Engine() :
 
 	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
+
+	auto hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
+	hardlightSuit->RegisterDrivers(m_registry);
 }
 
 
@@ -328,7 +333,7 @@ int Engine::Sample(uint16_t * strengths, uint32_t * areas, uint32_t* families, i
 
 	}
 
-	*resultCount = effectInfo.size();
+	*resultCount = static_cast<unsigned int>(effectInfo.size());
 
 	return NSVR_Success_Unqualified;
 }

@@ -113,10 +113,10 @@ void PlayableEffect::Update(float dt)
 		if (boost::apply_visitor(isTimeExpired, *current)) {
 			//region = *current->region;
 			auto consumers = m_registry.GetEventDrivers("body"); //placeholder
-			std::for_each(consumers->begin(), consumers->end(), [](auto& consumer) {
+			std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
 				
-				consumer->createRetained(m_id, *current);
-				m_activeDrivers.insert(std::weak_ptr<HapticDriver>(consumer));
+				consumer->createRetained(_id, *current);
+				m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
 			});
 			std::advance(current, 1);
 		}

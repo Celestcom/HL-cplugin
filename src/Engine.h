@@ -57,6 +57,7 @@ private:
 	std::string _currentError;
 	bool _isEnginePlaying;
 	ClientMessenger m_messenger;
+	EventRegistry m_registry;
 
 	HapticsPlayer m_player;
 
@@ -67,6 +68,7 @@ private:
 	ScheduledEvent m_hapticsTimestep;
 
 	boost::shared_ptr<MyTestLog> m_log;
+
 
 
 	

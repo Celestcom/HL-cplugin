@@ -7,11 +7,12 @@
 using namespace std;
 
 
-HapticsPlayer::HapticsPlayer():
+HapticsPlayer::HapticsPlayer(EventRegistry& registry):
 	_model(), 
 	_paused(false),
 	_generator(_model),
-	m_effectsMutex()
+	m_effectsMutex(),
+	m_registry(registry)
 {
 	
 }
@@ -84,7 +85,7 @@ void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
 	if (_outsideHandleToUUID.find(h) != _outsideHandleToUUID.end()) {
 		auto id = _outsideHandleToUUID[h];
 		_effects[uuid_hasher(id)]->Stop();
-		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), _generator, _uuidGen));
+		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), m_registry, _uuidGen));
 
 	}
 	else {
@@ -92,7 +93,7 @@ void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
 
 		_outsideHandleToUUID[h] = id;
 
-		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), _generator, _uuidGen));
+		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), m_registry, _uuidGen));
 	}
 
 }
