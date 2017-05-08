@@ -18,8 +18,10 @@ void Engine::executeTimestep()
 	
 	constexpr auto fraction_of_second = (1.0f / 1000.f);
 	auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
-	auto effectCommands = m_player.Update(dt);
-	for (const auto& command : effectCommands) {
+	
+	auto commands = m_hardlightSuit->GenerateHardwareCommands(dt);
+	
+	for (const auto& command : commands) {
 		m_messenger.WriteHaptics(command);
 	}
 	
@@ -52,16 +54,7 @@ Engine::Engine() :
 	m_cachedTracking({})
 {
 
-	m_hapticsTimestep.SetEvent([this]() {
-		try {
-			executeTimestep();
-		}
-		catch (const std::exception& e) {
-			BOOST_LOG_TRIVIAL(error) << "[PluginMain] Fatal error executing timestep: " << e.what();
-
-		}
-	});
-	m_hapticsTimestep.Start();
+	
 
 	using namespace boost::log;
 	m_log = boost::make_shared<MyTestLog>();
@@ -77,8 +70,20 @@ Engine::Engine() :
 	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
 
-	auto hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
-	hardlightSuit->RegisterDrivers(m_registry);
+	m_hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
+	m_hardlightSuit->RegisterDrivers(m_registry);
+
+
+	m_hapticsTimestep.SetEvent([this]() {
+		try {
+			executeTimestep();
+		}
+		catch (const std::exception& e) {
+			BOOST_LOG_TRIVIAL(error) << "[PluginMain] Fatal error executing timestep: " << e.what();
+
+		}
+	});
+	m_hapticsTimestep.Start();
 }
 
 

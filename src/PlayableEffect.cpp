@@ -108,16 +108,20 @@ void PlayableEffect::Update(float dt)
 
 	
 
-
+	
 	while (current != _effects.end()) {
 		if (boost::apply_visitor(isTimeExpired, *current)) {
 			//region = *current->region;
-			auto consumers = m_registry.GetEventDrivers("body"); //placeholder
-			std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
-				
-				consumer->createRetained(_id, *current);
-				m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
-			});
+			std::vector<std::string> regions = boost::apply_visitor(RegionVisitor(), *current);
+			for (const auto& region : regions) {
+				auto consumers = m_registry.GetEventDrivers(region); //placeholder
+				//need translator from registry's leaves to area flags for backwards compat?
+				std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
+
+					consumer->createRetained(_id, *current);
+					m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
+				});
+			}
 			std::advance(current, 1);
 		}
 		else {
@@ -245,4 +249,70 @@ TotalPlaytimeVisitor::TotalPlaytimeVisitor():
 float TotalPlaytimeVisitor::TotalPlaytime()
 {
 	return m_totalPlaytime;
+}
+
+RegionVisitor::RegionVisitor()
+{
+}
+#define START_BITMASK_SWITCH(x) \
+for (uint32_t bit = 1; x >= bit; bit *=2) if (x & bit) switch(AreaFlag(bit))
+
+std::vector<std::string> RegionVisitor::operator()(const BasicHapticEvent & event) const
+{
+	auto translator = Locator::getTranslator();
+	std::vector<std::string> regions;
+	START_BITMASK_SWITCH(event.Area) {
+		case AreaFlag::Forearm_Left:
+			regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Left));
+			break;
+		case AreaFlag::Upper_Arm_Left:
+			regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Left));
+			break;
+		case AreaFlag::Shoulder_Left:
+			regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Left));
+			break;
+		case AreaFlag::Back_Left:
+			regions.push_back(translator.ToRegionString(AreaFlag::Back_Left));
+			break;
+		case AreaFlag::Chest_Left:
+			regions.push_back(translator.ToRegionString(AreaFlag::Chest_Left));
+			break;
+		case AreaFlag::Upper_Ab_Left:
+			regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Left));
+			break;
+		case AreaFlag::Mid_Ab_Left:
+			regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Left));
+			break;
+		case AreaFlag::Lower_Ab_Left:
+			regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Left));
+			break;
+		case AreaFlag::Forearm_Right:
+			regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Right));
+			break;
+		case AreaFlag::Upper_Arm_Right:
+			regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Right));
+			break;
+		case AreaFlag::Shoulder_Right:
+			regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Right));
+			break;
+		case AreaFlag::Back_Right:
+			regions.push_back(translator.ToRegionString(AreaFlag::Back_Right));
+			break;
+		case AreaFlag::Chest_Right:
+			regions.push_back(translator.ToRegionString(AreaFlag::Chest_Right));
+			break;
+		case AreaFlag::Upper_Ab_Right:
+			regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Right));
+			break;
+		case AreaFlag::Mid_Ab_Right:
+			regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Right));
+			break;
+		case AreaFlag::Lower_Ab_Right:
+			regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Right));
+			break;
+		default:
+			break;
+	}
+
+	return regions;
 }

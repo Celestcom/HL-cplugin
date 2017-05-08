@@ -10,6 +10,7 @@
 #include "EventList.h"
 #include "NSLoader.h"
 #include "MyTestLog.h"
+#include "IHapticDevice.h"
 #include "NSLoader_Internal.h"
 #pragma pack(1)
 
@@ -59,6 +60,7 @@ private:
 	ClientMessenger m_messenger;
 	EventRegistry m_registry;
 
+	std::unique_ptr<IHapticDevice> m_hardlightSuit;
 	HapticsPlayer m_player;
 
 	boost::asio::deadline_timer m_hapticsExecutionTimer;

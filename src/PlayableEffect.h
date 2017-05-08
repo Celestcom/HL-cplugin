@@ -63,6 +63,13 @@ public:
 };
 
 
+class RegionVisitor : public boost::static_visitor<std::vector<std::string>> {
+private:
+public:
+	RegionVisitor();
+	std::vector<std::string> operator()(const BasicHapticEvent& event) const;
+};
+
 class PlayableEffect :
 	public IPlayable
 {

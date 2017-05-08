@@ -122,11 +122,29 @@ void HardlightDevice::UnregisterDrivers(EventRegistry& registry)
 {
 	//remove event drivers
 }
-void Hardlight_Mk3_ZoneDriver::update(float dt)
+
+CommandBuffer HardlightDevice::GenerateHardwareCommands(float dt)
 {
-	for (auto& event : m_events) {
-		event.event->Update(dt);
+	CommandBuffer result;
+	auto cl = chestLeft->update(dt);
+	result.insert(result.begin(), cl.begin(), cl.end());
+	return result;
+		
+}
+
+CommandBuffer Hardlight_Mk3_ZoneDriver::update(float dt)
+{
+	if (m_events.empty()) {
+		return CommandBuffer();
 	}
+	//since m_events is a stack-like structure, we only care about returning the events of the top level item
+
+	for (std::size_t i = 0; i < m_events.size() - 1 ; i++) {
+			m_events[i].event->Update(dt);
+	}
+	
+	return m_events.back().event->Update(dt);
+
 }
 
 

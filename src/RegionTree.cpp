@@ -27,6 +27,9 @@ RegionTree::RegionTree() : m_root(nullptr, "body")
 	auto left_arm = addChild(*left, "left_arm");
 	auto right_arm = addChild(*right, "right_arm");
 
+	addChild(*left, "left_shoulder");
+	addChild(*right, "right_shoulder");
+
 	addChild(*left_arm, "left_upper_arm");
 	addChild(*left_arm, "left_forearm");
 

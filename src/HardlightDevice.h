@@ -8,7 +8,6 @@
 #include <boost/uuid/uuid.hpp>
 
 
-typedef std::vector<NullSpaceIPC::EffectCommand> CommandBuffer;
 
 class GeneratedEvent {
 public:
@@ -23,7 +22,7 @@ public:
 class Hardlight_Mk3_ZoneDriver : public HardwareDriver {
 public:
 	std::vector<GeneratedEvent> m_events;
-	void update(float dt);
+	CommandBuffer update(float dt);
 
 	virtual boost::uuids::uuid Id() const override;
 	Hardlight_Mk3_ZoneDriver();
@@ -44,6 +43,9 @@ public:
 
 
 	virtual void UnregisterDrivers(EventRegistry& registry) override;
+
+
+	virtual CommandBuffer GenerateHardwareCommands(float dt) override;
 
 private:
 	std::shared_ptr<Hardlight_Mk3_ZoneDriver> chestLeft;

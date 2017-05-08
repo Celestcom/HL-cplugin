@@ -135,7 +135,7 @@ bool EffectIsExpired(const std::unique_ptr<IPlayable> &p, bool isGlobalPause) {
 int compute(int p) {
 	return p * 123123;
 }
-std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
+void HapticsPlayer::Update(float dt)
 {
 	std::lock_guard<std::mutex> lock_guard(m_effectsMutex);
 
@@ -173,7 +173,7 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 	_releasedEffects.erase(toRemove, _releasedEffects.end());
 
 	///BUGG!!!! Try running the graph engine at full speed. Locking error?
-	return _model.Update(dt);
+
 }
 
 

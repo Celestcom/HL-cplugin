@@ -107,6 +107,7 @@ EnumTranslator::EnumTranslator() {
 	init_areas();
 	init_familymap();
 	init_locarea_map();
+	init_regions();
 }
 
 AreaFlag EnumTranslator::ToArea(std::string area, AreaFlag defaultArea) const
@@ -140,6 +141,11 @@ std::string EnumTranslator::ToString(uint32_t effectFamily) const
 AreaFlag EnumTranslator::ToArea(Location loc) const
 {
 	return _locationAreaMap.left.at(loc);
+}
+
+std::string EnumTranslator::ToRegionString(AreaFlag f) const
+{
+	return _regionMap.left.at(f);
 }
 
 EnumTranslator::~EnumTranslator()
@@ -220,6 +226,28 @@ void EnumTranslator::init_locarea_map()
 		(Location::Upper_Ab_Right, AreaFlag::Upper_Ab_Right)
 		(Location::Mid_Ab_Right, AreaFlag::Mid_Ab_Right)
 		(Location::Lower_Ab_Right, AreaFlag::Lower_Ab_Right);
+}
+
+void EnumTranslator::init_regions()
+{
+	boost::assign::insert(_regionMap)
+		(AreaFlag::Back_Left, "left_back")
+		(AreaFlag::Back_Right, "right_back")
+		(AreaFlag::Shoulder_Left, "left_shoulder")
+		(AreaFlag::Shoulder_Right, "right_shoulder")
+		(AreaFlag::Upper_Arm_Left, "left_upper_arm")
+		(AreaFlag::Upper_Arm_Right, "right_upper_arm")
+		(AreaFlag::Forearm_Left, "left_forearm")
+		(AreaFlag::Forearm_Right, "right_forearm")
+		(AreaFlag::Chest_Left, "left_upper_chest")
+		(AreaFlag::Chest_Right, "right_upper_chest")
+		(AreaFlag::Upper_Ab_Left, "left_upper_ab")
+		(AreaFlag::Upper_Ab_Right, "right_upper_ab")
+		(AreaFlag::Mid_Ab_Left, "left_mid_ab")
+		(AreaFlag::Mid_Ab_Right, "right_mid_ab")
+		(AreaFlag::Lower_Ab_Left, "left_lower_ab")
+		(AreaFlag::Lower_Ab_Right, "right_lower_ab");
+
 }
 
 
