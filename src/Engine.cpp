@@ -19,9 +19,11 @@ void Engine::executeTimestep()
 	constexpr auto fraction_of_second = (1.0f / 1000.f);
 	auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
 	
+	m_player.Update(dt);
 	auto commands = m_hardlightSuit->GenerateHardwareCommands(dt);
 	
 	for (const auto& command : commands) {
+		int which_command = command.command();
 		m_messenger.WriteHaptics(command);
 	}
 	

@@ -7,19 +7,19 @@
 
 class MyBasicHapticEvent : public IRetainedEvent {
 public:
-	MyBasicHapticEvent(CommandBuffer& commands, uint32_t area, float duration, float strength, uint32_t effect) :
+	MyBasicHapticEvent( uint32_t area, float duration, float strength, uint32_t effect) :
 		m_area(area),
 		m_duration(duration),
 		m_strength(strength),
 		m_effect(effect),
 		m_time(0),
-		m_commands(commands),
+		m_commands(),
 		m_mutex(),
 		m_playing(true) {
 
 	}
 private:
-	CommandBuffer& m_commands;
+	CommandBuffer m_commands;
 	uint32_t m_area;
 	float m_duration;
 	float m_strength;
@@ -86,12 +86,12 @@ class RetainedEventCreator : public boost::static_visitor<std::unique_ptr<IRetai
 private:
 	//Main ID of the effect
 	boost::uuids::uuid& m_id;
-	CommandBuffer& m_buffer;
+	uint32_t m_area;
 public:
-	RetainedEventCreator(boost::uuids::uuid& id, CommandBuffer& buffer) : m_id(id), m_buffer(buffer) {}
+	RetainedEventCreator(boost::uuids::uuid& id, uint32_t area) : m_id(id), m_area(area) {}
 
 	std::unique_ptr<IRetainedEvent> operator()(const BasicHapticEvent& hapticEvent) const {
-		auto ptr = std::unique_ptr<IRetainedEvent>(new MyBasicHapticEvent(m_buffer, hapticEvent.Area, hapticEvent.Duration, hapticEvent.Strength, hapticEvent.RequestedEffectFamily));
+		auto ptr = std::unique_ptr<IRetainedEvent>(new MyBasicHapticEvent(m_area, hapticEvent.Duration, hapticEvent.Strength, hapticEvent.RequestedEffectFamily));
 		return ptr;
 	}
 };
@@ -110,7 +110,7 @@ bool GeneratedEvent::operator==(const GeneratedEvent & other)
 
 HardlightDevice::HardlightDevice()
 {
-	chestLeft = std::make_shared<Hardlight_Mk3_ZoneDriver>();
+	chestLeft = std::make_shared<Hardlight_Mk3_ZoneDriver>(Location::Chest_Left);
 }
 
 void HardlightDevice::RegisterDrivers(EventRegistry& registry)
@@ -153,18 +153,20 @@ boost::uuids::uuid Hardlight_Mk3_ZoneDriver::Id() const
 	return m_id;
 }
 
-Hardlight_Mk3_ZoneDriver::Hardlight_Mk3_ZoneDriver() : m_id(boost::uuids::random_generator()())
+
+Hardlight_Mk3_ZoneDriver::Hardlight_Mk3_ZoneDriver(Location area) : m_id(boost::uuids::random_generator()()), m_area(static_cast<uint32_t>(area))
 {
 
 }
 
 void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const SuitEvent & event)
 {
-	CommandBuffer temp;
-	auto ptr = boost::apply_visitor(RetainedEventCreator(handle, temp), event);
+
+	auto ptr = boost::apply_visitor(RetainedEventCreator(handle, m_area), event);
 	//the back of our vector is always the active effect
 	//it's supposed to be like a stack: the effect at the back is the active one
-	m_events.push_back(GeneratedEvent(handle, std::move(ptr)));
+	m_events.emplace_back(handle, std::move(ptr));
+	m_events.back().event->Begin();
 }
 
 void Hardlight_Mk3_ZoneDriver::controlRetained(boost::uuids::uuid handle, NSVR_PlaybackCommand command)
@@ -185,7 +187,8 @@ void Hardlight_Mk3_ZoneDriver::controlRetained(boost::uuids::uuid handle, NSVR_P
 		break;
 	case NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset:
 		(*it).event->Pause();
-		m_events.erase(it);
+		//m_events.erase(it); //can't just erase it..unless it generates the command immediately..
+		//todo: mark & sweep?
 		break;
 	default:
 		break;

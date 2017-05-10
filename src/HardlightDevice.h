@@ -6,7 +6,7 @@
 #include "EffectCommand.pb.h"
 #include <queue>
 #include <boost/uuid/uuid.hpp>
-
+#include "Enums.h"
 
 
 class GeneratedEvent {
@@ -25,11 +25,13 @@ public:
 	CommandBuffer update(float dt);
 
 	virtual boost::uuids::uuid Id() const override;
-	Hardlight_Mk3_ZoneDriver();
+	//this should really take a Location probably..
+	Hardlight_Mk3_ZoneDriver(Location area);
 private:
 	void createRetained(boost::uuids::uuid handle, const SuitEvent& event) override;
 	void controlRetained(boost::uuids::uuid handle, NSVR_PlaybackCommand command) override;
 	boost::uuids::uuid m_id;
+	uint32_t m_area;
 };
 
 

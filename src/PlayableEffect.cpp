@@ -6,6 +6,7 @@
 #include "PriorityModel.h"
 #include "NSLoader.h"
 #include <iterator>
+
 namespace NS {
 	namespace Playable {
 		void Restart(const std::unique_ptr<IPlayable>& playable) {
@@ -115,12 +116,14 @@ void PlayableEffect::Update(float dt)
 			std::vector<std::string> regions = boost::apply_visitor(RegionVisitor(), *current);
 			for (const auto& region : regions) {
 				auto consumers = m_registry.GetEventDrivers(region); //placeholder
-				//need translator from registry's leaves to area flags for backwards compat?
-				std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
+				if (consumers) {
+					//need translator from registry's leaves to area flags for backwards compat?
+					std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
 
-					consumer->createRetained(_id, *current);
-					m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
-				});
+						consumer->createRetained(_id, *current);
+						m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
+					});
+				}
 			}
 			std::advance(current, 1);
 		}
