@@ -18,21 +18,40 @@ public:
 };
 
 
+class ZoneModel {
+public:
+	//todo: may need a mutex to protect access to command buffer?
+	//nullptr signals nothing playing
+	//if something is playing, returns a non-owning pointer to it
+	IRetainedEvent* CurrentlyPlaying();
+	void Put(boost::uuids::uuid id, std::unique_ptr<IRetainedEvent> event);
+	void Remove(boost::uuids::uuid id);
+	void Play(boost::uuids::uuid id);
+	void Pause(boost::uuids::uuid id);
+	CommandBuffer Update(float dt);
+private:
+	CommandBuffer m_commands;
+	std::vector<GeneratedEvent> m_events;
 
+
+};
 class Hardlight_Mk3_ZoneDriver : public HardwareDriver {
 public:
-	std::vector<GeneratedEvent> m_events;
+	ZoneModel m_model;
 	CommandBuffer update(float dt);
 
 	virtual boost::uuids::uuid Id() const override;
 	//this should really take a Location probably..
 	Hardlight_Mk3_ZoneDriver(Location area);
+
+	Location Location();
 private:
 	void createRetained(boost::uuids::uuid handle, const SuitEvent& event) override;
 	void controlRetained(boost::uuids::uuid handle, NSVR_PlaybackCommand command) override;
 	boost::uuids::uuid m_id;
 	uint32_t m_area;
 };
+
 
 
 
@@ -50,7 +69,7 @@ public:
 	virtual CommandBuffer GenerateHardwareCommands(float dt) override;
 
 private:
-	std::shared_ptr<Hardlight_Mk3_ZoneDriver> chestLeft;
+	std::vector<std::shared_ptr<Hardlight_Mk3_ZoneDriver>> m_drivers;
 };
 
 
