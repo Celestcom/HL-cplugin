@@ -4,10 +4,10 @@
 #include "SuitEvent.h"
 #include <boost/uuid/uuid.hpp>
 class RealtimeArgs {
-
+public:
+	int volume;
 };
 
-//should be renamed to just Driver or HardwareDriver or something
 class HardwareDriver {
 public:
 	

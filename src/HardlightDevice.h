@@ -35,9 +35,19 @@ private:
 
 
 };
+
+class RtpModel {
+public:
+	
+	RtpModel();
+	void ChangeVolume(int newVolume);
+	CommandBuffer Update(float dt);
+private:
+	int m_volume;
+	CommandBuffer m_commands;
+};
 class Hardlight_Mk3_ZoneDriver : public HardwareDriver {
 public:
-	ZoneModel m_model;
 	CommandBuffer update(float dt);
 
 	virtual boost::uuids::uuid Id() const override;
@@ -45,11 +55,22 @@ public:
 	Hardlight_Mk3_ZoneDriver(Location area);
 
 	Location Location();
+
+
 private:
+	ZoneModel m_retainedModel;
+	RtpModel m_rtpModel;
 	void createRetained(boost::uuids::uuid handle, const SuitEvent& event) override;
 	void controlRetained(boost::uuids::uuid handle, NSVR_PlaybackCommand command) override;
+	void realtime(const RealtimeArgs& args) override;
+
+	enum class Mode {Retained, Realtime};
+	void transition(Mode mode);
+	Mode m_currentMode;
 	boost::uuids::uuid m_id;
 	uint32_t m_area;
+
+	CommandBuffer& m_commands;
 };
 
 
@@ -70,6 +91,8 @@ public:
 
 private:
 	std::vector<std::shared_ptr<Hardlight_Mk3_ZoneDriver>> m_drivers;
+
+
 };
 
 

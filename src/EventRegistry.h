@@ -16,7 +16,7 @@ public:
 		return m_eventRegions.Find(region); //try to make const
 	}
 
-	 const std::vector<std::shared_ptr<HardwareDriver>>* GetRtptDrivers(const std::string& region) {
+	 const std::vector<std::shared_ptr<HardwareDriver>>* GetRtpDrivers(const std::string& region) {
 		return m_rtpRegions.Find(region); //try to make const
 	}
 private:
