@@ -201,6 +201,9 @@ HardlightDevice::HardlightDevice()
 	for (int loc = (int)Location::Lower_Ab_Right; loc != (int)Location::Error; loc++) {
 		m_drivers.push_back(std::make_shared<Hardlight_Mk3_ZoneDriver>(Location(loc)));
 	}
+	
+	//	m_drivers.push_back(std::make_shared<Hardlight_Mk3_ZoneDriver>(Location::Lower_Ab_Right));
+	//}
 
 }
 
@@ -208,10 +211,12 @@ void HardlightDevice::RegisterDrivers(EventRegistry& registry)
 {
 	auto& translator = Locator::getTranslator();
 	for (auto& driver : m_drivers) {
-		registry.RegisterEventDriver(
-			translator.ToRegionString(
-				translator.ToArea(driver->Location())
-			), driver);
+		auto region = translator.ToRegionString(
+			translator.ToArea(driver->Location())
+		);
+
+		registry.RegisterEventDriver(region, driver);
+		registry.RegisterRtpDriver(region, driver);
 	}
 	
 }
@@ -238,6 +243,8 @@ CommandBuffer Hardlight_Mk3_ZoneDriver::update(float dt)
 	//think about if the commandbuffer vectors should really be reversed
 	auto rtpCommands = m_rtpModel.Update(dt);
 	auto retainedCommands = m_retainedModel.Update(dt);
+	
+	std::lock_guard<std::mutex> guard(m_mutex);
 
 	CommandBuffer result;
 	result.swap(m_commands);
@@ -263,7 +270,11 @@ boost::uuids::uuid Hardlight_Mk3_ZoneDriver::Id() const
 Hardlight_Mk3_ZoneDriver::Hardlight_Mk3_ZoneDriver(::Location area) : 
 	m_id(boost::uuids::random_generator()()), 
 	m_area(static_cast<uint32_t>(area)),
-	m_currentMode(Mode::Retained)
+	m_currentMode(Mode::Retained),
+	m_commands(),
+	m_rtpModel(m_area),
+	m_retainedModel(),
+	m_mutex()
 {
 
 }
@@ -276,22 +287,31 @@ Hardlight_Mk3_ZoneDriver::Hardlight_Mk3_ZoneDriver(::Location area) :
 void Hardlight_Mk3_ZoneDriver::realtime(const RealtimeArgs& args)
 {
 	m_rtpModel.ChangeVolume(args.volume);
-	transition(Mode::Realtime);
+	transitionInto(Mode::Realtime);
 }
 
-void Hardlight_Mk3_ZoneDriver::transition(Mode mode)
+void Hardlight_Mk3_ZoneDriver::transitionInto(Mode mode)
 {
+	std::lock_guard<std::mutex> guard(m_mutex);
+
 	using namespace NullSpaceIPC;
 	if (m_currentMode == Mode::Realtime) {
-		if (mode == Mode::Retained) {
+		if (mode == Mode::Retained) { 
+			m_currentMode = Mode::Retained;
 			//send command to go into retained mode.
-
+			EffectCommand enableRetained;
+			enableRetained.set_area(m_area);
+			enableRetained.set_command(NullSpaceIPC::EffectCommand_Command_ENABLE_INTRIG);
+			m_commands.push_back(enableRetained);
 		}
 	}
 	else {
 		if (mode == Mode::Realtime) {
-			//send command to go into realtime mode
-		
+			m_currentMode = Mode::Realtime;
+			EffectCommand enableRetained;
+			enableRetained.set_area(m_area);
+			enableRetained.set_command(NullSpaceIPC::EffectCommand_Command_ENABLE_RTP);
+			m_commands.push_back(enableRetained);
 		}
 	}
 }
@@ -304,7 +324,7 @@ void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const S
 	//it's supposed to be like a stack: the effect at the back is the active one
 	m_retainedModel.Put(handle, std::move(ptr));
 
-	transition(Mode::Retained);
+	transitionInto(Mode::Retained);
 
 }
 
@@ -325,25 +345,32 @@ void Hardlight_Mk3_ZoneDriver::controlRetained(boost::uuids::uuid handle, NSVR_P
 	}
 }
 
-RtpModel::RtpModel() : m_volume(0), m_commands()
+RtpModel::RtpModel(uint32_t area) :m_area(area), m_volume(0), m_commands()
 {
 }
 
 void RtpModel::ChangeVolume(int newVolume)
 {
-	m_volume = newVolume;
 	if (newVolume != m_volume) {
+		m_volume = newVolume;
+
 		using namespace NullSpaceIPC;
 		EffectCommand command;
 		command.set_command(EffectCommand_Command::EffectCommand_Command_PLAY_RTP);
-		command.set_strength(m_volume / 255.0f);
+		command.set_strength(255-(m_volume / 255.0f));
+		command.set_area(m_area);
+		
+		std::lock_guard<std::mutex> guard(m_mutex);
 		m_commands.push_back(std::move(command));
+
 	}
 }
 
 CommandBuffer RtpModel::Update(float dt)
 {
 	CommandBuffer copy;
+	std::lock_guard<std::mutex> guard(m_mutex);
+
 	copy.swap(m_commands);
 	std::reverse(copy.begin(), copy.end());
 	return copy;

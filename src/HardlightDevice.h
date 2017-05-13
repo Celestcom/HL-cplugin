@@ -39,12 +39,14 @@ private:
 class RtpModel {
 public:
 	
-	RtpModel();
+	RtpModel(uint32_t area);
 	void ChangeVolume(int newVolume);
 	CommandBuffer Update(float dt);
 private:
 	int m_volume;
+	uint32_t m_area;
 	CommandBuffer m_commands;
+	std::mutex m_mutex;
 };
 class Hardlight_Mk3_ZoneDriver : public HardwareDriver {
 public:
@@ -58,6 +60,8 @@ public:
 
 
 private:
+	uint32_t m_area;
+
 	ZoneModel m_retainedModel;
 	RtpModel m_rtpModel;
 	void createRetained(boost::uuids::uuid handle, const SuitEvent& event) override;
@@ -65,12 +69,11 @@ private:
 	void realtime(const RealtimeArgs& args) override;
 
 	enum class Mode {Retained, Realtime};
-	void transition(Mode mode);
+	void transitionInto(Mode mode);
 	Mode m_currentMode;
 	boost::uuids::uuid m_id;
-	uint32_t m_area;
-
-	CommandBuffer& m_commands;
+	std::mutex m_mutex;
+	CommandBuffer m_commands;
 };
 
 

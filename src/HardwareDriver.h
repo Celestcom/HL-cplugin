@@ -5,6 +5,7 @@
 #include <boost/uuid/uuid.hpp>
 class RealtimeArgs {
 public:
+	RealtimeArgs(int volume);
 	int volume;
 };
 

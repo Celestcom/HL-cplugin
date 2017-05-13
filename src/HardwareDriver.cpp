@@ -5,3 +5,7 @@ bool operator<(const HardwareDriver & lhs, const HardwareDriver & rhs)
 {
 	return lhs.Id() < rhs.Id();
 }
+
+RealtimeArgs::RealtimeArgs(int volume) :volume(volume)
+{
+}

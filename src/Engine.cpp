@@ -13,6 +13,7 @@
 #include "MyTestLog.h"
 #include "IHapticDevice.h"
 #include "HardlightDevice.h"
+#include "Locator.h"
 void Engine::executeTimestep()
 {
 	
@@ -23,7 +24,6 @@ void Engine::executeTimestep()
 	auto commands = m_hardlightSuit->GenerateHardwareCommands(dt);
 	
 	for (const auto& command : commands) {
-		int which_command = command.command();
 		m_messenger.WriteHaptics(command);
 	}
 	
@@ -37,9 +37,21 @@ int Engine::DumpDeviceDiagnostics()
 	return NSVR_Success_Unqualified;
 }
 
-int Engine::SetStrengths(uint16_t* strengths, uint32_t* areas, int length)
+int Engine::SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int length)
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	auto& translator = Locator::getTranslator();
+	for (unsigned int i = 0; i < length; i++) {
+		
+		auto drivers = m_registry.GetRtpDrivers(translator.ToRegionString(AreaFlag(areas[i])));
+
+		if (drivers) {
+			std::for_each(drivers->begin(), drivers->end(), [&](auto& driver) {
+				driver->realtime(RealtimeArgs(strengths[i]));
+			});
+		}
+	}
+
+	return NSVR_Success_Unqualified;
 }
 
 Engine::Engine() :
