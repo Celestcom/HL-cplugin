@@ -65,17 +65,19 @@ void HapticsPlayer::Release(HapticHandle hh)
 
 	//std::cout << "Got a new handle to release\n";
 
-	auto h = _outsideHandleToUUID[hh];
-	
-	auto it = _effects.find(uuid_hasher(h));
-	if (it != _effects.end()) {
-		_releasedEffects.push_back(Released(h));
-	}
-	else {
-		//std::cout << "Tried to release a handle that I never had in the first place\n";
-	}
+	if (_outsideHandleToUUID.find(hh) != _outsideHandleToUUID.end()) {
+		auto h = _outsideHandleToUUID.at(hh);
 
-	_outsideHandleToUUID.erase(_outsideHandleToUUID.find(hh));
+		auto it = _effects.find(uuid_hasher(h));
+		if (it != _effects.end()) {
+			_releasedEffects.push_back(Released(h));
+		}
+		else {
+			//std::cout << "Tried to release a handle that I never had in the first place\n";
+		}
+
+		_outsideHandleToUUID.erase(_outsideHandleToUUID.find(hh));
+	}
 }
 
 void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
