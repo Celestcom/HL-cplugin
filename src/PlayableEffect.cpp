@@ -231,18 +231,6 @@ EventVisitor::EventVisitor(float time):m_time(time)
 
 }
 
-EventExecutor::EventExecutor(boost::uuids::uuid & id, EventRegistry& registry):
-	m_id(id), 
-	m_registry(registry)
-{
-}
-
-void EventExecutor::operator()(BasicHapticEvent & h)
-{
-	auto consumers = m_registry.GetEventDrivers("body"); // todo: needs actual region
-//	std::for_each(consumers->begin(), consumers->end(), [](auto& consumer) {consumer->createRetained()}
-}
-
 TotalPlaytimeVisitor::TotalPlaytimeVisitor():
 	m_totalPlaytime(0), 
 	m_fudgeFactor(0.25f)

@@ -21,17 +21,7 @@ namespace NS {
 	}
 }
 
-//Responsible for calling the relevant components to execute each type of event
-class EventExecutor : public boost::static_visitor<> {
-private:
-	//Main ID of the effect
-	boost::uuids::uuid& m_id;
-	EventRegistry& m_registry;
-public:
-	EventExecutor(boost::uuids::uuid& id, EventRegistry& registry);
 
-	void operator()(BasicHapticEvent& hapticEvent);
-};
 
 //Responsible for summing up the duration of an effect
 class TotalPlaytimeVisitor : public boost::static_visitor<> {
