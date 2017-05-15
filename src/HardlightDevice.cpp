@@ -319,10 +319,8 @@ void Hardlight_Mk3_ZoneDriver::transitionInto(Mode mode)
 void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const SuitEvent & event)
 {
 
-	auto ptr = boost::apply_visitor(RetainedEventCreator(handle, m_area), event);
-	//the back of our vector is always the active effect
-	//it's supposed to be like a stack: the effect at the back is the active one
-	m_retainedModel.Put(handle, std::move(ptr));
+	auto retainedEvent = boost::apply_visitor(RetainedEventCreator(handle, m_area), event);
+	m_retainedModel.Put(handle, std::move(retainedEvent));
 
 	transitionInto(Mode::Retained);
 
