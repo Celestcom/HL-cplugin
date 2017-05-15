@@ -37,6 +37,10 @@ int PlaybackHandle::Command(NSVR_PlaybackCommand command)
 
 PlaybackHandle::~PlaybackHandle()
 {
+	//todo: pay back the debt
+	//this is bad
+	//can throw exceptions
+	//need to rearchitect playback handles
 	if (m_engine != nullptr) {
 		m_engine->HandleCommand(m_handle, NSVR_PlaybackCommand(3));
 	}
