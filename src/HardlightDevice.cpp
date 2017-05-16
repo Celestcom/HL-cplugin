@@ -6,6 +6,94 @@
 #include <boost/uuid/random_generator.hpp>
 
 
+class MyBasicHapticEvent : public IRetainedEvent {
+public:
+	MyBasicHapticEvent(uint32_t area, float duration, float strength, uint32_t effect) :
+		m_area(area),
+		m_duration(duration),
+		m_strength(strength),
+		m_effect(effect),
+		m_time(0),
+		m_playing(true) {
+
+	}
+
+	bool IsRedundantTo(const MyBasicHapticEvent& other) {
+		//possible implementation idea:: call Begin() on both and see if they emit the same commands. and End(), etc.
+		bool bothAreContinuous = m_duration > 0 && other.m_duration > 0;
+		return m_area == other.m_area && m_strength == other.m_strength && m_effect == other.m_effect && bothAreContinuous;
+	}
+private:
+	uint32_t m_area;
+	float m_duration;
+	float m_strength;
+	uint32_t m_effect;
+	float m_time;
+
+	bool m_playing;
+
+
+	virtual void Begin(CommandBuffer* buffer) override
+	{
+		m_playing = true;
+
+		if (buffer != nullptr) {
+			//we could cache the command if this ever ever ever becomes a bottleneck
+			using namespace NullSpaceIPC;
+			EffectCommand command;
+			command.set_area(m_area);
+			command.set_command(m_duration == 0.0 ? EffectCommand_Command::EffectCommand_Command_PLAY : NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
+			command.set_effect(m_effect);
+			command.set_strength(m_strength);
+
+
+			buffer->push_back(std::move(command));
+		}
+	}
+
+
+	virtual void Pause(CommandBuffer* buffer) override
+	{
+		m_playing = false;
+		if (m_duration == 0) { return; }
+		if (buffer != nullptr) {
+			using namespace NullSpaceIPC;
+			EffectCommand command;
+			command.set_area(m_area);
+			command.set_command(EffectCommand_Command::EffectCommand_Command_HALT);
+
+
+			buffer->push_back(std::move(command));
+		}
+
+	}
+
+
+	virtual void Resume(CommandBuffer* buffer) override
+	{
+		Begin(buffer);
+	}
+
+
+	virtual void Update(float dt) override
+	{
+		//note: you must call Pause to actually pause the effect
+		if (m_playing) {
+			m_time += dt;
+		}
+
+
+	}
+
+
+	virtual bool Finished() const override
+	{
+		return m_time >= m_duration;
+	}
+
+};
+
+
 IRetainedEvent* ZoneModel::CurrentlyPlaying() {
 		if (!m_events.empty()) {
 			return m_events.back().event.get();
@@ -19,8 +107,22 @@ IRetainedEvent* ZoneModel::CurrentlyPlaying() {
 void ZoneModel::Put(boost::uuids::uuid id, std::unique_ptr<IRetainedEvent> event) {
 	//must determine if the previous needs to be emit the "pause" command first, conceptually and practically	
 
-	m_events.emplace_back(id, std::move(event));
-	m_events.back().event->Begin(&m_commands);
+	//todo: this static casting is bad and I feel bad. Will rearchitect. This is a hack. 
+	MyBasicHapticEvent* basic = static_cast<MyBasicHapticEvent*>(event.get());
+	if (!m_events.empty()) {
+		MyBasicHapticEvent* current = static_cast<MyBasicHapticEvent*>(m_events.back().event.get());
+		if (basic->IsRedundantTo(*current)) {
+			m_events.emplace_back(id, std::move(event));
+		}
+		else {
+			m_events.emplace_back(id, std::move(event));
+			m_events.back().event->Begin(&m_commands);
+		}
+	}
+	else {
+		m_events.emplace_back(id, std::move(event));
+		m_events.back().event->Begin(&m_commands);
+	}
 }
 
 void ZoneModel::Remove(boost::uuids::uuid id)
@@ -66,7 +168,7 @@ void ZoneModel::Pause(boost::uuids::uuid id) {
 }
 
 CommandBuffer ZoneModel::Update(float dt) {
-
+	int size = m_events.size();
 	for (auto& event : m_events) {
 		event.event->Update(dt);
 
@@ -85,88 +187,6 @@ CommandBuffer ZoneModel::Update(float dt) {
 	return copy;
 
 }
-
-class MyBasicHapticEvent : public IRetainedEvent {
-public:
-	MyBasicHapticEvent( uint32_t area, float duration, float strength, uint32_t effect) :
-		m_area(area),
-		m_duration(duration),
-		m_strength(strength),
-		m_effect(effect),
-		m_time(0),
-		m_playing(true) {
-
-	}
-private:
-	uint32_t m_area;
-	float m_duration;
-	float m_strength;
-	uint32_t m_effect;
-	float m_time;
-
-	bool m_playing;
-
-
-	virtual void Begin(CommandBuffer* buffer) override
-	{
-		m_playing = true;
-
-		if (buffer != nullptr) {
-			//we could cache the command if this ever ever ever becomes a bottleneck
-			using namespace NullSpaceIPC;
-			EffectCommand command;
-			command.set_area(m_area);
-			command.set_command(m_duration == 0.0 ? EffectCommand_Command::EffectCommand_Command_PLAY : NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-			command.set_effect(m_effect);
-			command.set_strength(m_strength);
-
-
-			buffer->push_back(std::move(command));
-		}
-	}
-
-
-	virtual void Pause(CommandBuffer* buffer) override
-	{
-		m_playing = false;
-
-		if (buffer != nullptr) {
-			using namespace NullSpaceIPC;
-			EffectCommand command;
-			command.set_area(m_area);
-			command.set_command(EffectCommand_Command::EffectCommand_Command_HALT);
-
-
-			buffer->push_back(std::move(command));
-		}
-		
-	}
-
-
-	virtual void Resume(CommandBuffer* buffer) override
-	{
-		Begin(buffer);
-	}
-
-
-	virtual void Update(float dt) override
-	{
-		//note: you must call Pause to actually pause the effect
-		if (m_playing) {
-			m_time += dt;
-		}
-
-	
-	}
-
-
-	virtual bool Finished() const override
-	{
-		return m_time >= m_duration;
-	}
-
-};
-
 
 class RetainedEventCreator : public boost::static_visitor<std::unique_ptr<IRetainedEvent>> {
 private:

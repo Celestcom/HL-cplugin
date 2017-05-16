@@ -44,7 +44,7 @@ public:
 	std::string ToString(AreaFlag area) const;
 
 	uint32_t ToEffectFamily(std::string effectFamily) const;
-	std::string ToString(uint32_t effectFamily) const;
+	std::string ToEffectFamilyString(uint32_t effectFamily) const;
 
 	AreaFlag ToArea(Location loc) const;
 	

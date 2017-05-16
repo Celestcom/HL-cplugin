@@ -133,7 +133,7 @@ uint32_t EnumTranslator::ToEffectFamily(std::string effectFamily) const
 	return _effectFamilyMap.left.at(effectFamily);
 }
 
-std::string EnumTranslator::ToString(uint32_t effectFamily) const
+std::string EnumTranslator::ToEffectFamilyString(uint32_t effectFamily) const
 {
 	return _effectFamilyMap.right.at(effectFamily);
 }
