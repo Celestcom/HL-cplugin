@@ -80,8 +80,12 @@ NSVR_RETURN(int) NSVR_Version_HasFeature(const char * feature)
 
 NSVR_RETURN(void) NSVR_System_Release(NSVR_System** ptr)
 {	
-	delete AS_TYPE(Engine, *ptr);
-	*ptr = nullptr;
+	ExceptionGuard([&] {
+		delete AS_TYPE(Engine, *ptr);
+		*ptr = nullptr;
+
+		return NSVR_Success_Unqualified;
+	});
 }
 
 
@@ -174,8 +178,12 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType
 
 NSVR_RETURN(void) NSVR_Event_Release(NSVR_Event ** eventPtr)
  {
-	 delete AS_TYPE(ParameterizedEvent, *eventPtr);
-	 *eventPtr = nullptr;
+	ExceptionGuard([&] {
+		delete AS_TYPE(ParameterizedEvent, *eventPtr);
+		*eventPtr = nullptr;
+
+		return NSVR_Success_Unqualified;
+	});
  }
 
 NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event * event, const char * key, float value)
@@ -210,8 +218,12 @@ NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr, NSVR_S
 
 NSVR_RETURN(void) NSVR_Timeline_Release(NSVR_Timeline ** listPtr)
  {
-	delete AS_TYPE(EventList, *listPtr);
-	*listPtr = nullptr;
+	ExceptionGuard([&] {
+		delete AS_TYPE(EventList, *listPtr);
+		*listPtr = nullptr;
+
+		return NSVR_Success_Unqualified;
+	});
  }
 
 NSVR_RETURN(NSVR_Result) NSVR_Timeline_AddEvent(NSVR_Timeline * list, NSVR_Event * event)
@@ -269,8 +281,13 @@ NSVR_RETURN(NSVR_Result)NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle * handle
 
 NSVR_RETURN(void) NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr)
  {
-	delete AS_TYPE(PlaybackHandle, *handlePtr);
-	 *handlePtr = nullptr; 
+	ExceptionGuard([&] {
+		delete AS_TYPE(PlaybackHandle, *handlePtr);
+		*handlePtr = nullptr;
+
+		return NSVR_Success_Unqualified;
+	});
+	
  }
 
 

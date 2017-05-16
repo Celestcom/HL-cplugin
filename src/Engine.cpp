@@ -11,14 +11,19 @@
 #include <boost/log/sinks/sync_frontend.hpp>
 #include <boost/log/trivial.hpp>
 #include "MyTestLog.h"
-
+#include "IHapticDevice.h"
+#include "HardlightDevice.h"
+#include "Locator.h"
 void Engine::executeTimestep()
 {
 	
 	constexpr auto fraction_of_second = (1.0f / 1000.f);
 	auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
-	auto effectCommands = m_player.Update(dt);
-	for (const auto& command : effectCommands) {
+	
+	m_player.Update(dt);
+	auto commands = m_hardlightSuit->GenerateHardwareCommands(dt);
+	
+	for (const auto& command : commands) {
 		m_messenger.WriteHaptics(command);
 	}
 	
@@ -32,9 +37,21 @@ int Engine::DumpDeviceDiagnostics()
 	return NSVR_Success_Unqualified;
 }
 
-int Engine::SetStrengths(uint16_t* strengths, uint32_t* areas, int length)
+int Engine::SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int length)
 {
-	throw std::logic_error("The method or operation is not implemented.");
+	auto& translator = Locator::getTranslator();
+	for (unsigned int i = 0; i < length; i++) {
+		
+		auto drivers = m_registry.GetRtpDrivers(translator.ToRegionString(AreaFlag(areas[i])));
+
+		if (drivers) {
+			std::for_each(drivers->begin(), drivers->end(), [&](auto& driver) {
+				driver->realtime(RealtimeArgs(strengths[i]));
+			});
+		}
+	}
+
+	return NSVR_Success_Unqualified;
 }
 
 Engine::Engine() :
@@ -42,7 +59,8 @@ Engine::Engine() :
 	_isEnginePlaying(true),
 	m_ioService(),
 	m_messenger(m_ioService.GetIOService()),
-	m_player(),
+	m_registry(),
+	m_player(m_registry),
 	_currentHandleId(0),
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
 	m_hapticsExecutionTimer(m_ioService.GetIOService()),
@@ -50,16 +68,7 @@ Engine::Engine() :
 	m_cachedTracking({})
 {
 
-	m_hapticsTimestep.SetEvent([this]() {
-		try {
-			executeTimestep();
-		}
-		catch (const std::exception& e) {
-			BOOST_LOG_TRIVIAL(error) << "[PluginMain] Fatal error executing timestep: " << e.what();
-
-		}
-	});
-	m_hapticsTimestep.Start();
+	
 
 	using namespace boost::log;
 	m_log = boost::make_shared<MyTestLog>();
@@ -74,6 +83,21 @@ Engine::Engine() :
 
 	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
+
+	m_hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
+	m_hardlightSuit->RegisterDrivers(m_registry);
+
+
+	m_hapticsTimestep.SetEvent([this]() {
+		try {
+			executeTimestep();
+		}
+		catch (const std::exception& e) {
+			BOOST_LOG_TRIVIAL(error) << "[PluginMain] Fatal error executing timestep: " << e.what();
+
+		}
+	});
+	m_hapticsTimestep.Start();
 }
 
 
@@ -228,6 +252,7 @@ int Engine::CreateEffect(EventList * list, uint32_t handle)
 		return -1;
 	}
 
+
 	m_player.Create(handle, list->Events());
 	return 1;
 
@@ -327,7 +352,7 @@ int Engine::Sample(uint16_t * strengths, uint32_t * areas, uint32_t* families, i
 
 	}
 
-	*resultCount = effectInfo.size();
+	*resultCount = static_cast<unsigned int>(effectInfo.size());
 
 	return NSVR_Success_Unqualified;
 }

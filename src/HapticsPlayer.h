@@ -8,6 +8,7 @@
 #include "HapticEventGenerator.h"
 #include "SuitEvent.h"
 #include <mutex>
+#include "EventRegistry.h"
 
 typedef unsigned int HapticHandle;
 
@@ -23,10 +24,10 @@ public:
 	};
 
 	
-	HapticsPlayer();
+	HapticsPlayer(EventRegistry& registry);
 	~HapticsPlayer();
 
-	std::vector<NullSpaceIPC::EffectCommand> Update(float dt);
+	void Update(float dt);
 	void Play(HapticHandle h);
 	void Pause(HapticHandle h);
 	void Restart(HapticHandle h);
@@ -62,7 +63,7 @@ private:
 
 	bool _paused;
 
-	
+	EventRegistry& m_registry;
 	boost::optional<const std::unique_ptr<IPlayable>&>  toInternalUUID(HapticHandle hh);
 };
 

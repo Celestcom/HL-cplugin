@@ -7,11 +7,12 @@
 using namespace std;
 
 
-HapticsPlayer::HapticsPlayer():
+HapticsPlayer::HapticsPlayer(EventRegistry& registry):
 	_model(), 
 	_paused(false),
 	_generator(_model),
-	m_effectsMutex()
+	m_effectsMutex(),
+	m_registry(registry)
 {
 	
 }
@@ -64,17 +65,19 @@ void HapticsPlayer::Release(HapticHandle hh)
 
 	//std::cout << "Got a new handle to release\n";
 
-	auto h = _outsideHandleToUUID[hh];
-	
-	auto it = _effects.find(uuid_hasher(h));
-	if (it != _effects.end()) {
-		_releasedEffects.push_back(Released(h));
-	}
-	else {
-		//std::cout << "Tried to release a handle that I never had in the first place\n";
-	}
+	if (_outsideHandleToUUID.find(hh) != _outsideHandleToUUID.end()) {
+		auto h = _outsideHandleToUUID.at(hh);
 
-	_outsideHandleToUUID.erase(_outsideHandleToUUID.find(hh));
+		auto it = _effects.find(uuid_hasher(h));
+		if (it != _effects.end()) {
+			_releasedEffects.push_back(Released(h));
+		}
+		else {
+			//std::cout << "Tried to release a handle that I never had in the first place\n";
+		}
+
+		_outsideHandleToUUID.erase(_outsideHandleToUUID.find(hh));
+	}
 }
 
 void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
@@ -84,7 +87,7 @@ void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
 	if (_outsideHandleToUUID.find(h) != _outsideHandleToUUID.end()) {
 		auto id = _outsideHandleToUUID[h];
 		_effects[uuid_hasher(id)]->Stop();
-		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), _generator, _uuidGen));
+		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), m_registry, _uuidGen));
 
 	}
 	else {
@@ -92,7 +95,7 @@ void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
 
 		_outsideHandleToUUID[h] = id;
 
-		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), _generator, _uuidGen));
+		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), m_registry, _uuidGen));
 	}
 
 }
@@ -134,7 +137,7 @@ bool EffectIsExpired(const std::unique_ptr<IPlayable> &p, bool isGlobalPause) {
 int compute(int p) {
 	return p * 123123;
 }
-std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
+void HapticsPlayer::Update(float dt)
 {
 	std::lock_guard<std::mutex> lock_guard(m_effectsMutex);
 
@@ -172,7 +175,7 @@ std::vector<NullSpaceIPC::EffectCommand> HapticsPlayer::Update(float dt)
 	_releasedEffects.erase(toRemove, _releasedEffects.end());
 
 	///BUGG!!!! Try running the graph engine at full speed. Locking error?
-	return _model.Update(dt);
+
 }
 
 

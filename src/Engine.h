@@ -10,6 +10,7 @@
 #include "EventList.h"
 #include "NSLoader.h"
 #include "MyTestLog.h"
+#include "IHapticDevice.h"
 #include "NSLoader_Internal.h"
 #pragma pack(1)
 
@@ -47,7 +48,7 @@ public:
 	int Sample(uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount);
 
 	int DumpDeviceDiagnostics();
-	int SetStrengths(uint16_t* strengths, uint32_t* areas, int length);
+	int SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int length);
 
 private:
 	IoService m_ioService;
@@ -57,7 +58,9 @@ private:
 	std::string _currentError;
 	bool _isEnginePlaying;
 	ClientMessenger m_messenger;
+	EventRegistry m_registry;
 
+	std::unique_ptr<IHapticDevice> m_hardlightSuit;
 	HapticsPlayer m_player;
 
 	boost::asio::deadline_timer m_hapticsExecutionTimer;
@@ -67,6 +70,7 @@ private:
 	ScheduledEvent m_hapticsTimestep;
 
 	boost::shared_ptr<MyTestLog> m_log;
+
 
 
 	

@@ -48,6 +48,9 @@
     <ClInclude Include="..\src\EventList.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\EventRegistry.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\ExceptionSafeCall.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -75,10 +78,22 @@
     <ClInclude Include="..\src\HapticsPlayer.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\HardlightDevice.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HardwareDriver.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\HexUtils.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\IHapticDevice.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\IPlayable.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IRetainedEvent.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ITimeOffset.h">
@@ -118,6 +133,9 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\PriorityModel.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RegionTree.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\SuitEvent.h">
@@ -161,6 +179,9 @@
     <ClCompile Include="..\src\EventList.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\EventRegistry.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\HapticArgs.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -183,6 +204,12 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\HapticsPlayer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\HardlightDevice.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\HardwareDriver.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\HexUtils.cpp">
@@ -213,6 +240,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\PriorityModel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RegionTree.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\SuitEvent.cpp">

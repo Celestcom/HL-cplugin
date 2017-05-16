@@ -3,8 +3,17 @@
 #include "HapticEvent.h"
 #include "HapticEventGenerator.h"
 #include "SuitEvent.h"
+#include "EventRegistry.h"
+#include <set>
 #include <boost\uuid\random_generator.hpp>
 
+
+template<typename T>
+struct weak_ptr_less_than {
+	bool operator() (const std::weak_ptr<T>& lhs, const std::weak_ptr<T>& rhs) const {
+		return lhs.expired() || (!rhs.expired() && *lhs.lock() < *rhs.lock());
+	}
+};
 namespace NS {
 	namespace Playable {
 		//implements Restart by calling Stop() followed by Play()
@@ -12,18 +21,7 @@ namespace NS {
 	}
 }
 
-//Responsible for calling the relevant components to execute each type of event
-class EventExecutor : public boost::static_visitor<> {
-private:
-	//Main ID of the effect
-	boost::uuids::uuid& m_id;
-	//all generators listed here. For now, we only have basic haptic effects.
-	HapticEventGenerator& m_basicHapticGenerator;
-public:
-	EventExecutor(boost::uuids::uuid& id, HapticEventGenerator& basicHapticGenerator);
 
-	void operator()(BasicHapticEvent& hapticEvent);
-};
 
 //Responsible for summing up the duration of an effect
 class TotalPlaytimeVisitor : public boost::static_visitor<> {
@@ -55,13 +53,20 @@ public:
 };
 
 
+class RegionVisitor : public boost::static_visitor<std::vector<std::string>> {
+private:
+public:
+	RegionVisitor();
+	std::vector<std::string> operator()(const BasicHapticEvent& event) const;
+};
+
 class PlayableEffect :
 	public IPlayable
 {
 public:
 	
 	//Precondition: the vector is not empty
-	PlayableEffect(std::vector<SuitEvent> effects, HapticEventGenerator& gen, boost::uuids::random_generator&);
+	PlayableEffect(std::vector<SuitEvent> effects, EventRegistry& reg, boost::uuids::random_generator&);
 	~PlayableEffect();
 
 	void Play() override;
@@ -85,8 +90,9 @@ private:
 	PlaybackState _state;
 
 	float _time;
-	HapticEventGenerator& _gen;
-
+	EventRegistry& m_registry;
+	
+	std::set<std::weak_ptr<HardwareDriver>,weak_ptr_less_than<HardwareDriver>> m_activeDrivers;
 	std::vector<SuitEvent>::iterator _lastExecutedEffect;
 	std::vector<SuitEvent> _effects;
 	boost::uuids::uuid _id;
