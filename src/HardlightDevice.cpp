@@ -93,6 +93,28 @@ private:
 
 };
 
+class NullEvent : public IRetainedEvent {
+
+public:
+	virtual void Begin(CommandBuffer* buffer) override
+	{
+	}
+	virtual void Pause(CommandBuffer* buffer) override
+	{
+	}
+	virtual void Resume(CommandBuffer* buffer) override
+	{
+	}
+	virtual void Update(float dt) override
+	{
+	
+	}
+	virtual bool Finished() const override
+	{
+		return false;
+	}
+};
+
 
 IRetainedEvent* ZoneModel::CurrentlyPlaying() {
 		if (!m_events.empty()) {
@@ -186,6 +208,13 @@ CommandBuffer ZoneModel::Update(float dt) {
 	std::reverse(copy.begin(), copy.end());
 	return copy;
 
+}
+
+ZoneModel::ZoneModel(): m_commands(), m_events()
+{
+	//the null event does nothing; it's only purpose is to remain in the event list and let us treat the list
+	//without special cases for empty
+	m_events.emplace_back(boost::uuids::random_generator()(), std::unique_ptr<IRetainedEvent>(new NullEvent()));
 }
 
 class RetainedEventCreator : public boost::static_visitor<std::unique_ptr<IRetainedEvent>> {

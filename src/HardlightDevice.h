@@ -29,6 +29,8 @@ public:
 	void Play(boost::uuids::uuid id);
 	void Pause(boost::uuids::uuid id);
 	CommandBuffer Update(float dt);
+
+	ZoneModel();
 private:
 	CommandBuffer m_commands;
 	std::vector<GeneratedEvent> m_events;
