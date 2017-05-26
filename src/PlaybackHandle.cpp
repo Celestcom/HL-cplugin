@@ -7,7 +7,6 @@
 int PlaybackHandle::Bind(EventList * eventListPtr)
 {
 	assert(eventListPtr != nullptr);
-	//todo: This should do sorting automatically by time
 	if (m_engine != nullptr) {
 		m_engine->HandleCommand(m_handle, NSVR_PlaybackCommand(3));
 	}

@@ -40,6 +40,13 @@ public:
 	float TotalPlaytime();
 };
 
+class TimeOffsetVisitor : public boost::static_visitor<float> {
+public:
+	float operator()(const BasicHapticEvent& event) {
+		return event.Time;
+	}
+};
+
 //Responsible for checking if an event has expired
 class EventVisitor : public boost::static_visitor<bool> {
 private:
