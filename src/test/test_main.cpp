@@ -8,7 +8,8 @@
 TEST_CASE("The zone model works", "[ZoneModel]") {
 	ZoneModel model;
 
-	MyBasicHapticEvent oneshot_1(boost::uuids::random_generator()(), 0, 0.0, 1.0, 666);
+	auto gen = boost::uuids::random_generator();
+	MyBasicHapticEvent oneshot_1(gen(), gen(), 0, 0.0, 1.0, 666);
 
 	auto& pausedEvents = model.PausedEvents();
 	auto& activeEvents = model.PlayingEvents();
@@ -26,19 +27,19 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 
 
 			SECTION("Removing the event should result in no active and no paused events") {
-				model.Remove(oneshot_1.m_id);
+				model.Remove(oneshot_1.m_parentId);
 				REQUIRE(activeEvents.empty());
 				REQUIRE(pausedEvents.empty());
 			}
 
 			SECTION("Pausing the event should result in no active and one paused event") {
-				model.Pause(oneshot_1.m_id);
+				model.Pause(oneshot_1.m_parentId);
 				REQUIRE(activeEvents.empty());
 				REQUIRE(pausedEvents.size() == 1);
 			}
 
 			SECTION("Playing the event which was already added should have no effect") {
-				model.Play(oneshot_1.m_id);
+				model.Play(oneshot_1.m_parentId);
 				REQUIRE(activeEvents.size() == 1);
 				REQUIRE(pausedEvents.empty());
 				REQUIRE(oneshot_1 == activeEvents.back());
@@ -58,7 +59,7 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 			}
 
 			SECTION("After adding a second oneshot event, there should be only one playing event (as it replaces the first) and no paused events") {
-				MyBasicHapticEvent oneshot_2(boost::uuids::random_generator()(), 0, 0.0, 0.5, 666);
+				MyBasicHapticEvent oneshot_2(gen(), gen(), 0, 0.0, 0.5, 666);
 				model.Put(oneshot_2);
 				REQUIRE(activeEvents.size() == 1);
 				REQUIRE(pausedEvents.empty());
@@ -66,7 +67,7 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 
 
 				SECTION("After adding a continuous event, there should be only one playing event (as it replaces the first) and no paused events") {
-					MyBasicHapticEvent cont_1(boost::uuids::random_generator()(), 0, 5.0, 0.3, 666);
+					MyBasicHapticEvent cont_1(gen(), gen(), 0, 5.0, 0.3, 666);
 					model.Put(cont_1);
 					REQUIRE(activeEvents.size() == 1);
 					REQUIRE(pausedEvents.empty());
@@ -88,7 +89,7 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 
 
 					SECTION("After adding a oneshot on top of a continuous, there should be two playing events and no paused events") {
-						MyBasicHapticEvent oneshot_3(boost::uuids::random_generator()(), 0, 0.0, 0.5, 666);
+						MyBasicHapticEvent oneshot_3(gen(), gen(), 0, 0.0, 0.5, 666);
 						model.Put(oneshot_3);
 						REQUIRE(activeEvents.size() == 2);
 						REQUIRE(pausedEvents.empty());
@@ -99,7 +100,7 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 					}
 
 					SECTION("After adding a continuous event on top of a continuous event, there should be two playing events and no paused events") {
-						MyBasicHapticEvent cont_2(boost::uuids::random_generator()(), 0, 3.0, 0.3, 666);
+						MyBasicHapticEvent cont_2(gen(), gen(), 0, 3.0, 0.3, 666);
 						model.Put(cont_2);
 						REQUIRE(activeEvents.size() == 2);
 						REQUIRE(pausedEvents.empty());
@@ -125,7 +126,7 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 			|---o----o-----|---------------|-----------|
 			^first begin   ^-second begin  ^-second end ^first end
 			*/
-			MyBasicHapticEvent cont_1(boost::uuids::random_generator()(), 0, 1.0, 1.0, 666);
+			MyBasicHapticEvent cont_1(gen(), gen(), 0, 1.0, 1.0, 666);
 			model.Put(cont_1);
 			auto commands = model.Update(0.1f);
 			REQUIRE(commands.size() == 1);
@@ -137,7 +138,7 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 				
 
 				SECTION("After adding another cont play, there should be one CONT_PLAY command") {
-					MyBasicHapticEvent cont_2(boost::uuids::random_generator()(), 0, 0.3, 1.0, 666);
+					MyBasicHapticEvent cont_2(gen(), gen(), 0, 0.3, 1.0, 666);
 
 					model.Put(cont_2);
 					auto commands = model.Update(0.1f);
@@ -166,14 +167,14 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 				
 				
 					SECTION("After pausing cont_2, there should be one CONT_PLAY command and one paused effect") {
-						model.Pause(cont_2.m_id);
+						model.Pause(cont_2.m_parentId);
 						auto commands = model.Update(0.1f);
 						REQUIRE(pausedEvents.size() == 1);
 						REQUIRE(commands.size() == 1);
 						REQUIRE(commands.back().command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
 
 						SECTION("After removing cont_2, there should be one active effect and no paused events") {
-							model.Remove(cont_2.m_id);
+							model.Remove(cont_2.m_parentId);
 							REQUIRE(activeEvents.size() == 1);
 							REQUIRE(pausedEvents.size() == 0);
 							SECTION("After time step, there should be no commands") {
@@ -200,18 +201,16 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 		
 		/* Adding a ton of oneshots in the same update batch*/
 		SECTION("After adding 1000 oneshots, there should be only one active effect") {
-			auto gen = boost::uuids::random_generator();
 			for (int i = 0; i < 1000; i++) {
-				model.Put(MyBasicHapticEvent(gen(), 0, 0.0, 1.0, 666));
+				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 0.0, 1.0, 666));
 			}
 			REQUIRE(activeEvents.size() == 1);
 		}
 
 		/* Adding a ton of cont play in the same update batch */
 		SECTION("After adding 1000 cont plays, there should be 1000 active effects") {
-			auto gen = boost::uuids::random_generator();
 			for (int i = 0; i < 1000; i++) {
-				model.Put(MyBasicHapticEvent(gen(), 0, 1.0, 1.0, 666));
+				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 1.0, 1.0, 666));
 			}
 			REQUIRE(activeEvents.size() == 1000);
 		}
@@ -219,15 +218,14 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 		/* Adding a mix of cont play and oneshot in the same batch*/
 		/* this is probably a dumb test */
 		SECTION("After adding 100 oneshots, 100 cont play, then 100 oneshots, there should be 101 effects") {
-			auto gen = boost::uuids::random_generator();
 			for (int i = 0; i < 100; i++) {
-				model.Put(MyBasicHapticEvent(gen(), 0, 0.0, 1.0, 666));
+				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 0.0, 1.0, 666));
 			}
 			for (int i = 0; i < 100; i++) {
-				model.Put(MyBasicHapticEvent(gen(), 0, 1.0, 1.0, 666));
+				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 1.0, 1.0, 666));
 			}
 			for (int i = 0; i < 100; i++) {
-				model.Put(MyBasicHapticEvent(gen(), 0, 0.0, 1.0, 666));
+				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 0.0, 1.0, 666));
 			}
 
 			REQUIRE(activeEvents.back().m_duration == 0.0);
@@ -240,9 +238,10 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 	 /* Need to halt before playing a oneshot if a continuous play was previously playing
 		If you don't, the cont play gets "corrupted" and may even load up the new oneshot
 	 */
+
 		SECTION("Should not Poltergeezer") {
-			MyBasicHapticEvent badboy_cont_1(boost::uuids::random_generator()(), 0, 0.1, 0.3, 1);
-			MyBasicHapticEvent badboy_oneshot_1(boost::uuids::random_generator()(), 0, 0.0, 0.5, 1);
+			MyBasicHapticEvent badboy_cont_1(gen(), gen(), 0, 0.1, 0.3, 1);
+			MyBasicHapticEvent badboy_oneshot_1(gen(), gen(), 0, 0.0, 0.5, 1);
 
 			model.Put(badboy_cont_1);
 			auto commands1 = model.Update(0.05f);
@@ -252,6 +251,50 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 			REQUIRE(commands2.at(1).command() == NullSpaceIPC::EffectCommand_Command_PLAY);
 
 		}
+
+		SECTION("Should layer continuous correctly") {
+			MyBasicHapticEvent cont_bottom(gen(), gen(), 0, 10.0, 0.3, 1);
+			MyBasicHapticEvent cont_middle(gen(), gen(), 0, 1.0, 0.5, 2);
+
+			model.Put(cont_bottom);
+			auto commands = model.Update(1.0f);
+			REQUIRE(commands.size() == 1);
+			REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
+			REQUIRE(commands.at(0).effect() == cont_bottom.m_effect);
+
+			model.Put(cont_middle);
+			commands = model.Update(0.9f);
+
+			REQUIRE(commands.size() == 1);
+			REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
+			REQUIRE(commands.at(0).effect() == cont_middle.m_effect);
+
+			commands = model.Update(0.2f);
+
+			REQUIRE(commands.size() == 1);
+			REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
+			REQUIRE(commands.at(0).effect() == cont_bottom.m_effect);
+
+			//MyBasicHapticEvent cont_top(boost::uuids::random_generator()(), 0, 1.0, 0.5, 1);
+
+			commands = model.Update(9.0f);
+
+			REQUIRE(commands.size() == 1);
+			REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_HALT);
+		}
+
+		SECTION("Playing a oneshot right after another oneshot should work") {
+			MyBasicHapticEvent hum(gen(), gen(), 0, 0.0, 1.0, 1);
+			MyBasicHapticEvent click(gen(), gen(), 0, 0.0, 1.0, 2);
+			model.Put(hum);
+			//todo: test for the halt command as the oneshot is added
+			auto commands = model.Update(0.3);
+			model.Put(click);
+			commands = model.Update(0.05);
+
+		}
+
+		//need to test continuous interuppted by oneshot
 }
 
 

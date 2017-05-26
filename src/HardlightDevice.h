@@ -7,6 +7,7 @@
 #include <queue>
 #include <deque>
 #include <boost/uuid/uuid.hpp>
+#include <boost/uuid/random_generator.hpp>
 #include "Enums.h"
 #include <functional>
 #include <mutex>
@@ -14,15 +15,15 @@
 
 class MyBasicHapticEvent {
 public:
-	MyBasicHapticEvent(boost::uuids::uuid id, uint32_t area, float duration, float strength, uint32_t effect);
+	MyBasicHapticEvent(boost::uuids::uuid parent_id, boost::uuids::uuid unique_id, uint32_t area, float duration, float strength, uint32_t effect);
 
 	explicit MyBasicHapticEvent(boost::uuids::uuid id);
 
-	bool MyBasicHapticEvent::operator==(const MyBasicHapticEvent & other);
+	bool MyBasicHapticEvent::operator==(const MyBasicHapticEvent & other) const;
 	bool IsFunctionallyIdentical(const MyBasicHapticEvent &other);
 
-	void EmitCreationCommands(CommandBuffer* buffer) const;
-	void EmitCleanupCommands(CommandBuffer* buffer) const;
+	CommandBuffer EmitCreationCommands() const;
+	CommandBuffer EmitCleanupCommands() const;
 
 
 
@@ -32,13 +33,13 @@ public:
 	void LogicalPause();
 
 	bool Finished() const;
-	boost::uuids::uuid m_id;
+	boost::uuids::uuid m_parentId;
 	uint32_t m_area;
 	float m_duration;
 	float m_strength;
 	uint32_t m_effect;
 	float m_time;
-
+	boost::uuids::uuid m_uniqueId;
 	bool m_playing;
 	
 
@@ -48,34 +49,42 @@ public:
 };
 
 
+
 class ZoneModel {
 public:
-	typedef std::deque<MyBasicHapticEvent> PlayingContainer;
+	typedef std::vector<MyBasicHapticEvent> PlayingContainer;
 	typedef std::vector<MyBasicHapticEvent> PausedContainer;
 	//todo: may need a mutex to protect access to command buffer?
 	//nullptr signals nothing playing
 	//if something is playing, returns a non-owning pointer to it
 	void Put(MyBasicHapticEvent event);
-	ZoneModel::PlayingContainer::iterator Remove(boost::uuids::uuid id);
+	void Remove(boost::uuids::uuid id);
 	void Play(boost::uuids::uuid id);
 	const PausedContainer& PausedEvents();
 	const PlayingContainer& PlayingEvents();
-	ZoneModel::PlayingContainer::iterator  Pause(boost::uuids::uuid id);
+	void  Pause(boost::uuids::uuid id);
 	CommandBuffer Update(float dt);
-
+	void ZoneModel::swapOutEvent(const MyBasicHapticEvent& event);
+	bool ZoneModel::isTopEvent(const MyBasicHapticEvent& event) const;
 	ZoneModel();
 private:
 	
 	inline PlayingContainer::iterator findPlayingEvent(const boost::uuids::uuid& id);
 	inline PausedContainer::iterator findPausedEvent(const boost::uuids::uuid& id);
 
-	void setCreationCommands(std::function<void(CommandBuffer* buffer)>);
-	void setCleanupCommands(std::function<void(CommandBuffer* buffer)>);
+	//provides locked writing to the creation buffer
+	void setCreationCommands(CommandBuffer buffer);
+
+	//provides locked writing to the cleanup buffer
+	void setCleanupCommands(CommandBuffer buffer);
 	CommandBuffer m_creationCommands;
 	CommandBuffer m_cleanupCommands;
 	PlayingContainer m_events;
 	PausedContainer m_pausedEvents;
-	std::mutex m_mutex;
+	std::mutex m_eventsMutex;
+	std::mutex m_pausedMutex;
+	std::mutex m_commandsMutex;
+	boost::uuids::random_generator m_idGen;
 
 
 };
@@ -112,10 +121,11 @@ private:
 	void controlRetained(boost::uuids::uuid handle, NSVR_PlaybackCommand command) override;
 	void realtime(const RealtimeArgs& args) override;
 
+	boost::uuids::random_generator m_gen;
 	enum class Mode {Retained, Realtime};
 	void transitionInto(Mode mode);
 	Mode m_currentMode;
-	boost::uuids::uuid m_id;
+	boost::uuids::uuid m_parentId;
 	std::mutex m_mutex;
 	CommandBuffer m_commands;
 };

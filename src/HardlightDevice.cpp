@@ -7,8 +7,9 @@
 
 
 
-MyBasicHapticEvent::MyBasicHapticEvent(boost::uuids::uuid id, uint32_t area, float duration, float strength, uint32_t effect) :
-		m_id(id),
+MyBasicHapticEvent::MyBasicHapticEvent(boost::uuids::uuid parent_id, boost::uuids::uuid unique_id, uint32_t area, float duration, float strength, uint32_t effect) :
+		m_parentId(parent_id),
+		m_uniqueId(unique_id),
 		m_area(area),
 		m_duration(duration),
 		m_strength(strength),
@@ -17,13 +18,13 @@ MyBasicHapticEvent::MyBasicHapticEvent(boost::uuids::uuid id, uint32_t area, flo
 		m_playing(true) {
 }
 
-MyBasicHapticEvent::MyBasicHapticEvent(boost::uuids::uuid id) : m_id(id) {}
+MyBasicHapticEvent::MyBasicHapticEvent(boost::uuids::uuid id) : m_parentId(id) {}
 
 
-bool MyBasicHapticEvent::operator==(const MyBasicHapticEvent & other)
+bool MyBasicHapticEvent::operator==(const MyBasicHapticEvent & other) const
 {
 
-	return m_id == other.m_id;
+	return m_uniqueId == other.m_uniqueId;
 
 }
 
@@ -37,37 +38,40 @@ bool MyBasicHapticEvent::IsFunctionallyIdentical(const MyBasicHapticEvent &other
 		&& m_strength == other.m_strength;
 }
 
-void MyBasicHapticEvent::EmitCleanupCommands(CommandBuffer * buffer) const
+CommandBuffer MyBasicHapticEvent::EmitCleanupCommands() const
 {
-	if (m_duration == 0.0) {
-		return;
-	}
+	//if (m_duration == 0.0) {
+	//	return CommandBuffer();
+	//}
 
-	if (buffer != nullptr) {
-		using namespace NullSpaceIPC;
-		EffectCommand command;
-		command.set_area(m_area);
-		command.set_command(EffectCommand_Command::EffectCommand_Command_HALT);
+	
+	using namespace NullSpaceIPC;
 
+	EffectCommand command;
+	command.set_area(m_area);
+	command.set_command(EffectCommand_Command::EffectCommand_Command_HALT);
 
-		buffer->push_back(std::move(command));
-	}
+	CommandBuffer result;
+	result.push_back(std::move(command));
+	return result;
+
 }
 
 
-void MyBasicHapticEvent::EmitCreationCommands(CommandBuffer* buffer) const{
-	if (buffer != nullptr) {
-		//we could cache the command if this ever ever ever becomes a bottleneck
-		using namespace NullSpaceIPC;
-		EffectCommand command;
-		command.set_area(m_area);
-		command.set_command(m_duration == 0.0 ? EffectCommand_Command::EffectCommand_Command_PLAY : NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-		command.set_effect(m_effect);
-		command.set_strength(m_strength);
+CommandBuffer MyBasicHapticEvent::EmitCreationCommands() const{
 
+	//we could cache the command if this ever ever ever becomes a bottleneck
+	using namespace NullSpaceIPC;
+	EffectCommand command;
+	command.set_area(m_area);
+	command.set_command(m_duration == 0.0 ? EffectCommand_Command::EffectCommand_Command_PLAY : NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
+	command.set_effect(m_effect);
+	command.set_strength(m_strength);
 
-		buffer->push_back(std::move(command));
-	}
+	CommandBuffer result;
+	result.push_back(std::move(command));
+	return result;
+	
 }
 
 
@@ -106,87 +110,91 @@ inline bool isOneshot(const MyBasicHapticEvent& event) {
 }
 
 
-//these purely emit commands. They do not change the execution state of the events.
-//We must do this at a higher level where we know the context, e.g. is it pausing or deleting?
-CommandBuffer transitionUp(const MyBasicHapticEvent& topOfStack, const MyBasicHapticEvent& newEvent) {
 
-	CommandBuffer result;
-	newEvent.EmitCreationCommands(&result);
-	return result;
-}
-
-CommandBuffer transitionDown(const MyBasicHapticEvent& topOfStack, const MyBasicHapticEvent& newEvent) {
-	CommandBuffer result;
-	newEvent.EmitCreationCommands(&result);
-	return result;
-}
-
-//todo: Need to protect with mutexes
+//aquires the events mutex
 void ZoneModel::Put(MyBasicHapticEvent event) {
 
+
+	std::lock_guard<std::mutex> guard(m_eventsMutex);
+
+	setCreationCommands(event.EmitCreationCommands());
+
 	if (m_events.empty()) {
+		if (isOneshot(event)) {
+			setCleanupCommands(event.EmitCleanupCommands());
+		}
 		m_events.push_back(std::move(event));
-
-		setCreationCommands([&](CommandBuffer* buffer) {
-			m_events.back().EmitCreationCommands(buffer);
-		});
 	}
-	else {
-
-		auto& topOfStack = m_events.back();
-
-		setCreationCommands([&](CommandBuffer* buffer) {
-			CommandBuffer commands = transitionUp(topOfStack, event);
-			buffer->insert(buffer->begin(), commands.begin(), commands.end());
-		});
-
-		if (isOneshot(topOfStack)) {
-			//if it's a oneshot on top of the stack, we want any newer oneshots in this batch to replace it
-			//additionally, we want any new continuous plays to replace it. This behavior may change. 
-			std::swap(topOfStack, event);
-		}
-		else if (isContinuous(topOfStack) && isOneshot(event)) {
-			//If a continuous was previously playing and we want to replace it with a oneshot,
-			//we need a dirty hack to halt the cont-play. Firmware should just replace it, but it doesnt.
-			setCleanupCommands([&](CommandBuffer* buffer) {
-				topOfStack.EmitCleanupCommands(buffer);
-			});
-
-			m_events.push_back(std::move(event));
-		}
-
-		else {
-			m_events.push_back(std::move(event));
-		}
-	}
-}
-
-ZoneModel::PlayingContainer::iterator ZoneModel::Remove(boost::uuids::uuid id)
-{
-	auto nextEvent = Pause(id);
 	
-	//Since pausing will move the effect to the paused list, we should actually remove it from there as well
-	auto maybePausedEvent = findPausedEvent(id);
-	if (maybePausedEvent != m_pausedEvents.end()) {
-		m_pausedEvents.erase(maybePausedEvent);
+	else if (isOneshot(m_events.back())) {
+		//We want newer oneshots to replace older oneshots
+		//We want a continuous play to replace a oneshot
+		std::swap(m_events.back(), event);
 	}
 
-	return nextEvent;
+	else if (isContinuous(m_events.back()) && isOneshot(event)) {
+		//We want a oneshot to play over a continuous
+		//But the firmware requires a dirty hack: send a halt first
+		setCleanupCommands(m_events.back().EmitCleanupCommands());
+		m_events.push_back(std::move(event));
+	} 
+
+	else {
+		//Continuous should be added over continuous
+		m_events.push_back(std::move(event));
+	}
 }
 
+
+struct parent_id_matches {
+	parent_id_matches(boost::uuids::uuid id) : id(id) {}
+	boost::uuids::uuid id;
+	bool operator()(const MyBasicHapticEvent& event) const {
+		return event.m_parentId == id;
+	}
+};
+
+
+struct unique_id_matches {
+	unique_id_matches(const MyBasicHapticEvent& event) : id(event.m_uniqueId) {}
+	boost::uuids::uuid id;
+	bool operator()(const MyBasicHapticEvent& event) const {
+		return event.m_uniqueId == id;
+	}
+};
+
+//acquires events and paused mutexes
+void ZoneModel::Remove(boost::uuids::uuid id)
+{
+	//First we pause for the side effects of stopping the event
+	Pause(id);
+	
+	{
+		std::lock_guard<std::mutex> guard(m_pausedMutex);
+		//Second we remove from paused (because pause sticks stuff in the paused list)
+		m_pausedEvents.erase(std::remove_if(m_pausedEvents.begin(), m_pausedEvents.end(), parent_id_matches(id)), m_pausedEvents.end());
+
+	}
+}
+
+//acquires the paused and events mutexes
 void ZoneModel::Play(boost::uuids::uuid id) {
+
+	std::lock_guard<std::mutex> guard(m_pausedMutex);
+
 	if (m_pausedEvents.empty()) {
 		return;
 	}
-	auto it = std::find(m_pausedEvents.begin(), m_pausedEvents.end(),MyBasicHapticEvent(id));
 
-
-	if (it != m_pausedEvents.end()) {
-		Put(*it);
-		m_pausedEvents.erase(it);
+	for (const auto& event : m_pausedEvents) {
+		if (parent_id_matches(id)(event)) {
+			Put(event);
+		}
 	}
-	
+
+	m_pausedEvents.erase(std::remove_if(m_pausedEvents.begin(), m_pausedEvents.end(), parent_id_matches(id)), m_pausedEvents.end());
 }
+
 const ZoneModel::PausedContainer& ZoneModel::PausedEvents()
 {
 	return m_pausedEvents;
@@ -197,91 +205,133 @@ const ZoneModel::PlayingContainer& ZoneModel::PlayingEvents()
 	return m_events;
 }
 
+void ZoneModel::swapOutEvent(const MyBasicHapticEvent& event) {
+	assert(!m_events.empty());
 
-
-ZoneModel::PlayingContainer::iterator ZoneModel::Pause(boost::uuids::uuid id) {
-	
-	/*
-	if it's the top of the stack, we need to clean the effect up and put it in paused, then remove from playing.
-	If at that point playing has something left, we should restart it. If it's not on the top of the stack, we
-	can just remove it and put it in paused.
-	*/
-
-	if (m_events.empty()) {
-		return m_events.end();
-	}
-	
-	auto potentialEvent = findPlayingEvent(id);
-	if (potentialEvent == m_events.end()) {
-		return m_events.end();
-	}
-	//if the event exists in playing, we should put a copy of it into the paused event container
-	m_pausedEvents.push_back(*potentialEvent);
-
-	if (*potentialEvent == m_events.back()) {
-		//if the event was the 'top' of the stack, we should clean it up
-		if (m_events.size() > 1) {
-			assert(isContinuous(*(m_events.end() - 2)));
-			//since is something below it, we should create it
-			setCreationCommands([&](CommandBuffer* buffer) {
-				(m_events.end() - 2)->EmitCreationCommands(buffer);
-			});
+	//is it the only event in the stack?
+	if (m_events.size() == 1) {
+		if (isContinuous(event)) {
+			setCleanupCommands(event.EmitCleanupCommands());
 		}
-		else {
-			//since it's the only thing, we need to cleanup
-			if (isContinuous(*potentialEvent)) {
-				setCleanupCommands([&](CommandBuffer* buffer) {
-					(*potentialEvent).EmitCleanupCommands(buffer);
-				});
-			}
-		}
-
-		//then remove it
-		auto nextEvent = m_events.erase(potentialEvent);
-
-		//and if there was something beneath it, tell it to create itself
-		if (!m_events.empty()) {
-			setCreationCommands([&](CommandBuffer* buffer) {
-				m_events.back().EmitCreationCommands(buffer);
-			});
-		}
-
-		return nextEvent;
 	}
 	else {
-		//if it wasn't the top, then it has no effect on the motor, so just erase it
-		return m_events.erase(potentialEvent);
+		if (isOneshot(event)) {
+			//if swapping out a oneshot..
+		}
+		const auto& newTop = m_events.end()[-2];
+		assert(isContinuous(newTop)); //should never have the hack case of going from cont to oneshot
+		setCreationCommands(newTop.EmitCreationCommands());
 	}
+
+	
 }
 
-CommandBuffer ZoneModel::Update(float dt) {
-	
-	std::lock_guard<std::mutex> guard(m_mutex);
+bool ZoneModel::isTopEvent(const MyBasicHapticEvent& event) const {
+	assert(!m_events.empty());
+	return event == m_events.back();
+}
 
-	auto event = m_events.begin();
-	while (event != m_events.end()) {
-		event->Update(dt);
-		if (event->Finished()) {
-			event = Remove(event->m_id);
-		}
-		else {
-			++event;
-		}
+//acquires the events and paused mutexes
+void ZoneModel::Pause(boost::uuids::uuid id) {
+
+
+
+
+	/*
+	Case 0: There are no events
+		Return
+	Case 1: There are no matching events
+		Return 
+	Case 2: The matching events contain an event which is at the top of the stack (i.e. playing)
+		Clean up that effect
+		Put all effects in paused
+		Remove all effects from playing
+	Case 3: The matching events do not contain an event which is at the top of the stack
+		Put all effects in paused
+		remove all effects from playing
+	*/
+
+	std::lock_guard<std::mutex> guard(m_eventsMutex);
+
+	//Case 0
+	if (m_events.empty()) {
+		return;
 	}
 
-	CommandBuffer results;
-	results.reserve(m_cleanupCommands.size() + m_creationCommands.size());
+	//PROBLEM IS, PARENT MATCH ID WONT MATCH ON UNIQUE ID DUHHHH
+	//Case 1
+	std::vector<MyBasicHapticEvent> matchedEvents;
+	std::copy_if(m_events.begin(), m_events.end(), std::back_inserter(matchedEvents), parent_id_matches(id));
 
-	results.insert(results.end(), m_cleanupCommands.begin(), m_cleanupCommands.end());
-	results.insert(results.end(), m_creationCommands.begin(), m_creationCommands.end());
+	if (matchedEvents.empty()) {
+		return;
+	}
+
+	auto playingEvent = std::find_if(matchedEvents.begin(), matchedEvents.end(), unique_id_matches(m_events.back()));
+
+	//Case 2
+	if (playingEvent != matchedEvents.end()) {
+		swapOutEvent(*playingEvent);
+	}
+
+	//Case 3 & tail of Case 2
+
+	{
+		std::lock_guard<std::mutex> guard(m_pausedMutex);
+		//First copy all the matched events into paused
+		m_pausedEvents.insert(m_pausedEvents.end(), matchedEvents.begin(), matchedEvents.end());
+	}
+
+	//Then erase them from playing
+	m_events.erase(std::remove_if(m_events.begin(), m_events.end(), parent_id_matches(id)), m_events.end());
+
 	
-	m_cleanupCommands.clear();
-	m_creationCommands.clear();
+}
+
+
+CommandBuffer ZoneModel::Update(float dt) {
+	{
+		std::lock_guard<std::mutex> guard(m_eventsMutex);
+		
+		auto event = m_events.begin();
+		while (event != m_events.end()) {
+			event->Update(dt);
+			if (event->Finished()) {
+				if (isTopEvent(*event)) { swapOutEvent(*event); }
+				event = m_events.erase(event);
+			}
+			else {
+				++event;
+			}
+		}
+	}
+	
+
+	
+	CommandBuffer results;
+
+	{
+		std::lock_guard<std::mutex> guard(m_commandsMutex);
+		results.insert(results.end(), m_cleanupCommands.begin(), m_cleanupCommands.end());
+		results.insert(results.end(), m_creationCommands.begin(), m_creationCommands.end());
+		m_cleanupCommands.clear();
+		m_creationCommands.clear();
+	}
+
+	
+
 	return results;
 
 }
 
-ZoneModel::ZoneModel(): m_cleanupCommands(), m_creationCommands(), m_pausedEvents(), m_mutex(), m_events()
+ZoneModel::ZoneModel(): 
+	m_cleanupCommands(), 
+	m_creationCommands(), 
+	m_pausedEvents(),  
+	m_events(),
+	m_eventsMutex(),
+	m_commandsMutex(),
+	m_pausedMutex()
 {
 
 }
@@ -296,16 +346,16 @@ ZoneModel::PausedContainer::iterator ZoneModel::findPausedEvent(const boost::uui
 	return std::find(m_pausedEvents.begin(), m_pausedEvents.end(), MyBasicHapticEvent(id));
 }
 
-void ZoneModel::setCreationCommands(std::function<void(CommandBuffer*buffer)> creator )
+void ZoneModel::setCreationCommands(CommandBuffer buffer)
 {
-	m_creationCommands.clear();
-	creator(&m_creationCommands);
+	std::lock_guard<std::mutex> guard(m_commandsMutex);
+	m_creationCommands = buffer;
 }
 
-void ZoneModel::setCleanupCommands(std::function<void(CommandBuffer*buffer)> cleaner)
+void ZoneModel::setCleanupCommands(CommandBuffer buffer)
 {
-	m_cleanupCommands.clear();
-	cleaner(&m_cleanupCommands);
+	std::lock_guard<std::mutex> guard(m_commandsMutex);
+	m_cleanupCommands = buffer;
 }
 
 
@@ -313,13 +363,14 @@ void ZoneModel::setCleanupCommands(std::function<void(CommandBuffer*buffer)> cle
 class BasicHapticEventCreator : public boost::static_visitor<MyBasicHapticEvent> {
 private:
 	//Main ID of the effect
-	boost::uuids::uuid& m_id;
+	boost::uuids::uuid m_parentId;
 	uint32_t m_area;
+	boost::uuids::uuid m_uniqueId;
 public:
-	BasicHapticEventCreator(boost::uuids::uuid& id, uint32_t area) : m_id(id), m_area(area) {}
+	BasicHapticEventCreator(boost::uuids::uuid id, boost::uuids::uuid unique_id, uint32_t area) : m_parentId(id), m_uniqueId(unique_id), m_area(area) {}
 
 	MyBasicHapticEvent operator()(const BasicHapticEvent& hapticEvent) const {
-		return MyBasicHapticEvent(m_id, m_area, hapticEvent.Duration, hapticEvent.Strength, hapticEvent.RequestedEffectFamily);
+		return MyBasicHapticEvent(m_parentId, m_uniqueId, m_area, hapticEvent.Duration, hapticEvent.Strength, hapticEvent.RequestedEffectFamily);
 	}
 };
 
@@ -393,12 +444,12 @@ CommandBuffer Hardlight_Mk3_ZoneDriver::update(float dt)
 
 boost::uuids::uuid Hardlight_Mk3_ZoneDriver::Id() const
 {
-	return m_id;
+	return m_parentId;
 }
 
 
 Hardlight_Mk3_ZoneDriver::Hardlight_Mk3_ZoneDriver(::Location area) : 
-	m_id(boost::uuids::random_generator()()), 
+	m_parentId(boost::uuids::random_generator()()), 
 	m_area(static_cast<uint32_t>(area)),
 	m_currentMode(Mode::Retained),
 	m_commands(),
@@ -449,7 +500,7 @@ void Hardlight_Mk3_ZoneDriver::transitionInto(Mode mode)
 void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const SuitEvent & event)
 {
 
-	m_retainedModel.Put(boost::apply_visitor(BasicHapticEventCreator(handle, m_area), event));
+	m_retainedModel.Put(boost::apply_visitor(BasicHapticEventCreator(handle, m_gen(), m_area), event));
 
 	transitionInto(Mode::Retained);
 
