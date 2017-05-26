@@ -16,6 +16,15 @@ namespace NS {
 	}
 }
 
+
+struct time_sorter {
+	bool operator()(const SuitEvent& lhs, const SuitEvent& rhs) {
+		auto visitor = TimeOffsetVisitor();
+		float t1 = boost::apply_visitor(visitor, lhs);
+		float t2 = boost::apply_visitor(visitor, rhs);
+		return t1 < t2;
+	}
+};
 PlayableEffect::PlayableEffect(std::vector<SuitEvent> effects,EventRegistry& reg, boost::uuids::random_generator& uuid) :
 	_effects(std::move(effects)),
 	_state(PlaybackState::IDLE),
@@ -23,6 +32,9 @@ PlayableEffect::PlayableEffect(std::vector<SuitEvent> effects,EventRegistry& reg
 	_id(uuid())
 {
 	assert(!_effects.empty());
+
+	std::sort(_effects.begin(), _effects.end(), time_sorter());
+
 	reset();
 }
 

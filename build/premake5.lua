@@ -2,7 +2,7 @@
 
 
 workspace "Plugin"
-	configurations {"Debug", "Release"}
+	configurations {"Debug", "Release", "UnitTest"}
 	platforms {"Win32", "Win64"}
 	language "C++"
 	
@@ -10,7 +10,7 @@ workspace "Plugin"
 
 
 project "Plugin" 
-	kind "SharedLib"
+
 	
 	targetdir "bin/%{cfg.buildcfg}/%{cfg.platform}"
 	targetname "NSLoader"
@@ -41,6 +41,9 @@ project "Plugin"
 		"../src/*.cpp",
 		"../src/*.h",
 		"../src/*.hpp",
+		"../src/test/*.hpp",
+		"../src/test/*.h",
+		"../src/test/*.cpp",
 		path.join(protobuf_def_incl_dir, "DriverCommand.pb.cc"),
 		path.join(protobuf_def_incl_dir, "EffectCommand.pb.cc"),
 		path.join(shared_comms_incl_dir, "ScheduledEvent.cpp")
@@ -67,7 +70,14 @@ project "Plugin"
 		flags {'NoPCH'}
 	filter {"files:**ScheduledEvent.cpp"}
 		flags {'NoPCH'}
+	filter {"files:**test_main.cpp"}
+	 	flags{'NoPCH'}
 
+
+	filter {"configurations:Debug or configurations:Release"}
+		kind "SharedLib"
+	filter {"configurations:UnitTest"}
+		kind "ConsoleApp"
 
 	-- input: libprotobuf
 	filter {"platforms:Win32", "configurations:Debug"}
@@ -87,6 +97,16 @@ project "Plugin"
 			path.join(protobuf_win64_dir, "Release")
 		}
 
+	-- unit testing
+	filter {"platforms:Win32", "configurations:UnitTest"}
+		libdirs {
+			path.join(protobuf_win32_dir, "Debug")
+		}
+	filter {"platforms:Win64", "configurations:UnitTest"}
+		libdirs {
+			path.join(protobuf_win64_dir, "Debug")
+		}
+
 
 	filter "platforms:Win32" 
 		system "Windows"
@@ -101,7 +121,7 @@ project "Plugin"
 		libdirs {
 			boost_win64_dir
 		}
-	filter "configurations:Debug"
+	filter "configurations:Debug or configurations:UnitTest"
 		defines {"DEBUG", "_DEBUG"}
 		symbols "On"
 		optimize "Off"
@@ -115,6 +135,6 @@ project "Plugin"
 	filter {"system:Windows"}
 		defines {"_WINDOWS", "_USRDLL"}
 
-	filter {"system:Windows", "configurations:Debug"}
+	filter {"system:Windows", "configurations:Debug or configurations:UnitTest"}
 		buildoptions {"-D_SCL_SECURE_NO_WARNINGS"}
 
