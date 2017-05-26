@@ -114,35 +114,36 @@ inline bool isOneshot(const MyBasicHapticEvent& event) {
 //aquires the events mutex
 void ZoneModel::Put(MyBasicHapticEvent event) {
 
+	std::lock_guard<std::mutex> guard(m_stagingLock);
+	m_stagingEvents.push_back(std::move(event));
+	//std::lock_guard<std::mutex> guard(m_eventsMutex);
 
-	std::lock_guard<std::mutex> guard(m_eventsMutex);
+	//setCreationCommands(event.EmitCreationCommands());
 
-	setCreationCommands(event.EmitCreationCommands());
+	//if (m_events.empty()) {
+	//	if (isOneshot(event)) {
+	//		setCleanupCommands(event.EmitCleanupCommands());
+	//	}
+	//	m_events.push_back(std::move(event));
+	//}
+	//
+	//else if (isOneshot(m_events.back())) {
+	//	//We want newer oneshots to replace older oneshots
+	//	//We want a continuous play to replace a oneshot
+	//	std::swap(m_events.back(), event);
+	//}
 
-	if (m_events.empty()) {
-		if (isOneshot(event)) {
-			setCleanupCommands(event.EmitCleanupCommands());
-		}
-		m_events.push_back(std::move(event));
-	}
-	
-	else if (isOneshot(m_events.back())) {
-		//We want newer oneshots to replace older oneshots
-		//We want a continuous play to replace a oneshot
-		std::swap(m_events.back(), event);
-	}
+	//else if (isContinuous(m_events.back()) && isOneshot(event)) {
+	//	//We want a oneshot to play over a continuous
+	//	//But the firmware requires a dirty hack: send a halt first
+	//	setCleanupCommands(m_events.back().EmitCleanupCommands());
+	//	m_events.push_back(std::move(event));
+	//} 
 
-	else if (isContinuous(m_events.back()) && isOneshot(event)) {
-		//We want a oneshot to play over a continuous
-		//But the firmware requires a dirty hack: send a halt first
-		setCleanupCommands(m_events.back().EmitCleanupCommands());
-		m_events.push_back(std::move(event));
-	} 
-
-	else {
-		//Continuous should be added over continuous
-		m_events.push_back(std::move(event));
-	}
+	//else {
+	//	//Continuous should be added over continuous
+	//	m_events.push_back(std::move(event));
+	//}
 }
 
 
@@ -166,33 +167,41 @@ struct unique_id_matches {
 //acquires events and paused mutexes
 void ZoneModel::Remove(boost::uuids::uuid id)
 {
-	//First we pause for the side effects of stopping the event
-	Pause(id);
-	
-	{
-		std::lock_guard<std::mutex> guard(m_pausedMutex);
-		//Second we remove from paused (because pause sticks stuff in the paused list)
-		m_pausedEvents.erase(std::remove_if(m_pausedEvents.begin(), m_pausedEvents.end(), parent_id_matches(id)), m_pausedEvents.end());
 
-	}
+	std::lock_guard<std::mutex> guard(m_stagingLock);
+	m_stagingCommands.emplace_back(id, UserCommand::Command::Remove);
+	//First we pause for the side effects of stopping the event
+	//Pause(id);
+	//
+	//{
+	//	std::lock_guard<std::mutex> guard(m_pausedMutex);
+	//	//Second we remove from paused (because pause sticks stuff in the paused list)
+	//	m_pausedEvents.erase(std::remove_if(m_pausedEvents.begin(), m_pausedEvents.end(), parent_id_matches(id)), m_pausedEvents.end());
+
+	//}
 }
 
 //acquires the paused and events mutexes
 void ZoneModel::Play(boost::uuids::uuid id) {
 
-	std::lock_guard<std::mutex> guard(m_pausedMutex);
 
-	if (m_pausedEvents.empty()) {
-		return;
-	}
+	std::lock_guard<std::mutex> guard(m_stagingLock);
+	m_stagingCommands.emplace_back(id, UserCommand::Command::Play);
 
-	for (const auto& event : m_pausedEvents) {
-		if (parent_id_matches(id)(event)) {
-			Put(event);
-		}
-	}
 
-	m_pausedEvents.erase(std::remove_if(m_pausedEvents.begin(), m_pausedEvents.end(), parent_id_matches(id)), m_pausedEvents.end());
+	//std::lock_guard<std::mutex> guard(m_pausedMutex);
+
+	//if (m_pausedEvents.empty()) {
+	//	return;
+	//}
+
+	//for (const auto& event : m_pausedEvents) {
+	//	if (parent_id_matches(id)(event)) {
+	//		Put(event);
+	//	}
+	//}
+
+	//m_pausedEvents.erase(std::remove_if(m_pausedEvents.begin(), m_pausedEvents.end(), parent_id_matches(id)), m_pausedEvents.end());
 }
 
 const ZoneModel::PausedContainer& ZoneModel::PausedEvents()
@@ -233,7 +242,8 @@ bool ZoneModel::isTopEvent(const MyBasicHapticEvent& event) const {
 
 //acquires the events and paused mutexes
 void ZoneModel::Pause(boost::uuids::uuid id) {
-
+	std::lock_guard<std::mutex> guard(m_stagingLock);
+	m_stagingCommands.emplace_back(id, UserCommand::Command::Pause);
 
 
 
@@ -251,77 +261,102 @@ void ZoneModel::Pause(boost::uuids::uuid id) {
 		remove all effects from playing
 	*/
 
-	std::lock_guard<std::mutex> guard(m_eventsMutex);
+	//std::lock_guard<std::mutex> guard(m_eventsMutex);
 
-	//Case 0
-	if (m_events.empty()) {
-		return;
-	}
+	////Case 0
+	//if (m_events.empty()) {
+	//	return;
+	//}
 
-	//PROBLEM IS, PARENT MATCH ID WONT MATCH ON UNIQUE ID DUHHHH
-	//Case 1
-	std::vector<MyBasicHapticEvent> matchedEvents;
-	std::copy_if(m_events.begin(), m_events.end(), std::back_inserter(matchedEvents), parent_id_matches(id));
+	////PROBLEM IS, PARENT MATCH ID WONT MATCH ON UNIQUE ID DUHHHH
+	////Case 1
+	//std::vector<MyBasicHapticEvent> matchedEvents;
+	//std::copy_if(m_events.begin(), m_events.end(), std::back_inserter(matchedEvents), parent_id_matches(id));
 
-	if (matchedEvents.empty()) {
-		return;
-	}
+	//if (matchedEvents.empty()) {
+	//	return;
+	//}
 
-	auto playingEvent = std::find_if(matchedEvents.begin(), matchedEvents.end(), unique_id_matches(m_events.back()));
+	//auto playingEvent = std::find_if(matchedEvents.begin(), matchedEvents.end(), unique_id_matches(m_events.back()));
 
-	//Case 2
-	if (playingEvent != matchedEvents.end()) {
-		swapOutEvent(*playingEvent);
-	}
+	////Case 2
+	//if (playingEvent != matchedEvents.end()) {
+	//	swapOutEvent(*playingEvent);
+	//}
 
-	//Case 3 & tail of Case 2
+	////Case 3 & tail of Case 2
 
-	{
-		std::lock_guard<std::mutex> guard(m_pausedMutex);
-		//First copy all the matched events into paused
-		m_pausedEvents.insert(m_pausedEvents.end(), matchedEvents.begin(), matchedEvents.end());
-	}
+	//{
+	//	std::lock_guard<std::mutex> guard(m_pausedMutex);
+	//	//First copy all the matched events into paused
+	//	m_pausedEvents.insert(m_pausedEvents.end(), matchedEvents.begin(), matchedEvents.end());
+	//}
 
-	//Then erase them from playing
-	m_events.erase(std::remove_if(m_events.begin(), m_events.end(), parent_id_matches(id)), m_events.end());
+	////Then erase them from playing
+	//m_events.erase(std::remove_if(m_events.begin(), m_events.end(), parent_id_matches(id)), m_events.end());
 
-	
+	//
 }
 
-
+void pruneOneshots(std::vector<MyBasicHapticEvent>* events) {
+	auto secondToLast = events->end() - 1;
+	events->erase(std::remove_if(events->begin(), secondToLast, isOneshot), secondToLast);
+}
 CommandBuffer ZoneModel::Update(float dt) {
-	{
-		std::lock_guard<std::mutex> guard(m_eventsMutex);
-		
-		auto event = m_events.begin();
-		while (event != m_events.end()) {
-			event->Update(dt);
-			if (event->Finished()) {
-				if (isTopEvent(*event)) { swapOutEvent(*event); }
-				event = m_events.erase(event);
-			}
-			else {
-				++event;
-			}
-		}
-	}
-	
 
-	
-	CommandBuffer results;
+	m_stagingLock.lock();
+	auto requestedEvents = m_stagingEvents;
+	auto requestedCommands = m_stagingCommands;
+	m_stagingLock.unlock();
 
-	{
-		std::lock_guard<std::mutex> guard(m_commandsMutex);
-		results.insert(results.end(), m_cleanupCommands.begin(), m_cleanupCommands.end());
-		results.insert(results.end(), m_creationCommands.begin(), m_creationCommands.end());
-		m_cleanupCommands.clear();
-		m_creationCommands.clear();
-	}
 
-	
+	//First off, remove unreachable oneshots that will never play.
+	//This means every oneshot that is not at the back of the list will be removed.
+	pruneOneshots(&requestedEvents);
 
-	return results;
+	//Second, add all the events to the model
+	std::copy(requestedEvents.begin(), requestedEvents.end(), m_events.begin())
 
+
+
+
+
+
+
+
+
+	//{
+	//	std::lock_guard<std::mutex> guard(m_eventsMutex);
+	//	
+	//	auto event = m_events.begin();
+	//	while (event != m_events.end()) {
+	//		event->Update(dt);
+	//		if (event->Finished()) {
+	//			if (isTopEvent(*event)) { swapOutEvent(*event); }
+	//			event = m_events.erase(event);
+	//		}
+	//		else {
+	//			++event;
+	//		}
+	//	}
+	//}
+	//
+
+	//
+	//CommandBuffer results;
+
+	//{
+	//	std::lock_guard<std::mutex> guard(m_commandsMutex);
+	//	results.insert(results.end(), m_cleanupCommands.begin(), m_cleanupCommands.end());
+	//	results.insert(results.end(), m_creationCommands.begin(), m_creationCommands.end());
+	//	m_cleanupCommands.clear();
+	//	m_creationCommands.clear();
+	//}
+
+	//
+
+	//return results;
+	return CommandBuffer();
 }
 
 ZoneModel::ZoneModel(): 
@@ -553,4 +588,8 @@ CommandBuffer RtpModel::Update(float dt)
 	std::reverse(copy.begin(), copy.end());
 	return copy;
 
+}
+
+ZoneModel::UserCommand::UserCommand(boost::uuids::uuid id, Command c) : id(id), command(c)
+{
 }

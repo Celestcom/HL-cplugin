@@ -54,21 +54,34 @@ class ZoneModel {
 public:
 	typedef std::vector<MyBasicHapticEvent> PlayingContainer;
 	typedef std::vector<MyBasicHapticEvent> PausedContainer;
-	//todo: may need a mutex to protect access to command buffer?
-	//nullptr signals nothing playing
-	//if something is playing, returns a non-owning pointer to it
+
+
+	//Public, to-be-threadsafe api
 	void Put(MyBasicHapticEvent event);
 	void Remove(boost::uuids::uuid id);
 	void Play(boost::uuids::uuid id);
+	void  Pause(boost::uuids::uuid id);
+
 	const PausedContainer& PausedEvents();
 	const PlayingContainer& PlayingEvents();
-	void  Pause(boost::uuids::uuid id);
 	CommandBuffer Update(float dt);
 	void ZoneModel::swapOutEvent(const MyBasicHapticEvent& event);
 	bool ZoneModel::isTopEvent(const MyBasicHapticEvent& event) const;
 	ZoneModel();
 private:
-	
+	struct UserCommand {
+		enum class Command {
+			Unknown = 0, Play = 1, Pause = 2, Remove = 3
+		};
+		boost::uuids::uuid id;
+		Command command;
+
+		UserCommand(boost::uuids::uuid id, Command c);
+	};
+	std::vector<MyBasicHapticEvent> m_stagingEvents;
+	std::vector<UserCommand> m_stagingCommands;
+	std::mutex m_stagingLock;
+
 	inline PlayingContainer::iterator findPlayingEvent(const boost::uuids::uuid& id);
 	inline PausedContainer::iterator findPausedEvent(const boost::uuids::uuid& id);
 

@@ -14,6 +14,19 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 	auto& pausedEvents = model.PausedEvents();
 	auto& activeEvents = model.PlayingEvents();
 
+
+	SECTION("test") {
+		std::function<bool(int)> isEven = [&](int x) { return x % 2 == 0; };
+
+		std::vector<int> test = { 0,1,2,3,4 };
+		auto end = test.end() - 1;
+		test.erase(
+			std::remove_if(test.begin(),end, isEven),
+			end);
+
+		int z = 3;
+	}
+
 	SECTION("There should be no playing or paused events") {
 		REQUIRE(activeEvents.size() == 0);
 		REQUIRE(pausedEvents.size() == 0);
@@ -293,6 +306,8 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 			commands = model.Update(0.05);
 
 		}
+
+		
 
 		//need to test continuous interuppted by oneshot
 }
