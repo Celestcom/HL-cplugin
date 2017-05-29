@@ -36,8 +36,8 @@ CommandBuffer ZoneModel::Update(float dt) {
 	updateExistingEvents(dt);
 	removeExpiredEvents();
 
-	handleNewCommands();
 	handleNewEvents();
+	handleNewCommands();
 
 	return updateState();
 }
@@ -449,9 +449,14 @@ bool LiveBasicHapticEvent::isChildOf(const boost::uuids::uuid & parentId) const
 	return this->parentId == parentId;
 }
 
+boost::uuids::uuid LiveBasicHapticEvent::GetParentId()
+{
+	return parentId;
+}
+
 MotorStateChanger::MotorStateChanger(uint32_t areaId):
 	currentState(MotorFirmwareState::Idle),
-	previousEvent(),
+	previousContinuous(),
 	area(areaId)
 {
 }
@@ -464,16 +469,20 @@ MotorStateChanger::MotorFirmwareState MotorStateChanger::GetState() const
 CommandBuffer MotorStateChanger::transitionTo(const LiveBasicHapticEvent & event)
 {
 	CommandBuffer commands;
-	if (event == previousEvent) {
+	if (event == previousContinuous) {
 		commands = CommandBuffer();
 	} else if (event.isOneshot()) {
+
 		commands = transitionToOneshot(event.Data());
+		previousContinuous = boost::optional<LiveBasicHapticEvent>();
+
 	}
 	else {
 		commands = transitionToContinuous(event.Data());
+		previousContinuous = event;
+
 	}
 
-	previousEvent = event;
 	return commands;
 }
 
@@ -493,6 +502,7 @@ CommandBuffer MotorStateChanger::transitionToIdle()
 	}
 
 	currentState = MotorFirmwareState::Idle;
+	previousContinuous = boost::optional<LiveBasicHapticEvent>();
 	return requiredCmds;
 }
 

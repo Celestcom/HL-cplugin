@@ -11,6 +11,7 @@
 #include "Enums.h"
 #include <functional>
 #include <mutex>
+#include <boost/optional.hpp>
 #include <boost/lockfree/spsc_queue.hpp>
 
 
@@ -42,6 +43,7 @@ public:
 	bool isContinuous() const;
 	bool isOneshot() const;
 	bool isChildOf(const boost::uuids::uuid& parentId) const;
+	boost::uuids::uuid GetParentId();
 private:
 	boost::uuids::uuid parentId;
 	boost::uuids::uuid uniqueId;
@@ -59,7 +61,7 @@ public:
 	CommandBuffer transitionToIdle();
 private:
 	MotorFirmwareState currentState;
-	LiveBasicHapticEvent previousEvent;
+	boost::optional<LiveBasicHapticEvent> previousContinuous;
 	uint32_t area;
 	CommandBuffer transitionToOneshot(BasicHapticEventData data);
 	CommandBuffer transitionToContinuous(BasicHapticEventData data);

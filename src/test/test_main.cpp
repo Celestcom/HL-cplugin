@@ -94,6 +94,32 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 		model.Update(DELTA_TIME * 2 + .01);
 		REQUIRE(activeEvents.empty());
 	}
+
+	SECTION("A oneshot should cease generating commands after it has played") {
+		model.Put(makeOneshot());
+		model.Update(DELTA_TIME);
+		auto c1 = model.Update(DELTA_TIME);
+		auto c2 = model.Update(DELTA_TIME);
+		auto c3 = model.Update(DELTA_TIME);
+		REQUIRE(c1.empty());
+		REQUIRE(c2.empty());
+		REQUIRE(c3.empty());
+
+	}
+
+	SECTION("A continuous should cease generating commands after it has played") {
+		model.Put(makeCont(0.1));
+		model.Update(DELTA_TIME);
+		model.Update(DELTA_TIME * 2);
+		auto c1 = model.Update(DELTA_TIME);
+		auto c2 = model.Update(DELTA_TIME);
+		auto c3 = model.Update(DELTA_TIME);
+
+		REQUIRE(c1.empty());
+		REQUIRE(c2.empty());
+		REQUIRE(c3.empty());
+	}
+
 	SECTION("The model should drop all oneshots except the most recent in each batch") {
 		for (int i = 0; i < 100; i++) {
 			model.Put(makeOneshot());
@@ -203,51 +229,60 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 			REQUIRE(isContCommand(commands.at(0)));
 		}
 	}
-		//SECTION("Should layer continuous correctly") {
-		//	MyBasicHapticEvent cont_bottom(gen(), gen(), 0, 10.0, 0.3, 1);
-		//	MyBasicHapticEvent cont_middle(gen(), gen(), 0, 1.0, 0.5, 2);
 
-		//	model.Put(cont_bottom);
-		//	auto commands = model.Update(1.0f);
-		//	REQUIRE(commands.size() == 1);
-		//	REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-		//	REQUIRE(commands.at(0).effect() == cont_bottom.m_effect);
 
-		//	model.Put(cont_middle);
-		//	commands = model.Update(0.9f);
+	SECTION("Playback commands should work") {
+		SECTION("Pausing a nonexistant effect should not cause any exceptions") {
+			REQUIRE_NOTHROW(model.Pause(boost::uuids::uuid()));
+		}
+		SECTION("Playing a nonexistant effect should not cause any exceptions") {
+			REQUIRE_NOTHROW(model.Play(boost::uuids::uuid()));
+		}
+		SECTION("Removing a nonexistant effect should not cause any exceptions") {
+			REQUIRE_NOTHROW(model.Remove(boost::uuids::uuid()));
+		}
 
-		//	REQUIRE(commands.size() == 1);
-		//	REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-		//	REQUIRE(commands.at(0).effect() == cont_middle.m_effect);
 
-		//	commands = model.Update(0.2f);
+		SECTION("Pausing and playing cont play should move it to the correct lists") {
+			auto cont = makeCont();
+			model.Put(cont);
+			model.Update(DELTA_TIME);
+			model.Pause(cont.GetParentId());
+			model.Update(DELTA_TIME);
+			REQUIRE(activeEvents.empty());
+			REQUIRE(pausedEvents.size() == 1);
 
-		//	REQUIRE(commands.size() == 1);
-		//	REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-		//	REQUIRE(commands.at(0).effect() == cont_bottom.m_effect);
+			model.Play(cont.GetParentId());
+			model.Update(DELTA_TIME);
+			REQUIRE(pausedEvents.empty());
+			REQUIRE(activeEvents.size() == 1);
+		}
 
-		//	//MyBasicHapticEvent cont_top(boost::uuids::random_generator()(), 0, 1.0, 0.5, 1);
+		SECTION("Pausing and resuming play should generate the correct commands") {
+			auto cont = makeCont();
+			model.Put(cont);
+			model.Update(DELTA_TIME);
+			model.Pause(cont.GetParentId());
+			auto commands = model.Update(DELTA_TIME);
 
-		//	commands = model.Update(9.0f);
+			REQUIRE(commands.size() == 1);
+			REQUIRE(isIdleCommand(commands.at(0)));
 
-		//	REQUIRE(commands.size() == 1);
-		//	REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_HALT);
-		//}
-
-		//SECTION("Playing a oneshot right after another oneshot should work") {
-		//	MyBasicHapticEvent hum(gen(), gen(), 0, 0.0, 1.0, 1);
-		//	MyBasicHapticEvent click(gen(), gen(), 0, 0.0, 1.0, 2);
-		//	model.Put(hum);
-		//	//todo: test for the halt command as the oneshot is added
-		//	auto commands = model.Update(0.3);
-		//	model.Put(click);
-		//	commands = model.Update(0.05);
-
-		//}
-
-		//
-
-		//need to test continuous interuppted by oneshot
+			model.Play(cont.GetParentId());
+			commands = model.Update(DELTA_TIME);
+			REQUIRE(commands.size() == 1);
+			REQUIRE(isContCommand(commands.at(0)));
+		}
+		
+		
+		SECTION("It should (?) be possible to command an effect in the same batch that it is sent") {
+			auto cont = makeCont();
+			model.Put(cont);
+			model.Pause(cont.GetParentId());
+			model.Update(DELTA_TIME);
+			REQUIRE(pausedEvents.size() == 1);
+		}
+	}
 }
 
 
