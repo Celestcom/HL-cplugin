@@ -1,313 +1,251 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 #include <iostream>
-
+#include "../AreaFlags.h"
 #include "../HardlightDevice.h"
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid.hpp>
-TEST_CASE("The zone model works", "[ZoneModel]") {
-	ZoneModel model;
 
-	auto gen = boost::uuids::random_generator();
-	MyBasicHapticEvent oneshot_1(gen(), gen(), 0, 0.0, 1.0, 666);
+boost::uuids::random_generator idGenerator;
+const float DELTA_TIME = 0.05f;
+
+LiveBasicHapticEvent makeOneshot() {
+	BasicHapticEventData data;
+	data.area = (uint32_t)AreaFlag::Chest_Left;
+	data.duration = 0.0;
+	data.effect = 666;
+	data.strength = 1.0;
+	return LiveBasicHapticEvent(idGenerator(), idGenerator(), data);
+}
+
+
+LiveBasicHapticEvent makeCont(float duration) {
+	BasicHapticEventData data;
+	data.area = (uint32_t)AreaFlag::Chest_Left;
+	data.duration = duration;
+	data.effect = 555;
+	data.strength = 0.5;
+	return LiveBasicHapticEvent(idGenerator(), idGenerator(), data);
+}
+LiveBasicHapticEvent makeCont() {
+	return makeCont(1.0);
+}
+
+
+bool isIdleCommand(const NullSpaceIPC::EffectCommand& command) {
+
+	return command.command() == NullSpaceIPC::EffectCommand_Command_HALT;
+}
+bool isOneshotCommand(const NullSpaceIPC::EffectCommand& command) {
+	return command.command() == NullSpaceIPC::EffectCommand_Command_PLAY;
+}
+
+bool isContCommand(const NullSpaceIPC::EffectCommand& command) {
+	return command.command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS;
+}
+
+
+TEST_CASE("The zone model works", "[ZoneModel]") {
+	ZoneModel model((uint32_t)AreaFlag::Chest_Left);
 
 	auto& pausedEvents = model.PausedEvents();
 	auto& activeEvents = model.PlayingEvents();
 
 
-	SECTION("test") {
-		std::function<bool(int)> isEven = [&](int x) { return x % 2 == 0; };
-
-		std::vector<int> test = { 0,1,2,3,4 };
-		auto end = test.end() - 1;
-		test.erase(
-			std::remove_if(test.begin(),end, isEven),
-			end);
-
-		int z = 3;
-	}
-
-	SECTION("There should be no playing or paused events") {
+	SECTION("A default model should have no active and no paused effects") {
 		REQUIRE(activeEvents.size() == 0);
 		REQUIRE(pausedEvents.size() == 0);
+	}
 
-		/* General testing */
-		SECTION("There should be one playing event and no paused events") {
-			model.Put(oneshot_1);
-			REQUIRE(activeEvents.size() == 1);
-			REQUIRE(pausedEvents.empty());
-			REQUIRE(oneshot_1 == activeEvents.back());
+	SECTION("Continuous play should stop and start at the correct times") {
+		model.Put(makeCont(0.2));
+		auto startCommands = model.Update(DELTA_TIME);
+		auto potentialStops = model.Update(DELTA_TIME * 3);
+		auto stopCommands = model.Update(DELTA_TIME + .001);
+		REQUIRE(startCommands.size() == 1);
+		REQUIRE(isContCommand(startCommands.at(0)));
 
+		REQUIRE(potentialStops.empty());
 
-			SECTION("Removing the event should result in no active and no paused events") {
-				model.Remove(oneshot_1.m_parentId);
-				REQUIRE(activeEvents.empty());
-				REQUIRE(pausedEvents.empty());
-			}
+		REQUIRE(stopCommands.size() == 1);
+		REQUIRE(isIdleCommand(stopCommands.at(0)));
+	}
 
-			SECTION("Pausing the event should result in no active and one paused event") {
-				model.Pause(oneshot_1.m_parentId);
-				REQUIRE(activeEvents.empty());
-				REQUIRE(pausedEvents.size() == 1);
-			}
-
-			SECTION("Playing the event which was already added should have no effect") {
-				model.Play(oneshot_1.m_parentId);
-				REQUIRE(activeEvents.size() == 1);
-				REQUIRE(pausedEvents.empty());
-				REQUIRE(oneshot_1 == activeEvents.back());
-			}
-
-
-			SECTION("After one timestep, a PLAY command should be generated") {
-				CommandBuffer result = model.Update(0.1f);
-				REQUIRE(result.size() == 1);
-				REQUIRE(result.back().command() == NullSpaceIPC::EffectCommand_Command_PLAY);
-
-
-				SECTION("After two timesteps, no commands should be generated") {
-					CommandBuffer result = model.Update(0.1f);
-					REQUIRE(result.empty());
-				}
-			}
-
-			SECTION("After adding a second oneshot event, there should be only one playing event (as it replaces the first) and no paused events") {
-				MyBasicHapticEvent oneshot_2(gen(), gen(), 0, 0.0, 0.5, 666);
-				model.Put(oneshot_2);
-				REQUIRE(activeEvents.size() == 1);
-				REQUIRE(pausedEvents.empty());
-				REQUIRE(oneshot_2 == activeEvents.back());
-
-
-				SECTION("After adding a continuous event, there should be only one playing event (as it replaces the first) and no paused events") {
-					MyBasicHapticEvent cont_1(gen(), gen(), 0, 5.0, 0.3, 666);
-					model.Put(cont_1);
-					REQUIRE(activeEvents.size() == 1);
-					REQUIRE(pausedEvents.empty());
-					REQUIRE(cont_1 == activeEvents.back());
-
-
-					SECTION("After one timestep, a PLAY_CONTINUOUS command should be generated") {
-						CommandBuffer result = model.Update(4.9f);
-						REQUIRE(result.size() == 1);
-						REQUIRE(result.back().command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-
-
-						SECTION("After two timesteps (past the end of the cont play), a halt should be generated") {
-							CommandBuffer result = model.Update(0.1001f);
-							REQUIRE(result.size() == 1);
-							REQUIRE(result.back().command() == NullSpaceIPC::EffectCommand_Command_HALT);
-						}
-					}
-
-
-					SECTION("After adding a oneshot on top of a continuous, there should be two playing events and no paused events") {
-						MyBasicHapticEvent oneshot_3(gen(), gen(), 0, 0.0, 0.5, 666);
-						model.Put(oneshot_3);
-						REQUIRE(activeEvents.size() == 2);
-						REQUIRE(pausedEvents.empty());
-						REQUIRE(cont_1 == *(activeEvents.end() - 2));
-						REQUIRE(oneshot_3 == activeEvents.back());
-
-						
-					}
-
-					SECTION("After adding a continuous event on top of a continuous event, there should be two playing events and no paused events") {
-						MyBasicHapticEvent cont_2(gen(), gen(), 0, 3.0, 0.3, 666);
-						model.Put(cont_2);
-						REQUIRE(activeEvents.size() == 2);
-						REQUIRE(pausedEvents.empty());
-						REQUIRE(cont_2 == activeEvents.back());
-						REQUIRE(cont_1 == *(activeEvents.end() - 2));
-
-					}
-				}
-
-
-			}
-
-
-		}
+	SECTION("Oneshots should generate play command") {
+		model.Put(makeOneshot());
+		auto commands = model.Update(DELTA_TIME);
 	
-		/* Cont A start -> Cont B start -> Cont B end -> Cont A resume */
-		SECTION("After adding a cont play and simulating a timestep, there should be one CONT_PLAY command") {
+		REQUIRE(commands.size() == 1);
+		REQUIRE(isOneshotCommand(commands.at(0)));
+	}
 
-			/*
-			timestep = o
+	SECTION("Oneshots should be removed after they generate commands") {
+		model.Put(makeOneshot());
+		auto commands = model.Update(DELTA_TIME);
+		model.Update(DELTA_TIME);
 
-			0                      0.5                 1
-			|---o----o-----|---------------|-----------|
-			^first begin   ^-second begin  ^-second end ^first end
-			*/
-			MyBasicHapticEvent cont_1(gen(), gen(), 0, 1.0, 1.0, 666);
-			model.Put(cont_1);
-			auto commands = model.Update(0.1f);
-			REQUIRE(commands.size() == 1);
-			REQUIRE(commands.back().command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
+		REQUIRE(activeEvents.empty());
 
-			SECTION("After another timestep, there should be no commands") {
-				auto commands = model.Update(0.1f);
-				REQUIRE(commands.size() == 0);
-				
+	}
 
-				SECTION("After adding another cont play, there should be one CONT_PLAY command") {
-					MyBasicHapticEvent cont_2(gen(), gen(), 0, 0.3, 1.0, 666);
-
-					model.Put(cont_2);
-					auto commands = model.Update(0.1f);
-					REQUIRE(commands.size() == 1);
-					REQUIRE(commands.back().command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-
-
-					SECTION("After another timestep, there should be no commands") {
-						auto commands = model.Update(0.1f);
-						REQUIRE(commands.size() == 0);
-
-						SECTION("After a timestep past cont_2 end, there should be a cont play for cont_1") {
-							auto commands = model.Update(0.11f);
-							REQUIRE(commands.size() == 1);
-							REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-
-
-							SECTION("After a timestep past cont_1 end, there should be a halt") {
-								auto commands = model.Update(10.0f);
-								REQUIRE(commands.size() == 1);
-								REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_HALT);
-
-							}
-						}
-					}
-				
-				
-					SECTION("After pausing cont_2, there should be one CONT_PLAY command and one paused effect") {
-						model.Pause(cont_2.m_parentId);
-						auto commands = model.Update(0.1f);
-						REQUIRE(pausedEvents.size() == 1);
-						REQUIRE(commands.size() == 1);
-						REQUIRE(commands.back().command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-
-						SECTION("After removing cont_2, there should be one active effect and no paused events") {
-							model.Remove(cont_2.m_parentId);
-							REQUIRE(activeEvents.size() == 1);
-							REQUIRE(pausedEvents.size() == 0);
-							SECTION("After time step, there should be no commands") {
-								auto commands = model.Update(0.1f);
-								REQUIRE(commands.size() == 0);
-
-
-							}
-							
-						}
-
-					}
-				
-				
-				}
-			
-			
-			
-			}
-
-
+	SECTION("Continuous play should be removed after it generates commands") {
+		model.Put(makeCont(0.1));
+		model.Update(DELTA_TIME);
+		model.Update(DELTA_TIME * 2 + .01);
+		REQUIRE(activeEvents.empty());
+	}
+	SECTION("The model should drop all oneshots except the most recent in each batch") {
+		for (int i = 0; i < 100; i++) {
+			model.Put(makeOneshot());
 		}
+		model.Update(DELTA_TIME);
+		REQUIRE(activeEvents.size() == 1);
+	}
 	
-		
-		/* Adding a ton of oneshots in the same update batch*/
-		SECTION("After adding 1000 oneshots, there should be only one active effect") {
-			for (int i = 0; i < 1000; i++) {
-				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 0.0, 1.0, 666));
-			}
+	SECTION("The model should not drop any continuous plays in a batch") {
+		for (int i = 0; i < 100; i++) {
+			model.Put(makeCont());
+		}
+
+		model.Update(DELTA_TIME);
+		REQUIRE(activeEvents.size() == 100);
+	}
+
+	SECTION("Smoketests for correct dropping behavior") {
+		SECTION("C -> O -> O -> C should result in C C") {
+			model.Put(makeCont());
+			model.Put(makeOneshot());
+			model.Put(makeOneshot());
+			model.Put(makeCont());
+
+			model.Update(DELTA_TIME);
+			REQUIRE(activeEvents.size() == 2);
+			REQUIRE(activeEvents.at(0).isContinuous());
+			REQUIRE(activeEvents.at(1).isContinuous());
+		}
+
+		SECTION("O -> O -> O -> C should result in C") {
+			model.Put(makeOneshot());
+			model.Put(makeOneshot());
+			model.Put(makeOneshot());
+			model.Put(makeCont());
+			model.Update(DELTA_TIME);
 			REQUIRE(activeEvents.size() == 1);
+			REQUIRE(activeEvents.at(0).isContinuous());
 		}
 
-		/* Adding a ton of cont play in the same update batch */
-		SECTION("After adding 1000 cont plays, there should be 1000 active effects") {
-			for (int i = 0; i < 1000; i++) {
-				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 1.0, 1.0, 666));
-			}
-			REQUIRE(activeEvents.size() == 1000);
+		SECTION("O -> O should result in O") {
+			model.Put(makeOneshot());
+			model.Put(makeOneshot());
+			model.Update(DELTA_TIME);
+			REQUIRE(activeEvents.size() == 1);
+			REQUIRE(activeEvents.at(0).isOneshot());
 		}
-
-		/* Adding a mix of cont play and oneshot in the same batch*/
-		/* this is probably a dumb test */
-		SECTION("After adding 100 oneshots, 100 cont play, then 100 oneshots, there should be 101 effects") {
-			for (int i = 0; i < 100; i++) {
-				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 0.0, 1.0, 666));
-			}
-			for (int i = 0; i < 100; i++) {
-				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 1.0, 1.0, 666));
-			}
-			for (int i = 0; i < 100; i++) {
-				model.Put(MyBasicHapticEvent(gen(), gen(), 0, 0.0, 1.0, 666));
-			}
-
-			REQUIRE(activeEvents.back().m_duration == 0.0);
-			REQUIRE((activeEvents.end() - 2)->m_duration == 1.0);
-			REQUIRE((activeEvents.end() - 3)->m_duration == 1.0);
-
-			REQUIRE(activeEvents.size() == 101);
-		}
-
-	 /* Need to halt before playing a oneshot if a continuous play was previously playing
-		If you don't, the cont play gets "corrupted" and may even load up the new oneshot
-	 */
-
-		SECTION("Should not Poltergeezer") {
-			MyBasicHapticEvent badboy_cont_1(gen(), gen(), 0, 0.1, 0.3, 1);
-			MyBasicHapticEvent badboy_oneshot_1(gen(), gen(), 0, 0.0, 0.5, 1);
-
-			model.Put(badboy_cont_1);
-			auto commands1 = model.Update(0.05f);
-			model.Put(badboy_oneshot_1);
-			auto commands2 = model.Update(0.05f);
-			REQUIRE(commands2.at(0).command() == NullSpaceIPC::EffectCommand_Command_HALT);
-			REQUIRE(commands2.at(1).command() == NullSpaceIPC::EffectCommand_Command_PLAY);
+		SECTION("C -> C -> O -> O should result in C C O") {
+			model.Put(makeCont());
+			model.Put(makeCont());
+			model.Put(makeOneshot());
+			model.Put(makeOneshot());
+			model.Update(DELTA_TIME);
+			REQUIRE(activeEvents.size() == 3);
+			REQUIRE(activeEvents.at(0).isContinuous());
+			REQUIRE(activeEvents.at(1).isContinuous());
+			REQUIRE(activeEvents.at(2).isOneshot());
 
 		}
+	}
+	
 
-		SECTION("Should layer continuous correctly") {
-			MyBasicHapticEvent cont_bottom(gen(), gen(), 0, 10.0, 0.3, 1);
-			MyBasicHapticEvent cont_middle(gen(), gen(), 0, 1.0, 0.5, 2);
 
-			model.Put(cont_bottom);
-			auto commands = model.Update(1.0f);
-			REQUIRE(commands.size() == 1);
-			REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-			REQUIRE(commands.at(0).effect() == cont_bottom.m_effect);
+	//Bug: Poltergeezer
+	//If you play a oneshot while a cont play is happening, you must send a halt first
+	//If you don'tm the cont play gets "corrupted" and may even load up with the new oneshot
+	//thus playing the motor incorrectly.
+	SECTION("Should not Poltergeezer") {
+		model.Put(makeCont());
+		model.Update(DELTA_TIME);
+		model.Put(makeOneshot());
+		auto commands = model.Update(DELTA_TIME);
+		REQUIRE(commands.size() == 2);
+		REQUIRE(isIdleCommand(commands.at(0)));
+		REQUIRE(isOneshotCommand(commands.at(1)));
+	}
+	
+	SECTION("Effects should be layered based upon recency (newest takes priority)") {
 
-			model.Put(cont_middle);
-			commands = model.Update(0.9f);
+		SECTION("A newer cont play should play over an older one") {
+
+			auto bottomLayer = makeCont();
+			auto topLayer = makeCont();
+
+			model.Put(bottomLayer);
+			model.Update(DELTA_TIME);
+		    model.Put(topLayer);
+			auto commands = model.Update(DELTA_TIME);
 
 			REQUIRE(commands.size() == 1);
-			REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-			REQUIRE(commands.at(0).effect() == cont_middle.m_effect);
-
-			commands = model.Update(0.2f);
-
-			REQUIRE(commands.size() == 1);
-			REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
-			REQUIRE(commands.at(0).effect() == cont_bottom.m_effect);
-
-			//MyBasicHapticEvent cont_top(boost::uuids::random_generator()(), 0, 1.0, 0.5, 1);
-
-			commands = model.Update(9.0f);
-
-			REQUIRE(commands.size() == 1);
-			REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_HALT);
-		}
-
-		SECTION("Playing a oneshot right after another oneshot should work") {
-			MyBasicHapticEvent hum(gen(), gen(), 0, 0.0, 1.0, 1);
-			MyBasicHapticEvent click(gen(), gen(), 0, 0.0, 1.0, 2);
-			model.Put(hum);
-			//todo: test for the halt command as the oneshot is added
-			auto commands = model.Update(0.3);
-			model.Put(click);
-			commands = model.Update(0.05);
+			REQUIRE(isContCommand(commands.at(0)));
 
 		}
 
-		
+		SECTION("A short-running cont should yield to a longer running cont when it is finished") {
+			auto bottomLayer = makeCont(1.0);
+			auto topLayer = makeCont(0.1);
+
+			model.Put(bottomLayer);
+			model.Update(DELTA_TIME);
+			model.Put(topLayer);
+
+			auto ignoreTopPlayCommands = model.Update(DELTA_TIME);
+			auto commands = model.Update(DELTA_TIME * 2 + .01);
+
+			REQUIRE(commands.size() == 1);
+			REQUIRE(isContCommand(commands.at(0)));
+		}
+	}
+		//SECTION("Should layer continuous correctly") {
+		//	MyBasicHapticEvent cont_bottom(gen(), gen(), 0, 10.0, 0.3, 1);
+		//	MyBasicHapticEvent cont_middle(gen(), gen(), 0, 1.0, 0.5, 2);
+
+		//	model.Put(cont_bottom);
+		//	auto commands = model.Update(1.0f);
+		//	REQUIRE(commands.size() == 1);
+		//	REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
+		//	REQUIRE(commands.at(0).effect() == cont_bottom.m_effect);
+
+		//	model.Put(cont_middle);
+		//	commands = model.Update(0.9f);
+
+		//	REQUIRE(commands.size() == 1);
+		//	REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
+		//	REQUIRE(commands.at(0).effect() == cont_middle.m_effect);
+
+		//	commands = model.Update(0.2f);
+
+		//	REQUIRE(commands.size() == 1);
+		//	REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS);
+		//	REQUIRE(commands.at(0).effect() == cont_bottom.m_effect);
+
+		//	//MyBasicHapticEvent cont_top(boost::uuids::random_generator()(), 0, 1.0, 0.5, 1);
+
+		//	commands = model.Update(9.0f);
+
+		//	REQUIRE(commands.size() == 1);
+		//	REQUIRE(commands.at(0).command() == NullSpaceIPC::EffectCommand_Command_HALT);
+		//}
+
+		//SECTION("Playing a oneshot right after another oneshot should work") {
+		//	MyBasicHapticEvent hum(gen(), gen(), 0, 0.0, 1.0, 1);
+		//	MyBasicHapticEvent click(gen(), gen(), 0, 0.0, 1.0, 2);
+		//	model.Put(hum);
+		//	//todo: test for the halt command as the oneshot is added
+		//	auto commands = model.Update(0.3);
+		//	model.Put(click);
+		//	commands = model.Update(0.05);
+
+		//}
+
+		//
 
 		//need to test continuous interuppted by oneshot
 }
@@ -317,8 +255,130 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 
 
 
-}
 
+
+
+
+TEST_CASE("The motor state changer works", "[MotorStateChanger]") {
+	using MotorFirmwareState = MotorStateChanger::MotorFirmwareState;
+
+	auto trans = MotorStateChanger((uint32_t)AreaFlag::Chest_Left);
+
+	REQUIRE(MotorFirmwareState::Idle == trans.GetState());
+
+	SECTION("Transitions should produce the correct states") {
+
+		SECTION("Adding a oneshot to an idle motor should transition to playing_oneshot") {
+			trans.transitionTo(makeOneshot());
+			REQUIRE(MotorFirmwareState::PlayingOneshot == trans.GetState());
+		}
+
+		SECTION("Adding a cont to an idle motor should transition to playing_cont") {
+			trans.transitionTo(makeCont());
+			REQUIRE(MotorFirmwareState::PlayingContinuous == trans.GetState());
+		}
+
+		SECTION("Halting from oneshot should transition to idle") {
+			trans.transitionTo(makeOneshot());
+			trans.transitionToIdle();
+			REQUIRE(MotorFirmwareState::Idle == trans.GetState());
+		}
+
+		SECTION("Halting from cont should transition to idle ") {
+			trans.transitionTo(makeCont());
+			trans.transitionToIdle();
+			REQUIRE(MotorFirmwareState::Idle == trans.GetState());
+		}
+
+		SECTION("Halting from idle should transition to idle") {
+			trans.transitionToIdle();
+			REQUIRE(MotorFirmwareState::Idle == trans.GetState());
+		}
+
+		SECTION("Transitioning to cont from oneshot should result in PlayingContinuous") {
+			trans.transitionTo(makeOneshot());
+			trans.transitionTo(makeCont());
+			REQUIRE(MotorFirmwareState::PlayingContinuous == trans.GetState());
+		}
+
+		SECTION("Transitioning to oneshot from cont should result in PlayingOneshot") {
+			trans.transitionTo(makeCont());
+			trans.transitionTo(makeOneshot());
+			REQUIRE(MotorFirmwareState::PlayingOneshot == trans.GetState());
+		}
+
+
+	}
+
+	SECTION("Transitioning should produce the correct commands") {
+		SECTION("Adding a oneshot to an idle motor should produce PLAY command") {
+			auto commands = trans.transitionTo(makeOneshot());
+			REQUIRE(commands.size() == 1);
+			REQUIRE(isOneshotCommand(commands.at(0)));
+		}
+
+		SECTION("Adding a oneshot on top of a continuous should produce HALT followed by PLAY commands") {
+			trans.transitionTo(makeCont());
+			auto commands = trans.transitionTo(makeOneshot());
+			REQUIRE(commands.size() == 2);
+			REQUIRE(isIdleCommand(commands.at(0)));
+			REQUIRE(isOneshotCommand(commands.at(1)));
+		}
+
+		SECTION("Adding a oneshot on top of a oneshot should produce PLAY command") {
+			trans.transitionTo(makeOneshot());
+			auto commands = trans.transitionTo(makeOneshot());
+			REQUIRE(commands.size() == 1);
+			REQUIRE(isOneshotCommand(commands.at(0)));
+		}
+
+		SECTION("Adding a continuous to an idle motor should produce PLAY_CONT command") {
+			auto commands = trans.transitionTo(makeCont());
+			REQUIRE(commands.size() == 1);
+			REQUIRE(isContCommand(commands.at(0)));
+		}
+
+		SECTION("Adding a continuous on top of a oneshot should produce PLAY_CONT command") {
+			trans.transitionTo(makeOneshot());
+			auto commands = trans.transitionTo(makeCont());
+			REQUIRE(commands.size() == 1);
+			REQUIRE(isContCommand(commands.at(0)));
+		}
+
+		SECTION("Adding a continuous on top of a continuous should produce  PLAY_CONT command") {
+			trans.transitionTo(makeCont());
+			auto commands = trans.transitionTo(makeCont());
+			REQUIRE(commands.size() == 1);
+			REQUIRE(isContCommand(commands.at(0)));
+		}
+
+
+
+
+	}
+
+
+	SECTION("Halting should produce the correct commands") {
+		SECTION("Halting from idle should result in no commands") {
+			auto commands = trans.transitionToIdle();
+			REQUIRE(commands.empty());
+		}
+
+		SECTION("Halting from a oneshot should result in no commands") {
+			trans.transitionTo(makeOneshot());
+			auto commands = trans.transitionToIdle();
+			REQUIRE(commands.empty());
+		}
+
+		SECTION("Halting from a continuous should result in a HALT command") {
+			trans.transitionTo(makeCont());
+			auto commands = trans.transitionToIdle();
+			REQUIRE(commands.size() == 1);
+			REQUIRE(isIdleCommand(commands.at(0)));
+		}
+	}
+
+}
 
 
 int main(int argc, char* argv[]) {

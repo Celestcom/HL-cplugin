@@ -11,96 +11,112 @@
 #include "Enums.h"
 #include <functional>
 #include <mutex>
+#include <boost/lockfree/spsc_queue.hpp>
 
 
-class MyBasicHapticEvent {
+class BasicHapticEventData {
 public:
-	MyBasicHapticEvent(boost::uuids::uuid parent_id, boost::uuids::uuid unique_id, uint32_t area, float duration, float strength, uint32_t effect);
-
-	explicit MyBasicHapticEvent(boost::uuids::uuid id);
-
-	bool MyBasicHapticEvent::operator==(const MyBasicHapticEvent & other) const;
-	bool IsFunctionallyIdentical(const MyBasicHapticEvent &other);
-
-	CommandBuffer EmitCreationCommands() const;
-	CommandBuffer EmitCleanupCommands() const;
-
-
-
-	void Update(float dt);
-
-	void LogicalPlay();
-	void LogicalPause();
-
-	bool Finished() const;
-	boost::uuids::uuid m_parentId;
-	uint32_t m_area;
-	float m_duration;
-	float m_strength;
-	uint32_t m_effect;
-	float m_time;
-	boost::uuids::uuid m_uniqueId;
-	bool m_playing;
-	
-
-
-	
-
+	uint32_t effect;
+	uint32_t area;
+	float duration;
+	float strength;
 };
+
+//Todo: This is not good design. The plugin shouldn't have to know the specific firmware commands.
+//We should push this knowledge into the Driver so that the plugin can issue PLAY_DURATION and it will issue
+//HALT - PLAY_CONT - or whatever is actually necessary to make the hardware respond correctly.
+class Hardlight_Mk3_Firmware {
+public:
+	static NullSpaceIPC::EffectCommand generateContinuousPlay(const BasicHapticEventData& data);
+	static NullSpaceIPC::EffectCommand generateOneshotPlay(const BasicHapticEventData& data);
+	static NullSpaceIPC::EffectCommand generateHalt(uint32_t area);
+};
+class LiveBasicHapticEvent {
+public:
+	LiveBasicHapticEvent();
+	LiveBasicHapticEvent(boost::uuids::uuid parentId, boost::uuids::uuid uniqueId, BasicHapticEventData data);
+	const BasicHapticEventData& Data() const;
+	bool operator==(const LiveBasicHapticEvent& other) const;
+	void update(float dt);
+	bool isFinished() const;
+	bool isContinuous() const;
+	bool isOneshot() const;
+	bool isChildOf(const boost::uuids::uuid& parentId) const;
+private:
+	boost::uuids::uuid parentId;
+	boost::uuids::uuid uniqueId;
+	float currentTime;
+	bool isPlaying;
+	BasicHapticEventData eventData;
+};
+
+class MotorStateChanger {
+public:
+	MotorStateChanger(uint32_t areaId);
+	enum class MotorFirmwareState {Idle, PlayingOneshot, PlayingContinuous};
+	MotorFirmwareState GetState() const;
+	CommandBuffer transitionTo(const LiveBasicHapticEvent& event);
+	CommandBuffer transitionToIdle();
+private:
+	MotorFirmwareState currentState;
+	LiveBasicHapticEvent previousEvent;
+	uint32_t area;
+	CommandBuffer transitionToOneshot(BasicHapticEventData data);
+	CommandBuffer transitionToContinuous(BasicHapticEventData data);
+};
+
 
 
 
 class ZoneModel {
 public:
-	typedef std::vector<MyBasicHapticEvent> PlayingContainer;
-	typedef std::vector<MyBasicHapticEvent> PausedContainer;
 
+	ZoneModel(uint32_t area);
 
-	//Public, to-be-threadsafe api
-	void Put(MyBasicHapticEvent event);
+	void Put(LiveBasicHapticEvent event);
 	void Remove(boost::uuids::uuid id);
 	void Play(boost::uuids::uuid id);
-	void  Pause(boost::uuids::uuid id);
+	void Pause(boost::uuids::uuid id);
+
+
+	typedef std::vector<LiveBasicHapticEvent> PlayingContainer;
+	typedef std::vector<LiveBasicHapticEvent> PausedContainer;
 
 	const PausedContainer& PausedEvents();
 	const PlayingContainer& PlayingEvents();
+
 	CommandBuffer Update(float dt);
-	void ZoneModel::swapOutEvent(const MyBasicHapticEvent& event);
-	bool ZoneModel::isTopEvent(const MyBasicHapticEvent& event) const;
-	ZoneModel();
+
 private:
-	struct UserCommand {
+	class UserCommand {
+	public:
 		enum class Command {
 			Unknown = 0, Play = 1, Pause = 2, Remove = 3
 		};
 		boost::uuids::uuid id;
 		Command command;
-
+		UserCommand();
 		UserCommand(boost::uuids::uuid id, Command c);
 	};
-	std::vector<MyBasicHapticEvent> m_stagingEvents;
-	std::vector<UserCommand> m_stagingCommands;
-	std::mutex m_stagingLock;
+	PlayingContainer playingEvents;
+	PausedContainer pausedEvents;
 
-	inline PlayingContainer::iterator findPlayingEvent(const boost::uuids::uuid& id);
-	inline PausedContainer::iterator findPausedEvent(const boost::uuids::uuid& id);
+	boost::lockfree::spsc_queue<LiveBasicHapticEvent> incomingEvents;
+	boost::lockfree::spsc_queue<UserCommand> incomingCommands;
+	
+	MotorStateChanger stateChanger;
 
-	//provides locked writing to the creation buffer
-	void setCreationCommands(CommandBuffer buffer);
+	void pauseAllChildren(const boost::uuids::uuid& id);
+	void resumeAllChildren(const boost::uuids::uuid& id);
+	void removeAllChildren(const boost::uuids::uuid& id);
 
-	//provides locked writing to the cleanup buffer
-	void setCleanupCommands(CommandBuffer buffer);
-	CommandBuffer m_creationCommands;
-	CommandBuffer m_cleanupCommands;
-	PlayingContainer m_events;
-	PausedContainer m_pausedEvents;
-	std::mutex m_eventsMutex;
-	std::mutex m_pausedMutex;
-	std::mutex m_commandsMutex;
-	boost::uuids::random_generator m_idGen;
-
-
+	CommandBuffer updateState();
+	void updateExistingEvents(float dt);
+	void removeExpiredEvents();
+	void handleNewCommands();
+	void handleNewEvents();
 };
+
 
 class RtpModel {
 public:
