@@ -8,9 +8,7 @@ using namespace std;
 
 
 HapticsPlayer::HapticsPlayer(EventRegistry& registry):
-	_model(), 
 	_paused(false),
-	_generator(_model),
 	m_effectsMutex(),
 	m_registry(registry)
 {
@@ -100,10 +98,6 @@ void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
 
 }
 
-PriorityModel & HapticsPlayer::GetModel()
-{
-	return _model;
-}
 
 std::size_t HapticsPlayer::NumLiveEffects()
 {
@@ -226,7 +220,7 @@ void HapticsPlayer::ClearAll()
 
 std::vector<PriorityModel::EffectInfo> HapticsPlayer::GetEffectInfo() const
 {
-	return _model.GetEffectInfo();
+	return std::vector<PriorityModel::EffectInfo>();
 }
 
 

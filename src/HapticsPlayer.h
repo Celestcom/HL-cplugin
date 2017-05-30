@@ -54,8 +54,6 @@ private:
 	std::mutex m_effectsMutex;
 	std::unordered_map<std::size_t, std::unique_ptr<IPlayable>> _effects;
 
-	PriorityModel _model; //order dependency (1)
-	HapticEventGenerator _generator; //order dependency (2)
 
 	std::vector<Released> _releasedEffects;
 	std::unordered_map<HapticHandle, boost::uuids::uuid> _outsideHandleToUUID;
