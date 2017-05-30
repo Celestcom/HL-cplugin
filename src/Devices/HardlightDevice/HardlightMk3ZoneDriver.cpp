@@ -2,6 +2,28 @@
 #include "HardlightMk3ZoneDriver.h"
 #include "Locator.h"
 #include "NSLoader.h"
+
+
+
+class BasicHapticEventCreator : public boost::static_visitor<LiveBasicHapticEvent> {
+private:
+	//Main ID of the effect
+	boost::uuids::uuid m_parentId;
+	Location m_area;
+	boost::uuids::uuid m_uniqueId;
+public:
+	BasicHapticEventCreator(boost::uuids::uuid id, boost::uuids::uuid unique_id, Location area) : m_parentId(id), m_uniqueId(unique_id), m_area(area) {}
+
+	LiveBasicHapticEvent operator()(const BasicHapticEvent& hapticEvent) const {
+		BasicHapticEventData data;
+		data.area = static_cast<uint32_t>(m_area);
+		data.duration = hapticEvent.Duration;
+		data.strength = hapticEvent.Strength;
+		data.effect = hapticEvent.RequestedEffectFamily;
+		return LiveBasicHapticEvent(m_parentId, m_uniqueId, data);
+	}
+};
+
 CommandBuffer Hardlight_Mk3_ZoneDriver::update(float dt)
 {
 	//think about if the commandbuffer vectors should really be reversed
