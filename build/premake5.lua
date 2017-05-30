@@ -42,7 +42,7 @@ project "Plugin"
 
 	files {
 		"../src/**.cpp",
-	
+		"../src/**.h",
 		path.join(protobuf_def_incl_dir, "DriverCommand.pb.cc"),
 		path.join(protobuf_def_incl_dir, "EffectCommand.pb.cc"),
 		path.join(shared_comms_incl_dir, "ScheduledEvent.cpp")

@@ -25,9 +25,179 @@
     <Filter Include="src\Devices\HardlightDevice">
       <UniqueIdentifier>{7584AFCF-E191-DDB5-6A78-D9A0D684A96C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Wire">
+      <UniqueIdentifier>{B3B127CF-9F7E-82DA-C897-7082B4C3B768}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\json">
+      <UniqueIdentifier>{164732CF-0214-8DDA-2B2D-7B821759C268}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\test">
       <UniqueIdentifier>{DC8737CF-C854-92DA-F16D-8082DD99C768}</UniqueIdentifier>
     </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\AreaFlags.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\AreaParser.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ClientMessenger.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Devices\HardlightDevice\HardlightMk3Firmware.h">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Devices\HardlightDevice\HardlightMk3ZoneDriver.h">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Devices\HardlightDevice\LiveBasicHapticEvent.h">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Devices\HardlightDevice\MotorStateChanger.h">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Devices\HardlightDevice\RtpModel.h">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Devices\HardlightDevice\ZoneModel.h">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Devices\HardlightDevice\hardlightdevice.h">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Encoder.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Engine.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\EnumTranslator.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Enums.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Event.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\EventList.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\EventRegistry.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ExceptionSafeCall.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HapticArgs.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HapticCache.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HapticClasses.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HapticDirectoryTools.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HapticEvent.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HapticEventGenerator.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HapticQueue.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HapticsPlayer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HardwareDriver.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\HexUtils.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IHapticDevice.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IPlayable.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IRetainedEvent.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ITimeOffset.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\IoService.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\JsonSerializer.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Locator.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MyTestLog.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NSLoader.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NSLoader_Errors.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NSLoader_Internal.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\NSLoader_fwds.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ParameterizedEvent.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PlayableEffect.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PlaybackHandle.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\PriorityModel.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\RegionTree.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\SuitEvent.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Wire\EncodingOperations.h">
+      <Filter>src\Wire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Wire\FlatbuffDecoder.h">
+      <Filter>src\Wire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Wire\Wire.h">
+      <Filter>src\Wire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Wire\ijsonserializable.h">
+      <Filter>src\Wire</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\json\json-forwards.h">
+      <Filter>src\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\json\json.h">
+      <Filter>src\json</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\stdafx.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\targetver.h">
+      <Filter>src</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -46,6 +216,24 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Devices\HardlightDevice\HardlightDevice.cpp">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Devices\HardlightDevice\HardlightMk3Firmware.cpp">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Devices\HardlightDevice\HardlightMk3ZoneDriver.cpp">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Devices\HardlightDevice\LiveBasicHapticEvent.cpp">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Devices\HardlightDevice\MotorStateChanger.cpp">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Devices\HardlightDevice\RtpModel.cpp">
+      <Filter>src\Devices\HardlightDevice</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Devices\HardlightDevice\ZoneModel.cpp">
       <Filter>src\Devices\HardlightDevice</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Engine.cpp">
