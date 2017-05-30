@@ -5,7 +5,7 @@
 #include "SuitEvent.h"
 #include <boost/uuid/random_generator.hpp>
 
-
+#include <experimental/vector>
 void ZoneModel::Put(LiveBasicHapticEvent event) {
 	incomingEvents.push(std::move(event));
 }
@@ -99,6 +99,7 @@ void pruneOneshots(std::vector<LiveBasicHapticEvent>* events) {
 	auto isOneshot = [](const LiveBasicHapticEvent& e) {return e.isOneshot(); };
 
 	auto secondToLast = events->end() - 1;
+
 	auto toRemove = std::remove_if(events->begin(), secondToLast, isOneshot);
 	events->erase(toRemove, secondToLast);
 }
@@ -140,46 +141,42 @@ ZoneModel::ZoneModel(uint32_t area):
 
 }
 
+template<class T, class Predicate>
+void copy_then_remove_if(std::vector<T>& from, std::vector<T>& to, Predicate predicate) {
+	std::copy_if(
+		from.begin(),
+		from.end(),
+		std::back_inserter(to),
+		predicate
+	);
 
+	std::experimental::erase_if(from, predicate);
+}
+
+
+struct is_child_of {
+	boost::uuids::uuid id;
+	is_child_of(boost::uuids::uuid id) : id(id) {}
+	bool operator()(const LiveBasicHapticEvent& e) {
+		return e.isChildOf(id);
+	}
+};
 
 void ZoneModel::pauseAllChildren(const boost::uuids::uuid & id)
 {
-	//todo: we can remove the playing flag from live event since we control what list it is in
-	for (const auto& event : playingEvents) {
-		if (event.isChildOf(id)) {
-			pausedEvents.push_back(event);
-		}
-	}
-
-	playingEvents.erase(
-		std::remove_if(playingEvents.begin(), playingEvents.end(), [&](const auto& e) {return e.isChildOf(id); }), 
-	playingEvents.end());
-
-
+	copy_then_remove_if(playingEvents, pausedEvents, is_child_of(id));
 }
+
 
 void ZoneModel::resumeAllChildren(const boost::uuids::uuid & id)
 {
-	for (const auto& event : pausedEvents) {
-		if (event.isChildOf(id)) {
-			playingEvents.push_back(event);
-		}
-	}
-
-	pausedEvents.erase(
-		std::remove_if(pausedEvents.begin(), pausedEvents.end(), [&](const auto& e) {return e.isChildOf(id); }),
-		pausedEvents.end());
+	copy_then_remove_if(pausedEvents, playingEvents, is_child_of(id));
 }
 
 void ZoneModel::removeAllChildren(const boost::uuids::uuid & id)
 {
-	playingEvents.erase(
-		std::remove_if(playingEvents.begin(), playingEvents.end(), [&](const auto& e) {return e.isChildOf(id); }),
-		playingEvents.end());
-
-	pausedEvents.erase(
-		std::remove_if(pausedEvents.begin(), pausedEvents.end(), [&](const auto& e) {return e.isChildOf(id); }),
-		pausedEvents.end());
+	std::experimental::erase_if(playingEvents, is_child_of(id));
+	std::experimental::erase_if(pausedEvents, is_child_of(id));
 }
 
 
@@ -510,18 +507,17 @@ CommandBuffer MotorStateChanger::transitionToIdle()
 
 CommandBuffer MotorStateChanger::transitionToOneshot(BasicHapticEventData data)
 {
+	//Note: as you can see, we generate the same commands from every state.
+	//This is subject to change with future firmware versions, which is why it is 
+	//setup like this.
+
 	CommandBuffer requiredCmds;
 	switch (currentState) {
 	case MotorFirmwareState::Idle:
-		//Notes: is this expected? need the halt first?
 		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateHalt(area));
 		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(data));
 		break;
 	case MotorFirmwareState::PlayingOneshot:
-		//Notes: is this expected? need the halt first? 
-		//Solution to this: if time since last oneshot is >= natural duration, then send only the play.
-		//Else send the halt to interrupt it, followed by the play. 
-		//Solution B: leave this. Don't worry about the redundant packet. Have the firmware fixed instead.
 		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateHalt(area));
 		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(data));
 		break;
@@ -537,6 +533,10 @@ CommandBuffer MotorStateChanger::transitionToOneshot(BasicHapticEventData data)
 
 CommandBuffer MotorStateChanger::transitionToContinuous(BasicHapticEventData data)
 {
+	//Note: as you can see, we generate the same commands from every state.
+	//This is subject to change with future firmware versions, which is why it is 
+	//setup like this.
+
 	CommandBuffer requiredCmds;
 	switch (currentState) {
 	case MotorFirmwareState::Idle:

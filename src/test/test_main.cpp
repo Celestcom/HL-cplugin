@@ -71,12 +71,13 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 		REQUIRE(isIdleCommand(stopCommands.at(0)));
 	}
 
-	SECTION("Oneshots should generate play command") {
+	SECTION("Oneshots should generate halt, play command") {
 		model.Put(makeOneshot());
 		auto commands = model.Update(DELTA_TIME);
 	
-		REQUIRE(commands.size() == 1);
-		REQUIRE(isOneshotCommand(commands.at(0)));
+		REQUIRE(commands.size() == 2);
+		REQUIRE(isIdleCommand(commands.at(0)));
+		REQUIRE(isOneshotCommand(commands.at(1)));
 	}
 
 	SECTION("Oneshots should be removed after they generate commands") {
@@ -346,10 +347,12 @@ TEST_CASE("The motor state changer works", "[MotorStateChanger]") {
 	}
 
 	SECTION("Transitioning should produce the correct commands") {
-		SECTION("Adding a oneshot to an idle motor should produce PLAY command") {
+		SECTION("Adding a oneshot to an idle motor should produce HALT, PLAY command") {
 			auto commands = trans.transitionTo(makeOneshot());
-			REQUIRE(commands.size() == 1);
-			REQUIRE(isOneshotCommand(commands.at(0)));
+			REQUIRE(commands.size() == 2);
+			REQUIRE(isIdleCommand(commands.at(0)));
+			REQUIRE(isOneshotCommand(commands.at(1)));
+
 		}
 
 		SECTION("Adding a oneshot on top of a continuous should produce HALT followed by PLAY commands") {
@@ -360,12 +363,6 @@ TEST_CASE("The motor state changer works", "[MotorStateChanger]") {
 			REQUIRE(isOneshotCommand(commands.at(1)));
 		}
 
-		/*SECTION("Adding a oneshot on top of a oneshot should produce PLAY command") {
-			trans.transitionTo(makeOneshot());
-			auto commands = trans.transitionTo(makeOneshot());
-			REQUIRE(commands.size() == 1);
-			REQUIRE(isOneshotCommand(commands.at(0)));
-		}*/
 
 		SECTION("Adding a oneshot on top of a oneshot should produce HALT, PLAY command") {
 			trans.transitionTo(makeOneshot());
