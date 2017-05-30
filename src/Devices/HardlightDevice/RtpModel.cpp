@@ -3,40 +3,49 @@
 
 
 
-RtpModel::RtpModel(Location area) :m_area(area), m_volume(0), m_commands()
+RtpModel::RtpModel(Location area) : 
+	location(area), 
+	volume(0), 
+	volumeValueProtector(),
+	volumeCommand(boost::none)
 {
 }
 
 void RtpModel::ChangeVolume(int newVolume)
 {
-	if (newVolume != m_volume) {
-		m_volume = newVolume;
+	using namespace NullSpaceIPC;
 
+	std::lock_guard<std::mutex> guard(volumeValueProtector);
 
-		using namespace NullSpaceIPC;
+	if (newVolume != volume) {
+		volume = newVolume;
 		EffectCommand command;
 		command.set_command(EffectCommand_Command::EffectCommand_Command_PLAY_RTP);
-		command.set_strength((m_volume / 2) / 128.0f);
-		command.set_area(static_cast<uint32_t>(m_area));
-
-		std::lock_guard<std::mutex> guard(m_mutex);
-		m_commands.push_back(std::move(command));
-
+		command.set_strength((volume / 2) / 128.0f);
+		command.set_area(static_cast<uint32_t>(location));
+		volumeCommand = command;
 	}
+	else {
+		volumeCommand = boost::none;
+	}
+
 }
 
 CommandBuffer RtpModel::Update(float dt)
 {
-	CommandBuffer copy;
-	std::lock_guard<std::mutex> guard(m_mutex);
+	CommandBuffer commands;
 
-	copy.swap(m_commands);
-	std::reverse(copy.begin(), copy.end());
-	return copy;
+	std::lock_guard<std::mutex> guard(volumeValueProtector);
 
+	if (volumeCommand) {
+		commands.push_back(std::move(*volumeCommand));
+		volumeCommand = boost::none;
+	}
+
+	return commands;
 }
 
 int RtpModel::GetVolume()
 {
-	return m_volume;
+	return volume;
 }

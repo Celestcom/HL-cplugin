@@ -3,18 +3,19 @@
 #include "Enums.h"
 #include "IHapticDevice.h"
 #include <mutex>
-
+#include <boost/optional/optional.hpp>
+#include "EffectCommand.pb.h"
 
 class RtpModel {
 public:
-	
 	RtpModel(Location area);
 	void ChangeVolume(int newVolume);
-	CommandBuffer Update(float dt);
 	int GetVolume();
+	CommandBuffer Update(float dt);
 private:
-	int m_volume;
-	Location m_area;
-	CommandBuffer m_commands;
-	std::mutex m_mutex;
+	int volume;
+	Location location;
+
+	boost::optional<NullSpaceIPC::EffectCommand> volumeCommand;
+	std::mutex volumeValueProtector;
 };
