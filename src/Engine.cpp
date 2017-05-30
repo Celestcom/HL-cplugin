@@ -12,7 +12,7 @@
 #include <boost/log/trivial.hpp>
 #include "MyTestLog.h"
 #include "IHapticDevice.h"
-#include "HardlightDevice.h"
+#include "Devices/HardlightDevice/hardlightdevice.h"
 #include "Locator.h"
 void Engine::executeTimestep()
 {
