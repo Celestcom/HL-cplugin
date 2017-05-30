@@ -39,7 +39,7 @@ CommandBuffer ZoneModel::Update(float dt) {
 	handleNewEvents();
 	handleNewCommands();
 
-	return updateState();
+	return generateCommands();
 }
 
 
@@ -118,7 +118,7 @@ void ZoneModel::handleNewEvents() {
 
 
 
-CommandBuffer ZoneModel::updateState()
+CommandBuffer ZoneModel::generateCommands()
 {
 
 	if (playingEvents.empty()) {
@@ -241,7 +241,8 @@ CommandBuffer HardlightDevice::GenerateHardwareCommands(float dt)
 {
 	CommandBuffer result;
 	for (auto& driver : m_drivers) {
-		auto cl = driver->update(dt);
+		CommandBuffer cl = driver->update(dt);
+		//std::reverse(cl.begin(), cl.end()); todo: see if necessary order is already created
 		result.insert(result.begin(), cl.begin(), cl.end());
 	}
 	return result;
@@ -361,10 +362,11 @@ void RtpModel::ChangeVolume(int newVolume)
 	if (newVolume != m_volume) {
 		m_volume = newVolume;
 
+
 		using namespace NullSpaceIPC;
 		EffectCommand command;
 		command.set_command(EffectCommand_Command::EffectCommand_Command_PLAY_RTP);
-		command.set_strength(255-(m_volume / 255.0f));
+		command.set_strength((m_volume/2) / 128.0f);
 		command.set_area(m_area);
 		
 		std::lock_guard<std::mutex> guard(m_mutex);
@@ -511,9 +513,16 @@ CommandBuffer MotorStateChanger::transitionToOneshot(BasicHapticEventData data)
 	CommandBuffer requiredCmds;
 	switch (currentState) {
 	case MotorFirmwareState::Idle:
+		//Notes: is this expected? need the halt first?
+		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateHalt(area));
 		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(data));
 		break;
 	case MotorFirmwareState::PlayingOneshot:
+		//Notes: is this expected? need the halt first? 
+		//Solution to this: if time since last oneshot is >= natural duration, then send only the play.
+		//Else send the halt to interrupt it, followed by the play. 
+		//Solution B: leave this. Don't worry about the redundant packet. Have the firmware fixed instead.
+		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateHalt(area));
 		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(data));
 		break;
 	case MotorFirmwareState::PlayingContinuous:

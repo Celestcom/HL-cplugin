@@ -112,7 +112,7 @@ private:
 	void resumeAllChildren(const boost::uuids::uuid& id);
 	void removeAllChildren(const boost::uuids::uuid& id);
 
-	CommandBuffer updateState();
+	CommandBuffer generateCommands();
 	void updateExistingEvents(float dt);
 	void removeExpiredEvents();
 	void handleNewCommands();

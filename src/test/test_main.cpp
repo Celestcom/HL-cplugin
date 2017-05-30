@@ -360,11 +360,19 @@ TEST_CASE("The motor state changer works", "[MotorStateChanger]") {
 			REQUIRE(isOneshotCommand(commands.at(1)));
 		}
 
-		SECTION("Adding a oneshot on top of a oneshot should produce PLAY command") {
+		/*SECTION("Adding a oneshot on top of a oneshot should produce PLAY command") {
 			trans.transitionTo(makeOneshot());
 			auto commands = trans.transitionTo(makeOneshot());
 			REQUIRE(commands.size() == 1);
 			REQUIRE(isOneshotCommand(commands.at(0)));
+		}*/
+
+		SECTION("Adding a oneshot on top of a oneshot should produce HALT, PLAY command") {
+			trans.transitionTo(makeOneshot());
+			auto commands = trans.transitionTo(makeOneshot());
+			REQUIRE(commands.size() == 2);
+			REQUIRE(isIdleCommand(commands.at(0)));
+			REQUIRE(isOneshotCommand(commands.at(1)));
 		}
 
 		SECTION("Adding a continuous to an idle motor should produce PLAY_CONT command") {
