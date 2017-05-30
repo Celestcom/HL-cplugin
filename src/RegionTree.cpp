@@ -77,6 +77,17 @@ bool RegionTree::Insert(const std::string & friendlyName, std::shared_ptr<Hardwa
 
 }
 
+bool RegionTree::Remove(const std::string & friendlyName, const std::shared_ptr<HardwareDriver>& driver)
+{
+	RegionNode* result = findRegion(&m_root, friendlyName);
+	if (result != nullptr) {
+		result->consumers.erase(std::find(result->consumers.begin(), result->consumers.end(), driver));
+		return true;
+	}
+
+	return false;
+}
+
 
 const RegionTree::DriverList* findConsumerHelper(RegionNode* node) {
 	if (node->consumers.empty()) {

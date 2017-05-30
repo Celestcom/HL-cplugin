@@ -57,8 +57,7 @@ void ZoneModel::removeExpiredEvents() {
 		return e.isFinished();
 	};
 
-	auto toRemove = std::remove_if(playingEvents.begin(), playingEvents.end(), expired);
-	playingEvents.erase(toRemove, playingEvents.end());
+	std::experimental::erase_if(playingEvents, expired);
 }
 
 template<class T>
@@ -208,10 +207,6 @@ HardlightDevice::HardlightDevice()
 	for (int loc = (int)Location::Lower_Ab_Right; loc != (int)Location::Error; loc++) {
 		m_drivers.push_back(std::make_shared<Hardlight_Mk3_ZoneDriver>(Location(loc)));
 	}
-	
-	//	m_drivers.push_back(std::make_shared<Hardlight_Mk3_ZoneDriver>(Location::Lower_Ab_Right));
-	//}
-
 }
 
 void HardlightDevice::RegisterDrivers(EventRegistry& registry)
@@ -230,8 +225,16 @@ void HardlightDevice::RegisterDrivers(EventRegistry& registry)
 
 void HardlightDevice::UnregisterDrivers(EventRegistry& registry)
 {
-	//remove event drivers
+	auto& translator = Locator::getTranslator();
 
+	for (auto& driver : m_drivers) {
+		auto region = translator.ToRegionString(
+			translator.ToArea(driver->Location())
+		);
+
+		registry.UnregisterEventDriver(region, driver);
+		registry.UnregisterRtpDriver(region, driver);
+	}
 }
 
 CommandBuffer HardlightDevice::GenerateHardwareCommands(float dt)
