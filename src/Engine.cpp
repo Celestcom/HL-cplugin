@@ -343,12 +343,11 @@ int Engine::SubmitRawCommand(uint8_t * buffer, int length)
 
 int Engine::Sample(uint16_t * strengths, uint32_t * areas, uint32_t* families, int length, unsigned int * resultCount)
 {
+	auto samples = m_hardlightSuit->QueryDrivers();
 
-	std::vector<PriorityModel::EffectInfo> effectInfo = m_player.GetEffectInfo();
-
-	std::size_t max_num_effects = std::min<std::size_t>(length, effectInfo.size());
+	std::size_t max_num_effects = std::min<std::size_t>(length, samples.size());
 	for (std::size_t i = 0; i < max_num_effects; i++) {
-		const auto& effect = effectInfo[i];
+		const auto& effect = samples[i];
 	
 		strengths[i] = effect.strength;
 		families[i] = effect.family;
@@ -356,7 +355,7 @@ int Engine::Sample(uint16_t * strengths, uint32_t * areas, uint32_t* families, i
 
 	}
 
-	*resultCount = static_cast<unsigned int>(effectInfo.size());
+	*resultCount = static_cast<unsigned int>(samples.size());
 
 	return NSVR_Success_Unqualified;
 }

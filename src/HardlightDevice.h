@@ -30,7 +30,7 @@ class Hardlight_Mk3_Firmware {
 public:
 	static NullSpaceIPC::EffectCommand generateContinuousPlay(const BasicHapticEventData& data);
 	static NullSpaceIPC::EffectCommand generateOneshotPlay(const BasicHapticEventData& data);
-	static NullSpaceIPC::EffectCommand generateHalt(uint32_t area);
+	static NullSpaceIPC::EffectCommand generateHalt(Location area);
 };
 class LiveBasicHapticEvent {
 public:
@@ -54,7 +54,7 @@ private:
 
 class MotorStateChanger {
 public:
-	MotorStateChanger(uint32_t areaId);
+	MotorStateChanger(Location areaId);
 	enum class MotorFirmwareState {Idle, PlayingOneshot, PlayingContinuous};
 	MotorFirmwareState GetState() const;
 	CommandBuffer transitionTo(const LiveBasicHapticEvent& event);
@@ -62,7 +62,7 @@ public:
 private:
 	MotorFirmwareState currentState;
 	boost::optional<LiveBasicHapticEvent> previousContinuous;
-	uint32_t area;
+	Location area;
 	CommandBuffer transitionToOneshot(BasicHapticEventData data);
 	CommandBuffer transitionToContinuous(BasicHapticEventData data);
 };
@@ -73,7 +73,7 @@ private:
 class ZoneModel {
 public:
 
-	ZoneModel(uint32_t area);
+	ZoneModel(Location area);
 
 	void Put(LiveBasicHapticEvent event);
 	void Remove(boost::uuids::uuid id);
@@ -88,6 +88,9 @@ public:
 	const PlayingContainer& PlayingEvents();
 
 	CommandBuffer Update(float dt);
+
+	boost::optional<LiveBasicHapticEvent> GetCurrentlyPlayingEvent();
+
 
 private:
 	class UserCommand {
@@ -123,12 +126,13 @@ private:
 class RtpModel {
 public:
 	
-	RtpModel(uint32_t area);
+	RtpModel(Location area);
 	void ChangeVolume(int newVolume);
 	CommandBuffer Update(float dt);
+	int GetVolume();
 private:
 	int m_volume;
-	uint32_t m_area;
+	Location m_area;
 	CommandBuffer m_commands;
 	std::mutex m_mutex;
 };
@@ -142,9 +146,9 @@ public:
 
 	Location Location();
 
-
+	boost::optional<HapticDisplayInfo> QueryCurrentlyPlaying();
 private:
-	uint32_t m_area;
+	::Location m_area;
 
 	ZoneModel m_retainedModel;
 	RtpModel m_rtpModel;
@@ -176,6 +180,11 @@ public:
 
 
 	virtual CommandBuffer GenerateHardwareCommands(float dt) override;
+
+
+
+
+	virtual DisplayResults QueryDrivers() override;
 
 private:
 	std::vector<std::shared_ptr<Hardlight_Mk3_ZoneDriver>> m_drivers;

@@ -46,7 +46,7 @@ bool isContCommand(const NullSpaceIPC::EffectCommand& command) {
 
 
 TEST_CASE("The zone model works", "[ZoneModel]") {
-	ZoneModel model((uint32_t)AreaFlag::Chest_Left);
+	ZoneModel model(Location::Chest_Left);
 
 	auto& pausedEvents = model.PausedEvents();
 	auto& activeEvents = model.PlayingEvents();
@@ -298,7 +298,7 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 TEST_CASE("The motor state changer works", "[MotorStateChanger]") {
 	using MotorFirmwareState = MotorStateChanger::MotorFirmwareState;
 
-	auto trans = MotorStateChanger((uint32_t)AreaFlag::Chest_Left);
+	auto trans = MotorStateChanger(Location::Chest_Left);
 
 	REQUIRE(MotorFirmwareState::Idle == trans.GetState());
 

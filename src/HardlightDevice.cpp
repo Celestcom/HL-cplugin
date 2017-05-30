@@ -4,8 +4,8 @@
 #include "Locator.h"
 #include "SuitEvent.h"
 #include <boost/uuid/random_generator.hpp>
-
 #include <experimental/vector>
+
 void ZoneModel::Put(LiveBasicHapticEvent event) {
 	incomingEvents.push(std::move(event));
 }
@@ -42,6 +42,16 @@ CommandBuffer ZoneModel::Update(float dt) {
 	return generateCommands();
 }
 
+boost::optional<LiveBasicHapticEvent> ZoneModel::GetCurrentlyPlayingEvent()
+{
+	if (playingEvents.empty()) {
+		return boost::optional<LiveBasicHapticEvent>();
+	}
+	else {
+		return playingEvents.back();
+	}
+}
+
 
 
 void ZoneModel::updateExistingEvents(float dt)
@@ -62,7 +72,7 @@ void ZoneModel::removeExpiredEvents() {
 
 template<class T>
 std::vector<T> consumeAll(boost::lockfree::spsc_queue<T>& queue) {
-	std::vector<T> result = std::vector<T>();
+	std::vector<T> result; 
 	queue.consume_all([&](auto element) {
 		result.push_back(element);
 	});
@@ -130,7 +140,7 @@ CommandBuffer ZoneModel::generateCommands()
 	}
 }
 
-ZoneModel::ZoneModel(uint32_t area):
+ZoneModel::ZoneModel(Location area):
 	pausedEvents(),  
 	playingEvents(),
 	stateChanger(area),
@@ -184,14 +194,14 @@ class BasicHapticEventCreator : public boost::static_visitor<LiveBasicHapticEven
 private:
 	//Main ID of the effect
 	boost::uuids::uuid m_parentId;
-	uint32_t m_area;
+	Location m_area;
 	boost::uuids::uuid m_uniqueId;
 public:
-	BasicHapticEventCreator(boost::uuids::uuid id, boost::uuids::uuid unique_id, uint32_t area) : m_parentId(id), m_uniqueId(unique_id), m_area(area) {}
+	BasicHapticEventCreator(boost::uuids::uuid id, boost::uuids::uuid unique_id, Location area) : m_parentId(id), m_uniqueId(unique_id), m_area(area) {}
 
 	LiveBasicHapticEvent operator()(const BasicHapticEvent& hapticEvent) const {
 		BasicHapticEventData data;
-		data.area = m_area;
+		data.area = static_cast<uint32_t>(m_area);
 		data.duration = hapticEvent.Duration;
 		data.strength = hapticEvent.Strength;
 		data.effect = hapticEvent.RequestedEffectFamily;
@@ -249,6 +259,20 @@ CommandBuffer HardlightDevice::GenerateHardwareCommands(float dt)
 		
 }
 
+DisplayResults HardlightDevice::QueryDrivers()
+{
+	DisplayResults representations;
+
+	for (const auto& driver : m_drivers) {
+		auto result = driver->QueryCurrentlyPlaying();
+		if (result) {
+			representations.push_back(*result);
+		}
+	}
+
+	return representations;
+}
+
 CommandBuffer Hardlight_Mk3_ZoneDriver::update(float dt)
 {
 	//think about if the commandbuffer vectors should really be reversed
@@ -280,7 +304,7 @@ boost::uuids::uuid Hardlight_Mk3_ZoneDriver::Id() const
 
 Hardlight_Mk3_ZoneDriver::Hardlight_Mk3_ZoneDriver(::Location area) : 
 	m_parentId(boost::uuids::random_generator()()), 
-	m_area(static_cast<uint32_t>(area)),
+	m_area(area),
 	m_currentMode(Mode::Retained),
 	m_commands(),
 	m_rtpModel(m_area),
@@ -295,6 +319,31 @@ Hardlight_Mk3_ZoneDriver::Hardlight_Mk3_ZoneDriver(::Location area) :
 	return static_cast<::Location>(m_area);
 }
 
+boost::optional<HapticDisplayInfo> Hardlight_Mk3_ZoneDriver::QueryCurrentlyPlaying()
+{
+	auto& translator = Locator::getTranslator();
+
+	if (m_currentMode == Mode::Retained) {
+		auto potentialEvent = m_retainedModel.GetCurrentlyPlayingEvent();
+		if (potentialEvent) {
+			HapticDisplayInfo info;
+			info.area = translator.ToArea(m_area);
+			info.family = potentialEvent->Data().effect;
+			info.strength = static_cast<uint16_t>(255 * potentialEvent->Data().strength);
+			return info;
+		}
+	}
+	else {
+		HapticDisplayInfo info;
+		info.area = translator.ToArea(m_area);
+		info.family = 0;
+		info.strength = m_rtpModel.GetVolume();
+		return info;
+	}
+
+	return boost::optional<HapticDisplayInfo>();
+}
+
 void Hardlight_Mk3_ZoneDriver::realtime(const RealtimeArgs& args)
 {
 	m_rtpModel.ChangeVolume(args.volume);
@@ -304,27 +353,28 @@ void Hardlight_Mk3_ZoneDriver::realtime(const RealtimeArgs& args)
 void Hardlight_Mk3_ZoneDriver::transitionInto(Mode mode)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
-
+	//Better long term solution: the drivers are notified of disconnects and reconnects so that they can
+	//send the commands properly.
 	using namespace NullSpaceIPC;
-	if (m_currentMode == Mode::Realtime) {
+	//if (m_currentMode == Mode::Realtime) {
 		if (mode == Mode::Retained) { 
 			m_currentMode = Mode::Retained;
 			//send command to go into retained mode.
 			EffectCommand enableRetained;
-			enableRetained.set_area(m_area);
+			enableRetained.set_area(static_cast<uint32_t>(m_area));
 			enableRetained.set_command(NullSpaceIPC::EffectCommand_Command_ENABLE_INTRIG);
 			m_commands.push_back(enableRetained);
-		}
-	}
-	else {
+		}else
+//	}
+	//else {
 		if (mode == Mode::Realtime) {
 			m_currentMode = Mode::Realtime;
 			EffectCommand enableRetained;
-			enableRetained.set_area(m_area);
+			enableRetained.set_area(static_cast<uint32_t>(m_area));
 			enableRetained.set_command(NullSpaceIPC::EffectCommand_Command_ENABLE_RTP);
 			m_commands.push_back(enableRetained);
 		}
-	}
+	//}
 }
 
 void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const SuitEvent & event)
@@ -353,7 +403,7 @@ void Hardlight_Mk3_ZoneDriver::controlRetained(boost::uuids::uuid handle, NSVR_P
 	}
 }
 
-RtpModel::RtpModel(uint32_t area) :m_area(area), m_volume(0), m_commands()
+RtpModel::RtpModel(Location area) :m_area(area), m_volume(0), m_commands()
 {
 }
 
@@ -367,7 +417,7 @@ void RtpModel::ChangeVolume(int newVolume)
 		EffectCommand command;
 		command.set_command(EffectCommand_Command::EffectCommand_Command_PLAY_RTP);
 		command.set_strength((m_volume/2) / 128.0f);
-		command.set_area(m_area);
+		command.set_area(static_cast<uint32_t>(m_area));
 		
 		std::lock_guard<std::mutex> guard(m_mutex);
 		m_commands.push_back(std::move(command));
@@ -384,6 +434,11 @@ CommandBuffer RtpModel::Update(float dt)
 	std::reverse(copy.begin(), copy.end());
 	return copy;
 
+}
+
+int RtpModel::GetVolume()
+{
+	return m_volume;
 }
 
 ZoneModel::UserCommand::UserCommand(): id(), command(Command::Unknown)
@@ -456,7 +511,7 @@ boost::uuids::uuid LiveBasicHapticEvent::GetParentId()
 	return parentId;
 }
 
-MotorStateChanger::MotorStateChanger(uint32_t areaId):
+MotorStateChanger::MotorStateChanger(Location areaId):
 	currentState(MotorFirmwareState::Idle),
 	previousContinuous(),
 	area(areaId)
@@ -581,11 +636,11 @@ NullSpaceIPC::EffectCommand Hardlight_Mk3_Firmware::generateOneshotPlay(const Ba
 	return command;
 }
 
-NullSpaceIPC::EffectCommand Hardlight_Mk3_Firmware::generateHalt(uint32_t area)
+NullSpaceIPC::EffectCommand Hardlight_Mk3_Firmware::generateHalt(Location area)
 {
 	using namespace NullSpaceIPC;
 	EffectCommand command;
-	command.set_area(area);
+	command.set_area(static_cast<uint32_t>(area));
 	command.set_command(NullSpaceIPC::EffectCommand_Command_HALT);
 	return command;
 }
