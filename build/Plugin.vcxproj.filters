@@ -19,143 +19,15 @@
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Devices">
+      <UniqueIdentifier>{1F5A9D73-8B0F-1669-1404-104080B80C6D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Devices\HardlightDevice">
+      <UniqueIdentifier>{7584AFCF-E191-DDB5-6A78-D9A0D684A96C}</UniqueIdentifier>
+    </Filter>
     <Filter Include="src\test">
       <UniqueIdentifier>{DC8737CF-C854-92DA-F16D-8082DD99C768}</UniqueIdentifier>
     </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\AreaFlags.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\AreaParser.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ClientMessenger.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Encoder.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Engine.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\EnumTranslator.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Enums.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Event.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\EventList.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\EventRegistry.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ExceptionSafeCall.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticArgs.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticCache.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticClasses.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticDirectoryTools.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticEvent.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticEventGenerator.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticQueue.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticsPlayer.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HardlightDevice.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HardwareDriver.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HexUtils.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\IHapticDevice.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\IPlayable.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\IRetainedEvent.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ITimeOffset.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\IoService.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\JsonSerializer.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Locator.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MyTestLog.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\NSLoader.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\NSLoader_Errors.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\NSLoader_Internal.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\NSLoader_fwds.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\ParameterizedEvent.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\PlayableEffect.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\PlaybackHandle.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\PriorityModel.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\RegionTree.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\SuitEvent.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\stdafx.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\targetver.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\test\catch.hpp">
-      <Filter>src\test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\zmq_addon.hpp">
-      <Filter>src</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -172,6 +44,9 @@
     </ClCompile>
     <ClCompile Include="..\src\ClientMessenger.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Devices\HardlightDevice\HardlightDevice.cpp">
+      <Filter>src\Devices\HardlightDevice</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Engine.cpp">
       <Filter>src</Filter>
@@ -210,9 +85,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\HapticsPlayer.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\HardlightDevice.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\HardwareDriver.cpp">

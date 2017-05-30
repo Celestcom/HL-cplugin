@@ -27,7 +27,10 @@ project "Plugin"
 		protobuf_incl_dir,
 		shared_comms_incl_dir,
 		boost_incl_dir,
-		protobuf_def_incl_dir
+		protobuf_def_incl_dir,
+		"../src/",
+		"../src/test",
+		"../src/devices"
 	}
 
 	flags {
@@ -38,12 +41,8 @@ project "Plugin"
 	--links {"System", "UnityEditor", "UnityEngine", "System.ServiceProcess"}
 
 	files {
-		"../src/*.cpp",
-		"../src/*.h",
-		"../src/*.hpp",
-		"../src/test/*.hpp",
-		"../src/test/*.h",
-		"../src/test/*.cpp",
+		"../src/**.cpp",
+	
 		path.join(protobuf_def_incl_dir, "DriverCommand.pb.cc"),
 		path.join(protobuf_def_incl_dir, "EffectCommand.pb.cc"),
 		path.join(shared_comms_incl_dir, "ScheduledEvent.cpp")

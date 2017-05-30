@@ -164,7 +164,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src;..\src\test;..\src\devices;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -186,7 +186,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src;..\src\test;..\src\devices;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -208,7 +208,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src;..\src\test;..\src\devices;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -232,7 +232,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src;..\src\test;..\src\devices;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -256,7 +256,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src;..\src\test;..\src\devices;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -278,7 +278,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src;..\src\test;..\src\devices;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -293,52 +293,6 @@
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="..\src\AreaFlags.h" />
-    <ClInclude Include="..\src\AreaParser.h" />
-    <ClInclude Include="..\src\ClientMessenger.h" />
-    <ClInclude Include="..\src\Encoder.h" />
-    <ClInclude Include="..\src\Engine.h" />
-    <ClInclude Include="..\src\EnumTranslator.h" />
-    <ClInclude Include="..\src\Enums.h" />
-    <ClInclude Include="..\src\Event.h" />
-    <ClInclude Include="..\src\EventList.h" />
-    <ClInclude Include="..\src\EventRegistry.h" />
-    <ClInclude Include="..\src\ExceptionSafeCall.h" />
-    <ClInclude Include="..\src\HapticArgs.h" />
-    <ClInclude Include="..\src\HapticCache.h" />
-    <ClInclude Include="..\src\HapticClasses.h" />
-    <ClInclude Include="..\src\HapticDirectoryTools.h" />
-    <ClInclude Include="..\src\HapticEvent.h" />
-    <ClInclude Include="..\src\HapticEventGenerator.h" />
-    <ClInclude Include="..\src\HapticQueue.h" />
-    <ClInclude Include="..\src\HapticsPlayer.h" />
-    <ClInclude Include="..\src\HardlightDevice.h" />
-    <ClInclude Include="..\src\HardwareDriver.h" />
-    <ClInclude Include="..\src\HexUtils.h" />
-    <ClInclude Include="..\src\IHapticDevice.h" />
-    <ClInclude Include="..\src\IPlayable.h" />
-    <ClInclude Include="..\src\IRetainedEvent.h" />
-    <ClInclude Include="..\src\ITimeOffset.h" />
-    <ClInclude Include="..\src\IoService.h" />
-    <ClInclude Include="..\src\JsonSerializer.h" />
-    <ClInclude Include="..\src\Locator.h" />
-    <ClInclude Include="..\src\MyTestLog.h" />
-    <ClInclude Include="..\src\NSLoader.h" />
-    <ClInclude Include="..\src\NSLoader_Errors.h" />
-    <ClInclude Include="..\src\NSLoader_Internal.h" />
-    <ClInclude Include="..\src\NSLoader_fwds.h" />
-    <ClInclude Include="..\src\ParameterizedEvent.h" />
-    <ClInclude Include="..\src\PlayableEffect.h" />
-    <ClInclude Include="..\src\PlaybackHandle.h" />
-    <ClInclude Include="..\src\PriorityModel.h" />
-    <ClInclude Include="..\src\RegionTree.h" />
-    <ClInclude Include="..\src\SuitEvent.h" />
-    <ClInclude Include="..\src\stdafx.h" />
-    <ClInclude Include="..\src\targetver.h" />
-    <ClInclude Include="..\src\test\catch.hpp" />
-    <ClInclude Include="..\src\zmq_addon.hpp" />
-  </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
@@ -366,6 +320,7 @@
     </ClCompile>
     <ClCompile Include="..\src\AreaParser.cpp" />
     <ClCompile Include="..\src\ClientMessenger.cpp" />
+    <ClCompile Include="..\src\Devices\HardlightDevice\HardlightDevice.cpp" />
     <ClCompile Include="..\src\Engine.cpp" />
     <ClCompile Include="..\src\EnumTranslator.cpp" />
     <ClCompile Include="..\src\Event.cpp" />
@@ -379,7 +334,6 @@
     <ClCompile Include="..\src\HapticEventGenerator.cpp" />
     <ClCompile Include="..\src\HapticQueue.cpp" />
     <ClCompile Include="..\src\HapticsPlayer.cpp" />
-    <ClCompile Include="..\src\HardlightDevice.cpp" />
     <ClCompile Include="..\src\HardwareDriver.cpp" />
     <ClCompile Include="..\src\HexUtils.cpp" />
     <ClCompile Include="..\src\IoService.cpp" />
