@@ -24,7 +24,7 @@ void HapticsPlayer::Play(HapticHandle hh)
 	std::lock_guard<std::mutex> guard(m_effectsMutex);
 
 	if (auto effect = toInternalUUID(hh)) {
-		effect.get()->Play();
+		effect.get().Play();
 	}
 }
 
@@ -33,7 +33,7 @@ void HapticsPlayer::Pause(HapticHandle hh)
 	std::lock_guard<std::mutex> guard(m_effectsMutex);
 
 	if (auto effect = toInternalUUID(hh)) {
-		effect.get()->Pause();
+		effect.get().Pause();
 	}
 }
 
@@ -51,7 +51,7 @@ void HapticsPlayer::Stop(HapticHandle hh)
 	std::lock_guard<std::mutex> guard(m_effectsMutex);
 
 	if (auto effect = toInternalUUID(hh)) {
-		effect.get()->Stop();
+		effect.get().Stop();
 	}
 }
 
@@ -103,7 +103,7 @@ boost::optional<PlayableInfo> HapticsPlayer::GetHandleInfo(HapticHandle h)
 	std::lock_guard<std::mutex> guard(m_effectsMutex);
 
 	if (auto effect = toInternalUUID(h)) {
-		return effect->get()->GetInfo();
+		return effect.get().GetInfo();
 	}
 	
 	return boost::none;
@@ -127,17 +127,6 @@ std::size_t HapticsPlayer::NumOrphanedEffects()
 bool EffectIsExpired(const std::unique_ptr<IPlayable> &p, bool isGlobalPause) {
 	const auto& effectInfo = p->GetInfo();
 	return !effectInfo.Playing();
-
-	/*
-	if (isGlobalPause) {
-		return effectInfo.CurrentTime() >= effectInfo.Duration();
-		//return p->CurrentTime() >= p->GetTotalPlayTime();
-	}
-	else {
-		return !effectInfo.Playing() || effectInfo.CurrentTime() >= effectInfo.Duration();
-		return !p->IsPlaying() || p->CurrentTime() >= p->GetTotalPlayTime();
-	}
-	*/
 }
 int compute(int p) {
 	return p * 123123;
@@ -239,14 +228,16 @@ std::vector<PriorityModel::EffectInfo> HapticsPlayer::GetEffectInfo() const
 
 
 
-boost::optional<const std::unique_ptr<IPlayable>&> HapticsPlayer::toInternalUUID(HapticHandle hh)
+boost::optional<IPlayable&> HapticsPlayer::toInternalUUID(HapticHandle hh) const
 {
 	
-	//todo: _ousideHandleToUUID should probably be searched, not inserted if not found as is current behavior
-	auto h = uuid_hasher(_outsideHandleToUUID[hh]);
-	if (_effects.find(h) != _effects.end()) {
-		return _effects.at(h);
+	if (_outsideHandleToUUID.find(hh) != _outsideHandleToUUID.end()) {
+		auto h = uuid_hasher(_outsideHandleToUUID.at(hh));
+		if (_effects.find(h) != _effects.end()) {
+			return *_effects.at(h);
+		}
 	}
 	
-	return boost::optional<const std::unique_ptr<IPlayable>&>();
+	return boost::none;
 }
+

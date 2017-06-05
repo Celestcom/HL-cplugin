@@ -62,6 +62,7 @@ private:
 	bool _paused;
 
 	EventRegistry& m_registry;
-	boost::optional<const std::unique_ptr<IPlayable>&>  toInternalUUID(HapticHandle hh);
+	boost::optional<IPlayable&>  toInternalUUID(HapticHandle hh) const;
+
 };
 

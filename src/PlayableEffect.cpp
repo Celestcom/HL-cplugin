@@ -9,9 +9,9 @@
 
 namespace NS {
 	namespace Playable {
-		void Restart(const std::unique_ptr<IPlayable>& playable) {
-			playable->Stop();
-			playable->Play();
+		void Restart(IPlayable& playable) {
+			playable.Stop();
+			playable.Play();
 		}
 	}
 }

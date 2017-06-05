@@ -17,7 +17,7 @@ struct weak_ptr_less_than {
 namespace NS {
 	namespace Playable {
 		//implements Restart by calling Stop() followed by Play()
-		void Restart(const std::unique_ptr<IPlayable>&);
+		void Restart(IPlayable&);
 	}
 }
 
