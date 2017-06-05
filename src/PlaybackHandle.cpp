@@ -43,4 +43,19 @@ PlaybackHandle::~PlaybackHandle()
 	if (m_engine != nullptr) {
 		m_engine->HandleCommand(m_handle, NSVR_PlaybackCommand(3));
 	}
+
 }
+
+int PlaybackHandle::GetHandleInfo(NSVR_HandleInfo* infoPtr)
+{
+	//todo: pay back the debt
+	//this is bad
+	//can throw exceptions
+	//need to rearchitect playback handles
+	if (m_engine != nullptr) {
+		return m_engine->GetHandleInfo(m_handle, infoPtr);
+	}
+
+	return NSVR_Error_NullArgument;
+}
+
