@@ -98,6 +98,17 @@ void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
 
 }
 
+boost::optional<PlayableInfo> HapticsPlayer::GetHandleInfo(HapticHandle h) 
+{
+	std::lock_guard<std::mutex> guard(m_effectsMutex);
+
+	if (auto effect = toInternalUUID(h)) {
+		return effect->get()->GetInfo();
+	}
+	
+	return boost::none;
+}
+
 
 std::size_t HapticsPlayer::NumLiveEffects()
 {
@@ -231,6 +242,7 @@ std::vector<PriorityModel::EffectInfo> HapticsPlayer::GetEffectInfo() const
 boost::optional<const std::unique_ptr<IPlayable>&> HapticsPlayer::toInternalUUID(HapticHandle hh)
 {
 	
+	//todo: _ousideHandleToUUID should probably be searched, not inserted if not found as is current behavior
 	auto h = uuid_hasher(_outsideHandleToUUID[hh]);
 	if (_effects.find(h) != _effects.end()) {
 		return _effects.at(h);

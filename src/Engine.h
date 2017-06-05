@@ -49,6 +49,7 @@ public:
 
 	int DumpDeviceDiagnostics();
 	int SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int length);
+	int GetHandleInfo(uint32_t m_handle, NSVR_HandleInfo* infoPtr);
 
 private:
 	IoService m_ioService;

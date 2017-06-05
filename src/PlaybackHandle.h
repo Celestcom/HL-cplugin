@@ -10,8 +10,11 @@ public:
 	PlaybackHandle();
 	int Command(NSVR_PlaybackCommand command);
 	~PlaybackHandle();
+	int GetHandleInfo(NSVR_HandleInfo* infoPtr);
+
 private:
 	Engine* m_engine;
 	uint32_t m_handle;
+public:
 };
 

@@ -29,6 +29,18 @@ void Engine::executeTimestep()
 	
 }
 
+int Engine::GetHandleInfo(uint32_t m_handle, NSVR_HandleInfo* infoPtr) 
+{
+	if (auto info = m_player.GetHandleInfo(HapticHandle(m_handle))) {
+		infoPtr->Duration = info->Duration();
+		infoPtr->Elapsed = info->CurrentTime();
+		return NSVR_Success_Unqualified;
+	}
+	else {
+		return NSVR_Error_NoSuchHandle;
+	}
+}
+
 int Engine::DumpDeviceDiagnostics()
 {
 	NullSpaceIPC::DriverCommand command;

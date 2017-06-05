@@ -48,6 +48,9 @@ typedef enum NSVR_ErrorTypes_ {
 	/* Service errors*/
 	NSVR_Error_ServiceDisconnected = -4000,
 
+	/* Handle errors */
+	NSVR_Error_NoSuchHandle = -5000,
+
 
 
 } NSVR_ErrorTypes;

@@ -95,6 +95,10 @@ extern "C" {
 		unsigned int ServiceMinor;
 	} NSVR_ServiceInfo;
 
+	typedef struct NSVR_HandleInfo_ {
+		float Duration;
+		float Elapsed;
+	} NSVR_HandleInfo;
 	
 	//Instantiates a new NSVR system context
 	NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr);
@@ -153,7 +157,7 @@ extern "C" {
 	NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle* handlePtr, NSVR_PlaybackCommand command);
 	NSVR_RETURN(void)		 NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr);
 
-
+	NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_GetInfo(NSVR_PlaybackHandle* handlePtr, NSVR_HandleInfo* infoPtr);
 
 
 #ifdef __cplusplus

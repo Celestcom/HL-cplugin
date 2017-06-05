@@ -1,7 +1,7 @@
 #pragma once
 #include <boost\uuid\uuid.hpp>
 #include <boost\uuid\random_generator.hpp>
-
+#include <boost\optional.hpp>
 #include "HapticClasses.h"
 #include "IPlayable.h"
 #include "PriorityModel.h"
@@ -34,7 +34,7 @@ public:
 	void Stop(HapticHandle h);
 	void Release(HapticHandle h);
 	void Create(HapticHandle h, std::vector<SuitEvent>);
-
+	boost::optional<PlayableInfo> GetHandleInfo(HapticHandle h);
 	PriorityModel& GetModel();
 
 	std::size_t NumLiveEffects();

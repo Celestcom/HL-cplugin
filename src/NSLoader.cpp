@@ -149,18 +149,6 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Disable(NSVR_System * ptr)
 
 
 
-NSVR_RETURN(NSVR_Result) NSVR_System_GetError(NSVR_System* ptr, NSVR_ErrorInfo* errorInfo)
- {
-	 RETURN_IF_NULL(ptr);
-	 RETURN_IF_NULL(errorInfo);
-
-	 return ExceptionGuard([&] {
-		 AS_TYPE(Engine, ptr)->GetError(errorInfo);
-		 return NSVR_Success_Unqualified;
-	 });
- }
-
-
 NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType type)
  {
 	
@@ -260,15 +248,7 @@ NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_Create(NSVR_PlaybackHandle ** handl
 	 
 }
 
-NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_Bind(NSVR_PlaybackHandle * handlePtr, NSVR_Timeline * timelinePtr)
- {
-	 RETURN_IF_NULL(handlePtr);
-	 RETURN_IF_NULL(timelinePtr);
 
-	 return ExceptionGuard([&] {
-		 return AS_TYPE(PlaybackHandle, handlePtr)->Bind(AS_TYPE(EventList, timelinePtr));
-	 });
- }
 
 NSVR_RETURN(NSVR_Result)NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle * handlePtr, NSVR_PlaybackCommand command)
  {
@@ -290,6 +270,15 @@ NSVR_RETURN(void) NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr)
 	
  }
 
+NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_GetInfo(NSVR_PlaybackHandle* handlePtr, NSVR_HandleInfo* infoPtr)
+{
+	RETURN_IF_NULL(handlePtr);
+	RETURN_IF_NULL(infoPtr);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(PlaybackHandle, handlePtr)->GetHandleInfo(infoPtr);
+	});
+}
 
 
 
