@@ -12,28 +12,24 @@
 #include "MyTestLog.h"
 #include "IHapticDevice.h"
 #include "NSLoader_Internal.h"
-#pragma pack(1)
-
-typedef enum NSVR_EngineCommand_ {
-	NSVR_EngineCommand_ResumeAll = 1,
-	NSVR_EngineCommand_PauseAll,
-	NSVR_EngineCommand_DestroyAll,
-	NSVR_EngineCommand_EnableTracking,
-	NSVR_EngineCommand_DisableTracking
-} NSVR_EngineCommand;
+#include "EngineIsAlive.h"
+#include "EngineCommand.h"
 
 class Engine
 {
 public:
 	Engine();
+
+	void setupUserFacingLogSink();
+
 	~Engine();
 	int PollStatus(NSVR_ServiceInfo*);
 	uint32_t GenHandle();
 	int PollDevice(NSVR_DeviceInfo *);
-	bool EngineCommand(NSVR_EngineCommand command);
+	bool DoEngineCommand(::EngineCommand command);
 	int GetEngineStats(NSVR_SystemStats* stats);
 	void HandleCommand(unsigned int handle, NSVR_PlaybackCommand);
-
+	void ReleaseHandle(unsigned int handle);
 	void GetError(NSVR_ErrorInfo* errorInfo);
 	int CreateEffect(EventList* list, uint32_t handle);
 	int  PollTracking(NSVR_TrackingUpdate* q);
@@ -75,5 +71,6 @@ private:
 
 
 	
+	void setupFileLogSink();
 };
 

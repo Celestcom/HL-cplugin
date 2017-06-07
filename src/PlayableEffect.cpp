@@ -5,6 +5,7 @@
 #include "SuitEvent.h"
 #include "PriorityModel.h"
 #include "NSLoader.h"
+#include <memory>
 #include <iterator>
 
 namespace NS {
@@ -181,11 +182,9 @@ PlayableInfo PlayableEffect::GetInfo() const
 void PlayableEffect::Release()
 {
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
-		try {
-			auto p = hd.lock();
+		if (auto p = hd.lock()) {
 			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
-		}
-		catch (std::bad_weak_ptr) {
+		} else  {
 			//the driver was removed, probably physically, so we don't need to worry about it
 		}
 	});
@@ -198,11 +197,10 @@ void PlayableEffect::reset()
 	
 
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
-		try {
-			auto p = hd.lock();
+		if (auto p = hd.lock()){
 			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
 		}
-		catch (std::bad_weak_ptr) {
+		else {
 			//the driver was removed, probably physically, so we don't need to worry about it
 		}
 	});
@@ -211,11 +209,10 @@ void PlayableEffect::reset()
 void PlayableEffect::pause()
 {
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
-		try {
-			auto p = hd.lock();
+		if (auto p = hd.lock()) {
 			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Pause);
 		}
-		catch (std::bad_weak_ptr) {
+		else {
 			//the driver was removed, probably physically, so we don't need to worry about it
 		}
 	});
@@ -226,11 +223,10 @@ void PlayableEffect::resume() {
 	//So if we fail to obtain the ptr, we should probably re-try to put this on a new set of drivers! But not now.
 
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
-		try {
-			auto p = hd.lock();
+		if (auto p = hd.lock()) {
 			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Play);
 		}
-		catch (std::bad_weak_ptr) {
+		else {
 			//the driver was removed, probably physically, so we don't need to worry about it
 		}
 	});

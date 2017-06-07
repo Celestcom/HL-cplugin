@@ -9,7 +9,9 @@
 
 #include <boost/log/core.hpp>
 #include <boost/log/sinks/sync_frontend.hpp>
+#include <boost/log/sinks/text_file_backend.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/core/null_deleter.hpp>
 #include "MyTestLog.h"
 #include "IHapticDevice.h"
 #include "Devices/HardlightDevice/hardlightdevice.h"
@@ -82,16 +84,8 @@ Engine::Engine() :
 
 	
 
-	using namespace boost::log;
-	m_log = boost::make_shared<MyTestLog>();
-	m_log->Provide(&m_messenger, m_ioService.GetIOService());
-	typedef sinks::synchronous_sink<MyTestLog> sink_t;
-
-	boost::shared_ptr<sink_t> sink(new sink_t(m_log));
-	
-	//sink->locked_backend()->Provide(&m_messenger, m_ioService.GetIOService());
-
-	core::get()->add_sink(sink);
+	setupUserFacingLogSink();
+	//setupFileLogSink();
 
 	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
@@ -113,6 +107,36 @@ Engine::Engine() :
 }
 
 
+void Engine::setupFileLogSink()
+{
+	using namespace boost::log;
+	auto backend = boost::make_shared<sinks::text_file_backend>(
+		  keywords::file_name = "nsvr_plugin_%5N.log"
+		, keywords::rotation_size = 5 * 1024 * 1024
+		, keywords::time_based_rotation = sinks::file::rotation_at_time_point(12, 0, 0)
+	);
+
+	typedef sinks::synchronous_sink<sinks::text_file_backend> sink_t;
+	boost::shared_ptr<sink_t> sink(new sink_t(backend));
+	
+	boost::log::core::get()->add_sink(sink);
+
+}
+
+
+
+void Engine::setupUserFacingLogSink()
+{
+	
+	using namespace boost::log;
+	m_log = boost::make_shared<MyTestLog>();
+	m_log->Provide(&m_messenger, m_ioService.GetIOService());
+	
+	typedef sinks::synchronous_sink<MyTestLog> sink_t;
+	boost::shared_ptr<sink_t> sink(new sink_t(m_log));
+	core::get()->add_sink(sink);
+	
+}
 
 Engine::~Engine()
 {
@@ -181,26 +205,26 @@ int Engine::PollDevice(NSVR_DeviceInfo * device)
 
 
 
-bool Engine::EngineCommand(NSVR_EngineCommand command)
+bool Engine::DoEngineCommand(::EngineCommand command)
 {
 	switch (command) {
-	case NSVR_EngineCommand::NSVR_EngineCommand_ResumeAll:
+	case EngineCommand::ResumeAll:
 		m_player.PlayAll();
 		break;
-	case NSVR_EngineCommand::NSVR_EngineCommand_PauseAll:
+	case EngineCommand::PauseAll:
 		m_player.PauseAll();
 		break;
-	case NSVR_EngineCommand::NSVR_EngineCommand_DestroyAll:
+	case EngineCommand::DestroyAll:
 		m_player.ClearAll();
 		break;
-	case NSVR_EngineCommand::NSVR_EngineCommand_EnableTracking:
+	case EngineCommand::EnableTracking:
 		{
 		NullSpaceIPC::DriverCommand command;
 		command.set_command(NullSpaceIPC::DriverCommand_Command_ENABLE_TRACKING);
 		m_messenger.WriteCommand(command);
 		}
 		break;
-	case NSVR_EngineCommand::NSVR_EngineCommand_DisableTracking:
+	case EngineCommand::DisableTracking:
 		{
 		NullSpaceIPC::DriverCommand command;
 		command.set_command(NullSpaceIPC::DriverCommand_Command_DISABLE_TRACKING);
@@ -222,6 +246,12 @@ int Engine::GetEngineStats(NSVR_SystemStats * stats)
 }
 
 
+
+void Engine::ReleaseHandle(unsigned int handle)
+{
+	HapticHandle h = HapticHandle(handle);
+	m_player.Release(h);
+}
 
 
 
