@@ -4,7 +4,15 @@
 
 //Check that the string is null terminated and less than 32 characters. Not sure if this is appropriate.
 //Still evaluating
+
 //#define DO_VALIDATION
+
+#ifdef DO_VALIDATION
+#define VALIDATE_KEY(key) do { if (!validate(key)) { return false; } } while (0)
+#else 
+#define VALIDATE_KEY(key)
+#endif
+
 
 bool validate(const char* key) {
 	const unsigned int max_key_len = 32;
@@ -30,22 +38,20 @@ ParameterizedEvent::ParameterizedEvent()
 
 bool ParameterizedEvent::SetFloat(const char * key, float value)
 {
-#ifdef DO_VALIDATION
-	if (!validate(key)) {
-		return false;
-	}
-#endif
+	VALIDATE_KEY(key);
 	return doSetFloat(key, value);
 }
 
 bool ParameterizedEvent::SetInt(const char * key, int value)
 {
-#ifdef DO_VALIDATION
-	if (!validate(key)) {
-		return false;
-	}
-#endif
+	VALIDATE_KEY(key);
 	return doSetInt(key, value);
+}
+
+bool ParameterizedEvent::SetFloats(const char * key, float * values, unsigned int length)
+{
+	VALIDATE_KEY(key);
+	return doSetFloats(key, values, length);
 }
 
 

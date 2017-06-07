@@ -96,6 +96,9 @@
     <ClInclude Include="..\src\Events\BasicHapticEvent.h">
       <Filter>src\Events</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Events\CurveEvent.h">
+      <Filter>src\Events</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\ExceptionSafeCall.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -255,6 +258,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Events\BasicHapticEvent.cpp">
+      <Filter>src\Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Events\CurveEvent.cpp">
       <Filter>src\Events</Filter>
     </ClCompile>
     <ClCompile Include="..\src\HapticArgs.cpp">
