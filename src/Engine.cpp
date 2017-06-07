@@ -70,22 +70,21 @@ int Engine::SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int leng
 
 Engine::Engine() :
 
-	_isEnginePlaying(true),
+	m_isHapticsSystemPlaying(true),
 	m_ioService(),
 	m_messenger(m_ioService.GetIOService()),
 	m_registry(),
 	m_player(m_registry),
-	_currentHandleId(0),
+	m_currentHandleId(0),
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
-	m_hapticsExecutionTimer(m_ioService.GetIOService()),
 	m_hapticsTimestep(m_ioService.GetIOService(), m_hapticsExecutionInterval),
-	m_cachedTracking({})
+	m_cachedTrackingUpdate({})
 {
 
 	
 
 	setupUserFacingLogSink();
-	//setupFileLogSink();
+//	setupFileLogSink(); //not implementing this yet
 
 	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
@@ -167,11 +166,11 @@ int Engine::PollStatus(NSVR_ServiceInfo* info)
 	
 }
 
-uint32_t Engine::GenHandle()
+uint32_t Engine::GenerateHandle()
 {
 	//todo: bounds check
-	_currentHandleId += 1;
-	return _currentHandleId;
+	m_currentHandleId += 1;
+	return m_currentHandleId;
 }
 
 int Engine::PollDevice(NSVR_DeviceInfo * device)
@@ -280,12 +279,7 @@ void Engine::HandleCommand(unsigned int handle, NSVR_PlaybackCommand c)
 
 
 
-void Engine::GetError(NSVR_ErrorInfo* errorInfo)
-{
-	strncpy_s(errorInfo->ErrorString, 512, _currentError.c_str(), 512);
-	errorInfo->ErrorString[511] = '\0';
-	//todo: Keep track of LastResult as well
-}
+
 
 
 int Engine::CreateEffect(EventList * list, uint32_t handle)

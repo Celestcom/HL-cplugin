@@ -1,9 +1,20 @@
 #include "StdAfx.h"
 #include "IoService.h"
 #include <iostream>
-//#include "Locator.h"
-IoService::IoService():_io(), _work(), _running(false), _readyToResumeIO(2),
-_shouldQuit{false}, _wantsReset{false}, _isReset{false}
+
+
+//To those who would venture into this code:
+//It is very old. With a good testing suite, we may be able to replace it with something less complex
+//now that most of the serial issues are moved into the driver. 
+
+IoService::IoService():
+	_io(), 
+	_work(), 
+	_running(false), 
+	_readyToResumeIO(2),
+	_shouldQuit{false}, 
+	_wantsReset{false}, 
+	_isReset{false}
 {
 	start();
 }
@@ -66,7 +77,7 @@ void IoService::start() {
 				_doneResettingIO.notify_one();
 			}
 			catch (boost::system::system_error&) {
-			//	std::cout <<"WTF\n";
+				//The Io service couldn't reset?!
 			}
 
 		}

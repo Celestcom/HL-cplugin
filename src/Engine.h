@@ -24,7 +24,7 @@ public:
 
 	~Engine();
 	int PollStatus(NSVR_ServiceInfo*);
-	uint32_t GenHandle();
+	uint32_t GenerateHandle();
 	int PollDevice(NSVR_DeviceInfo *);
 	bool DoEngineCommand(::EngineCommand command);
 	int GetEngineStats(NSVR_SystemStats* stats);
@@ -49,18 +49,15 @@ public:
 
 private:
 	IoService m_ioService;
-	NSVR_TrackingUpdate m_cachedTracking;
-	NSVR_TrackingUpdate _tracking;
-	uint32_t _currentHandleId;
-	std::string _currentError;
-	bool _isEnginePlaying;
+	NSVR_TrackingUpdate m_cachedTrackingUpdate;
+	uint32_t m_currentHandleId;
+	bool m_isHapticsSystemPlaying;
 	ClientMessenger m_messenger;
 	EventRegistry m_registry;
 
 	std::unique_ptr<IHapticDevice> m_hardlightSuit;
 	HapticsPlayer m_player;
 
-	boost::asio::deadline_timer m_hapticsExecutionTimer;
 	boost::posix_time::milliseconds m_hapticsExecutionInterval;
 	void executeTimestep();
 
