@@ -3,7 +3,6 @@
 
 #include "NSLoader.h"
 #include "Locator.h"
-#include "Event.h"
 #include "ParameterizedEvent.h"
 #include "Engine.h"
 

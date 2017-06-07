@@ -5,7 +5,6 @@
 #include "NSLoader.h"
 #include "Engine.h"
 #include "EventList.h"
-#include "Event.h"
 #include "ParameterizedEvent.h"
 #include "PlaybackHandle.h"
 #include "ExceptionSafeCall.h"

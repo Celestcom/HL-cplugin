@@ -78,9 +78,6 @@
     <ClInclude Include="..\src\Enums.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Event.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\EventList.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -246,9 +243,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\EnumTranslator.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Event.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\EventList.cpp">

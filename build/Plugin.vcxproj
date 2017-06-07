@@ -314,7 +314,6 @@
     <ClInclude Include="..\src\EngineIsAlive.h" />
     <ClInclude Include="..\src\EnumTranslator.h" />
     <ClInclude Include="..\src\Enums.h" />
-    <ClInclude Include="..\src\Event.h" />
     <ClInclude Include="..\src\EventList.h" />
     <ClInclude Include="..\src\EventRegistry.h" />
     <ClInclude Include="..\src\ExceptionSafeCall.h" />
@@ -391,7 +390,6 @@
     <ClCompile Include="..\src\Devices\HardlightDevice\ZoneModel.cpp" />
     <ClCompile Include="..\src\Engine.cpp" />
     <ClCompile Include="..\src\EnumTranslator.cpp" />
-    <ClCompile Include="..\src\Event.cpp" />
     <ClCompile Include="..\src\EventList.cpp" />
     <ClCompile Include="..\src\EventRegistry.cpp" />
     <ClCompile Include="..\src\HapticArgs.cpp" />
