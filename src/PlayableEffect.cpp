@@ -2,7 +2,7 @@
 #include "PlayableEffect.h"
 #include "Locator.h"
 #include <iostream>
-#include "SuitEvent.h"
+#include "BasicHapticEvent.h"
 #include "PriorityModel.h"
 #include "NSLoader.h"
 #include <memory>

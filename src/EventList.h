@@ -1,7 +1,7 @@
 #pragma once
 
 #include <boost\variant.hpp>
-#include "SuitEvent.h"
+#include "BasicHapticEvent.h"
 class ParameterizedEvent;
 class Engine;
 

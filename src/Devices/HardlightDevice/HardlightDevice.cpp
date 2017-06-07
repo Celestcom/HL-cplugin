@@ -2,7 +2,7 @@
 #include "HardlightDevice.h"
 #include "NSLoader.h"
 #include "Locator.h"
-#include "SuitEvent.h"
+#include "BasicHapticEvent.h"
 #include <boost/uuid/random_generator.hpp>
 #include <experimental/vector>
 

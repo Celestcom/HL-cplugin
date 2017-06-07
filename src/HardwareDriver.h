@@ -1,7 +1,7 @@
 #pragma once
 #include <boost/uuid/uuid.hpp>
 #include "NSLoader_fwds.h"
-#include "SuitEvent.h"
+#include "BasicHapticEvent.h"
 #include <boost/uuid/uuid.hpp>
 class RealtimeArgs {
 public:

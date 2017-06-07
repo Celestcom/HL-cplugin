@@ -344,7 +344,7 @@
     <ClInclude Include="..\src\PlaybackHandle.h" />
     <ClInclude Include="..\src\PriorityModel.h" />
     <ClInclude Include="..\src\RegionTree.h" />
-    <ClInclude Include="..\src\SuitEvent.h" />
+    <ClInclude Include="..\src\BasicHapticEvent.h" />
     <ClInclude Include="..\src\Wire\EncodingOperations.h" />
     <ClInclude Include="..\src\Wire\FlatbuffDecoder.h" />
     <ClInclude Include="..\src\Wire\Wire.h" />
@@ -412,7 +412,7 @@
     <ClCompile Include="..\src\PlaybackHandle.cpp" />
     <ClCompile Include="..\src\PriorityModel.cpp" />
     <ClCompile Include="..\src\RegionTree.cpp" />
-    <ClCompile Include="..\src\SuitEvent.cpp" />
+    <ClCompile Include="..\src\BasicHapticEvent.cpp" />
     <ClCompile Include="..\src\dllmain.cpp" />
     <ClCompile Include="..\src\jsoncpp.cpp" />
     <ClCompile Include="..\src\stdafx.cpp">

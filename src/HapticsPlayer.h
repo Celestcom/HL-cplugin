@@ -6,7 +6,7 @@
 #include "IPlayable.h"
 #include "PriorityModel.h"
 #include "HapticEventGenerator.h"
-#include "SuitEvent.h"
+#include "BasicHapticEvent.h"
 #include <mutex>
 #include "EventRegistry.h"
 

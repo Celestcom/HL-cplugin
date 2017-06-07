@@ -2,7 +2,7 @@
 #include "IPlayable.h"
 #include "HapticEvent.h"
 #include "HapticEventGenerator.h"
-#include "SuitEvent.h"
+#include "BasicHapticEvent.h"
 #include "EventRegistry.h"
 #include <set>
 #include <boost\uuid\random_generator.hpp>
