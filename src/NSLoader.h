@@ -147,10 +147,10 @@ extern "C" {
 
 
 	/* Timelines */
-	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Create(NSVR_Timeline** eventListPtr, NSVR_System* systemPtr);
+	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Create(NSVR_Timeline** eventListPtr);
 	NSVR_RETURN(void)		 NSVR_Timeline_Release(NSVR_Timeline** listPtr);
 	NSVR_RETURN(NSVR_Result) NSVR_Timeline_AddEvent(NSVR_Timeline* list, NSVR_Event* event);
-	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline* timeline, NSVR_PlaybackHandle* handlePr);
+	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline* timeline, NSVR_System* systemPtr, NSVR_PlaybackHandle* handlePr);
 
 	/* Playback */
 	NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_Create(NSVR_PlaybackHandle** handlePtr);

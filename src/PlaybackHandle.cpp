@@ -1,50 +1,35 @@
 #include "stdafx.h"
 #include "PlaybackHandle.h"
-#include "Engine.h"
 
 #include "EventList.h"
 #include "NSLoader.h"
-int PlaybackHandle::Bind(EventList * eventListPtr)
-{
-	assert(eventListPtr != nullptr);
-	if (m_engine != nullptr) {
-		m_engine->HandleCommand(m_handle, NSVR_PlaybackCommand(3));
-	}
-	m_engine = eventListPtr->EnginePtr();
-	assert(m_engine != nullptr);
-	m_handle = m_engine->GenHandle();
+#include "Engine.h"
 
-	m_engine->CreateEffect(eventListPtr, m_handle);
-	return NSVR_Success_Unqualified;
+PlaybackHandle::PlaybackHandle() : handle(0), engine{ nullptr }
+{
+
 }
 
-PlaybackHandle::PlaybackHandle(): m_engine(nullptr)
+PlaybackHandle::~PlaybackHandle()
 {
+	engine = nullptr;
+	handle = 0;
 }
 
 int PlaybackHandle::Command(NSVR_PlaybackCommand command)
 {
-	if (m_engine != nullptr) {
-		m_engine->HandleCommand(m_handle, command);
+	if (engine != nullptr) {
+		engine->HandleCommand(handle, command);
 		return NSVR_Success_Unqualified;
 	}
-	else {
-		return -1;
-	}
+	
+	
+	return NSVR_Error_Unknown;
+	
 }
 
 
-PlaybackHandle::~PlaybackHandle()
-{
-	//todo: pay back the debt
-	//this is bad
-	//can throw exceptions
-	//need to rearchitect playback handles
-	if (m_engine != nullptr) {
-		m_engine->HandleCommand(m_handle, NSVR_PlaybackCommand(3));
-	}
 
-}
 
 int PlaybackHandle::GetHandleInfo(NSVR_HandleInfo* infoPtr)
 {
@@ -52,10 +37,12 @@ int PlaybackHandle::GetHandleInfo(NSVR_HandleInfo* infoPtr)
 	//this is bad
 	//can throw exceptions
 	//need to rearchitect playback handles
-	if (m_engine != nullptr) {
-		return m_engine->GetHandleInfo(m_handle, infoPtr);
+	if (engine != nullptr) {
+		return engine->GetHandleInfo(handle, infoPtr);
 	}
+	
 
-	return NSVR_Error_NullArgument;
+
+	return NSVR_Error_Unknown;
 }
 

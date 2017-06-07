@@ -9,6 +9,7 @@
 #include "ParameterizedEvent.h"
 #include "PlaybackHandle.h"
 #include "ExceptionSafeCall.h"
+#include "EngineCommand.h"
 
 #define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
@@ -25,6 +26,7 @@
 #else
 #define RETURN_IF_NULL(ptr)
 #endif
+
 
 
 NSVR_RETURN(unsigned int) NSVR_Version_Get(void)
@@ -60,6 +62,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetDeviceInfo(NSVR_System * systemPtr, NSVR
 
 NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr)
 {
+
 	return ExceptionGuard([&] { *systemPtr = AS_TYPE(NSVR_System, new Engine()); return NSVR_Success_Unqualified; });
 }
 
@@ -94,7 +97,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Pause(NSVR_System* ptr)
 	 RETURN_IF_NULL(ptr);
 
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_PauseAll);
+		 return AS_TYPE(Engine, ptr)->DoEngineCommand(EngineCommand::PauseAll);
 	 });
  }
 
@@ -103,7 +106,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Resume(NSVR_System* ptr)
 	 RETURN_IF_NULL(ptr);
 
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_ResumeAll);
+		 return AS_TYPE(Engine, ptr)->DoEngineCommand(EngineCommand::ResumeAll);
 	 });
  }
 
@@ -112,7 +115,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Destroy(NSVR_System* ptr)
 	 RETURN_IF_NULL(ptr);
 
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_DestroyAll);
+		 return AS_TYPE(Engine, ptr)->DoEngineCommand(EngineCommand::DestroyAll);
 	 });
  }
 
@@ -134,7 +137,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Enable(NSVR_System * ptr)
 	 RETURN_IF_NULL(ptr);
 
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_EnableTracking);
+		 return AS_TYPE(Engine, ptr)->DoEngineCommand(EngineCommand::EnableTracking);
 	 });
  }
 
@@ -143,7 +146,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Disable(NSVR_System * ptr)
 	 RETURN_IF_NULL(ptr);
 
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->EngineCommand(NSVR_EngineCommand_DisableTracking);
+		 return AS_TYPE(Engine, ptr)->DoEngineCommand(EngineCommand::DisableTracking);
 	 });
  }
 
@@ -192,12 +195,11 @@ NSVR_RETURN(NSVR_Result)NSVR_Event_SetInteger(NSVR_Event * event, const char * k
 	 });
  }
 
-NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr, NSVR_System* systemPtr)
+NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr)
  {
-	 RETURN_IF_NULL(systemPtr);
 
 	 return ExceptionGuard([&] {
-		 *timelinePtr = AS_TYPE(NSVR_Timeline, new EventList(AS_TYPE(Engine, systemPtr)));
+		 *timelinePtr = AS_TYPE(NSVR_Timeline, new EventList());
 		 return NSVR_Success_Unqualified;
 	 });
  }
@@ -224,14 +226,25 @@ NSVR_RETURN(NSVR_Result) NSVR_Timeline_AddEvent(NSVR_Timeline * list, NSVR_Event
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSVR_PlaybackHandle * handlePtr)
+NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSVR_System* systemPtr, NSVR_PlaybackHandle * handlePtr)
  {
+	 RETURN_IF_NULL(systemPtr);
 	 RETURN_IF_NULL(timelinePtr);
 	 RETURN_IF_NULL(handlePtr);
 
 	 return ExceptionGuard([&] {
+		 auto engine = AS_TYPE(Engine, systemPtr);
+		 auto timeline = AS_TYPE(EventList, timelinePtr);
+		 auto handle = AS_TYPE(PlaybackHandle, handlePtr);
 
-		 return AS_TYPE(PlaybackHandle, handlePtr)->Bind(AS_TYPE(EventList, timelinePtr));
+		
+		 if (handle->handle != 0) {
+			 engine->ReleaseHandle(handle->handle);
+		 }
+		
+		 handle->handle = engine->GenHandle();
+		 handle->engine = engine;
+		 return engine->CreateEffect(timeline, handle->handle);
 		 
 	 });
  }
@@ -261,14 +274,38 @@ NSVR_RETURN(NSVR_Result)NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle * handle
 
 NSVR_RETURN(void) NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr)
  {
+
+
+
+	//ExceptionGuard([&] {
+		/*if (handlePtr != nullptr && *handlePtr != nullptr) {
+			auto handle = AS_TYPE(PlaybackHandle, *handlePtr);
+			if (handle->engine != nullptr) {
+				handle->engine->ReleaseHandle(handle->handle);
+			}
+		}
+
+		PlaybackHandle* toDelete = AS_TYPE(PlaybackHandle, *handlePtr);
+		delete toDelete;
+		*handlePtr = nullptr;*/
+
+	/*PlaybackHandle* p = (PlaybackHandle*)(*handlePtr);
+		delete p;*/
+		//*handlePtr = nullptr;
+
+
+	//});
+	
 	ExceptionGuard([&] {
+
 		delete AS_TYPE(PlaybackHandle, *handlePtr);
 		*handlePtr = nullptr;
 
 		return NSVR_Success_Unqualified;
 	});
-	
  }
+
+
 
 NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_GetInfo(NSVR_PlaybackHandle* handlePtr, NSVR_HandleInfo* infoPtr)
 {

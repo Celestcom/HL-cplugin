@@ -6,7 +6,8 @@
 #include "Event.h"
 #include "ParameterizedEvent.h"
 #include "Engine.h"
-EventList::EventList(Engine* enginePtr):m_engine(enginePtr)
+
+EventList::EventList()
 {
 }
 
@@ -27,10 +28,7 @@ EventList::~EventList()
 {
 }
 
-Engine * EventList::EnginePtr()
-{
-	return m_engine;
-}
+
 
 std::vector<boost::variant<BasicHapticEvent>> EventList::Events()
 {
