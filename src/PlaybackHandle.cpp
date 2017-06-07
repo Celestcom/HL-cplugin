@@ -10,11 +10,6 @@ PlaybackHandle::PlaybackHandle() : handle(0), engine{ nullptr }
 
 }
 
-PlaybackHandle::~PlaybackHandle()
-{
-	engine = nullptr;
-	handle = 0;
-}
 
 int PlaybackHandle::Command(NSVR_PlaybackCommand command)
 {
@@ -33,16 +28,9 @@ int PlaybackHandle::Command(NSVR_PlaybackCommand command)
 
 int PlaybackHandle::GetHandleInfo(NSVR_HandleInfo* infoPtr)
 {
-	//todo: pay back the debt
-	//this is bad
-	//can throw exceptions
-	//need to rearchitect playback handles
 	if (engine != nullptr) {
 		return engine->GetHandleInfo(handle, infoPtr);
 	}
-	
-
-
 	return NSVR_Error_Unknown;
 }
 

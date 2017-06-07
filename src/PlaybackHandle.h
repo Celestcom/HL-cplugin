@@ -9,7 +9,6 @@ class PlaybackHandle
 {
 public:
 	PlaybackHandle();
-	~PlaybackHandle();
 	PlaybackHandle(const PlaybackHandle&) = delete;
 
 
