@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="NS_Unreal_SDK">
@@ -24,6 +24,9 @@
     </Filter>
     <Filter Include="src\Devices\HardlightDevice">
       <UniqueIdentifier>{7584AFCF-E191-DDB5-6A78-D9A0D684A96C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Events">
+      <UniqueIdentifier>{7162C20E-5D1A-045C-C621-DDB7B2F89E4C}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Wire">
       <UniqueIdentifier>{B3B127CF-9F7E-82DA-C897-7082B4C3B768}</UniqueIdentifier>
@@ -72,6 +75,12 @@
     <ClInclude Include="..\src\Engine.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\EngineCommand.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\EngineIsAlive.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\EnumTranslator.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -83,6 +92,9 @@
     </ClInclude>
     <ClInclude Include="..\src\EventRegistry.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Events\BasicHapticEvent.h">
+      <Filter>src\Events</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ExceptionSafeCall.h">
       <Filter>src</Filter>
@@ -192,15 +204,6 @@
     <ClInclude Include="..\src\targetver.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\EngineIsAlive.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\EngineCommand.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\BasicHapticEvent.h">
-      <Filter>src</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -250,6 +253,9 @@
     </ClCompile>
     <ClCompile Include="..\src\EventRegistry.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Events\BasicHapticEvent.cpp">
+      <Filter>src\Events</Filter>
     </ClCompile>
     <ClCompile Include="..\src\HapticArgs.cpp">
       <Filter>src</Filter>
@@ -323,11 +329,5 @@
     <ClCompile Include="..\src\test\test_main.cpp">
       <Filter>src\test</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\BasicHapticEvent.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
 </Project>

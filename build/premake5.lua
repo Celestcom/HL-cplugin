@@ -30,7 +30,8 @@ project "Plugin"
 		protobuf_def_incl_dir,
 		"../src/",
 		"../src/test",
-		"../src/devices"
+		"../src/devices",
+		"../src/events"
 	}
 
 	flags {
