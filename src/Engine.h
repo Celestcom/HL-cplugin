@@ -20,7 +20,6 @@ class Engine
 public:
 	Engine();
 
-	void setupUserFacingLogSink();
 
 	~Engine();
 	int PollStatus(NSVR_ServiceInfo*);
@@ -30,7 +29,6 @@ public:
 	int GetEngineStats(NSVR_SystemStats* stats);
 	void HandleCommand(unsigned int handle, NSVR_PlaybackCommand);
 	void ReleaseHandle(unsigned int handle);
-	void GetError(NSVR_ErrorInfo* errorInfo);
 	int CreateEffect(EventList* list, uint32_t handle);
 	int  PollTracking(NSVR_TrackingUpdate* q);
 
@@ -67,7 +65,8 @@ private:
 
 
 
-	
+	void setupUserFacingLogSink();
+
 	void setupFileLogSink();
 };
 
