@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "ParameterizedEvent.h"
-
-
+#include "NSLoader.h"
+#include "BasicHapticEvent.h"
+#include "CurveEvent.h"
 //Check that the string is null terminated and less than 32 characters. Not sure if this is appropriate.
 //Still evaluating
 
@@ -54,5 +55,21 @@ bool ParameterizedEvent::SetFloats(const char * key, float * values, unsigned in
 	return doSetFloats(key, values, length);
 }
 
+ParameterizedEvent* ParameterizedEvent::makeEvent(NSVR_EventType type)
+{
+	switch (type) {
+	case NSVR_EventType::NSVR_EventType_BasicHapticEvent:
+		return new BasicHapticEvent();
+	case NSVR_EventType::NSVR_EventType_CurveHapticEvent:
+		return new CurveEvent();
+	default:
+		return nullptr;
+	}
+}
+
+std::unique_ptr<ParameterizedEvent> ParameterizedEvent::Clone()
+{
+	return std::unique_ptr<ParameterizedEvent>(doClone());
+}
 
 

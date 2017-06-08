@@ -33,9 +33,8 @@ public:
 	void Restart(HapticHandle h);
 	void Stop(HapticHandle h);
 	void Release(HapticHandle h);
-	void Create(HapticHandle h, std::vector<SuitEvent>);
+	void Create(HapticHandle h, std::vector<std::unique_ptr<PlayableEvent>>&& events);
 	boost::optional<PlayableInfo> GetHandleInfo(HapticHandle h);
-	PriorityModel& GetModel();
 
 	std::size_t NumLiveEffects();
 	std::size_t NumOrphanedEffects();
@@ -44,6 +43,7 @@ public:
 	void PauseAll();
 	void ClearAll();
 
+	
 
 	std::vector<PriorityModel::EffectInfo> GetEffectInfo() const;
 	

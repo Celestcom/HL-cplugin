@@ -1,7 +1,7 @@
 #pragma once
 
-#include <boost\variant.hpp>
-#include "BasicHapticEvent.h"
+#include <memory>
+
 class ParameterizedEvent;
 class Engine;
 
@@ -11,8 +11,8 @@ public:
 	EventList();
 	int AddEvent(ParameterizedEvent* e);
 	~EventList();
-	std::vector<boost::variant<BasicHapticEvent>> Events();
+	const std::vector<std::unique_ptr<ParameterizedEvent>>& events();
 private:
-	std::vector<boost::variant<BasicHapticEvent>> m_events;
+	std::vector<std::unique_ptr<ParameterizedEvent>> m_events;
 };
 

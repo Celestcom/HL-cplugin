@@ -1,25 +1,19 @@
 #include "stdafx.h"
 #include "EventList.h"
 
-#include "NSLoader.h"
-#include "Locator.h"
 #include "ParameterizedEvent.h"
-#include "Engine.h"
-
+#include "NSLoader_Errors.h"
 EventList::EventList()
 {
 }
 
-int EventList::AddEvent(ParameterizedEvent * pe)
+//Precondition: event is not null
+int EventList::AddEvent(ParameterizedEvent * event)
 {	
-	if (pe == nullptr) {
-		return -1;
-	}
-	BasicHapticEvent* e = static_cast<BasicHapticEvent*>(pe);
-
-	//take a copy
-	m_events.push_back(boost::variant<BasicHapticEvent>(*e));
-	return 1;
+	auto clone = event->Clone();
+	m_events.push_back(std::move(clone));
+	
+	return NSVR_Success_Unqualified;
 }
 
 
@@ -29,7 +23,7 @@ EventList::~EventList()
 
 
 
-std::vector<boost::variant<BasicHapticEvent>> EventList::Events()
+const std::vector<std::unique_ptr<ParameterizedEvent>>& EventList::events()
 {
 	return m_events;
 }

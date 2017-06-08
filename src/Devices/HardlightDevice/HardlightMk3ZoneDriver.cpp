@@ -17,9 +17,9 @@ public:
 	LiveBasicHapticEvent operator()(const BasicHapticEvent& hapticEvent) const {
 		BasicHapticEventData data;
 		data.area = static_cast<uint32_t>(m_area);
-		data.duration = hapticEvent.Duration;
-		data.strength = hapticEvent.Strength;
-		data.effect = hapticEvent.RequestedEffectFamily;
+		data.duration = hapticEvent.duration();
+		data.strength = hapticEvent.strength();
+		data.effect = hapticEvent.effectFamily();
 		return LiveBasicHapticEvent(m_parentId, m_uniqueId, data);
 	}
 };

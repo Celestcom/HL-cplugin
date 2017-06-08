@@ -18,23 +18,17 @@ namespace NS {
 }
 
 
-struct time_sorter {
-	bool operator()(const SuitEvent& lhs, const SuitEvent& rhs) {
-		auto visitor = TimeOffsetVisitor();
-		float t1 = boost::apply_visitor(visitor, lhs);
-		float t2 = boost::apply_visitor(visitor, rhs);
-		return t1 < t2;
-	}
-};
-PlayableEffect::PlayableEffect(std::vector<SuitEvent> effects,EventRegistry& reg, boost::uuids::random_generator& uuid) :
-	_effects(std::move(effects)),
-	_state(PlaybackState::IDLE),
-	m_registry(reg),
-	_id(uuid())
-{
-	assert(!_effects.empty());
 
-	std::sort(_effects.begin(), _effects.end(), time_sorter());
+PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry& reg, boost::uuids::random_generator& uuid) :
+	m_effects(std::move(effects)),
+	m_state(PlaybackState::IDLE),
+	m_registry(reg),
+	m_id(uuid()),
+	m_time(0)
+{
+	assert(!m_effects.empty());
+
+	std::sort(m_effects.begin(), m_effects.end());
 
 	reset();
 }
@@ -49,14 +43,13 @@ PlayableEffect::~PlayableEffect()
 
 void PlayableEffect::Play()
 {
-	switch (_state) {
+	switch (m_state) {
 	case PlaybackState::IDLE:
-	//	reset();
-		_state = PlaybackState::PLAYING;
+		m_state = PlaybackState::PLAYING;
 		break;
 	case PlaybackState::PAUSED:
 		resume();
-		_state = PlaybackState::PLAYING;
+		m_state = PlaybackState::PLAYING;
 		break;
 	case PlaybackState::PLAYING:
 		//remain in playing state
@@ -70,17 +63,17 @@ void PlayableEffect::Play()
 void PlayableEffect::Stop()
 {
 
-	switch (_state) {
+	switch (m_state) {
 		case PlaybackState::IDLE:
 			//remain in idle state
 			break;
 		case PlaybackState::PAUSED:
 			reset();
-			_state = PlaybackState::IDLE;
+			m_state = PlaybackState::IDLE;
 			break;
 		case PlaybackState::PLAYING:
 			reset();
-			_state = PlaybackState::IDLE;
+			m_state = PlaybackState::IDLE;
 			break;
 		default:
 			break;
@@ -89,7 +82,7 @@ void PlayableEffect::Stop()
 
 void PlayableEffect::Pause()
 {
-	switch (_state) {
+	switch (m_state) {
 	case PlaybackState::IDLE:
 		//remain in idle state
 		break;
@@ -98,7 +91,7 @@ void PlayableEffect::Pause()
 		break;
 	case PlaybackState::PLAYING:
 		pause();
-		_state = PlaybackState::PAUSED;
+		m_state = PlaybackState::PAUSED;
 		break;
 	default:
 		break;
@@ -110,30 +103,29 @@ void PlayableEffect::Pause()
 
 void PlayableEffect::Update(float dt)
 {
-	if (_state == PlaybackState::IDLE || _state == PlaybackState::PAUSED) {
+	if (m_state == PlaybackState::IDLE || m_state == PlaybackState::PAUSED) {
 		return;
 	}
 
-	_time += dt;
+	m_time += dt;
 	
-	auto current(_lastExecutedEffect);
-	//this visitor returns true if the event is expired and should be executed
-	EventVisitor isTimeExpired(_time);
+	auto current(m_lastExecutedEffect);
+
+	auto isTimeExpired = [this](const PlayablePtr& event) {
+		return event->time() <= m_time;
+	};
 
 	
-
-	
-	while (current != _effects.end()) {
-		if (boost::apply_visitor(isTimeExpired, *current)) {
-			//region = *current->region;
-			std::vector<std::string> regions = boost::apply_visitor(RegionVisitor(), *current);
+	while (current != m_effects.end()) {
+		if (isTimeExpired(*current)) {
+			std::vector<std::string> regions = extractRegions(*current);
 			for (const auto& region : regions) {
-				auto consumers = m_registry.GetEventDrivers(region); //placeholder
+				auto consumers = m_registry.GetEventDrivers(region); 
 				if (consumers) {
 					//need translator from registry's leaves to area flags for backwards compat?
 					std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
 
-						consumer->createRetained(_id, *current);
+						consumer->createRetained(m_id, *current);
 						m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
 					});
 				}
@@ -141,14 +133,15 @@ void PlayableEffect::Update(float dt)
 			std::advance(current, 1);
 		}
 		else {
-			
+			//precondition: this requires that the effects vector was sorted by time.
+			//Given that, we can stop here because if it wasn't expired, then the next won't be either
 			break;
 		}
 	}
 
-	_lastExecutedEffect = current;
+	m_lastExecutedEffect = current;
 
-	if (_time >= GetTotalPlayTime()) {
+	if (m_time >= GetTotalPlayTime()) {
 		Stop();
 	}
 
@@ -159,31 +152,31 @@ void PlayableEffect::Update(float dt)
 float PlayableEffect::GetTotalPlayTime() const
 {
 	TotalPlaytimeVisitor playtimeCounter;
-	std::for_each(_effects.begin(), _effects.end(), boost::apply_visitor(playtimeCounter));
+	std::for_each(m_effects.begin(), m_effects.end(), boost::apply_visitor(playtimeCounter));
 	return playtimeCounter.TotalPlaytime();
 
 }
 
 float PlayableEffect::CurrentTime() const
 {
-	return _time;
+	return m_time;
 }
 
 bool PlayableEffect::IsPlaying() const
 {
-	return _state == PlaybackState::PLAYING;
+	return m_state == PlaybackState::PLAYING;
 }
 
 PlayableInfo PlayableEffect::GetInfo() const
 {
-	return PlayableInfo(GetTotalPlayTime(), _time, _state == PlaybackState::PLAYING);
+	return PlayableInfo(GetTotalPlayTime(), m_time, m_state == PlaybackState::PLAYING);
 }
 
 void PlayableEffect::Release()
 {
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
 		if (auto p = hd.lock()) {
-			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
+			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
 		} else  {
 			//the driver was removed, probably physically, so we don't need to worry about it
 		}
@@ -192,13 +185,13 @@ void PlayableEffect::Release()
 
 void PlayableEffect::reset()
 {
-	_time = 0;
-	_lastExecutedEffect = _effects.begin();
+	m_time = 0;
+	m_lastExecutedEffect = m_effects.begin();
 	
 
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
 		if (auto p = hd.lock()){
-			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
+			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
 		}
 		else {
 			//the driver was removed, probably physically, so we don't need to worry about it
@@ -210,7 +203,7 @@ void PlayableEffect::pause()
 {
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
 		if (auto p = hd.lock()) {
-			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Pause);
+			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Pause);
 		}
 		else {
 			//the driver was removed, probably physically, so we don't need to worry about it
@@ -224,7 +217,7 @@ void PlayableEffect::resume() {
 
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
 		if (auto p = hd.lock()) {
-			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Play);
+			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Play);
 		}
 		else {
 			//the driver was removed, probably physically, so we don't need to worry about it
@@ -256,11 +249,12 @@ RegionVisitor::RegionVisitor()
 #define START_BITMASK_SWITCH(x) \
 for (uint32_t bit = 1; x >= bit; bit *=2) if (x & bit) switch(AreaFlag(bit))
 
-std::vector<std::string> RegionVisitor::operator()(const BasicHapticEvent & event) const
+std::vector<std::string> extractRegions(const PlayablePtr & event) 
 {
 	auto translator = Locator::getTranslator();
 	std::vector<std::string> regions;
-	START_BITMASK_SWITCH(event.Area) {
+	uint32_t area = event->area();
+	START_BITMASK_SWITCH(area) {
 		case AreaFlag::Forearm_Left:
 			regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Left));
 			break;
@@ -315,3 +309,4 @@ std::vector<std::string> RegionVisitor::operator()(const BasicHapticEvent & even
 
 	return regions;
 }
+

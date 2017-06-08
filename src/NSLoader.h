@@ -78,6 +78,7 @@ extern "C" {
 
 	typedef enum NSVR_EventType_ {
 		NSVR_EventType_BasicHapticEvent = 1,
+		NSVR_EventType_CurveHapticEvent = 2,
 		NSVR_EventType_Max = 65535
 	} NSVR_EventType;
 

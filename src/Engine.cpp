@@ -278,9 +278,30 @@ void Engine::HandleCommand(unsigned int handle, NSVR_PlaybackCommand c)
 }
 
 
-
-
-
+template<class Ta, class Tb>
+bool side_cast(std::unique_ptr<Ta>& original, std::unique_ptr<Tb>& outPtr) {
+	if (Tb* sister = dynamic_cast<Tb*>(original.get())) {
+		original.release();
+		outPtr.reset(sister);
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+std::vector<std::unique_ptr<PlayableEvent>> extractPlayables(const std::vector<std::unique_ptr<ParameterizedEvent>>& events) {
+	using PlayablePtr = std::unique_ptr<PlayableEvent>;
+	std::vector<PlayablePtr> playables;
+	playables.reserve(events.size());
+	for (const auto& event : events) {
+		auto clone = event->Clone();
+		PlayablePtr possibleResult;
+		if (side_cast<ParameterizedEvent, PlayableEvent>(clone, possibleResult)) {
+			playables.push_back(std::move(possibleResult));
+		}
+	}
+	return playables;
+}
 
 int Engine::CreateEffect(EventList * list, uint32_t handle)
 {
@@ -288,11 +309,12 @@ int Engine::CreateEffect(EventList * list, uint32_t handle)
 		return -1;
 	}
 
-	if (list->Events().empty()) {
+	if (list->events().empty()) {
 		return -1;
 	}
 	else {
-		m_player.Create(handle, list->Events());
+		m_player.Create(handle, std::move(extractPlayables(list->events())));
+		//m_player.Create(handle, list->events());
 	}
 	return 1;
 

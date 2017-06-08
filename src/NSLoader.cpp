@@ -154,14 +154,14 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Disable(NSVR_System * ptr)
 NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType type)
  {
 	
-	 return ExceptionGuard([&] {
-		 switch (type) {
-		 case NSVR_EventType::NSVR_EventType_BasicHapticEvent:
-			 *eventPtr = AS_TYPE(NSVR_Event, new BasicHapticEvent());
-		 default:
-			 return (NSVR_Result) NSVR_Error_InvalidEventType;
-		 }
+	return ExceptionGuard([&] {
+	
+		ParameterizedEvent* newEvent = ParameterizedEvent::makeEvent(type);
+		if (newEvent == nullptr) { 
+			return (NSVR_Result)NSVR_Error_InvalidEventType; 
+		}
 
+		*eventPtr = AS_TYPE(NSVR_Event, newEvent);
 		 return (NSVR_Result) NSVR_Success_Unqualified;
 	 });
  }
@@ -273,28 +273,6 @@ NSVR_RETURN(NSVR_Result)NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle * handle
 
 NSVR_RETURN(void) NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr)
  {
-
-
-
-	//ExceptionGuard([&] {
-		/*if (handlePtr != nullptr && *handlePtr != nullptr) {
-			auto handle = AS_TYPE(PlaybackHandle, *handlePtr);
-			if (handle->engine != nullptr) {
-				handle->engine->ReleaseHandle(handle->handle);
-			}
-		}
-
-		PlaybackHandle* toDelete = AS_TYPE(PlaybackHandle, *handlePtr);
-		delete toDelete;
-		*handlePtr = nullptr;*/
-
-	/*PlaybackHandle* p = (PlaybackHandle*)(*handlePtr);
-		delete p;*/
-		//*handlePtr = nullptr;
-
-
-	//});
-	
 	ExceptionGuard([&] {
 
 		delete AS_TYPE(PlaybackHandle, *handlePtr);

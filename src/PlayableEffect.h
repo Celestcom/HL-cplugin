@@ -40,12 +40,7 @@ public:
 	float TotalPlaytime();
 };
 
-class TimeOffsetVisitor : public boost::static_visitor<float> {
-public:
-	float operator()(const BasicHapticEvent& event) {
-		return event.Time;
-	}
-};
+std::vector<std::string> extractRegions(const std::unique_ptr<PlayableEvent> & event);
 
 //Responsible for checking if an event has expired
 class EventVisitor : public boost::static_visitor<bool> {
@@ -66,16 +61,17 @@ public:
 	RegionVisitor();
 	std::vector<std::string> operator()(const BasicHapticEvent& event) const;
 };
+using PlayablePtr = std::unique_ptr<PlayableEvent>;
 
 class PlayableEffect :
 	public IPlayable
 {
 public:
-	
-	//Precondition: the vector is not empty
-	PlayableEffect(std::vector<SuitEvent> effects, EventRegistry& reg, boost::uuids::random_generator&);
-	~PlayableEffect();
 
+	//Precondition: the vector is not empty
+	PlayableEffect(std::vector<PlayablePtr>&& effects, EventRegistry& reg, boost::uuids::random_generator&);
+	~PlayableEffect();
+	
 	void Play() override;
 	void Pause() override;
 	void Stop() override;
@@ -94,15 +90,15 @@ private:
 		IDLE
 	};
 	
-	PlaybackState _state;
+	PlaybackState m_state;
 
-	float _time;
+	float m_time;
 	EventRegistry& m_registry;
-	
-	std::set<std::weak_ptr<HardwareDriver>,weak_ptr_less_than<HardwareDriver>> m_activeDrivers;
-	std::vector<SuitEvent>::iterator _lastExecutedEffect;
-	std::vector<SuitEvent> _effects;
-	boost::uuids::uuid _id;
+
+	std::set<std::weak_ptr<HardwareDriver>, weak_ptr_less_than<HardwareDriver>> m_activeDrivers;
+	std::vector<PlayablePtr>::iterator m_lastExecutedEffect;
+	std::vector<PlayablePtr> m_effects;
+	boost::uuids::uuid m_id;
 
 	void reset();
 	void pause();

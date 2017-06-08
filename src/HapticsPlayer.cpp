@@ -78,14 +78,16 @@ void HapticsPlayer::Release(HapticHandle hh)
 	}
 }
 
-void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
+void HapticsPlayer::Create(HapticHandle h, std::vector<std::unique_ptr<PlayableEvent>>&& events)
 {
 	std::lock_guard<std::mutex> guard(m_effectsMutex);
 
+
+	
 	if (_outsideHandleToUUID.find(h) != _outsideHandleToUUID.end()) {
 		auto id = _outsideHandleToUUID[h];
 		_effects[uuid_hasher(id)]->Stop();
-		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), m_registry, _uuidGen));
+		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(events), m_registry, _uuidGen));
 
 	}
 	else {
@@ -93,7 +95,7 @@ void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
 
 		_outsideHandleToUUID[h] = id;
 
-		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), m_registry, _uuidGen));
+		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(events), m_registry, _uuidGen));
 	}
 
 }
