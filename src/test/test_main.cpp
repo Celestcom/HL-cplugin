@@ -58,10 +58,10 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 	}
 
 	SECTION("Continuous play should stop and start at the correct times") {
-		model.Put(makeCont(0.2));
+		model.Put(makeCont(0.2f));
 		auto startCommands = model.Update(DELTA_TIME);
 		auto potentialStops = model.Update(DELTA_TIME * 3);
-		auto stopCommands = model.Update(DELTA_TIME + .001);
+		auto stopCommands = model.Update(DELTA_TIME + .001f);
 		REQUIRE(startCommands.size() == 1);
 		REQUIRE(isContCommand(startCommands.at(0)));
 
@@ -90,9 +90,9 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 	}
 
 	SECTION("Continuous play should be removed after it generates commands") {
-		model.Put(makeCont(0.1));
+		model.Put(makeCont(0.1f));
 		model.Update(DELTA_TIME);
-		model.Update(DELTA_TIME * 2 + .01);
+		model.Update(DELTA_TIME * 2.f + .01f);
 		REQUIRE(activeEvents.empty());
 	}
 
@@ -109,7 +109,7 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 	}
 
 	SECTION("A continuous should cease generating commands after it has played") {
-		model.Put(makeCont(0.1));
+		model.Put(makeCont(0.1f));
 		model.Update(DELTA_TIME);
 		model.Update(DELTA_TIME * 2);
 		auto c1 = model.Update(DELTA_TIME);
@@ -216,15 +216,15 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 		}
 
 		SECTION("A short-running cont should yield to a longer running cont when it is finished") {
-			auto bottomLayer = makeCont(1.0);
-			auto topLayer = makeCont(0.1);
+			auto bottomLayer = makeCont(1.0f);
+			auto topLayer = makeCont(0.1f);
 
 			model.Put(bottomLayer);
 			model.Update(DELTA_TIME);
 			model.Put(topLayer);
 
 			auto ignoreTopPlayCommands = model.Update(DELTA_TIME);
-			auto commands = model.Update(DELTA_TIME * 2 + .01);
+			auto commands = model.Update(DELTA_TIME * 2.f + .01f);
 
 			REQUIRE(commands.size() == 1);
 			REQUIRE(isContCommand(commands.at(0)));

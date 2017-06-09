@@ -7,6 +7,7 @@
 #include "NSLoader.h"
 #include <memory>
 #include <iterator>
+#include <numeric>
 
 namespace NS {
 	namespace Playable {
@@ -125,7 +126,7 @@ void PlayableEffect::Update(float dt)
 					//need translator from registry's leaves to area flags for backwards compat?
 					std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
 
-						consumer->createRetained(m_id, *current);
+					//	consumer->createRetained(m_id, *current);
 						m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
 					});
 				}
@@ -151,8 +152,9 @@ void PlayableEffect::Update(float dt)
 
 float PlayableEffect::GetTotalPlayTime() const
 {
+//	std::accumulate(m_effects.begin(), m_effects.end(), [](const auto& effect, float totalDuration) {});
 	TotalPlaytimeVisitor playtimeCounter;
-	std::for_each(m_effects.begin(), m_effects.end(), boost::apply_visitor(playtimeCounter));
+	//std::for_each(m_effects.begin(), m_effects.end(), boost::apply_visitor(playtimeCounter));
 	return playtimeCounter.TotalPlaytime();
 
 }

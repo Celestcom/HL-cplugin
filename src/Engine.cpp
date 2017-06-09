@@ -16,6 +16,7 @@
 #include "IHapticDevice.h"
 #include "Devices/HardlightDevice/hardlightdevice.h"
 #include "Locator.h"
+
 void Engine::executeTimestep()
 {
 	
@@ -278,16 +279,14 @@ void Engine::HandleCommand(unsigned int handle, NSVR_PlaybackCommand c)
 }
 
 
-template<class Ta, class Tb>
-bool side_cast(std::unique_ptr<Ta>& original, std::unique_ptr<Tb>& outPtr) {
+
+template<class Tb, class Ta>
+boost::optional<std::unique_ptr<Tb>> side_cast(std::unique_ptr<Ta>& original) {
 	if (Tb* sister = dynamic_cast<Tb*>(original.get())) {
 		original.release();
-		outPtr.reset(sister);
-		return true;
+		return std::unique_ptr<Tb>(sister);
 	}
-	else {
-		return false;
-	}
+	return boost::none;
 }
 std::vector<std::unique_ptr<PlayableEvent>> extractPlayables(const std::vector<std::unique_ptr<ParameterizedEvent>>& events) {
 	using PlayablePtr = std::unique_ptr<PlayableEvent>;
@@ -295,9 +294,9 @@ std::vector<std::unique_ptr<PlayableEvent>> extractPlayables(const std::vector<s
 	playables.reserve(events.size());
 	for (const auto& event : events) {
 		auto clone = event->Clone();
-		PlayablePtr possibleResult;
-		if (side_cast<ParameterizedEvent, PlayableEvent>(clone, possibleResult)) {
-			playables.push_back(std::move(possibleResult));
+	
+		if (auto ptr = side_cast<PlayableEvent>(clone)) {
+			playables.push_back(std::move(*ptr));
 		}
 	}
 	return playables;

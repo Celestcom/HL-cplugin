@@ -15,11 +15,7 @@ public:
 
 	static ParameterizedEvent* makeEvent(NSVR_EventType type);
 
-	virtual NSVR_EventType type() const = 0;
-
-
-	//Here, I shoehorn in playable effect necessary operations
-	
+	virtual NSVR_EventType type() const = 0;	
 
 
 private:

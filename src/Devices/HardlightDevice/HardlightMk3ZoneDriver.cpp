@@ -129,9 +129,8 @@ void Hardlight_Mk3_ZoneDriver::transitionInto(Mode mode)
 	//}
 }
 
-void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const SuitEvent & event)
+void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const SuitEvent& event)
 {
-
 	m_retainedModel.Put(boost::apply_visitor(BasicHapticEventCreator(handle, m_gen(), m_area), event));
 
 	transitionInto(Mode::Retained);

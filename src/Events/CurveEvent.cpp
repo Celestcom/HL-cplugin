@@ -77,5 +77,5 @@ NSVR_EventType CurveEvent::type() const
 
 float CurveEvent::duration() const
 {
-	m_duration;
+	return m_duration;
 }
