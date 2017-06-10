@@ -4,24 +4,21 @@
 #include "PlayableEvent.h"
 #include "NSLoader.h"
 
-class BasicHapticEvent : public ParameterizedEvent, public PlayableEvent {
+class BasicHapticEvent : public PlayableEvent {
 public:	
 	BasicHapticEvent();
 
-	/* ParameterizedEvent implementation */
-	bool doSetFloat(const char* key, float value) override;
-	bool doSetInt(const char* key, int value) override;
-	BasicHapticEvent* doClone() override;
-	NSVR_EventType type() const override;
-	static constexpr NSVR_EventType descriptor = NSVR_EventType::NSVR_EventType_BasicHapticEvent;
+	float strength() const;
+	uint32_t effectFamily() const;
 
-	/* PlayableEvent implementation*/
+	/* PlayableEvent impl */
 	uint32_t area() const override;
 	float time() const override;
 	float duration() const override;
+	NSVR_EventType type() const override;
+	bool parse(const ParameterizedEvent&) override;
+	static constexpr NSVR_EventType descriptor = NSVR_EventType::NSVR_EventType_BasicHapticEvent;
 
-	float strength() const;
-	uint32_t effectFamily() const;
 private:
 	float m_time;
 	float m_strength;
@@ -29,6 +26,8 @@ private:
 	uint32_t m_area;
 	std::string m_parsedEffectFamily;
 	uint32_t m_requestedEffectFamily;
+
+
 };
 
 

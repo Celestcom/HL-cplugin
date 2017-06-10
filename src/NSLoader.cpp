@@ -156,7 +156,7 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType
 	
 	return ExceptionGuard([&] {
 	
-		ParameterizedEvent* newEvent = ParameterizedEvent::makeEvent(type);
+		ParameterizedEvent* newEvent = new ParameterizedEvent(type);
 		if (newEvent == nullptr) { 
 			return (NSVR_Result)NSVR_Error_InvalidEventType; 
 		}

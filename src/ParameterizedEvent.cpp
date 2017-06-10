@@ -6,13 +6,6 @@
 //Check that the string is null terminated and less than 32 characters. Not sure if this is appropriate.
 //Still evaluating
 
-//#define DO_VALIDATION
-
-#ifdef DO_VALIDATION
-#define VALIDATE_KEY(key) do { if (!validate(key)) { return false; } } while (0)
-#else 
-#define VALIDATE_KEY(key)
-#endif
 
 
 bool validate(const char* key) {
@@ -32,7 +25,7 @@ bool validate(const char* key) {
 	return true;
 }
 
-ParameterizedEvent::ParameterizedEvent()
+ParameterizedEvent::ParameterizedEvent(NSVR_EventType t): m_properties(), m_type(t)
 {
 }
 
@@ -40,36 +33,79 @@ ParameterizedEvent::ParameterizedEvent()
 bool ParameterizedEvent::SetFloat(const char * key, float value)
 {
 	VALIDATE_KEY(key);
-	return doSetFloat(key, value);
+	update_or_add(key, value);
+	return true;
 }
 
 bool ParameterizedEvent::SetInt(const char * key, int value)
 {
 	VALIDATE_KEY(key);
-	return doSetInt(key, value);
+	update_or_add(key, value);
+	return true;
 }
 
 bool ParameterizedEvent::SetFloats(const char * key, float * values, unsigned int length)
 {
 	VALIDATE_KEY(key);
-	return doSetFloats(key, values, length);
+	std::vector<float> vec(length);
+	memcpy_s(&vec[0], vec.size(), &values[0], length);
+	update_or_add(key, std::move(vec));
+	return true;
 }
 
-ParameterizedEvent* ParameterizedEvent::makeEvent(NSVR_EventType type)
+NSVR_EventType ParameterizedEvent::type() const
 {
-	switch (type) {
-	case NSVR_EventType::NSVR_EventType_BasicHapticEvent:
-		return new BasicHapticEvent();
-	case NSVR_EventType::NSVR_EventType_CurveHapticEvent:
-		return new CurveEvent();
-	default:
-		return nullptr;
+	return m_type;
+}
+
+//this reference will become invalid if anybody changes the vector
+boost::optional<property&> ParameterizedEvent::find(const char * key) 
+{
+	auto it = std::find_if(m_properties.begin(), m_properties.end(), [&key](auto& prop) {
+		return strcmp(key, prop.key) == 0;
+	});
+
+	if (it != m_properties.end()) {
+		return *it;
+	}
+
+	return boost::none;
+}
+
+boost::optional<property> ParameterizedEvent::findByValue(const char * key) const
+{
+	auto it = std::find_if(m_properties.begin(), m_properties.end(), [&key](auto& prop) {
+		return strcmp(key, prop.key) == 0;
+	});
+
+	if (it != m_properties.end()) {
+		return *it;
+	}
+
+	return boost::none;
+}
+
+
+void ParameterizedEvent::update_or_add(const char * key, const EventValue & val)
+{
+	if (auto existing = find(key)) {
+		existing->value = val;
+	}
+	else {
+		m_properties.emplace_back(key, val);
 	}
 }
 
-std::unique_ptr<ParameterizedEvent> ParameterizedEvent::Clone()
+
+
+property::property() : key(nullptr), value()
 {
-	return std::unique_ptr<ParameterizedEvent>(doClone());
+
 }
 
+property::property(const char* key, const EventValue& val):
+	key(key),
+	value(val)
+{
 
+}

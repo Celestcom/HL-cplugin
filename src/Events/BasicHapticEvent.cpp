@@ -4,7 +4,6 @@
 
 
 BasicHapticEvent::BasicHapticEvent() : 
-	ParameterizedEvent(), 
 	PlayableEvent(),
 	m_time(0),
 	m_strength(1),
@@ -15,41 +14,6 @@ BasicHapticEvent::BasicHapticEvent() :
 	m_requestedEffectFamily = Locator::getTranslator().ToEffectFamily(m_parsedEffectFamily);
 }
 
-
-bool BasicHapticEvent::doSetFloat(const char * key, float value)
-{
-	if (strcmp("strength", key) == 0) {
-		m_strength = minimum_bound(0.0f, value);
-		return true;
-	}
-	else if (strcmp("time", key) == 0) {
-		m_time = minimum_bound(0.0f, value);
-		return true;
-	}
-	else if (strcmp("duration", key) == 0) {
-		m_duration = minimum_bound(0.0f, value);
-		return true;
-	}
-	
-	return false;
-}
-
-bool BasicHapticEvent::doSetInt(const char * key, int value)
-{
-	if (strcmp("area", key) == 0) {
-		m_area = minimum_bound(0, value);
-		return true;
-	}
-	else if (strcmp("effect", key) == 0) {
-		value = minimum_bound(1, value); //1 is bump
-		std::string effect = Locator::getTranslator().ToEffectFamilyString(value);
-		m_parsedEffectFamily = effect;
-		m_requestedEffectFamily = value;
-		return true;
-	}
-
-	return false;
-}
 
 
 
@@ -75,15 +39,26 @@ uint32_t BasicHapticEvent::effectFamily() const
 	return m_requestedEffectFamily;
 }
 
+bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
+{
+	m_time = ev.Get<float>("time", 0.0f);
+	m_strength = ev.Get<float>("strength", 1.0f);
+	m_duration = ev.Get<float>("duration", 0.0f);
+	m_area = ev.Get<int>("area", 0);
+	m_requestedEffectFamily = ev.Get<int>("effect", 1);
+	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
+	m_parsedEffectFamily = effect;
+	
+	return true;
+
+}
+
 float BasicHapticEvent::strength() const
 {
 	return m_strength;
 }
 
-BasicHapticEvent * BasicHapticEvent::doClone()
-{
-	return new BasicHapticEvent(*this);
-}
+
 
 NSVR_EventType BasicHapticEvent::type() const
 {

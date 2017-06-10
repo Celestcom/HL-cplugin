@@ -10,8 +10,7 @@ EventList::EventList()
 //Precondition: event is not null
 int EventList::AddEvent(ParameterizedEvent * event)
 {	
-	auto clone = event->Clone();
-	m_events.push_back(std::move(clone));
+	m_events.push_back(std::make_unique<ParameterizedEvent>(*event));
 	
 	return NSVR_Success_Unqualified;
 }
