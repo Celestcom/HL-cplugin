@@ -99,9 +99,6 @@
     <ClInclude Include="..\src\ExceptionSafeCall.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\HapticEvent.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\HapticsPlayer.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -229,9 +226,6 @@
     </ClCompile>
     <ClCompile Include="..\src\Events\CurveEvent.cpp">
       <Filter>src\Events</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\HapticEvent.cpp">
-      <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\HapticsPlayer.cpp">
       <Filter>src</Filter>

@@ -326,7 +326,6 @@
     <ClInclude Include="..\src\Events\CurveEvent.h" />
     <ClInclude Include="..\src\Events\PlayableEvent.h" />
     <ClInclude Include="..\src\ExceptionSafeCall.h" />
-    <ClInclude Include="..\src\HapticEvent.h" />
     <ClInclude Include="..\src\HapticsPlayer.h" />
     <ClInclude Include="..\src\HardwareDriver.h" />
     <ClInclude Include="..\src\HexUtils.h" />
@@ -392,7 +391,6 @@
     <ClCompile Include="..\src\Events\BasicHapticEvent.cpp" />
     <ClCompile Include="..\src\Events\CurveEvent.cpp" />
     <ClCompile Include="..\src\Events\PlayableEvent.cpp" />
-    <ClCompile Include="..\src\HapticEvent.cpp" />
     <ClCompile Include="..\src\HapticsPlayer.cpp" />
     <ClCompile Include="..\src\HardwareDriver.cpp" />
     <ClCompile Include="..\src\HexUtils.cpp" />
