@@ -77,6 +77,7 @@ public:
 	float GetTotalPlayTime() const override;
 	float CurrentTime() const override;
 	bool IsPlaying() const override;
+	bool IsReleased() const override;
 	PlayableInfo GetInfo() const override;
 	void Release() override;
 
@@ -97,6 +98,8 @@ private:
 	std::vector<PlayablePtr>::iterator m_lastExecutedEffect;
 	std::vector<PlayablePtr> m_effects;
 	boost::uuids::uuid m_id;
+
+	bool m_released;
 
 	void reset();
 	void pause();

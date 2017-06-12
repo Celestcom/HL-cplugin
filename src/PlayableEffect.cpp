@@ -8,14 +8,7 @@
 #include <iterator>
 #include <numeric>
 
-namespace NS {
-	namespace Playable {
-		void Restart(IPlayable& playable) {
-			playable.Stop();
-			playable.Play();
-		}
-	}
-}
+
 
 
 
@@ -24,7 +17,8 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry&
 	m_state(PlaybackState::IDLE),
 	m_registry(reg),
 	m_id(uuid()),
-	m_time(0)
+	m_time(0),
+	m_released(false)
 {
 	assert(!m_effects.empty());
 
@@ -168,6 +162,11 @@ bool PlayableEffect::IsPlaying() const
 	return m_state == PlaybackState::PLAYING;
 }
 
+bool PlayableEffect::IsReleased() const
+{
+	return m_released;
+}
+
 PlayableInfo PlayableEffect::GetInfo() const
 {
 	return PlayableInfo(GetTotalPlayTime(), m_time, m_state == PlaybackState::PLAYING);
@@ -175,13 +174,9 @@ PlayableInfo PlayableEffect::GetInfo() const
 
 void PlayableEffect::Release()
 {
-	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
-		if (auto p = hd.lock()) {
-			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
-		} else  {
-			//the driver was removed, probably physically, so we don't need to worry about it
-		}
-	});
+	m_released = true;
+
+	
 }
 
 void PlayableEffect::reset()

@@ -7,7 +7,7 @@
 #include <mutex>
 #include "EventRegistry.h"
 
-typedef unsigned int HapticHandle;
+typedef uint32_t HapticHandle;
 
 //todo: evaluate if this needs a name change.
 //ideas: EventPlayer
@@ -18,60 +18,44 @@ class HapticsPlayer
 {
 public:
 
-	struct EffectInfo {
-		uint16_t strength;
-		uint32_t family;
-		AreaFlag area;
-		EffectInfo(uint16_t strength, uint32_t family, AreaFlag area) : strength(strength), family(family), area(area) {}
-	};
-
-	struct Released {
-	public:
-		boost::uuids::uuid ID;
-		bool NeedsSweep;
-		Released(boost::uuids::uuid id) :ID(id), NeedsSweep(false) {}
-	};
-
-	
 	HapticsPlayer(EventRegistry& registry);
 	~HapticsPlayer();
 
 	void Update(float dt);
+
+	void Create(HapticHandle h, std::vector<std::unique_ptr<PlayableEvent>>&& events);
+	void Release(HapticHandle h);
+
 	void Play(HapticHandle h);
 	void Pause(HapticHandle h);
-	void Restart(HapticHandle h);
 	void Stop(HapticHandle h);
-	void Release(HapticHandle h);
-	void Create(HapticHandle h, std::vector<std::unique_ptr<PlayableEvent>>&& events);
-	boost::optional<PlayableInfo> GetHandleInfo(HapticHandle h);
-
-	std::size_t NumLiveEffects();
-	std::size_t NumOrphanedEffects();
-
+	
 	void PlayAll();
 	void PauseAll();
 	void ClearAll();
 
-	
+	boost::optional<PlayableInfo> GetHandleInfo(HapticHandle h);
 
-	std::vector<EffectInfo> GetEffectInfo() const;
-	
+	std::size_t GetNumLiveEffects();
+	std::size_t GetNumReleasedEffects();
 private:
-	boost::hash<boost::uuids::uuid> uuid_hasher;
-	boost::uuids::random_generator _uuidGen;
-
-	std::mutex m_effectsMutex;
-	std::unordered_map<std::size_t, std::unique_ptr<IPlayable>> _effects;
-
-
-	std::vector<Released> _releasedEffects;
-	std::unordered_map<HapticHandle, boost::uuids::uuid> _outsideHandleToUUID;
-	std::vector<std::size_t> _frozenEffects;
-
-	bool _paused;
-
+	bool m_playerPaused;
 	EventRegistry& m_registry;
-	boost::optional<IPlayable&>  toInternalUUID(HapticHandle hh) const;
 
+	boost::hash<boost::uuids::uuid> m_hasher;
+	boost::uuids::random_generator m_uuidGenerator;
+
+	std::mutex m_effectsLock;
+
+	std::unordered_map<std::size_t, std::unique_ptr<IPlayable>> m_effects;
+	std::vector<std::size_t> m_frozenEffects;
+
+	std::unordered_map<HapticHandle, boost::uuids::uuid> m_outsideToInternal;
+
+
+	boost::optional<boost::uuids::uuid> findInternalHandle(HapticHandle h); 
+	boost::optional<IPlayable&> findExistingPlayable(const boost::uuids::uuid& internalHandle);
+	boost::optional<IPlayable&> findExistingPlayable(HapticHandle h);
+	void addNewEffect(const boost::uuids::uuid&, std::vector<std::unique_ptr<PlayableEvent>>&& events);
 };
 
