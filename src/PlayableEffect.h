@@ -1,7 +1,6 @@
 #pragma once
 #include "IPlayable.h"
 #include "HapticEvent.h"
-#include "HapticEventGenerator.h"
 #include "BasicHapticEvent.h"
 #include "EventRegistry.h"
 #include <set>

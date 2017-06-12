@@ -220,9 +220,9 @@ void HapticsPlayer::ClearAll()
 	_releasedEffects.clear();
 }
 
-std::vector<PriorityModel::EffectInfo> HapticsPlayer::GetEffectInfo() const
+std::vector<HapticsPlayer::EffectInfo> HapticsPlayer::GetEffectInfo() const
 {
-	return std::vector<PriorityModel::EffectInfo>();
+	return std::vector<HapticsPlayer::EffectInfo>();
 }
 
 

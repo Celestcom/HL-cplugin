@@ -3,7 +3,6 @@
 #include "Locator.h"
 #include <iostream>
 #include "BasicHapticEvent.h"
-#include "PriorityModel.h"
 #include "NSLoader.h"
 #include <memory>
 #include <iterator>

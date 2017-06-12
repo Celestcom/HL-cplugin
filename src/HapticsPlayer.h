@@ -2,20 +2,29 @@
 #include <boost\uuid\uuid.hpp>
 #include <boost\uuid\random_generator.hpp>
 #include <boost\optional.hpp>
-#include "HapticClasses.h"
 #include "IPlayable.h"
-#include "PriorityModel.h"
-#include "HapticEventGenerator.h"
 #include "BasicHapticEvent.h"
 #include <mutex>
 #include "EventRegistry.h"
 
 typedef unsigned int HapticHandle;
 
-//todo: all misnamed now; must be a generic EventPlayer
+//todo: evaluate if this needs a name change.
+//ideas: EventPlayer
+//RetainedEventPlayer
+//EffectPlayer
+
 class HapticsPlayer
 {
 public:
+
+	struct EffectInfo {
+		uint16_t strength;
+		uint32_t family;
+		AreaFlag area;
+		EffectInfo(uint16_t strength, uint32_t family, AreaFlag area) : strength(strength), family(family), area(area) {}
+	};
+
 	struct Released {
 	public:
 		boost::uuids::uuid ID;
@@ -45,7 +54,7 @@ public:
 
 	
 
-	std::vector<PriorityModel::EffectInfo> GetEffectInfo() const;
+	std::vector<EffectInfo> GetEffectInfo() const;
 	
 private:
 	boost::hash<boost::uuids::uuid> uuid_hasher;

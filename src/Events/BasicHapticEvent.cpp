@@ -41,6 +41,7 @@ uint32_t BasicHapticEvent::effectFamily() const
 
 bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 {
+
 	m_time = ev.Get<float>("time", 0.0f);
 	m_strength = ev.Get<float>("strength", 1.0f);
 	m_duration = ev.Get<float>("duration", 0.0f);
