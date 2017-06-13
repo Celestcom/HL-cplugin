@@ -3,6 +3,20 @@
 
 #include <boost/assign/list_of.hpp>
 #include <boost/assign/list_inserter.hpp>
+
+
+#include <functional>
+#include <chrono>
+
+template<typename T>
+T time(std::function<void()> fn) {
+	auto then = std::chrono::high_resolution_clock::now();
+	fn();
+	auto now = std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - then);
+	return now;
+}
+
+
 template<typename T> struct map_init_helper
 {
 	T& data;
@@ -145,7 +159,14 @@ AreaFlag EnumTranslator::ToArea(Location loc) const
 
 std::string EnumTranslator::ToRegionString(AreaFlag f) const
 {
-	return _regionMap.left.at(f);
+	return "a";
+	//std::cout << "Runtime of region string lookup: " << time<std::chrono::microseconds>([&]()
+	//{
+		std::string h = _regionMap.at(f);
+		return h;
+	//}).count() << '\n';
+//return "";
+	
 }
 
 EnumTranslator::~EnumTranslator()

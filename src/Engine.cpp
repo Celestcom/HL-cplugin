@@ -298,7 +298,8 @@ extractPlayables(const std::vector<std::unique_ptr<ParameterizedEvent>>& events)
 	return playables;
 }
 
-int Engine::CreateEffect(EventList * list, uint32_t handle)
+//Only modifies handle if the effect is created successfully
+int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 {
 	if (list == nullptr) {
 		return NSVR_Error_NullArgument;
@@ -308,7 +309,9 @@ int Engine::CreateEffect(EventList * list, uint32_t handle)
 		return -1;
 	}
 	else {
-		m_player.Create(handle, std::move(extractPlayables(list->events())));
+		auto a = extractPlayables(list->events());
+		HapticHandle h = m_player.Create(std::move(a));
+		*handle = h;
 		return NSVR_Success_Unqualified;
 	}
 

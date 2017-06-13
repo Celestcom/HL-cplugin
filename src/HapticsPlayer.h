@@ -24,7 +24,7 @@ public:
 
 	void Update(float dt);
 
-	HapticHandle Create(std::vector<std::unique_ptr<PlayableEvent>>&& events);
+	HapticHandle Create(std::vector<std::unique_ptr<PlayableEvent>> events);
 	void Release(HapticHandle h);
 
 	void Play(HapticHandle h);

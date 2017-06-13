@@ -7,6 +7,16 @@
 #include <boost/uuid/uuid.hpp>
 #include "../EventRegistry.h"
 #include "../HapticsPlayer.h"
+#include <functional>
+#include <chrono>
+
+template<typename T>
+T time(std::function<void()> fn) {
+	auto then = std::chrono::high_resolution_clock::now();
+	fn();
+	auto now = std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - then);
+	return now;
+}
 
 boost::uuids::random_generator idGenerator;
 const float DELTA_TIME = 0.05f;
@@ -425,8 +435,12 @@ TEST_CASE("The motor state changer works", "[MotorStateChanger]") {
 
 std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 	std::vector<std::unique_ptr<PlayableEvent>> events;
-	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent()));
-	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent()));
+	BasicHapticEvent a;
+	ParameterizedEvent e(NSVR_EventType_BasicHapticEvent);
+	e.SetInt("area", (int)AreaFlag::Chest_Both);
+	a.parse(e);
+	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
+	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
 	return events;
 }
 TEST_CASE("The haptics player works", "[HapticsPlayer]") {
@@ -472,8 +486,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	}
 
 	SECTION("Stopping an effect should work") {
-		HapticHandle h = 1;
-		player.Create(h, makePlayables());
+		HapticHandle h = player.Create(makePlayables());
 		auto info = player.GetHandleInfo(h);
 		REQUIRE(info->Duration() > DELTA_TIME);
 
@@ -487,8 +500,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	}
 
 	SECTION("Resuming an effect should work") {
-		HapticHandle h = 1;
-		player.Create(h, makePlayables());
+		HapticHandle h = player.Create(makePlayables());
 		auto info = player.GetHandleInfo(h);
 		REQUIRE(info->Duration() > DELTA_TIME);
 
@@ -505,8 +517,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	}
 
 	SECTION("An effect should stop after reaching its duration") {
-		HapticHandle h = 1;
-		player.Create(h, makePlayables());
+		HapticHandle h = player.Create(makePlayables());
 
 		auto info = player.GetHandleInfo(h);
 		REQUIRE(info->Duration() > DELTA_TIME);
@@ -520,8 +531,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	}
 
 	SECTION("Releasing an effect should work") {
-		HapticHandle h = 1;
-		player.Create(h, makePlayables());
+		HapticHandle h = player.Create(makePlayables());
 		player.Release(h);
 		REQUIRE(player.GetNumLiveEffects() == 0);
 		REQUIRE(player.GetNumReleasedEffects() == 1);
@@ -529,8 +539,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	}
 
 	SECTION("A released effect should be cleaned up properly") {
-		HapticHandle h = 1;
-		player.Create(h, makePlayables());
+		HapticHandle h = player.Create(makePlayables());
 
 		SECTION("If it was playing at the time of release, it should not be deleted until it is done playing") {
 			player.Play(h);
@@ -552,14 +561,38 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 			REQUIRE(player.GetNumReleasedEffects() == 0);
 			REQUIRE(player.GetNumLiveEffects() == 0);
 		}
-	}
 
-	SECTION("Creating an effect on the same handle should crash") {
-			//this cannot be tested with catch, as it doesn't have an out-of-proc runner.
-		//i.e., it would crash Catch because the assertion fails
 
 	}
+
+
+	SECTION("The player should be able to handle a lot of handles") {
+		//let me say a reasonable amount of effects active at once is 100. 
+		//With this arbitrary number in mind, the engine should execute quite fast.
+		//This test aims to verify that 100 effects can be updated in less than 1 millisecond. 
+#ifdef NDEBUG
+		for (int i = 0; i < 100; i++) {
+			auto h = player.Create(makePlayables());
+			player.Play(h);
+		}
+
+		auto duration = 
+		time<std::chrono::milliseconds>([&]() {
+			player.Update(DELTA_TIME);
+		}).count();
+
+		REQUIRE(duration <= 1);
+#endif
+
+	}
+		
+	
+
 }
+
+
+
+
 
 int main(int argc, char* argv[]) {
 	int result = Catch::Session().run(argc, argv);

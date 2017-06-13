@@ -6,6 +6,19 @@
 #include <experimental/unordered_map>
 #include <numeric>
 #include "PlayableEffect.h"
+
+#include <functional>
+#include <chrono>
+
+template<typename T>
+T time(std::function<void()> fn) {
+	auto then = std::chrono::high_resolution_clock::now();
+	fn();
+	auto now = std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - then);
+	return now;
+}
+
+
 using namespace std;
 
 
@@ -66,12 +79,14 @@ void HapticsPlayer::Release(HapticHandle h)
 
 HapticHandle HapticsPlayer::nextHandle()
 {
+	//This will overflow when we exceed the storage of a uint32_t (4 billion). 
+	//Update if this becomes likely: someone playing constant effects 10 times per second on 16 pads for ~300 days.
 	m_currentHandleId += 1;
 	return HapticHandle(m_currentHandleId);
 }
 
 
-HapticHandle HapticsPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>>&& events)
+HapticHandle HapticsPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>> events)
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 	HapticHandle handle = nextHandle();
@@ -121,15 +136,20 @@ void HapticsPlayer::Update(float dt)
 {
 	std::lock_guard<std::mutex> lock_guard(m_effectsLock);
 
-	
+
 	for (auto& effect : m_effects) {
-		effect.second.Update(dt);
+	
+			effect.second.Update(dt);
+		
+	
+
+
 	}
 
-	std::experimental::erase_if(m_effects, [](const auto& effect) { 
-		return effect.second.IsReleased() && !effect.second.IsPlaying(); 
+	
+	std::experimental::erase_if(m_effects, [](const auto& effect) {
+		return effect.second.IsReleased() && !effect.second.IsPlaying();
 	});
-
 
 }
 

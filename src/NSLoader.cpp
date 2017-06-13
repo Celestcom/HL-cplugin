@@ -241,9 +241,8 @@ NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSV
 			 engine->ReleaseHandle(handle->handle);
 		 }
 		
-		 handle->handle = engine->GenerateHandle();
 		 handle->engine = engine;
-		 return engine->CreateEffect(timeline, handle->handle);
+		 return engine->CreateEffect(timeline, &handle->handle);
 		 
 	 });
  }

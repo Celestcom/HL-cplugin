@@ -3,7 +3,8 @@
 
 #include "ParameterizedEvent.h"
 #include "NSLoader_Errors.h"
-EventList::EventList()
+
+EventList::EventList():m_events()
 {
 }
 

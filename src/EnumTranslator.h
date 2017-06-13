@@ -14,7 +14,7 @@ typedef bimap<AreaFlag, std::string> AreaMap; //duplication
 typedef bimap<std::string, uint32_t> EffectFamilyMap;
 
 typedef bimap<Location, AreaFlag> LocationAreaMap; //duplication
-typedef bimap<AreaFlag, std::string> RegionMap; //duplication, we need to clean this up and draw it out
+typedef std::unordered_map<AreaFlag, std::string> RegionMap; //duplication, we need to clean this up and draw it out
 
 class EnumTranslator
 {

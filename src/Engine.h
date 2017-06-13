@@ -29,7 +29,7 @@ public:
 	int GetEngineStats(NSVR_SystemStats* stats);
 	void HandleCommand(unsigned int handle, NSVR_PlaybackCommand);
 	void ReleaseHandle(unsigned int handle);
-	int CreateEffect(EventList* list, uint32_t handle);
+	int CreateEffect(EventList * list, HapticHandle * handle);
 	int  PollTracking(NSVR_TrackingUpdate* q);
 
 	int PollLogs(NSVR_LogEntry* entry);
