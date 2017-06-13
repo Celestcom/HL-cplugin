@@ -12,7 +12,13 @@ using namespace std;
 HapticsPlayer::HapticsPlayer(EventRegistry& registry):
 	m_playerPaused(false),
 	m_effectsLock(),
-	m_registry(registry)
+	m_registry(registry),
+	m_hasher(),
+	m_frozenEffects(),
+	m_effects(),
+	m_outsideToInternal(),
+	m_uuidGenerator(),
+	m_currentHandleId(0)
 {	
 }
 
@@ -46,6 +52,8 @@ void HapticsPlayer::Stop(HapticHandle hh)
 	}
 }
 
+
+
 void HapticsPlayer::Release(HapticHandle h)
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
@@ -56,33 +64,33 @@ void HapticsPlayer::Release(HapticHandle h)
 	}
 }
 
-void HapticsPlayer::Create(HapticHandle h, std::vector<std::unique_ptr<PlayableEvent>>&& events)
+HapticHandle HapticsPlayer::nextHandle()
+{
+	m_currentHandleId += 1;
+	return HapticHandle(m_currentHandleId);
+}
+
+
+HapticHandle HapticsPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>>&& events)
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
+	HapticHandle handle = nextHandle();
+	boost::uuids::uuid uuid = m_uuidGenerator();
 
-	if (auto internalHandle = findInternalHandle(h)) {
-		if (auto effect = findExistingPlayable(*internalHandle)) {
-			effect->Stop();
-			addNewEffect(*internalHandle, std::move(events));
-		} else {
-			assert("It should never be the case that an internal handle is found, \
-				yet the playable it is associated with is not");
-		}
-	}
-	else {
-		boost::uuids::uuid uuid = m_uuidGenerator();
-		m_outsideToInternal[h] = uuid;
-		addNewEffect(uuid, std::move(events));
-	}
+	m_outsideToInternal[handle] = uuid;
+	addNewEffect(uuid, std::move(events));
+
+	return handle;
 }
 
 
 
 void HapticsPlayer::addNewEffect(const boost::uuids::uuid& id, std::vector<std::unique_ptr<PlayableEvent>>&& events) {
-	m_effects[m_hasher(id)] = std::unique_ptr<IPlayable>(
-		new PlayableEffect(std::move(events), m_registry, m_uuidGenerator)
-	);
+	
+	PlayableEffect temp(std::move(events), m_registry, m_uuidGenerator);
+	m_effects.insert(std::make_pair(m_hasher(id), std::move(temp)));
 }
+
 
 boost::optional<PlayableInfo> HapticsPlayer::GetHandleInfo(HapticHandle h) 
 {
@@ -96,15 +104,15 @@ boost::optional<PlayableInfo> HapticsPlayer::GetHandleInfo(HapticHandle h)
 }
 
 
-std::size_t HapticsPlayer::NumLiveEffects()
+std::size_t HapticsPlayer::GetNumLiveEffects()
 {
-	return m_effects.size();
+	return m_effects.size() - GetNumReleasedEffects();
 }
 
-std::size_t HapticsPlayer::NumOrphanedEffects()
+std::size_t HapticsPlayer::GetNumReleasedEffects()
 {
 	return std::accumulate(m_effects.begin(), m_effects.end(), 0, [](int currentTotal, const auto& effect) {
-		return effect.second->IsReleased() ? currentTotal + 1 : currentTotal;
+		return effect.second.IsReleased() ? currentTotal + 1 : currentTotal;
 	});
 }
 
@@ -115,11 +123,11 @@ void HapticsPlayer::Update(float dt)
 
 	
 	for (auto& effect : m_effects) {
-		effect.second->Update(dt);
+		effect.second.Update(dt);
 	}
 
 	std::experimental::erase_if(m_effects, [](const auto& effect) { 
-		return effect.second->IsReleased() && !effect.second->IsPlaying(); 
+		return effect.second.IsReleased() && !effect.second.IsPlaying(); 
 	});
 
 
@@ -135,7 +143,7 @@ void HapticsPlayer::PlayAll()
 	
 	for (const auto& frozen : m_frozenEffects) {
 		if (m_effects.find(frozen) != m_effects.end()) {
-			m_effects.at(frozen)->Play();
+			m_effects.at(frozen).Play();
 		}
 	}
 
@@ -150,8 +158,8 @@ void HapticsPlayer::PauseAll()
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 
 	for (auto& effect : m_effects) {
-		if (effect.second->IsPlaying()) {
-			effect.second->Pause();
+		if (effect.second.IsPlaying()) {
+			effect.second.Pause();
 			m_frozenEffects.push_back(effect.first);
 		}
 	}
@@ -162,7 +170,7 @@ void HapticsPlayer::ClearAll()
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 
 	for (auto& effect : m_effects) {
-		effect.second->Stop();
+		effect.second.Stop();
 	}
 	m_outsideToInternal.clear();
 	m_effects.clear();
@@ -181,17 +189,17 @@ boost::optional<boost::uuids::uuid> HapticsPlayer::findInternalHandle(HapticHand
 	return boost::none;
 }
 
-boost::optional<IPlayable&> HapticsPlayer::findExistingPlayable(const boost::uuids::uuid& internalHandle)
+boost::optional<PlayableEffect&> HapticsPlayer::findExistingPlayable(const boost::uuids::uuid& internalHandle)
 {
 	auto intKey = m_hasher(internalHandle);
 	if (m_effects.find(intKey) != m_effects.end()) {
-		return *m_effects.at(intKey);
+		return m_effects.at(intKey);
 	}
 
 	return boost::none;
 }
 
-boost::optional<IPlayable&> HapticsPlayer::findExistingPlayable(HapticHandle h)
+boost::optional<PlayableEffect&> HapticsPlayer::findExistingPlayable(HapticHandle h)
 {
 	if (auto internalHandle = findInternalHandle(h)) {
 		return findExistingPlayable(*internalHandle);

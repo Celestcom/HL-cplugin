@@ -1,8 +1,9 @@
 #pragma once
 #include <boost\uuid\uuid.hpp>
 #include <boost\uuid\random_generator.hpp>
+#include <boost\functional\hash.hpp>
 #include <boost\optional.hpp>
-#include "IPlayable.h"
+#include "PlayableEffect.h"
 #include "BasicHapticEvent.h"
 #include <mutex>
 #include "EventRegistry.h"
@@ -23,7 +24,7 @@ public:
 
 	void Update(float dt);
 
-	void Create(HapticHandle h, std::vector<std::unique_ptr<PlayableEvent>>&& events);
+	HapticHandle Create(std::vector<std::unique_ptr<PlayableEvent>>&& events);
 	void Release(HapticHandle h);
 
 	void Play(HapticHandle h);
@@ -47,15 +48,17 @@ private:
 
 	std::mutex m_effectsLock;
 
-	std::unordered_map<std::size_t, std::unique_ptr<IPlayable>> m_effects;
+	std::unordered_map<std::size_t, PlayableEffect> m_effects;
 	std::vector<std::size_t> m_frozenEffects;
 
 	std::unordered_map<HapticHandle, boost::uuids::uuid> m_outsideToInternal;
 
+	uint32_t m_currentHandleId;
 
 	boost::optional<boost::uuids::uuid> findInternalHandle(HapticHandle h); 
-	boost::optional<IPlayable&> findExistingPlayable(const boost::uuids::uuid& internalHandle);
-	boost::optional<IPlayable&> findExistingPlayable(HapticHandle h);
+	boost::optional<PlayableEffect&> findExistingPlayable(const boost::uuids::uuid& internalHandle);
+	boost::optional<PlayableEffect&> findExistingPlayable(HapticHandle h);
 	void addNewEffect(const boost::uuids::uuid&, std::vector<std::unique_ptr<PlayableEvent>>&& events);
+	HapticHandle nextHandle();
 };
 

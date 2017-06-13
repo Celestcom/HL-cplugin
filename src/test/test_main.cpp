@@ -5,6 +5,8 @@
 #include "../Devices/HardlightDevice/HardlightDevice.h"
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid.hpp>
+#include "../EventRegistry.h"
+#include "../HapticsPlayer.h"
 
 boost::uuids::random_generator idGenerator;
 const float DELTA_TIME = 0.05f;
@@ -420,6 +422,144 @@ TEST_CASE("The motor state changer works", "[MotorStateChanger]") {
 
 }
 
+
+std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
+	std::vector<std::unique_ptr<PlayableEvent>> events;
+	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent()));
+	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent()));
+	return events;
+}
+TEST_CASE("The haptics player works", "[HapticsPlayer]") {
+	EventRegistry registry;
+	HapticsPlayer player(registry);
+
+	REQUIRE(player.GetNumLiveEffects() == 0);
+	REQUIRE(player.GetNumReleasedEffects() == 0);
+
+
+	SECTION("Retrieving a nonexistent handle shouldn't crash") {
+		HapticHandle randomlyChosen = 1245;
+		REQUIRE_NOTHROW([&]() {
+			auto handle = player.GetHandleInfo(randomlyChosen);
+			REQUIRE(!handle);
+		});
+		
+	}
+
+	SECTION("Creating an effect should work, and the effect should be not be playing by default") {
+		HapticHandle h = player.Create(makePlayables());
+		
+		REQUIRE(player.GetNumLiveEffects() == 1);
+
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(!info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(0.0f));
+	}
+
+	SECTION("Pausing an effect should work") {
+		HapticHandle h = player.Create(makePlayables());
+		
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(info->Duration() > DELTA_TIME);
+
+		player.Play(h);
+		player.Update(DELTA_TIME);
+		player.Pause(h);
+
+		info = player.GetHandleInfo(h);
+		REQUIRE(!info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME));
+	}
+
+	SECTION("Stopping an effect should work") {
+		HapticHandle h = 1;
+		player.Create(h, makePlayables());
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(info->Duration() > DELTA_TIME);
+
+		player.Play(h);
+		player.Update(DELTA_TIME);
+		player.Stop(h);
+
+		info = player.GetHandleInfo(h);
+		REQUIRE(!info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(0.0f));
+	}
+
+	SECTION("Resuming an effect should work") {
+		HapticHandle h = 1;
+		player.Create(h, makePlayables());
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(info->Duration() > DELTA_TIME);
+
+		player.Play(h);
+		player.Update(DELTA_TIME);
+		player.Pause(h);
+		player.Update(DELTA_TIME * 10);
+		player.Play(h);
+		player.Update(DELTA_TIME);
+
+		info = player.GetHandleInfo(h);
+		REQUIRE(info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME * 2));
+	}
+
+	SECTION("An effect should stop after reaching its duration") {
+		HapticHandle h = 1;
+		player.Create(h, makePlayables());
+
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(info->Duration() > DELTA_TIME);
+
+
+		player.Play(h);
+		player.Update(info->Duration() + DELTA_TIME);
+		info = player.GetHandleInfo(h);
+		REQUIRE(!info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(0.0f));
+	}
+
+	SECTION("Releasing an effect should work") {
+		HapticHandle h = 1;
+		player.Create(h, makePlayables());
+		player.Release(h);
+		REQUIRE(player.GetNumLiveEffects() == 0);
+		REQUIRE(player.GetNumReleasedEffects() == 1);
+		
+	}
+
+	SECTION("A released effect should be cleaned up properly") {
+		HapticHandle h = 1;
+		player.Create(h, makePlayables());
+
+		SECTION("If it was playing at the time of release, it should not be deleted until it is done playing") {
+			player.Play(h);
+			auto duration = player.GetHandleInfo(h)->Duration();
+			player.Release(h);
+			player.Update(DELTA_TIME);
+			REQUIRE(player.GetNumReleasedEffects() == 1);
+			player.Update(DELTA_TIME);
+			REQUIRE(player.GetNumReleasedEffects() == 1);
+
+			player.Update(duration + DELTA_TIME);
+			REQUIRE(player.GetNumLiveEffects() == 0);
+			REQUIRE(player.GetNumReleasedEffects() == 0);
+		}
+
+		SECTION("If it was not playing at time of release, it should be deleted in the next update") {
+			player.Release(h);
+			player.Update(DELTA_TIME);
+			REQUIRE(player.GetNumReleasedEffects() == 0);
+			REQUIRE(player.GetNumLiveEffects() == 0);
+		}
+	}
+
+	SECTION("Creating an effect on the same handle should crash") {
+			//this cannot be tested with catch, as it doesn't have an out-of-proc runner.
+		//i.e., it would crash Catch because the assertion fails
+
+	}
+}
 
 int main(int argc, char* argv[]) {
 	int result = Catch::Session().run(argc, argv);

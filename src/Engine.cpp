@@ -240,8 +240,8 @@ bool Engine::DoEngineCommand(::EngineCommand command)
 
 int Engine::GetEngineStats(NSVR_SystemStats * stats)
 {
-	stats->NumLiveEffects = static_cast<unsigned int>(m_player.NumLiveEffects());
-	stats->NumOrphanedEffects = static_cast<unsigned int>(m_player.NumOrphanedEffects());
+	stats->NumLiveEffects = static_cast<unsigned int>(m_player.GetNumLiveEffects());
+	stats->NumOrphanedEffects = static_cast<unsigned int>(m_player.GetNumReleasedEffects());
 	return NSVR_Success_Unqualified;
 }
 

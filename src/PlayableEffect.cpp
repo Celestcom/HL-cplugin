@@ -29,6 +29,19 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry&
 
 
 
+PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
+	m_effects(std::move(rhs.m_effects)),
+	m_state(rhs.m_state),
+	m_registry(rhs.m_registry),
+	m_id(rhs.m_id),
+	m_time(rhs.m_time),
+	m_released(rhs.m_released),
+	m_activeDrivers(rhs.m_activeDrivers),
+	m_lastExecutedEffect(m_effects.begin())
+{
+	
+}
+
 PlayableEffect::~PlayableEffect()
 {
 	//shouldn't have to do this anymore if you call Stop first
@@ -145,10 +158,9 @@ void PlayableEffect::Update(float dt)
 
 float PlayableEffect::GetTotalPlayTime() const
 {
-//	std::accumulate(m_effects.begin(), m_effects.end(), [](const auto& effect, float totalDuration) {});
-	TotalPlaytimeVisitor playtimeCounter;
-	//std::for_each(m_effects.begin(), m_effects.end(), boost::apply_visitor(playtimeCounter));
-	return playtimeCounter.TotalPlaytime();
+	return std::accumulate(m_effects.begin(), m_effects.end(), 0.0f, [](float currentDuration, const auto& effect) {
+		return currentDuration + effect->duration();
+	});
 
 }
 
@@ -222,22 +234,6 @@ void PlayableEffect::resume() {
 }
 
 
-
-EventVisitor::EventVisitor(float time):m_time(time)
-{
-
-}
-
-TotalPlaytimeVisitor::TotalPlaytimeVisitor():
-	m_totalPlaytime(0), 
-	m_fudgeFactor(0.25f)
-{
-}
-
-float TotalPlaytimeVisitor::TotalPlaytime()
-{
-	return m_totalPlaytime;
-}
 
 RegionVisitor::RegionVisitor()
 {
