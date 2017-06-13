@@ -2,8 +2,8 @@
 
 
 workspace "Plugin"
-	configurations {"Debug", "Release", "UnitTest"}
-	platforms {"Win32", "Win64"}
+	configurations {"Debug", "Release"}
+	platforms {"Win32", "Win64", "UnitTestWin32"}
 	language "C++"
 	
 	
@@ -74,9 +74,9 @@ project "Plugin"
 	 	flags{'NoPCH'}
 
 
-	filter {"configurations:Debug or configurations:Release"}
+	filter {"platforms:Win32 or platforms:Win64"}
 		kind "SharedLib"
-	filter {"configurations:UnitTest"}
+	filter {"platforms:UnitTestWin32"}
 		kind "ConsoleApp"
 
 	-- input: libprotobuf
@@ -98,17 +98,17 @@ project "Plugin"
 		}
 
 	-- unit testing
-	filter {"platforms:Win32", "configurations:UnitTest"}
+	filter {"platforms:UnitTestWin32", "configurations:Debug"}
 		libdirs {
 			path.join(protobuf_win32_dir, "Debug")
 		}
-	filter {"platforms:Win64", "configurations:UnitTest"}
+	filter {"platforms:UnitTestWin32", "configurations:Release"}
 		libdirs {
-			path.join(protobuf_win64_dir, "Debug")
+			path.join(protobuf_win32_dir, "Release")
 		}
 
 
-	filter "platforms:Win32" 
+	filter "platforms:Win32 or platforms:UnitTestWin32" 
 		system "Windows"
 		architecture "x86"
 		libdirs {
@@ -121,7 +121,7 @@ project "Plugin"
 		libdirs {
 			boost_win64_dir
 		}
-	filter "configurations:Debug or configurations:UnitTest"
+	filter "configurations:Debug"
 		defines {"DEBUG", "_DEBUG"}
 		symbols "On"
 		optimize "Off"
@@ -135,6 +135,6 @@ project "Plugin"
 	filter {"system:Windows"}
 		defines {"_WINDOWS", "_USRDLL"}
 
-	filter {"system:Windows", "configurations:Debug or configurations:UnitTest"}
+	filter {"system:Windows", "configurations:Debug"}
 		buildoptions {"-D_SCL_SECURE_NO_WARNINGS"}
 
