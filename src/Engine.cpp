@@ -282,14 +282,14 @@ void Engine::HandleCommand(unsigned int handle, NSVR_PlaybackCommand c)
 
 
 std::vector<std::unique_ptr<PlayableEvent>> 
-extractPlayables(const std::vector<std::unique_ptr<ParameterizedEvent>>& events) {
+extractPlayables(const std::vector<ParameterizedEvent>& events) {
 	
 	using PlayablePtr = std::unique_ptr<PlayableEvent>;
 	std::vector<PlayablePtr> playables;
 	playables.reserve(events.size());
 	for (const auto& event : events) {
-		if (auto newPlayable = PlayableEvent::make(event->type())) {
-			if (newPlayable->parse(*event.get())) {
+		if (auto newPlayable = PlayableEvent::make(event.type())) {
+			if (newPlayable->parse(event)) {
 				playables.push_back(std::move(newPlayable));
 			}
 		}

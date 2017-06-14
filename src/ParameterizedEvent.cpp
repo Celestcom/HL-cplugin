@@ -30,6 +30,19 @@ ParameterizedEvent::ParameterizedEvent(NSVR_EventType t): m_properties(), m_type
 }
 
 
+ParameterizedEvent::ParameterizedEvent(ParameterizedEvent && other) : 
+	m_type(other.m_type),
+	m_properties(std::move(other.m_properties))
+{
+	
+}
+
+ParameterizedEvent::ParameterizedEvent(const ParameterizedEvent & other):
+	m_type(other.m_type),
+	m_properties(other.m_properties)
+{
+}
+
 bool ParameterizedEvent::SetFloat(const char * key, float value)
 {
 	VALIDATE_KEY(key);

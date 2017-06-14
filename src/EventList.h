@@ -11,8 +11,8 @@ public:
 	EventList();
 	int AddEvent(ParameterizedEvent* e);
 	~EventList();
-	const std::vector<std::unique_ptr<ParameterizedEvent>>& events();
+	const std::vector<ParameterizedEvent>& events();
 private:
-	std::vector<std::unique_ptr<ParameterizedEvent>> m_events;
+	std::vector<ParameterizedEvent> m_events;
 };
 

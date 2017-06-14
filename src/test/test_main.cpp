@@ -569,19 +569,26 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	SECTION("The player should be able to handle a lot of handles") {
 		//let me say a reasonable amount of effects active at once is 100. 
 		//With this arbitrary number in mind, the engine should execute quite fast.
-		//This test aims to verify that 100 effects can be updated in less than 1 millisecond. 
+		//This test aims to verify that 100 effects can be updated in less than 1ms. 
 #ifdef NDEBUG
-		for (int i = 0; i < 100; i++) {
-			auto h = player.Create(makePlayables());
-			player.Play(h);
-		}
 
-		auto duration = 
-		time<std::chrono::milliseconds>([&]() {
-			player.Update(DELTA_TIME);
+		auto duration1 = 
+			time<std::chrono::microseconds>([&] {
+			for (int i = 0; i < 10000; i++) {
+				auto h = player.Create(makePlayables());
+				player.Play(h);
+			}
 		}).count();
 
-		REQUIRE(duration <= 1);
+		std::cout << "Creation time microseconds: " << duration1 << '\n';
+		//raw version: 18-19,000 microseconds
+		auto duration = 
+		time<std::chrono::microseconds>([&]() {
+			player.Update(DELTA_TIME);
+		}).count();
+		//18,000 microseconds to pointer version
+		std::cout << "Duration (microseconds): " << duration << '\n';
+		REQUIRE(duration <= 1000);
 #endif
 
 	}

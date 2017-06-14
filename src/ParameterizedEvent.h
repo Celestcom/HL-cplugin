@@ -25,7 +25,8 @@ class ParameterizedEvent
 public:
 	ParameterizedEvent(NSVR_EventType);
 	~ParameterizedEvent() {}
-
+	ParameterizedEvent(ParameterizedEvent&&);
+	ParameterizedEvent(const ParameterizedEvent&);
 	bool SetFloat(const char* key, float value);
 	bool SetInt(const char* key, int value);
 	bool SetFloats(const char* key, float* values, unsigned int length);
