@@ -23,7 +23,7 @@ const float DELTA_TIME = 0.05f;
 
 LiveBasicHapticEvent makeOneshot() {
 	BasicHapticEventData data;
-	data.area = (uint32_t)AreaFlag::Chest_Left;
+	data.area = 10;
 	data.duration = 0.0;
 	data.effect = 666;
 	data.strength = 1.0;
@@ -33,7 +33,7 @@ LiveBasicHapticEvent makeOneshot() {
 
 LiveBasicHapticEvent makeCont(float duration) {
 	BasicHapticEventData data;
-	data.area = (uint32_t)AreaFlag::Chest_Left;
+	data.area = 10;
 	data.duration = duration;
 	data.effect = 555;
 	data.strength = 0.5;
@@ -589,6 +589,10 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 #endif
 
 	}
+
+
+
+	
 		
 	
 

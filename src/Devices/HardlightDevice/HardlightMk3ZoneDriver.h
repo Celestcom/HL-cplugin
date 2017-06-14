@@ -27,7 +27,7 @@ private:
 
 	ZoneModel m_retainedModel;
 	RtpModel m_rtpModel;
-	void createRetained(boost::uuids::uuid handle, const SuitEvent& event) override;
+	void createRetained(boost::uuids::uuid handle, const std::unique_ptr<PlayableEvent>& event) override;
 	void controlRetained(boost::uuids::uuid handle, NSVR_PlaybackCommand command) override;
 	void realtime(const RealtimeArgs& args) override;
 

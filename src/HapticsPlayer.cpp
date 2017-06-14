@@ -134,16 +134,15 @@ std::size_t HapticsPlayer::GetNumReleasedEffects()
 
 void HapticsPlayer::Update(float dt)
 {
+	if (m_playerPaused) {
+		return;
+	}
+
 	std::lock_guard<std::mutex> lock_guard(m_effectsLock);
 
 
 	for (auto& effect : m_effects) {
-	
-			effect.second.Update(dt);
-		
-	
-
-
+		effect.second.Update(dt);
 	}
 
 	

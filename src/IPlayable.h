@@ -50,7 +50,7 @@ public:
 	virtual PlayableInfo GetInfo() const = 0;
 
 	//Return the total length of the effect in fractional seconds
-	virtual float GetTotalPlayTime() const = 0;
+	virtual float GetTotalDuration() const = 0;
 
 	//Return the current time of the effect in fractional seconds
 	virtual float CurrentTime() const = 0;

@@ -31,7 +31,7 @@ enum class AreaFlag : uint32_t {
 	Lower_Ab_Both = Lower_Ab_Left | Lower_Ab_Right,
 
 	Left_All = 0x000000FF,
-	Right_All = 0x00FF0000,
+	Right_All =0x00FF0000,
 	All_Areas = Left_All | Right_All
 };
 inline AreaFlag& operator|=(AreaFlag& a, const AreaFlag b)

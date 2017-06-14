@@ -20,7 +20,9 @@ LiveBasicHapticEvent::LiveBasicHapticEvent(boost::uuids::uuid parentId, boost::u
 	eventData(std::move(data))
 
 {
-
+	if (std::abs(eventData.duration - 0.25f) <= 0.001f) {
+		eventData.duration = 0;
+	}
 }
 
 const BasicHapticEventData & LiveBasicHapticEvent::Data() const
@@ -52,7 +54,7 @@ bool LiveBasicHapticEvent::isContinuous() const
 
 bool LiveBasicHapticEvent::isOneshot() const
 {
-	return eventData.duration == 0.0;
+	return eventData.duration == 0;
 }
 
 bool LiveBasicHapticEvent::isChildOf(const boost::uuids::uuid & parentId) const

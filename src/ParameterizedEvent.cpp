@@ -72,17 +72,19 @@ NSVR_EventType ParameterizedEvent::type() const
 }
 
 //this reference will become invalid if anybody changes the vector
-boost::optional<property&> ParameterizedEvent::find(const char * key) 
+property* ParameterizedEvent::find(const char * key) 
 {
 	auto it = std::find_if(m_properties.begin(), m_properties.end(), [&key](auto& prop) {
 		return strcmp(key, prop.key) == 0;
 	});
 
 	if (it != m_properties.end()) {
-		return *it;
+		return &*it;
+	}
+	else {
+		return nullptr;
 	}
 
-	return boost::none;
 }
 
 boost::optional<property> ParameterizedEvent::findByValue(const char * key) const
@@ -101,7 +103,8 @@ boost::optional<property> ParameterizedEvent::findByValue(const char * key) cons
 
 void ParameterizedEvent::update_or_add(const char * key, const EventValue & val)
 {
-	if (auto existing = find(key)) {
+	property* existing = find(key);
+	if (existing != nullptr) {
 		existing->value = val;
 	}
 	else {

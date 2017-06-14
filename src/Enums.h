@@ -25,7 +25,7 @@ enum class Side
 	NotSpecified
 };
 
-enum class Location
+enum class Location : uint32_t
 {
 	/// <summary>
 	/// Right lower abdominal feedback zone

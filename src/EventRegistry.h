@@ -1,6 +1,6 @@
 #pragma once
 #include "RegionTree.h"
-
+#include "HardwareDriver.h"
 class EventRegistry {
 public:
 	EventRegistry();

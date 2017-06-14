@@ -38,7 +38,7 @@ public:
 	NSVR_EventType type() const;
 
 private:
-	boost::optional<property&> find(const char* key);
+	property* find(const char* key);
 	boost::optional<property> findByValue(const char* key) const;
 	void update_or_add(const char* key, const EventValue& val);
 	std::vector<property> m_properties;

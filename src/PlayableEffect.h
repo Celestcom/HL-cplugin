@@ -4,7 +4,7 @@
 #include "EventRegistry.h"
 #include <set>
 #include <boost\uuid\random_generator.hpp>
-
+#include "HardwareDriver.h"
 
 template<typename T>
 struct weak_ptr_less_than {
@@ -40,7 +40,7 @@ public:
 	void Pause();
 	void Stop();
 	void Update(float dt);
-	float GetTotalPlayTime() const;
+	float GetTotalDuration() const;
 	float CurrentTime() const;
 	bool IsPlaying() const;
 	bool IsReleased() const;

@@ -7,8 +7,8 @@
 #include <memory>
 #include <iterator>
 #include <numeric>
-
-
+#include <bitset>
+#include <array>
 
 #include <functional>
 #include <chrono>
@@ -147,8 +147,8 @@ void PlayableEffect::Update(float dt)
 				if (consumers) {
 					//need translator from registry's leaves to area flags for backwards compat?
 					std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
-
-						//	consumer->createRetained(m_id, *current);
+						assert(current->get()->area() != 0);
+							consumer->createRetained(m_id, *current);
 						m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
 					});
 				}
@@ -165,7 +165,7 @@ void PlayableEffect::Update(float dt)
 
 	m_lastExecutedEffect = current;
 
-	if (m_time >= GetTotalPlayTime()) {
+	if (m_time >= GetTotalDuration()) {
 		Stop();
 	}
 
@@ -173,10 +173,11 @@ void PlayableEffect::Update(float dt)
 
 
 
-float PlayableEffect::GetTotalPlayTime() const
+float PlayableEffect::GetTotalDuration() const
 {
 	return std::accumulate(m_effects.begin(), m_effects.end(), 0.0f, [](float currentDuration, const auto& effect) {
-		return currentDuration + effect->duration();
+		float thisEffectEndTime = std::max(0.0f, effect->duration() + effect->time());
+		return std::max(currentDuration, thisEffectEndTime);
 	});
 
 }
@@ -198,7 +199,7 @@ bool PlayableEffect::IsReleased() const
 
 PlayableInfo PlayableEffect::GetInfo() const
 {
-	return PlayableInfo(GetTotalPlayTime(), m_time, m_state == PlaybackState::PLAYING);
+	return PlayableInfo(GetTotalDuration(), m_time, m_state == PlaybackState::PLAYING);
 }
 
 void PlayableEffect::Release()
@@ -255,13 +256,58 @@ void PlayableEffect::resume() {
 RegionVisitor::RegionVisitor()
 {
 }
-#define START_BITMASK_SWITCH(x) \
+
+
+std::array<std::string, 32> regionmap = {
+
+	"left_forearm",
+	"left_upper_arm",
+	"left_shoulder",
+	"left_back",
+	"left_upper_chest",
+	"left_upper_ab",
+	"left_mid_ab",
+	"left_lower_ab",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"right_forearm",
+	"right_upper_arm",
+	"right_shoulder",
+	"right_back",
+	"right_upper_chest",
+	"right_upper_ab",
+	"right_mid_ab",
+	"right_lower_ab",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved"
+};
+	
+
 
 std::vector<std::string> extractRegions(const PlayablePtr & event) 
 {
 	auto& translator = Locator::getTranslator();
 	std::vector<std::string> regions;
 	uint32_t area = event->area();
+	std::bitset<32> areas(area);
+	for (std::size_t i = 0; i < areas.size(); i++) {
+		if (areas.test(i)) {
+			regions.push_back(regionmap[i]);
+		}
+	}
+	/*
 	for (uint32_t bit = 1; area >= bit; bit *= 2)
 	{
 		if (area & bit) {
@@ -319,7 +365,7 @@ std::vector<std::string> extractRegions(const PlayablePtr & event)
 			}
 		}
 	}
-
+	*/
 	return regions;
 }
 
