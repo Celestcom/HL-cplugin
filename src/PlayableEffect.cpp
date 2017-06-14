@@ -267,52 +267,52 @@ std::vector<std::string> extractRegions(const PlayablePtr & event)
 		if (area & bit) {
 			switch (AreaFlag(bit)) {
 			case AreaFlag::Forearm_Left:
-				regions.push_back("AreaFlag::Forearm_Left");
+				regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Left));
 				break;
 			case AreaFlag::Upper_Arm_Left:
-				regions.push_back("AreaFlag::Upper_Arm_Left");
+				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Left));
 				break;
 			case AreaFlag::Shoulder_Left:
-				regions.push_back("AreaFlag::Shoulder_Left");
+				regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Left));
 				break;
 			case AreaFlag::Back_Left:
-				regions.push_back("AreaFlag::Back_Left");
+				regions.push_back(translator.ToRegionString(AreaFlag::Back_Left));
 				break;
 			case AreaFlag::Chest_Left:
-				regions.push_back("AreaFlag::Chest_Left");
+				regions.push_back(translator.ToRegionString(AreaFlag::Chest_Left));
 				break;
 			case AreaFlag::Upper_Ab_Left:
-				regions.push_back("AreaFlag::Upper_Ab_Left");
+				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Left));
 				break;
 			case AreaFlag::Mid_Ab_Left:
-				regions.push_back("AreaFlag::Mid_Ab_Left");
+				regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Left));
 				break;
 			case AreaFlag::Lower_Ab_Left:
-				regions.push_back("AreaFlag::Lower_Ab_Left");
+				regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Left));
 				break;
 			case AreaFlag::Forearm_Right:
-				regions.push_back("AreaFlag::Forearm_Right");
+				regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Right));
 				break;
 			case AreaFlag::Upper_Arm_Right:
-				regions.push_back("AreaFlag::Upper_Arm_Right");
+				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Right));
 				break;
 			case AreaFlag::Shoulder_Right:
-				regions.push_back("AreaFlag::Shoulder_Right");
+				regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Right));
 				break;
 			case AreaFlag::Back_Right:
-				regions.push_back("AreaFlag::Back_Right");
+				regions.push_back(translator.ToRegionString(AreaFlag::Back_Right));
 				break;
 			case AreaFlag::Chest_Right:
-				regions.push_back("AreaFlag::Chest_Right");
+				regions.push_back(translator.ToRegionString(AreaFlag::Chest_Right));
 				break;
 			case AreaFlag::Upper_Ab_Right:
-				regions.push_back("AreaFlag::Upper_Ab_Right");
+				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Right));
 				break;
 			case AreaFlag::Mid_Ab_Right:
-				regions.push_back("AreaFlag::Mid_Ab_Right");
+				regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Right));
 				break;
 			case AreaFlag::Lower_Ab_Right:
-				regions.push_back("AreaFlag::Lower_Ab_Right");
+				regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Right));
 				break;
 			default:
 				break;

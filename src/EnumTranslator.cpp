@@ -159,14 +159,7 @@ AreaFlag EnumTranslator::ToArea(Location loc) const
 
 std::string EnumTranslator::ToRegionString(AreaFlag f) const
 {
-	return "a";
-	//std::cout << "Runtime of region string lookup: " << time<std::chrono::microseconds>([&]()
-	//{
-		std::string h = _regionMap.at(f);
-		return h;
-	//}).count() << '\n';
-//return "";
-	
+	return _regionMap.left.at(f);
 }
 
 EnumTranslator::~EnumTranslator()
