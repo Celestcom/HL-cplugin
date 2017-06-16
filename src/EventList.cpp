@@ -30,3 +30,8 @@ std::vector<ParameterizedEvent> EventList::events()
 
 	return m_events;
 }
+
+bool EventList::empty() const
+{
+	return m_events.empty();
+}

@@ -310,8 +310,8 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 	if (list == nullptr) {
 		return NSVR_Error_NullArgument;
 	}
-	//FIX to return the direct empty value
-	if (list->events().empty()) {
+	//enforces precondition on PlayableEffect to not have an empty effects list
+	if (list->empty()) {
 		return -1;
 	}
 	else {
