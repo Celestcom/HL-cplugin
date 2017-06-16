@@ -316,8 +316,8 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 	}
 	else {
 		
-		auto a = extractPlayables(list->events());
-		HapticHandle h = m_player.Create(std::move(a));
+		auto a = ;
+		HapticHandle h = m_player.Create(extractPlayables(list->events()));
 		*handle = h;
 		return NSVR_Success_Unqualified;
 	}
