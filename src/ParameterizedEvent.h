@@ -3,7 +3,7 @@
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>
 
-#define DO_VALIDATION
+//#define DO_VALIDATION
 
 #ifdef DO_VALIDATION
 #define VALIDATE_KEY(key) do { if (!validate(key)) { return false; } } while (0)
@@ -38,8 +38,8 @@ public:
 	NSVR_EventType type() const;
 
 private:
-	event_attribute* findMyCoolThing(const char* key);
-	const event_attribute* findMyCoolThing(const char* key) const;
+	event_attribute* findAttribute(const char* key);
+	const event_attribute* findAttribute(const char* key) const;
 	template<typename T>
 	void update_or_add(const char* key, T val);
 	std::vector<event_attribute> m_properties;
@@ -69,7 +69,7 @@ template<typename T>
 inline T ParameterizedEvent::Get(const char * key, T defaultValue) const
 {
 	try {
-		if (const event_attribute* prop = findMyCoolThing(key)) {
+		if (const event_attribute* prop = findAttribute(key)) {
 			return  boost::get<T>(prop->value);
 		}
 		else {
@@ -91,9 +91,9 @@ inline T ParameterizedEvent::Get(const char * key, T defaultValue) const
 template<typename T>
 inline void ParameterizedEvent::update_or_add(const char * key, T val)
 {
-	BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
-		"[ParameterizedEvent] Setting key " << key << " to type T = " << typeid(T).name();
-	event_attribute* existing = findMyCoolThing(key);
+	//BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
+	//	"[ParameterizedEvent] Setting key " << key << " to type T = " << typeid(T).name();
+	event_attribute* existing = findAttribute(key);
 	if (existing != nullptr) {
 		existing->value = val;
 	}

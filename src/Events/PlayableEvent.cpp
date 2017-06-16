@@ -16,7 +16,7 @@ PlayableEvent::make(NSVR_EventType type)
 	std::unique_ptr<PlayableEvent> possibleEvent;
 	switch (type) {
 	case NSVR_EventType::NSVR_EventType_BasicHapticEvent:
-		possibleEvent = std::unique_ptr<PlayableEvent>(new BasicHapticEvent());
+		possibleEvent = std::make_unique<BasicHapticEvent>();
 		break;
 	case NSVR_EventType::NSVR_EventType_CurveHapticEvent:
 //		possibleEvent = std::unique_ptr<PlayableEvent>(new CurveEvent());

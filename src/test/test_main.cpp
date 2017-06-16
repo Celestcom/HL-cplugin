@@ -595,29 +595,9 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		 
 
 	}
-	SECTION("The player should be able to handle a lot of handles") {
-		//let me say a reasonable amount of effects active at once is 100. 
-		//With a time update interval of 5 milliseconds, we should be able to perform the creation and
-		//updating of 100 events in one batch within that interval. 
-		//Let's start with a tight performance bound and then adjust as we make changes.
-		//For now: I'll choose 1ms as our goal.
-
-#ifdef NDEBUG
-
-		for (int i = 0; i < 100; i++) {
-			auto h = player.Create(makePlayables());
-			player.Play(h);
-		}
 	
 
-		auto duration = 
-		time<std::chrono::microseconds>([&]() {
-			player.Update(DELTA_TIME);
-		}).count();
-		REQUIRE(duration <= 1000);
-#endif
-
-	}
+	
 
 
 
