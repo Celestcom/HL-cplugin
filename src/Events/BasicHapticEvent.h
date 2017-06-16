@@ -28,6 +28,9 @@ private:
 	uint32_t m_requestedEffectFamily;
 
 
+
+	virtual bool isEqual(const PlayableEvent& other) const override;
+
 };
 
 

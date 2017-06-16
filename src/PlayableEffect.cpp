@@ -31,8 +31,29 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry&
 	m_released(false)
 {
 	assert(!m_effects.empty());
-	std::sort(m_effects.begin(), m_effects.end(), cmp_by_time);
+
+	sortByTime(m_effects);
+
+	//It is unclear if this de-duplication should happen at all, or if it should
+	//happen at a higher level. It feels wrong to iterate over thousands of duplicates when
+	//the lower level will be forced to wipe them out. 
+
+	pruneDuplicates(m_effects);
+
 	reset();
+}
+
+void PlayableEffect::sortByTime(std::vector<PlayablePtr>& playables)
+{
+	std::sort(playables.begin(), playables.end(), cmp_by_time);
+}
+
+
+void PlayableEffect::pruneDuplicates(std::vector<PlayablePtr>& playables) {
+	
+	auto last = std::unique(playables.begin(), playables.end(), cmp_by_duplicate);
+	playables.erase(last, playables.end());
+	playables.shrink_to_fit();
 }
 
 
@@ -47,9 +68,7 @@ PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
 	m_activeDrivers(rhs.m_activeDrivers),
 	m_lastExecutedEffect(m_effects.begin())
 {
-	//std::sort(m_effects.begin(), m_effects.end(), cmp_by_time);
-	//assert(m_effects.at(0)->time() != 1.0f);
-	//reset();
+	
 }
 
 PlayableEffect::~PlayableEffect()

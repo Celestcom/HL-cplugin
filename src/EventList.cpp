@@ -24,7 +24,7 @@ EventList::~EventList()
 
 
 
-const std::vector<ParameterizedEvent>& EventList::events()
+std::vector<ParameterizedEvent> EventList::events()
 {
 	std::lock_guard<std::mutex> guard(m_eventLock);
 

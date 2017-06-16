@@ -81,7 +81,7 @@ NSVR_EventType ParameterizedEvent::type() const
 event_attribute* ParameterizedEvent::findMyCoolThing(const char * key)
 {
 	for (std::size_t i = 0; i < m_properties.size(); i++) {
-		if (strcmp(m_properties.at(i).key, key) == 0	) {
+		if (strcmp(m_properties.at(i).key.c_str(), key) == 0	) {
 			return &m_properties.at(i);
 		}
 	}
@@ -91,16 +91,18 @@ event_attribute* ParameterizedEvent::findMyCoolThing(const char * key)
 
 }
 
-boost::optional<event_attribute> ParameterizedEvent::findByValue(const char * key) const
+const event_attribute * ParameterizedEvent::findMyCoolThing(const char * key) const
 {
 	for (std::size_t i = 0; i < m_properties.size(); i++) {
-		if (strcmp(m_properties.at(i).key, key) == 0) {
-			return m_properties.at(i);
+		if (strcmp(m_properties.at(i).key.c_str(), key) == 0) {
+			return &m_properties.at(i);
 		}
 	}
 
-	return boost::none;
+	return nullptr;
 }
+
+
 
 
 event_attribute::event_attribute() : key(nullptr), value()

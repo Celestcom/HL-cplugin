@@ -89,6 +89,7 @@ Engine::Engine() :
 
 	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
+	boost::log::core::get()->set_logging_enabled(false);
 
 	m_hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
 	m_hardlightSuit->RegisterDrivers(m_registry);
@@ -309,7 +310,7 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 	if (list == nullptr) {
 		return NSVR_Error_NullArgument;
 	}
-
+	//FIX to return the direct empty value
 	if (list->events().empty()) {
 		return -1;
 	}

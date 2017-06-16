@@ -57,6 +57,18 @@ bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 
 }
 
+bool BasicHapticEvent::isEqual(const PlayableEvent& other) const
+{
+	const auto& ev = static_cast<const BasicHapticEvent&>(other);
+	return 
+		   m_time == ev.m_time
+		&& m_strength == ev.m_strength
+		&& m_requestedEffectFamily == ev.m_requestedEffectFamily
+		&& m_parsedEffectFamily == ev.m_parsedEffectFamily
+		&& m_area == ev.m_area
+		&& m_duration == ev.m_duration;
+}
+
 float BasicHapticEvent::strength() const
 {
 	return m_strength;

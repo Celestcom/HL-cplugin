@@ -18,8 +18,10 @@ public:
 
 	static std::unique_ptr<PlayableEvent> make(NSVR_EventType type);
 
-	
+	bool operator==(const PlayableEvent& other) const;
+private:
+	virtual bool isEqual(const PlayableEvent& other) const = 0;
 };
 
-
+bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);
 bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);

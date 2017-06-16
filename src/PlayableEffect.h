@@ -31,6 +31,7 @@ class PlayableEffect
 {
 public:
 
+
 	//Precondition: the vector is not empty
 	PlayableEffect(std::vector<PlayablePtr>&& effects, EventRegistry& reg, boost::uuids::random_generator&);
 	PlayableEffect(const PlayableEffect&) = delete;
@@ -49,6 +50,9 @@ public:
 
 	
 private:
+	void pruneDuplicates(std::vector<PlayablePtr>& playables);
+	void sortByTime(std::vector<PlayablePtr>& playables);
+
 	enum class PlaybackState {
 		PLAYING,
 		PAUSED,

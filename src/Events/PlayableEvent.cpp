@@ -4,6 +4,7 @@
 #include "NSLoader.h"
 #include "BasicHapticEvent.h"
 #include "CurveEvent.h"
+#include <typeinfo>
 bool PlayableEvent::operator<(const PlayableEvent & rhs) const
 {
 	return this->time() < rhs.time();
@@ -29,7 +30,16 @@ PlayableEvent::make(NSVR_EventType type)
 
 }
 
+bool PlayableEvent::operator==(const PlayableEvent& other) const
+{
+	return typeid(*this) == typeid(other) && isEqual(other);
+}
+
 bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs)
 {
 	return lhs->time() < rhs->time();
+}
+
+bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs) {
+	return *lhs == *rhs;
 }

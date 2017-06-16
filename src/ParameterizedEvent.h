@@ -15,7 +15,7 @@ typedef boost::variant<float, int, std::vector<float>> EventValue;
 struct event_attribute {
 	event_attribute();
 	event_attribute(const char* key, EventValue);
-	const char* key;
+	std::string key;
 	EventValue value;
 };
 
@@ -39,9 +39,7 @@ public:
 
 private:
 	event_attribute* findMyCoolThing(const char* key);
-	boost::optional<event_attribute> findByValue(const char* key) const;
-	void update_or_add(const char* key, EventValue val);
-
+	const event_attribute* findMyCoolThing(const char* key) const;
 	template<typename T>
 	void update_or_add(const char* key, T val);
 	std::vector<event_attribute> m_properties;
@@ -71,11 +69,11 @@ template<typename T>
 inline T ParameterizedEvent::Get(const char * key, T defaultValue) const
 {
 	try {
-		if (auto prop = findByValue(key)) {
-			if (T result = boost::get<T>(prop->value)) {
-				return result;
-			}
-			//	EventValue v = prop->value;
+		if (const event_attribute* prop = findMyCoolThing(key)) {
+			return  boost::get<T>(prop->value);
+		}
+		else {
+			return defaultValue;
 		}
 	}
 	catch (const boost::bad_get&) {
