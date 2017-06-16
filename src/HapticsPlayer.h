@@ -56,7 +56,6 @@ private:
 	std::atomic<uint32_t> m_currentHandleId;
 
 	boost::optional<boost::uuids::uuid> findInternalHandle(HapticHandle h); 
-	boost::optional<PlayableEffect&> findExistingPlayable(const boost::uuids::uuid& internalHandle);
 	boost::optional<PlayableEffect&> findExistingPlayable(HapticHandle h);
 	void addNewEffect(const boost::uuids::uuid&, std::vector<std::unique_ptr<PlayableEvent>>&& events);
 	HapticHandle nextHandle();

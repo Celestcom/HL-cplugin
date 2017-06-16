@@ -293,9 +293,6 @@ extractPlayables(const std::vector<ParameterizedEvent>& events) {
 	for (const auto& event : events) {
 		if (auto newPlayable = PlayableEvent::make(event.type())) {
 			if (newPlayable->parse(event)) {
-
-
-
 				playables.push_back(std::move(newPlayable));
 			}
 		}
@@ -315,8 +312,6 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 		return -1;
 	}
 	else {
-		
-		auto a = ;
 		HapticHandle h = m_player.Create(extractPlayables(list->events()));
 		*handle = h;
 		return NSVR_Success_Unqualified;

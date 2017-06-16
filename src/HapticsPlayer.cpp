@@ -149,15 +149,7 @@ void HapticsPlayer::Update(float dt)
 
 	
 	std::experimental::erase_if(m_effects, [](const auto& effect) {
-		bool shouldRemove = effect.second.IsReleased() && !effect.second.IsPlaying();
-		if (shouldRemove) {
-			BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-				"[Player] Deleting effect ";
-			return true;
-		}
-		else {
-			return false;
-		}
+		return effect.second.IsReleased() && !effect.second.IsPlaying();
 	});
 
 }
@@ -218,20 +210,16 @@ boost::optional<boost::uuids::uuid> HapticsPlayer::findInternalHandle(HapticHand
 	return boost::none;
 }
 
-boost::optional<PlayableEffect&> HapticsPlayer::findExistingPlayable(const boost::uuids::uuid& internalHandle)
-{
-	auto intKey = m_hasher(internalHandle);
-	if (m_effects.find(intKey) != m_effects.end()) {
-		return m_effects.at(intKey);
-	}
-
-	return boost::none;
-}
 
 boost::optional<PlayableEffect&> HapticsPlayer::findExistingPlayable(HapticHandle h)
 {
 	if (auto internalHandle = findInternalHandle(h)) {
-		return findExistingPlayable(*internalHandle);
+
+		auto intKey = m_hasher(*internalHandle);
+		if (m_effects.find(intKey) != m_effects.end()) {
+			return m_effects.at(intKey);
+		}
+	
 	}
 
 	return boost::none;
