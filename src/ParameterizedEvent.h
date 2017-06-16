@@ -12,9 +12,9 @@
 #endif
 
 typedef boost::variant<float, int, std::vector<float>> EventValue;
-struct property {
-	property();
-	property(const char* key, const EventValue&);
+struct event_attribute {
+	event_attribute();
+	event_attribute(const char* key, EventValue);
 	const char* key;
 	EventValue value;
 };
@@ -38,12 +38,15 @@ public:
 	NSVR_EventType type() const;
 
 private:
-	property* find(const char* key);
-	boost::optional<property> findByValue(const char* key) const;
-	void update_or_add(const char* key, const EventValue& val);
-	std::vector<property> m_properties;
-	NSVR_EventType m_type;
+	event_attribute* findMyCoolThing(const char* key);
+	boost::optional<event_attribute> findByValue(const char* key) const;
+	void update_or_add(const char* key, EventValue val);
 
+	template<typename T>
+	void update_or_add(const char* key, T val);
+	std::vector<event_attribute> m_properties;
+	NSVR_EventType m_type;
+	std::mutex m_propLock;
 	
 	
 };
@@ -67,13 +70,36 @@ inline T constrain(T min, T val, T max) {
 template<typename T>
 inline T ParameterizedEvent::Get(const char * key, T defaultValue) const
 {
-	if (auto prop = findByValue(key)) {
-		if (T result = boost::get<T>(prop->value)) {
-			return result;
+	try {
+		if (auto prop = findByValue(key)) {
+			if (T result = boost::get<T>(prop->value)) {
+				return result;
+			}
+			//	EventValue v = prop->value;
 		}
-	//	EventValue v = prop->value;
 	}
-	
+	catch (const boost::bad_get&) {
+		BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
+			"[ParameterizedEvent " << this << "] Bad get! key = " << key << " T = " << typeid(T).name();
+		for (const auto& prop : m_properties) {
+			BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
+				"\t " << prop.key << ": type = " << prop.value.which();
+		}
+	}
 	return defaultValue;
 	
+}
+
+template<typename T>
+inline void ParameterizedEvent::update_or_add(const char * key, T val)
+{
+	BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
+		"[ParameterizedEvent] Setting key " << key << " to type T = " << typeid(T).name();
+	event_attribute* existing = findMyCoolThing(key);
+	if (existing != nullptr) {
+		existing->value = val;
+	}
+	else {
+		m_properties.emplace_back(key, val);
+	}
 }

@@ -16,8 +16,9 @@ bool validate(const char* key) {
 	for (int i = 0; i < max_key_len; i++) {
 		if (key[i] == 0) //if null terminator 
 		{
-			return true;	
-		}else if (!isalnum(key[i])) {
+			return true;
+		}
+		else if (!isalnum(key[i])) {
 			return false;
 		}
 	}
@@ -25,19 +26,20 @@ bool validate(const char* key) {
 	return true;
 }
 
-ParameterizedEvent::ParameterizedEvent(NSVR_EventType t): m_properties(), m_type(t)
+ParameterizedEvent::ParameterizedEvent(NSVR_EventType t) : m_properties(), m_type(t)
 {
 }
 
 
-ParameterizedEvent::ParameterizedEvent(ParameterizedEvent && other) : 
+ParameterizedEvent::ParameterizedEvent(ParameterizedEvent && other) :
 	m_type(other.m_type),
 	m_properties(std::move(other.m_properties))
 {
-	
+	int y = 3;
+
 }
 
-ParameterizedEvent::ParameterizedEvent(const ParameterizedEvent & other):
+ParameterizedEvent::ParameterizedEvent(const ParameterizedEvent & other) :
 	m_type(other.m_type),
 	m_properties(other.m_properties)
 {
@@ -45,24 +47,28 @@ ParameterizedEvent::ParameterizedEvent(const ParameterizedEvent & other):
 
 bool ParameterizedEvent::SetFloat(const char * key, float value)
 {
+	std::lock_guard<std::mutex> guard(m_propLock);
 	VALIDATE_KEY(key);
-	update_or_add(key, value);
+	update_or_add<float>(key, value);
 	return true;
 }
 
 bool ParameterizedEvent::SetInt(const char * key, int value)
 {
+	std::lock_guard<std::mutex> guard(m_propLock);
 	VALIDATE_KEY(key);
-	update_or_add(key, value);
+	update_or_add<int>(key, value);
 	return true;
 }
 
 bool ParameterizedEvent::SetFloats(const char * key, float * values, unsigned int length)
 {
+	std::lock_guard<std::mutex> guard(m_propLock);
+
 	VALIDATE_KEY(key);
 	std::vector<float> vec(length);
 	memcpy_s(&vec[0], vec.size(), &values[0], length);
-	update_or_add(key, std::move(vec));
+	update_or_add<std::vector<float>>(key, std::move(vec));
 	return true;
 }
 
@@ -72,54 +78,37 @@ NSVR_EventType ParameterizedEvent::type() const
 }
 
 //this reference will become invalid if anybody changes the vector
-property* ParameterizedEvent::find(const char * key) 
+event_attribute* ParameterizedEvent::findMyCoolThing(const char * key)
 {
-	auto it = std::find_if(m_properties.begin(), m_properties.end(), [&key](auto& prop) {
-		return strcmp(key, prop.key) == 0;
-	});
-
-	if (it != m_properties.end()) {
-		return &*it;
+	for (std::size_t i = 0; i < m_properties.size(); i++) {
+		if (strcmp(m_properties.at(i).key, key) == 0	) {
+			return &m_properties.at(i);
+		}
 	}
-	else {
-		return nullptr;
-	}
+	
+	return nullptr;
+	
 
 }
 
-boost::optional<property> ParameterizedEvent::findByValue(const char * key) const
+boost::optional<event_attribute> ParameterizedEvent::findByValue(const char * key) const
 {
-	auto it = std::find_if(m_properties.begin(), m_properties.end(), [&key](auto& prop) {
-		return strcmp(key, prop.key) == 0;
-	});
-
-	if (it != m_properties.end()) {
-		return *it;
+	for (std::size_t i = 0; i < m_properties.size(); i++) {
+		if (strcmp(m_properties.at(i).key, key) == 0) {
+			return m_properties.at(i);
+		}
 	}
 
 	return boost::none;
 }
 
 
-void ParameterizedEvent::update_or_add(const char * key, const EventValue & val)
-{
-	property* existing = find(key);
-	if (existing != nullptr) {
-		existing->value = val;
-	}
-	else {
-		m_properties.emplace_back(key, val);
-	}
-}
-
-
-
-property::property() : key(nullptr), value()
+event_attribute::event_attribute() : key(nullptr), value()
 {
 
 }
 
-property::property(const char* key, const EventValue& val):
+event_attribute::event_attribute(const char* key, EventValue val):
 	key(key),
 	value(val)
 {

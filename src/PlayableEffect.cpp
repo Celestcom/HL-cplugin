@@ -31,9 +31,7 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry&
 	m_released(false)
 {
 	assert(!m_effects.empty());
-
-	std::sort(m_effects.begin(), m_effects.end());
-
+	std::sort(m_effects.begin(), m_effects.end(), cmp_by_time);
 	reset();
 }
 
@@ -49,13 +47,14 @@ PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
 	m_activeDrivers(rhs.m_activeDrivers),
 	m_lastExecutedEffect(m_effects.begin())
 {
-	
+	//std::sort(m_effects.begin(), m_effects.end(), cmp_by_time);
+	//assert(m_effects.at(0)->time() != 1.0f);
+	//reset();
 }
 
 PlayableEffect::~PlayableEffect()
 {
-	//shouldn't have to do this anymore if you call Stop first
-	//if necessary, we go through activeConsumers and stop everything
+	
 }
 
 void PlayableEffect::Play()
@@ -135,12 +134,16 @@ void PlayableEffect::Update(float dt)
 	
 	while (current != m_effects.end()) {
 		if (isTimeExpired(*current)) {
-		
-			//Todo: the following function call is unacceptably slow, and accounts for basically
-			//all of the runtime of this function. About 80 microseconds on average.
-			//This adds up really quickly, and limits the amount of effects that can be updated at once. 
+			BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+				"[Effect " << boost::hash<boost::uuids::uuid>()(m_id) << "] Spawning new event";
 			std::vector<std::string> regions =  extractRegions(*current);
-			
+
+			std::string result = std::accumulate(regions.begin(), regions.end(), std::string("regions= "), [](std::string reg,const auto& region) {
+				reg += region + ", ";
+				return reg;
+			});
+			BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+				"\t " << result;
 			
 			for (const auto& region : regions) {
 				auto consumers = m_registry.GetEventDrivers(region);

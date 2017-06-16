@@ -46,7 +46,9 @@ bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 	m_strength = ev.Get<float>("strength", 1.0f);
 	m_duration = ev.Get<float>("duration", 0.0f);
 	//todo: replace with valid location
-	m_area = ev.Get<int>("area", (int)Location::Error);
+	static_assert(sizeof(int) == 4, "sizeof int should be 4");
+	static_assert(sizeof(uint32_t) == 4, "sizeof uint32_t should be 4");
+	m_area = ev.Get<int>("area", (int)AreaFlag::None);
 	m_requestedEffectFamily = ev.Get<int>("effect", 1);
 	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
 	m_parsedEffectFamily = effect;

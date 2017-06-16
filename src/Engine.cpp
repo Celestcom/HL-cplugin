@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Engine.h"
 #include "Enums.h"
-
+#include <boost/log/support/date_time.hpp>
 #include <boost\bind.hpp>
 #include "EventList.h"
 #include "NSLoader_Internal.h"
@@ -85,7 +85,7 @@ Engine::Engine() :
 	
 
 	setupUserFacingLogSink();
-//	setupFileLogSink(); //not implementing this yet
+	setupFileLogSink(); //not implementing this yet
 
 	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
@@ -114,11 +114,13 @@ void Engine::setupFileLogSink()
 		  keywords::file_name = "nsvr_plugin_%5N.log"
 		, keywords::rotation_size = 5 * 1024 * 1024
 		, keywords::time_based_rotation = sinks::file::rotation_at_time_point(12, 0, 0)
+
 	);
+
 
 	typedef sinks::synchronous_sink<sinks::text_file_backend> sink_t;
 	boost::shared_ptr<sink_t> sink(new sink_t(backend));
-	
+
 	boost::log::core::get()->add_sink(sink);
 
 }
@@ -290,6 +292,9 @@ extractPlayables(const std::vector<ParameterizedEvent>& events) {
 	for (const auto& event : events) {
 		if (auto newPlayable = PlayableEvent::make(event.type())) {
 			if (newPlayable->parse(event)) {
+
+
+
 				playables.push_back(std::move(newPlayable));
 			}
 		}
@@ -309,6 +314,7 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 		return -1;
 	}
 	else {
+		
 		auto a = extractPlayables(list->events());
 		HapticHandle h = m_player.Create(std::move(a));
 		*handle = h;

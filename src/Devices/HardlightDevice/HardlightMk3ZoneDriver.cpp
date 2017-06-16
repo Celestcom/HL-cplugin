@@ -11,9 +11,7 @@ CommandBuffer Hardlight_Mk3_ZoneDriver::update(float dt)
 	auto rtpCommands = m_rtpModel.Update(dt);
 	auto retainedCommands = m_retainedModel.Update(dt);
 
-	if (retainedCommands.size() > 0) {
-		int y = 3;
-	}
+	
 	std::lock_guard<std::mutex> guard(m_mutex);
 
 	CommandBuffer result;
@@ -115,14 +113,13 @@ void Hardlight_Mk3_ZoneDriver::transitionInto(Mode mode)
 
 void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const std::unique_ptr<PlayableEvent>& event)
 {
+
 	const BasicHapticEvent* ptr = dynamic_cast<const BasicHapticEvent*>((event.get()));
 	if (ptr != nullptr) {
 		//problem is in the difference between the data that the Service accepts, and the data that we have. For example, location vs area,
 		//and a .25 duration for BasicHapticEvent which is really a 0 duration for the retained model. 
 		BasicHapticEventData d;
-		d.area = static_cast<uint32_t>(m_area);
-		assert(d.area != (int)Location::Error);
-		assert(m_area != Location::Error);
+		d.area = static_cast<uint32_t>(m_area); //areaFlag at this point
 		d.duration = ptr->duration();
 		d.effect = ptr->effectFamily();
 		d.strength = ptr->strength();

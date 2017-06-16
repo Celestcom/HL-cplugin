@@ -7,7 +7,7 @@
 #include "BasicHapticEvent.h"
 #include <mutex>
 #include "EventRegistry.h"
-
+#include <atomic>
 typedef uint32_t HapticHandle;
 
 //todo: evaluate if this needs a name change.
@@ -53,7 +53,7 @@ private:
 
 	std::unordered_map<HapticHandle, boost::uuids::uuid> m_outsideToInternal;
 
-	uint32_t m_currentHandleId;
+	std::atomic<uint32_t> m_currentHandleId;
 
 	boost::optional<boost::uuids::uuid> findInternalHandle(HapticHandle h); 
 	boost::optional<PlayableEffect&> findExistingPlayable(const boost::uuids::uuid& internalHandle);

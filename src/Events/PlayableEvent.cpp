@@ -28,3 +28,8 @@ PlayableEvent::make(NSVR_EventType type)
 
 
 }
+
+bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs)
+{
+	return lhs->time() < rhs->time();
+}

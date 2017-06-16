@@ -81,17 +81,19 @@ HapticHandle HapticsPlayer::nextHandle()
 {
 	//This will overflow when we exceed the storage of a uint32_t (4 billion). 
 	//Update if this becomes likely: someone playing constant effects 10 times per second on 16 pads for ~300 days.
-	m_currentHandleId += 1;
+	m_currentHandleId++;
 	return HapticHandle(m_currentHandleId);
 }
 
 
 HapticHandle HapticsPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>> events)
 {
+	
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 	HapticHandle handle = nextHandle();
 	boost::uuids::uuid uuid = m_uuidGenerator();
-
+	BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+		"[Player] Creating effect with external handle " << handle;
 	m_outsideToInternal[handle] = uuid;
 	addNewEffect(uuid, std::move(events));
 
@@ -147,7 +149,15 @@ void HapticsPlayer::Update(float dt)
 
 	
 	std::experimental::erase_if(m_effects, [](const auto& effect) {
-		return effect.second.IsReleased() && !effect.second.IsPlaying();
+		bool shouldRemove = effect.second.IsReleased() && !effect.second.IsPlaying();
+		if (shouldRemove) {
+			BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+				"[Player] Deleting effect ";
+			return true;
+		}
+		else {
+			return false;
+		}
 	});
 
 }

@@ -438,8 +438,12 @@ std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 	BasicHapticEvent a;
 	ParameterizedEvent e(NSVR_EventType_BasicHapticEvent);
 	e.SetInt("area", (int)AreaFlag::Chest_Both);
+	e.SetFloat("time", 0.0f);
+	
 	a.parse(e);
 	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
+	e.SetFloat("time", 1.0f);
+	a.parse(e);
 	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
 	return events;
 }
@@ -562,10 +566,35 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 			REQUIRE(player.GetNumLiveEffects() == 0);
 		}
 
-
 	}
 
+	SECTION("When you play an effect, it should .. work") {
+		HardlightDevice device;
+		device.RegisterDrivers(registry);
+		
+		HapticHandle h = player.Create(makePlayables());
+		player.Play(h);
+		player.Update(DELTA_TIME);
+		auto cmds = device.GenerateHardwareCommands(DELTA_TIME);
+		REQUIRE(cmds.size() > 0);
+		REQUIRE(player.GetNumLiveEffects() == 1);
 
+		DisplayResults effects = device.QueryDrivers();
+		REQUIRE(!effects.empty());
+		player.Update(DELTA_TIME);
+		 cmds = device.GenerateHardwareCommands(DELTA_TIME);
+		 REQUIRE(cmds.empty());
+
+		 player.Update(DELTA_TIME*20);
+		 cmds = device.GenerateHardwareCommands(DELTA_TIME*20);
+		 REQUIRE(cmds.size() > 0);
+
+		 player.Update(DELTA_TIME * 20);
+		 cmds = device.GenerateHardwareCommands(DELTA_TIME * 20);
+		 REQUIRE(cmds.empty());
+		 
+
+	}
 	SECTION("The player should be able to handle a lot of handles") {
 		//let me say a reasonable amount of effects active at once is 100. 
 		//With a time update interval of 5 milliseconds, we should be able to perform the creation and

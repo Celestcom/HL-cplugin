@@ -155,13 +155,13 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType
  {
 	
 	return ExceptionGuard([&] {
-	
-		ParameterizedEvent* newEvent = new ParameterizedEvent(type);
-		if (newEvent == nullptr) { 
-			return (NSVR_Result)NSVR_Error_InvalidEventType; 
-		}
 
-		*eventPtr = AS_TYPE(NSVR_Event, newEvent);
+	
+		*eventPtr = AS_TYPE(NSVR_Event, new ParameterizedEvent(type));
+		
+		BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
+			"[Event " << *eventPtr << "] Create ";
+
 		 return (NSVR_Result) NSVR_Success_Unqualified;
 	 });
  }
@@ -169,6 +169,9 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType
 NSVR_RETURN(void) NSVR_Event_Release(NSVR_Event ** eventPtr)
  {
 	ExceptionGuard([&] {
+		BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() 
+			<<"[Event " << *eventPtr << "] Release ";
+
 		delete AS_TYPE(ParameterizedEvent, *eventPtr);
 		*eventPtr = nullptr;
 
@@ -181,6 +184,8 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event * event, const char * ke
 	 RETURN_IF_NULL(event);
 
 	 return ExceptionGuard([&] {
+		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
+			 "[Event " << event << "] SetFloat  " << key << " to " << value;
 		 return AS_TYPE(ParameterizedEvent, event)->SetFloat(key, value);
 	 });
  }
@@ -190,6 +195,9 @@ NSVR_RETURN(NSVR_Result)NSVR_Event_SetInteger(NSVR_Event * event, const char * k
 	 RETURN_IF_NULL(event);
 
 	 return ExceptionGuard([&] {
+		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+			 "[Event " << event << "] SetInteger  " << key << " to " << value;
+
 		 return AS_TYPE(ParameterizedEvent, event)->SetInt(key, value);
 	 });
  }
@@ -198,7 +206,11 @@ NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr)
  {
 
 	 return ExceptionGuard([&] {
+
 		 *timelinePtr = AS_TYPE(NSVR_Timeline, new EventList());
+		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+			 "[Timeline " << *timelinePtr << "] Create";
+
 		 return NSVR_Success_Unqualified;
 	 });
  }
@@ -208,6 +220,9 @@ NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr)
 NSVR_RETURN(void) NSVR_Timeline_Release(NSVR_Timeline ** listPtr)
  {
 	ExceptionGuard([&] {
+		BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+			"[Timeline " << *listPtr << "] Release";
+
 		delete AS_TYPE(EventList, *listPtr);
 		*listPtr = nullptr;
 
@@ -221,6 +236,9 @@ NSVR_RETURN(NSVR_Result) NSVR_Timeline_AddEvent(NSVR_Timeline * list, NSVR_Event
 	 RETURN_IF_NULL(event);
 
 	 return ExceptionGuard([&] {
+		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
+			 "[Timeline " << list << "] AddEvent " << event;
+
 		return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(ParameterizedEvent, event));
 	 });
  }
@@ -232,12 +250,17 @@ NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSV
 	 RETURN_IF_NULL(handlePtr);
 
 	 return ExceptionGuard([&] {
+
 		 auto engine = AS_TYPE(Engine, systemPtr);
 		 auto timeline = AS_TYPE(EventList, timelinePtr);
 		 auto handle = AS_TYPE(PlaybackHandle, handlePtr);
 
-		
+		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+			 "[Timeline " << timelinePtr << "] Transmit to handle " << handle;
+
 		 if (handle->handle != 0) {
+			 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+				 "[Timeline " << timelinePtr << "] (releasing previous handle) " << handle;
 			 engine->ReleaseHandle(handle->handle);
 		 }
 		
@@ -253,6 +276,9 @@ NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_Create(NSVR_PlaybackHandle ** handl
 
 	 return ExceptionGuard([&] {
 		 *handlePtr = AS_TYPE(NSVR_PlaybackHandle, new PlaybackHandle());
+		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+			 "[Handle " << *handlePtr << "] Create";
+
 		 return NSVR_Success_Unqualified;
 	 });
 
@@ -266,6 +292,8 @@ NSVR_RETURN(NSVR_Result)NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle * handle
 	 RETURN_IF_NULL(handlePtr);
 
 	 return ExceptionGuard([&] {
+		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+			 "[Handle " << handlePtr << "] Command " << command;
 		return AS_TYPE(PlaybackHandle, handlePtr)->Command(command);
 	 });
  }
@@ -273,7 +301,8 @@ NSVR_RETURN(NSVR_Result)NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle * handle
 NSVR_RETURN(void) NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr)
  {
 	ExceptionGuard([&] {
-
+		BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+			"[Handle " << *handlePtr << "] Release";
 		delete AS_TYPE(PlaybackHandle, *handlePtr);
 		*handlePtr = nullptr;
 

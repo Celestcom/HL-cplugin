@@ -10,6 +10,9 @@ LiveBasicHapticEvent::LiveBasicHapticEvent() :
 	isPlaying(false),
 	eventData()
 {
+	if (std::abs(eventData.duration - 0.25f) <= 0.001f) {
+		eventData.duration = 0;
+	}
 }
 
 LiveBasicHapticEvent::LiveBasicHapticEvent(boost::uuids::uuid parentId, boost::uuids::uuid uniqueId, BasicHapticEventData data) :
