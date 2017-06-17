@@ -17,6 +17,7 @@ typedef enum NSVR_SuccessTypes_ NSVR_SuccessTypes;
 
 typedef enum NSVR_ErrorTypes_ NSVR_ErrorTypes;
 
+typedef enum NSVR_EventType_ NSVR_EventType;
 
 typedef enum NSVR_PlaybackCommand_ NSVR_PlaybackCommand;
 

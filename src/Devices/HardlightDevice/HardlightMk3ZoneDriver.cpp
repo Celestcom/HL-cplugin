@@ -2,27 +2,8 @@
 #include "HardlightMk3ZoneDriver.h"
 #include "Locator.h"
 #include "NSLoader.h"
+#include "BasicHapticEvent.h"
 
-
-
-class BasicHapticEventCreator : public boost::static_visitor<LiveBasicHapticEvent> {
-private:
-	//Main ID of the effect
-	boost::uuids::uuid m_parentId;
-	Location m_area;
-	boost::uuids::uuid m_uniqueId;
-public:
-	BasicHapticEventCreator(boost::uuids::uuid id, boost::uuids::uuid unique_id, Location area) : m_parentId(id), m_uniqueId(unique_id), m_area(area) {}
-
-	LiveBasicHapticEvent operator()(const BasicHapticEvent& hapticEvent) const {
-		BasicHapticEventData data;
-		data.area = static_cast<uint32_t>(m_area);
-		data.duration = hapticEvent.Duration;
-		data.strength = hapticEvent.Strength;
-		data.effect = hapticEvent.RequestedEffectFamily;
-		return LiveBasicHapticEvent(m_parentId, m_uniqueId, data);
-	}
-};
 
 CommandBuffer Hardlight_Mk3_ZoneDriver::update(float dt)
 {
@@ -30,6 +11,7 @@ CommandBuffer Hardlight_Mk3_ZoneDriver::update(float dt)
 	auto rtpCommands = m_rtpModel.Update(dt);
 	auto retainedCommands = m_retainedModel.Update(dt);
 
+	
 	std::lock_guard<std::mutex> guard(m_mutex);
 
 	CommandBuffer result;
@@ -129,12 +111,23 @@ void Hardlight_Mk3_ZoneDriver::transitionInto(Mode mode)
 	//}
 }
 
-void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const SuitEvent & event)
+void Hardlight_Mk3_ZoneDriver::createRetained(boost::uuids::uuid handle, const std::unique_ptr<PlayableEvent>& event)
 {
 
-	m_retainedModel.Put(boost::apply_visitor(BasicHapticEventCreator(handle, m_gen(), m_area), event));
+	const BasicHapticEvent* ptr = dynamic_cast<const BasicHapticEvent*>((event.get()));
+	if (ptr != nullptr) {
+		//problem is in the difference between the data that the Service accepts, and the data that we have. For example, location vs area,
+		//and a .25 duration for BasicHapticEvent which is really a 0 duration for the retained model. 
+		BasicHapticEventData d;
+		d.area = static_cast<uint32_t>(m_area); //areaFlag at this point
+		d.duration = ptr->duration();
+		d.effect = ptr->effectFamily();
+		d.strength = ptr->strength();
+		
+		m_retainedModel.Put(LiveBasicHapticEvent(handle, m_gen(), std::move(d)));
+		transitionInto(Mode::Retained);
 
-	transitionInto(Mode::Retained);
+	}
 
 }
 

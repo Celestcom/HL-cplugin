@@ -78,6 +78,7 @@ extern "C" {
 
 	typedef enum NSVR_EventType_ {
 		NSVR_EventType_BasicHapticEvent = 1,
+		NSVR_EventType_CurveHapticEvent = 2,
 		NSVR_EventType_Max = 65535
 	} NSVR_EventType;
 
@@ -121,6 +122,9 @@ extern "C" {
 	//Returns true if a suit is plugged in and the service is running, else false
 	NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System* systemPtr, NSVR_ServiceInfo* infoPtr);
 
+	//note:
+	//Should rename to NSVR_System_Haptics_Suspend
+	//Should rename to NSVR_System_Haptics_Resume
 	/* Haptics engine */ 
 	NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Pause(NSVR_System* ptr);
 	NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Resume(NSVR_System* ptr);

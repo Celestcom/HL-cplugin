@@ -65,15 +65,15 @@ CommandBuffer MotorStateChanger::transitionToOneshot(BasicHapticEventData data)
 	switch (currentState) {
 	case MotorFirmwareState::Idle:
 		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateHalt(area));
-		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(data));
+		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(area, data));
 		break;
 	case MotorFirmwareState::PlayingOneshot:
 		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateHalt(area));
-		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(data));
+		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(area, data));
 		break;
 	case MotorFirmwareState::PlayingContinuous:
 		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateHalt(area));
-		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(data));
+		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateOneshotPlay(area, data));
 		break;
 	}
 
@@ -90,13 +90,13 @@ CommandBuffer MotorStateChanger::transitionToContinuous(BasicHapticEventData dat
 	CommandBuffer requiredCmds;
 	switch (currentState) {
 	case MotorFirmwareState::Idle:
-		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateContinuousPlay(data));
+		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateContinuousPlay(area, data));
 		break;
 	case MotorFirmwareState::PlayingOneshot:
-		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateContinuousPlay(data));
+		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateContinuousPlay(area, data));
 		break;
 	case MotorFirmwareState::PlayingContinuous:
-		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateContinuousPlay(data));
+		requiredCmds.push_back(Hardlight_Mk3_Firmware::generateContinuousPlay(area, data));
 		break;
 	}
 

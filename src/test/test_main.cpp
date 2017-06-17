@@ -5,13 +5,25 @@
 #include "../Devices/HardlightDevice/HardlightDevice.h"
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid.hpp>
+#include "../EventRegistry.h"
+#include "../HapticsPlayer.h"
+#include <functional>
+#include <chrono>
+
+template<typename T>
+T time(std::function<void()> fn) {
+	auto then = std::chrono::high_resolution_clock::now();
+	fn();
+	auto now = std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - then);
+	return now;
+}
 
 boost::uuids::random_generator idGenerator;
 const float DELTA_TIME = 0.05f;
 
 LiveBasicHapticEvent makeOneshot() {
 	BasicHapticEventData data;
-	data.area = (uint32_t)AreaFlag::Chest_Left;
+	data.area = 10;
 	data.duration = 0.0;
 	data.effect = 666;
 	data.strength = 1.0;
@@ -21,7 +33,7 @@ LiveBasicHapticEvent makeOneshot() {
 
 LiveBasicHapticEvent makeCont(float duration) {
 	BasicHapticEventData data;
-	data.area = (uint32_t)AreaFlag::Chest_Left;
+	data.area = 10;
 	data.duration = duration;
 	data.effect = 555;
 	data.strength = 0.5;
@@ -58,10 +70,10 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 	}
 
 	SECTION("Continuous play should stop and start at the correct times") {
-		model.Put(makeCont(0.2));
+		model.Put(makeCont(0.2f));
 		auto startCommands = model.Update(DELTA_TIME);
 		auto potentialStops = model.Update(DELTA_TIME * 3);
-		auto stopCommands = model.Update(DELTA_TIME + .001);
+		auto stopCommands = model.Update(DELTA_TIME + .001f);
 		REQUIRE(startCommands.size() == 1);
 		REQUIRE(isContCommand(startCommands.at(0)));
 
@@ -90,9 +102,9 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 	}
 
 	SECTION("Continuous play should be removed after it generates commands") {
-		model.Put(makeCont(0.1));
+		model.Put(makeCont(0.1f));
 		model.Update(DELTA_TIME);
-		model.Update(DELTA_TIME * 2 + .01);
+		model.Update(DELTA_TIME * 2.f + .01f);
 		REQUIRE(activeEvents.empty());
 	}
 
@@ -109,7 +121,7 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 	}
 
 	SECTION("A continuous should cease generating commands after it has played") {
-		model.Put(makeCont(0.1));
+		model.Put(makeCont(0.1f));
 		model.Update(DELTA_TIME);
 		model.Update(DELTA_TIME * 2);
 		auto c1 = model.Update(DELTA_TIME);
@@ -216,15 +228,15 @@ TEST_CASE("The zone model works", "[ZoneModel]") {
 		}
 
 		SECTION("A short-running cont should yield to a longer running cont when it is finished") {
-			auto bottomLayer = makeCont(1.0);
-			auto topLayer = makeCont(0.1);
+			auto bottomLayer = makeCont(1.0f);
+			auto topLayer = makeCont(0.1f);
 
 			model.Put(bottomLayer);
 			model.Update(DELTA_TIME);
 			model.Put(topLayer);
 
 			auto ignoreTopPlayCommands = model.Update(DELTA_TIME);
-			auto commands = model.Update(DELTA_TIME * 2 + .01);
+			auto commands = model.Update(DELTA_TIME * 2.f + .01f);
 
 			REQUIRE(commands.size() == 1);
 			REQUIRE(isContCommand(commands.at(0)));
@@ -419,6 +431,187 @@ TEST_CASE("The motor state changer works", "[MotorStateChanger]") {
 	}
 
 }
+
+
+std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
+	std::vector<std::unique_ptr<PlayableEvent>> events;
+	BasicHapticEvent a;
+	ParameterizedEvent e(NSVR_EventType_BasicHapticEvent);
+	e.SetInt("area", (int)AreaFlag::Chest_Both);
+	e.SetFloat("time", 0.0f);
+	
+	a.parse(e);
+	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
+	e.SetFloat("time", 1.0f);
+	a.parse(e);
+	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
+	return events;
+}
+TEST_CASE("The haptics player works", "[HapticsPlayer]") {
+	EventRegistry registry;
+	HapticsPlayer player(registry);
+
+	REQUIRE(player.GetNumLiveEffects() == 0);
+	REQUIRE(player.GetNumReleasedEffects() == 0);
+
+
+	SECTION("Retrieving a nonexistent handle shouldn't crash") {
+		HapticHandle randomlyChosen = 1245;
+		REQUIRE_NOTHROW([&]() {
+			auto handle = player.GetHandleInfo(randomlyChosen);
+			REQUIRE(!handle);
+		});
+		
+	}
+
+	SECTION("Creating an effect should work, and the effect should be not be playing by default") {
+		HapticHandle h = player.Create(makePlayables());
+		
+		REQUIRE(player.GetNumLiveEffects() == 1);
+
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(!info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(0.0f));
+	}
+
+	SECTION("Pausing an effect should work") {
+		HapticHandle h = player.Create(makePlayables());
+		
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(info->Duration() > DELTA_TIME);
+
+		player.Play(h);
+		player.Update(DELTA_TIME);
+		player.Pause(h);
+
+		info = player.GetHandleInfo(h);
+		REQUIRE(!info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME));
+	}
+
+	SECTION("Stopping an effect should work") {
+		HapticHandle h = player.Create(makePlayables());
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(info->Duration() > DELTA_TIME);
+
+		player.Play(h);
+		player.Update(DELTA_TIME);
+		player.Stop(h);
+
+		info = player.GetHandleInfo(h);
+		REQUIRE(!info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(0.0f));
+	}
+
+	SECTION("Resuming an effect should work") {
+		HapticHandle h = player.Create(makePlayables());
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(info->Duration() > DELTA_TIME);
+
+		player.Play(h);
+		player.Update(DELTA_TIME);
+		player.Pause(h);
+		player.Update(DELTA_TIME * 10);
+		player.Play(h);
+		player.Update(DELTA_TIME);
+
+		info = player.GetHandleInfo(h);
+		REQUIRE(info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME * 2));
+	}
+
+	SECTION("An effect should stop after reaching its duration") {
+		HapticHandle h = player.Create(makePlayables());
+
+		auto info = player.GetHandleInfo(h);
+		REQUIRE(info->Duration() > DELTA_TIME);
+
+
+		player.Play(h);
+		player.Update(info->Duration() + DELTA_TIME);
+		info = player.GetHandleInfo(h);
+		REQUIRE(!info->Playing());
+		REQUIRE(info->CurrentTime() == Approx(0.0f));
+	}
+
+	SECTION("Releasing an effect should work") {
+		HapticHandle h = player.Create(makePlayables());
+		player.Release(h);
+		REQUIRE(player.GetNumLiveEffects() == 0);
+		REQUIRE(player.GetNumReleasedEffects() == 1);
+		
+	}
+
+	SECTION("A released effect should be cleaned up properly") {
+		HapticHandle h = player.Create(makePlayables());
+
+		SECTION("If it was playing at the time of release, it should not be deleted until it is done playing") {
+			player.Play(h);
+			auto duration = player.GetHandleInfo(h)->Duration();
+			player.Release(h);
+			player.Update(DELTA_TIME);
+			REQUIRE(player.GetNumReleasedEffects() == 1);
+			player.Update(DELTA_TIME);
+			REQUIRE(player.GetNumReleasedEffects() == 1);
+
+			player.Update(duration + DELTA_TIME);
+			REQUIRE(player.GetNumLiveEffects() == 0);
+			REQUIRE(player.GetNumReleasedEffects() == 0);
+		}
+
+		SECTION("If it was not playing at time of release, it should be deleted in the next update") {
+			player.Release(h);
+			player.Update(DELTA_TIME);
+			REQUIRE(player.GetNumReleasedEffects() == 0);
+			REQUIRE(player.GetNumLiveEffects() == 0);
+		}
+
+
+		
+
+	}
+
+	SECTION("When you play an effect, it should .. work") {
+		HardlightDevice device;
+		device.RegisterDrivers(registry);
+		
+		HapticHandle h = player.Create(makePlayables());
+		player.Play(h);
+		player.Update(DELTA_TIME);
+		auto cmds = device.GenerateHardwareCommands(DELTA_TIME);
+		REQUIRE(cmds.size() > 0);
+		REQUIRE(player.GetNumLiveEffects() == 1);
+
+		DisplayResults effects = device.QueryDrivers();
+		REQUIRE(!effects.empty());
+		player.Update(DELTA_TIME);
+		 cmds = device.GenerateHardwareCommands(DELTA_TIME);
+		 REQUIRE(cmds.empty());
+
+		 player.Update(DELTA_TIME*20);
+		 cmds = device.GenerateHardwareCommands(DELTA_TIME*20);
+		 REQUIRE(cmds.size() > 0);
+
+		 player.Update(DELTA_TIME * 20);
+		 cmds = device.GenerateHardwareCommands(DELTA_TIME * 20);
+		 REQUIRE(cmds.empty());
+		 
+
+	}
+	
+
+	
+
+
+	
+	
+		
+	
+
+}
+
+
+
 
 
 int main(int argc, char* argv[]) {

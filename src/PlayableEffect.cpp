@@ -3,60 +3,88 @@
 #include "Locator.h"
 #include <iostream>
 #include "BasicHapticEvent.h"
-#include "PriorityModel.h"
 #include "NSLoader.h"
 #include <memory>
 #include <iterator>
+#include <numeric>
+#include <bitset>
+#include <array>
 
-namespace NS {
-	namespace Playable {
-		void Restart(IPlayable& playable) {
-			playable.Stop();
-			playable.Play();
-		}
-	}
+#include <functional>
+#include <chrono>
+
+template<typename T>
+T time(std::function<void()> fn) {
+	auto then = std::chrono::high_resolution_clock::now();
+	fn();
+	auto now = std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - then);
+	return now;
 }
 
 
-struct time_sorter {
-	bool operator()(const SuitEvent& lhs, const SuitEvent& rhs) {
-		auto visitor = TimeOffsetVisitor();
-		float t1 = boost::apply_visitor(visitor, lhs);
-		float t2 = boost::apply_visitor(visitor, rhs);
-		return t1 < t2;
-	}
-};
-PlayableEffect::PlayableEffect(std::vector<SuitEvent> effects,EventRegistry& reg, boost::uuids::random_generator& uuid) :
-	_effects(std::move(effects)),
-	_state(PlaybackState::IDLE),
+PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry& reg, boost::uuids::random_generator& uuid) :
+	m_effects(std::move(effects)),
+	m_state(PlaybackState::IDLE),
 	m_registry(reg),
-	_id(uuid())
+	m_id(uuid()),
+	m_time(0),
+	m_released(false)
 {
-	assert(!_effects.empty());
+	assert(!m_effects.empty());
 
-	std::sort(_effects.begin(), _effects.end(), time_sorter());
+	sortByTime(m_effects);
+
+	//It is unclear if this de-duplication should happen at all, or if it should
+	//happen at a higher level. It feels wrong to iterate over thousands of duplicates when
+	//the lower level will be forced to wipe them out. 
+
+	pruneDuplicates(m_effects);
 
 	reset();
 }
 
+void PlayableEffect::sortByTime(std::vector<PlayablePtr>& playables)
+{
+	std::sort(playables.begin(), playables.end(), cmp_by_time);
+}
 
+
+void PlayableEffect::pruneDuplicates(std::vector<PlayablePtr>& playables) {
+	
+	auto last = std::unique(playables.begin(), playables.end(), cmp_by_duplicate);
+	playables.erase(last, playables.end());
+	playables.shrink_to_fit();
+}
+
+
+
+PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
+	m_effects(std::move(rhs.m_effects)),
+	m_state(rhs.m_state),
+	m_registry(rhs.m_registry),
+	m_id(rhs.m_id),
+	m_time(rhs.m_time),
+	m_released(rhs.m_released),
+	m_activeDrivers(rhs.m_activeDrivers),
+	m_lastExecutedEffect(m_effects.begin())
+{
+	
+}
 
 PlayableEffect::~PlayableEffect()
 {
-	//shouldn't have to do this anymore if you call Stop first
-	//if necessary, we go through activeConsumers and stop everything
+	
 }
 
 void PlayableEffect::Play()
 {
-	switch (_state) {
+	switch (m_state) {
 	case PlaybackState::IDLE:
-	//	reset();
-		_state = PlaybackState::PLAYING;
+		m_state = PlaybackState::PLAYING;
 		break;
 	case PlaybackState::PAUSED:
 		resume();
-		_state = PlaybackState::PLAYING;
+		m_state = PlaybackState::PLAYING;
 		break;
 	case PlaybackState::PLAYING:
 		//remain in playing state
@@ -70,17 +98,17 @@ void PlayableEffect::Play()
 void PlayableEffect::Stop()
 {
 
-	switch (_state) {
+	switch (m_state) {
 		case PlaybackState::IDLE:
 			//remain in idle state
 			break;
 		case PlaybackState::PAUSED:
 			reset();
-			_state = PlaybackState::IDLE;
+			m_state = PlaybackState::IDLE;
 			break;
 		case PlaybackState::PLAYING:
 			reset();
-			_state = PlaybackState::IDLE;
+			m_state = PlaybackState::IDLE;
 			break;
 		default:
 			break;
@@ -89,7 +117,7 @@ void PlayableEffect::Stop()
 
 void PlayableEffect::Pause()
 {
-	switch (_state) {
+	switch (m_state) {
 	case PlaybackState::IDLE:
 		//remain in idle state
 		break;
@@ -98,7 +126,7 @@ void PlayableEffect::Pause()
 		break;
 	case PlaybackState::PLAYING:
 		pause();
-		_state = PlaybackState::PAUSED;
+		m_state = PlaybackState::PAUSED;
 		break;
 	default:
 		break;
@@ -110,45 +138,56 @@ void PlayableEffect::Pause()
 
 void PlayableEffect::Update(float dt)
 {
-	if (_state == PlaybackState::IDLE || _state == PlaybackState::PAUSED) {
+	if (m_state == PlaybackState::IDLE || m_state == PlaybackState::PAUSED) {
 		return;
 	}
 
-	_time += dt;
+	m_time += dt;
 	
-	auto current(_lastExecutedEffect);
-	//this visitor returns true if the event is expired and should be executed
-	EventVisitor isTimeExpired(_time);
+	auto current(m_lastExecutedEffect);
+
+	auto isTimeExpired = [this](const PlayablePtr& event) {
+		return event->time() <= m_time;
+	};
 
 	
+	while (current != m_effects.end()) {
+		if (isTimeExpired(*current)) {
+			BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+				"[Effect " << boost::hash<boost::uuids::uuid>()(m_id) << "] Spawning new event";
+			std::vector<std::string> regions =  extractRegions(*current);
 
-	
-	while (current != _effects.end()) {
-		if (boost::apply_visitor(isTimeExpired, *current)) {
-			//region = *current->region;
-			std::vector<std::string> regions = boost::apply_visitor(RegionVisitor(), *current);
+			std::string result = std::accumulate(regions.begin(), regions.end(), std::string("regions= "), [](std::string reg,const auto& region) {
+				reg += region + ", ";
+				return reg;
+			});
+			BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+				"\t " << result;
+			
 			for (const auto& region : regions) {
-				auto consumers = m_registry.GetEventDrivers(region); //placeholder
+				auto consumers = m_registry.GetEventDrivers(region);
 				if (consumers) {
 					//need translator from registry's leaves to area flags for backwards compat?
 					std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
-
-						consumer->createRetained(_id, *current);
+						assert(current->get()->area() != 0);
+							consumer->createRetained(m_id, *current);
 						m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
 					});
 				}
 			}
+				
 			std::advance(current, 1);
 		}
 		else {
-			
+			//precondition: this requires that the effects vector was sorted by time.
+			//Given that, we can stop here because if it wasn't expired, then the next won't be either
 			break;
 		}
 	}
 
-	_lastExecutedEffect = current;
+	m_lastExecutedEffect = current;
 
-	if (_time >= GetTotalPlayTime()) {
+	if (m_time >= GetTotalDuration()) {
 		Stop();
 	}
 
@@ -156,49 +195,51 @@ void PlayableEffect::Update(float dt)
 
 
 
-float PlayableEffect::GetTotalPlayTime() const
+float PlayableEffect::GetTotalDuration() const
 {
-	TotalPlaytimeVisitor playtimeCounter;
-	std::for_each(_effects.begin(), _effects.end(), boost::apply_visitor(playtimeCounter));
-	return playtimeCounter.TotalPlaytime();
+	return std::accumulate(m_effects.begin(), m_effects.end(), 0.0f, [](float currentDuration, const auto& effect) {
+		float thisEffectEndTime = std::max(0.0f, effect->duration() + effect->time());
+		return std::max(currentDuration, thisEffectEndTime);
+	});
 
 }
 
 float PlayableEffect::CurrentTime() const
 {
-	return _time;
+	return m_time;
 }
 
 bool PlayableEffect::IsPlaying() const
 {
-	return _state == PlaybackState::PLAYING;
+	return m_state == PlaybackState::PLAYING;
+}
+
+bool PlayableEffect::IsReleased() const
+{
+	return m_released;
 }
 
 PlayableInfo PlayableEffect::GetInfo() const
 {
-	return PlayableInfo(GetTotalPlayTime(), _time, _state == PlaybackState::PLAYING);
+	return PlayableInfo(GetTotalDuration(), m_time, m_state == PlaybackState::PLAYING);
 }
 
 void PlayableEffect::Release()
 {
-	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
-		if (auto p = hd.lock()) {
-			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
-		} else  {
-			//the driver was removed, probably physically, so we don't need to worry about it
-		}
-	});
+	m_released = true;
+
+	
 }
 
 void PlayableEffect::reset()
 {
-	_time = 0;
-	_lastExecutedEffect = _effects.begin();
+	m_time = 0;
+	m_lastExecutedEffect = m_effects.begin();
 	
 
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
 		if (auto p = hd.lock()){
-			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
+			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
 		}
 		else {
 			//the driver was removed, probably physically, so we don't need to worry about it
@@ -210,7 +251,7 @@ void PlayableEffect::pause()
 {
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
 		if (auto p = hd.lock()) {
-			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Pause);
+			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Pause);
 		}
 		else {
 			//the driver was removed, probably physically, so we don't need to worry about it
@@ -224,7 +265,7 @@ void PlayableEffect::resume() {
 
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
 		if (auto p = hd.lock()) {
-			p->controlRetained(_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Play);
+			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Play);
 		}
 		else {
 			//the driver was removed, probably physically, so we don't need to worry about it
@@ -234,84 +275,119 @@ void PlayableEffect::resume() {
 
 
 
-EventVisitor::EventVisitor(float time):m_time(time)
-{
-
-}
-
-TotalPlaytimeVisitor::TotalPlaytimeVisitor():
-	m_totalPlaytime(0), 
-	m_fudgeFactor(0.25f)
-{
-}
-
-float TotalPlaytimeVisitor::TotalPlaytime()
-{
-	return m_totalPlaytime;
-}
-
 RegionVisitor::RegionVisitor()
 {
 }
-#define START_BITMASK_SWITCH(x) \
-for (uint32_t bit = 1; x >= bit; bit *=2) if (x & bit) switch(AreaFlag(bit))
 
-std::vector<std::string> RegionVisitor::operator()(const BasicHapticEvent & event) const
+
+std::array<std::string, 32> regionmap = {
+
+	"left_forearm",
+	"left_upper_arm",
+	"left_shoulder",
+	"left_back",
+	"left_upper_chest",
+	"left_upper_ab",
+	"left_mid_ab",
+	"left_lower_ab",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"right_forearm",
+	"right_upper_arm",
+	"right_shoulder",
+	"right_back",
+	"right_upper_chest",
+	"right_upper_ab",
+	"right_mid_ab",
+	"right_lower_ab",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved",
+	"reserved"
+};
+	
+
+
+std::vector<std::string> extractRegions(const PlayablePtr & event) 
 {
-	auto translator = Locator::getTranslator();
+	auto& translator = Locator::getTranslator();
 	std::vector<std::string> regions;
-	START_BITMASK_SWITCH(event.Area) {
-		case AreaFlag::Forearm_Left:
-			regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Left));
-			break;
-		case AreaFlag::Upper_Arm_Left:
-			regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Left));
-			break;
-		case AreaFlag::Shoulder_Left:
-			regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Left));
-			break;
-		case AreaFlag::Back_Left:
-			regions.push_back(translator.ToRegionString(AreaFlag::Back_Left));
-			break;
-		case AreaFlag::Chest_Left:
-			regions.push_back(translator.ToRegionString(AreaFlag::Chest_Left));
-			break;
-		case AreaFlag::Upper_Ab_Left:
-			regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Left));
-			break;
-		case AreaFlag::Mid_Ab_Left:
-			regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Left));
-			break;
-		case AreaFlag::Lower_Ab_Left:
-			regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Left));
-			break;
-		case AreaFlag::Forearm_Right:
-			regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Right));
-			break;
-		case AreaFlag::Upper_Arm_Right:
-			regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Right));
-			break;
-		case AreaFlag::Shoulder_Right:
-			regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Right));
-			break;
-		case AreaFlag::Back_Right:
-			regions.push_back(translator.ToRegionString(AreaFlag::Back_Right));
-			break;
-		case AreaFlag::Chest_Right:
-			regions.push_back(translator.ToRegionString(AreaFlag::Chest_Right));
-			break;
-		case AreaFlag::Upper_Ab_Right:
-			regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Right));
-			break;
-		case AreaFlag::Mid_Ab_Right:
-			regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Right));
-			break;
-		case AreaFlag::Lower_Ab_Right:
-			regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Right));
-			break;
-		default:
-			break;
+	uint32_t area = event->area();
+	std::bitset<32> areas(area);
+	for (std::size_t i = 0; i < areas.size(); i++) {
+		if (areas.test(i)) {
+			regions.push_back(regionmap[i]);
+		}
 	}
-
+	/*
+	for (uint32_t bit = 1; area >= bit; bit *= 2)
+	{
+		if (area & bit) {
+			switch (AreaFlag(bit)) {
+			case AreaFlag::Forearm_Left:
+				regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Left));
+				break;
+			case AreaFlag::Upper_Arm_Left:
+				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Left));
+				break;
+			case AreaFlag::Shoulder_Left:
+				regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Left));
+				break;
+			case AreaFlag::Back_Left:
+				regions.push_back(translator.ToRegionString(AreaFlag::Back_Left));
+				break;
+			case AreaFlag::Chest_Left:
+				regions.push_back(translator.ToRegionString(AreaFlag::Chest_Left));
+				break;
+			case AreaFlag::Upper_Ab_Left:
+				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Left));
+				break;
+			case AreaFlag::Mid_Ab_Left:
+				regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Left));
+				break;
+			case AreaFlag::Lower_Ab_Left:
+				regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Left));
+				break;
+			case AreaFlag::Forearm_Right:
+				regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Right));
+				break;
+			case AreaFlag::Upper_Arm_Right:
+				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Right));
+				break;
+			case AreaFlag::Shoulder_Right:
+				regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Right));
+				break;
+			case AreaFlag::Back_Right:
+				regions.push_back(translator.ToRegionString(AreaFlag::Back_Right));
+				break;
+			case AreaFlag::Chest_Right:
+				regions.push_back(translator.ToRegionString(AreaFlag::Chest_Right));
+				break;
+			case AreaFlag::Upper_Ab_Right:
+				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Right));
+				break;
+			case AreaFlag::Mid_Ab_Right:
+				regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Right));
+				break;
+			case AreaFlag::Lower_Ab_Right:
+				regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Right));
+				break;
+			default:
+				break;
+			}
+		}
+	}
+	*/
 	return regions;
 }
+

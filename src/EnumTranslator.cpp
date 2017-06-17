@@ -3,6 +3,20 @@
 
 #include <boost/assign/list_of.hpp>
 #include <boost/assign/list_inserter.hpp>
+
+
+#include <functional>
+#include <chrono>
+
+template<typename T>
+T time(std::function<void()> fn) {
+	auto then = std::chrono::high_resolution_clock::now();
+	fn();
+	auto now = std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - then);
+	return now;
+}
+
+
 template<typename T> struct map_init_helper
 {
 	T& data;

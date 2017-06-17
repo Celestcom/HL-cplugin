@@ -1,18 +1,38 @@
 #include "StdAfx.h"
 #include "HapticsPlayer.h"
-#include "HapticEvent.h"
 #include <boost/range/algorithm.hpp>
 #include <boost/range/adaptors.hpp>
+#include <experimental/vector>
+#include <experimental/unordered_map>
+#include <numeric>
 #include "PlayableEffect.h"
+
+#include <functional>
+#include <chrono>
+
+template<typename T>
+T time(std::function<void()> fn) {
+	auto then = std::chrono::high_resolution_clock::now();
+	fn();
+	auto now = std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - then);
+	return now;
+}
+
+
 using namespace std;
 
 
 HapticsPlayer::HapticsPlayer(EventRegistry& registry):
-	_paused(false),
-	m_effectsMutex(),
-	m_registry(registry)
-{
-	
+	m_playerPaused(false),
+	m_effectsLock(),
+	m_registry(registry),
+	m_hasher(),
+	m_frozenEffects(),
+	m_effects(),
+	m_outsideToInternal(),
+	m_uuidGenerator(),
+	m_currentHandleId(0)
+{	
 }
 
 HapticsPlayer::~HapticsPlayer()
@@ -21,223 +41,187 @@ HapticsPlayer::~HapticsPlayer()
 
 void HapticsPlayer::Play(HapticHandle hh)
 {
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
-
-	if (auto effect = toInternalUUID(hh)) {
-		effect.get().Play();
+	std::lock_guard<std::mutex> guard(m_effectsLock);
+	if (auto effect = findExistingPlayable(hh)) {
+		effect->Play();
 	}
 }
 
 void HapticsPlayer::Pause(HapticHandle hh)
 {
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
-
-	if (auto effect = toInternalUUID(hh)) {
-		effect.get().Pause();
+	std::lock_guard<std::mutex> guard(m_effectsLock);
+	if (auto effect = findExistingPlayable(hh)) {
+		effect->Pause();
 	}
 }
 
-void HapticsPlayer::Restart(HapticHandle hh)
-{
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
 
-	if (auto effect = toInternalUUID(hh)) {
-		NS::Playable::Restart(effect.get());
-	}
-}
 
 void HapticsPlayer::Stop(HapticHandle hh)
 {
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
-
-	if (auto effect = toInternalUUID(hh)) {
-		effect.get().Stop();
+	std::lock_guard<std::mutex> guard(m_effectsLock);
+	if (auto effect = findExistingPlayable(hh)) {
+		effect->Stop();
 	}
 }
 
 
-void HapticsPlayer::Release(HapticHandle hh)
+
+void HapticsPlayer::Release(HapticHandle h)
 {
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
+	std::lock_guard<std::mutex> guard(m_effectsLock);
 	
-
-	//std::cout << "Got a new handle to release\n";
-
-	if (_outsideHandleToUUID.find(hh) != _outsideHandleToUUID.end()) {
-		auto h = _outsideHandleToUUID.at(hh);
-
-		auto it = _effects.find(uuid_hasher(h));
-		if (it != _effects.end()) {
-			_releasedEffects.push_back(Released(h));
-		}
-		else {
-			//std::cout << "Tried to release a handle that I never had in the first place\n";
-		}
-
-		_outsideHandleToUUID.erase(_outsideHandleToUUID.find(hh));
+	if (auto effect = findExistingPlayable(h)) {
+		effect->Release();
+		m_outsideToInternal.erase(m_outsideToInternal.find(h));
 	}
 }
 
-void HapticsPlayer::Create(HapticHandle h, std::vector<SuitEvent> decoded)
+HapticHandle HapticsPlayer::nextHandle()
 {
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
-
-	if (_outsideHandleToUUID.find(h) != _outsideHandleToUUID.end()) {
-		auto id = _outsideHandleToUUID[h];
-		_effects[uuid_hasher(id)]->Stop();
-		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), m_registry, _uuidGen));
-
-	}
-	else {
-		auto id = _uuidGen();
-
-		_outsideHandleToUUID[h] = id;
-
-		_effects[uuid_hasher(id)] = std::unique_ptr<IPlayable>(new PlayableEffect(std::move(decoded), m_registry, _uuidGen));
-	}
-
+	//This will overflow when we exceed the storage of a uint32_t (4 billion). 
+	//Update if this becomes likely: someone playing constant effects 10 times per second on 16 pads for ~300 days.
+	m_currentHandleId++;
+	return HapticHandle(m_currentHandleId);
 }
+
+
+HapticHandle HapticsPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>> events)
+{
+	
+	std::lock_guard<std::mutex> guard(m_effectsLock);
+	HapticHandle handle = nextHandle();
+	boost::uuids::uuid uuid = m_uuidGenerator();
+	BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+		"[Player] Creating effect with external handle " << handle;
+	m_outsideToInternal[handle] = uuid;
+	addNewEffect(uuid, std::move(events));
+
+	return handle;
+}
+
+
+
+void HapticsPlayer::addNewEffect(const boost::uuids::uuid& id, std::vector<std::unique_ptr<PlayableEvent>>&& events) {
+	
+	PlayableEffect temp(std::move(events), m_registry, m_uuidGenerator);
+	m_effects.insert(std::make_pair(m_hasher(id), std::move(temp)));
+}
+
 
 boost::optional<PlayableInfo> HapticsPlayer::GetHandleInfo(HapticHandle h) 
 {
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
+	std::lock_guard<std::mutex> guard(m_effectsLock);
 
-	if (auto effect = toInternalUUID(h)) {
-		return effect.get().GetInfo();
+	if (auto effect = findExistingPlayable(h)) {
+		return effect->GetInfo();
 	}
 	
 	return boost::none;
 }
 
 
-std::size_t HapticsPlayer::NumLiveEffects()
+std::size_t HapticsPlayer::GetNumLiveEffects()
 {
-	return _effects.size();
+	return m_effects.size() - GetNumReleasedEffects();
 }
 
-std::size_t HapticsPlayer::NumOrphanedEffects()
+std::size_t HapticsPlayer::GetNumReleasedEffects()
 {
-	return _releasedEffects.size();
+	return std::accumulate(m_effects.begin(), m_effects.end(), 0, [](int currentTotal, const auto& effect) {
+		return effect.second.IsReleased() ? currentTotal + 1 : currentTotal;
+	});
 }
 
 
-
-
-
-bool EffectIsExpired(const std::unique_ptr<IPlayable> &p, bool isGlobalPause) {
-	const auto& effectInfo = p->GetInfo();
-	return !effectInfo.Playing();
-}
-int compute(int p) {
-	return p * 123123;
-}
 void HapticsPlayer::Update(float dt)
 {
-	std::lock_guard<std::mutex> lock_guard(m_effectsMutex);
+	if (m_playerPaused) {
+		return;
+	}
+
+	std::lock_guard<std::mutex> lock_guard(m_effectsLock);
+
+
+	for (auto& effect : m_effects) {
+		effect.second.Update(dt);
+	}
 
 	
-	for (auto& effect : _effects) {
-		effect.second->Update(dt);
-	}
-
-	//mark & erase from _effects
-
-
-	for (auto& released : _releasedEffects) {
-		auto hashed_id = uuid_hasher(released.ID);
-		auto it = _effects.find(hashed_id);
-		if (it != _effects.end()) {
-			if (EffectIsExpired(it->second, _paused)) {
-				released.NeedsSweep = true;
-				it->second->Release();
-				_effects.erase(it);
-			}
-		}
-		else {
-			BOOST_LOG_TRIVIAL(error) << "[HapticsPlayer] Tried to release an effect, but couldn't find it!";
-
-		}
-		
-	}
-
-
-	//sweep from _released
-
-	auto toRemove = std::remove_if(_releasedEffects.begin(), _releasedEffects.end(), [](const Released& e) {
-		return e.NeedsSweep;
+	std::experimental::erase_if(m_effects, [](const auto& effect) {
+		return effect.second.IsReleased() && !effect.second.IsPlaying();
 	});
-	_releasedEffects.erase(toRemove, _releasedEffects.end());
-
-	///BUGG!!!! Try running the graph engine at full speed. Locking error?
 
 }
 
 
 void HapticsPlayer::PlayAll()
 {
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
+	std::lock_guard<std::mutex> guard(m_effectsLock);
 
-	_paused = false;
+	m_playerPaused = false;
 
 	
-	//take anything that was frozen (not simply paused by the user) and resume it
-	for (auto& effect : _effects) {
-		if (std::find(_frozenEffects.begin(), _frozenEffects.end(), effect.first) != _frozenEffects.end()) {
-			effect.second->Play();
+	for (const auto& frozen : m_frozenEffects) {
+		if (m_effects.find(frozen) != m_effects.end()) {
+			m_effects.at(frozen).Play();
 		}
 	}
 
-	_frozenEffects.clear();
+	m_frozenEffects.clear();
 }
-//frozen vs paused
+
 
 void HapticsPlayer::PauseAll()
 {
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
+	m_playerPaused = true;
 
-	_paused = true;
+	std::lock_guard<std::mutex> guard(m_effectsLock);
 
-
-	for (auto& effect : _effects) {
-		if (effect.second->IsPlaying()) {
-			effect.second->Pause();
-			_frozenEffects.push_back(effect.first);
+	for (auto& effect : m_effects) {
+		if (effect.second.IsPlaying()) {
+			effect.second.Pause();
+			m_frozenEffects.push_back(effect.first);
 		}
 	}
 }
 
 void HapticsPlayer::ClearAll()
 {
-	std::lock_guard<std::mutex> guard(m_effectsMutex);
+	std::lock_guard<std::mutex> guard(m_effectsLock);
 
-	for (auto& effect : _effects) {
-		effect.second->Stop();
+	for (auto& effect : m_effects) {
+		effect.second.Stop();
 	}
-	_outsideHandleToUUID.clear();
-	_effects.clear();
-	_releasedEffects.clear();
-}
-
-std::vector<PriorityModel::EffectInfo> HapticsPlayer::GetEffectInfo() const
-{
-	return std::vector<PriorityModel::EffectInfo>();
+	m_outsideToInternal.clear();
+	m_effects.clear();
 }
 
 
 
 
 
-
-boost::optional<IPlayable&> HapticsPlayer::toInternalUUID(HapticHandle hh) const
+boost::optional<boost::uuids::uuid> HapticsPlayer::findInternalHandle(HapticHandle h)
 {
-	
-	if (_outsideHandleToUUID.find(hh) != _outsideHandleToUUID.end()) {
-		auto h = uuid_hasher(_outsideHandleToUUID.at(hh));
-		if (_effects.find(h) != _effects.end()) {
-			return *_effects.at(h);
+	if (m_outsideToInternal.find(h) != m_outsideToInternal.end()) {
+		return m_outsideToInternal.at(h);
+	}
+
+	return boost::none;
+}
+
+
+boost::optional<PlayableEffect&> HapticsPlayer::findExistingPlayable(HapticHandle h)
+{
+	if (auto internalHandle = findInternalHandle(h)) {
+
+		auto intKey = m_hasher(*internalHandle);
+		if (m_effects.find(intKey) != m_effects.end()) {
+			return m_effects.at(intKey);
 		}
-	}
 	
+	}
+
 	return boost::none;
 }
 

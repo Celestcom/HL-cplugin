@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "Engine.h"
 #include "Enums.h"
-
+#include <boost/log/support/date_time.hpp>
 #include <boost\bind.hpp>
 #include "EventList.h"
 #include "NSLoader_Internal.h"
@@ -16,6 +16,7 @@
 #include "IHapticDevice.h"
 #include "Devices/HardlightDevice/hardlightdevice.h"
 #include "Locator.h"
+
 void Engine::executeTimestep()
 {
 	
@@ -84,10 +85,11 @@ Engine::Engine() :
 	
 
 	setupUserFacingLogSink();
-//	setupFileLogSink(); //not implementing this yet
+	setupFileLogSink(); //not implementing this yet
 
 	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
+	boost::log::core::get()->set_logging_enabled(false);
 
 	m_hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
 	m_hardlightSuit->RegisterDrivers(m_registry);
@@ -113,11 +115,13 @@ void Engine::setupFileLogSink()
 		  keywords::file_name = "nsvr_plugin_%5N.log"
 		, keywords::rotation_size = 5 * 1024 * 1024
 		, keywords::time_based_rotation = sinks::file::rotation_at_time_point(12, 0, 0)
+
 	);
+
 
 	typedef sinks::synchronous_sink<sinks::text_file_backend> sink_t;
 	boost::shared_ptr<sink_t> sink(new sink_t(backend));
-	
+
 	boost::log::core::get()->add_sink(sink);
 
 }
@@ -239,8 +243,8 @@ bool Engine::DoEngineCommand(::EngineCommand command)
 
 int Engine::GetEngineStats(NSVR_SystemStats * stats)
 {
-	stats->NumLiveEffects = static_cast<unsigned int>(m_player.NumLiveEffects());
-	stats->NumOrphanedEffects = static_cast<unsigned int>(m_player.NumOrphanedEffects());
+	stats->NumLiveEffects = static_cast<unsigned int>(m_player.GetNumLiveEffects());
+	stats->NumOrphanedEffects = static_cast<unsigned int>(m_player.GetNumReleasedEffects());
 	return NSVR_Success_Unqualified;
 }
 
@@ -280,21 +284,40 @@ void Engine::HandleCommand(unsigned int handle, NSVR_PlaybackCommand c)
 
 
 
-
-
-int Engine::CreateEffect(EventList * list, uint32_t handle)
-{
-	if (list == nullptr) {
-		return -1;
+std::vector<std::unique_ptr<PlayableEvent>> 
+extractPlayables(const std::vector<ParameterizedEvent>& events) {
+	
+	using PlayablePtr = std::unique_ptr<PlayableEvent>;
+	std::vector<PlayablePtr> playables;
+	playables.reserve(events.size());
+	for (const auto& event : events) {
+		if (auto newPlayable = PlayableEvent::make(event.type())) {
+			if (newPlayable->parse(event)) {
+				playables.push_back(std::move(newPlayable));
+			}
+		}
 	}
 
-	if (list->Events().empty()) {
+	return playables;
+}
+
+//Only modifies handle if the effect is created successfully
+int Engine::CreateEffect(EventList * list, HapticHandle* handle)
+{
+	if (list == nullptr) {
+		return NSVR_Error_NullArgument;
+	}
+	//enforces precondition on PlayableEffect to not have an empty effects list
+	if (list->empty()) {
 		return -1;
 	}
 	else {
-		m_player.Create(handle, list->Events());
+		HapticHandle h = m_player.Create(extractPlayables(list->events()));
+		*handle = h;
+		return NSVR_Success_Unqualified;
 	}
-	return 1;
+
+	return NSVR_Error_Unknown;
 
 
 }

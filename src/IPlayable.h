@@ -39,14 +39,18 @@ public:
 	//Cleanup resources associated with the effect, pending removal by the HapticsPlayer
 	virtual void Release() = 0;
 
+
 	//Update playback of effect if playing, given delta time in fractional seconds
 	virtual void Update(float dt) = 0;
+	
+	//Check if this effect has already been released
+	virtual bool IsReleased() const = 0;
 
 	//Return info about the playable
 	virtual PlayableInfo GetInfo() const = 0;
 
 	//Return the total length of the effect in fractional seconds
-	virtual float GetTotalPlayTime() const = 0;
+	virtual float GetTotalDuration() const = 0;
 
 	//Return the current time of the effect in fractional seconds
 	virtual float CurrentTime() const = 0;

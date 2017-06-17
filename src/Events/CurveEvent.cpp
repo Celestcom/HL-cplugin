@@ -2,38 +2,37 @@
 #include "CurveEvent.h"
 
 
-CurveEvent::CurveEvent() : ParameterizedEvent()
+CurveEvent::CurveEvent() : 
+	PlayableEvent(),
+	m_area(0),
+	m_duration(0),
+	m_time(0),
+	m_timePoints(),
+	m_volumes()
 {
 	
 }
 
 
 
-bool CurveEvent::doSetFloat(const char * key, float value)
+
+
+float CurveEvent::time() const
 {
-	if (strcmp("time", key) == 0) {
-		Time = minimum_bound(0.0f, value);
-		return true;
-	}
-	return false;
+	return m_time;
 }
 
-bool CurveEvent::doSetFloats(const char* key, float* values, unsigned int length)
+uint32_t CurveEvent::area() const
 {
+	return m_area;
+}
 
-	//note: not constraining to be positive at this point
-	if (strcmp("volumes", key) == 0) {
-		Volumes.reserve(length);
-		memcpy(&Volumes[0], &values[0], length);
-		Volumes.resize(length);
-		return true;
-	}
+NSVR_EventType CurveEvent::type() const
+{
+	return descriptor;
+}
 
-	if (strcmp("time-points", key) == 0) {
-		TimePoints.reserve(length);
-		memcpy(&TimePoints[0], &values[0], length);
-		TimePoints.resize(length);
-		return true;
-	}
-	return false;
+float CurveEvent::duration() const
+{
+	return m_duration;
 }

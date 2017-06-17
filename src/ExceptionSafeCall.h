@@ -10,7 +10,9 @@ template<typename T> NSVR_Result ExceptionGuard(T&& t) {
 		return t();
 #ifdef CATCH_EXCEPTIONS
 	}
-	catch (const std::exception&) {
+	catch (const std::exception& e) {
+		BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
+			"[NSLOADER] Exception: " << e.what();
 		return NSVR_Error_Unknown;
 	}
 #endif

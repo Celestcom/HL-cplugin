@@ -37,25 +37,12 @@ CommandBuffer ZoneModel::Update(float dt) {
 	return generateCommands();
 }
 
-boost::optional<LiveBasicHapticEvent> ZoneModel::GetCurrentlyPlayingEvent()
-{
-	if (playingEvents.empty()) {
-		return boost::optional<LiveBasicHapticEvent>();
-	}
-	else {
-		return playingEvents.back();
-	}
-}
-
-
-
 void ZoneModel::updateExistingEvents(float dt)
 {
 	for (auto& event : playingEvents) {
 		event.update(dt);
 	}
 }
-
 
 void ZoneModel::removeExpiredEvents() {
 	auto expired = [](auto& e) {
@@ -65,10 +52,16 @@ void ZoneModel::removeExpiredEvents() {
 	std::experimental::erase_if(playingEvents, expired);
 }
 
+
+
+
+
+
+
 template<class T>
 std::vector<T> consumeAll(boost::lockfree::spsc_queue<T>& queue) {
 	std::vector<T> result;
-	queue.consume_all([&](auto element) {
+	queue.consumeAll([&](auto element) {
 		result.push_back(element);
 	});
 	return result;
@@ -132,6 +125,16 @@ CommandBuffer ZoneModel::generateCommands()
 	else {
 		return stateChanger.transitionTo(playingEvents.back());
 
+	}
+}
+
+boost::optional<LiveBasicHapticEvent> ZoneModel::GetCurrentlyPlayingEvent()
+{
+	if (playingEvents.empty()) {
+		return boost::optional<LiveBasicHapticEvent>();
+	}
+	else {
+		return playingEvents.back();
 	}
 }
 

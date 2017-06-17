@@ -7,8 +7,8 @@
 //HALT - PLAY_CONT - or whatever is actually necessary to make the hardware respond correctly.
 class Hardlight_Mk3_Firmware {
 public:
-	static NullSpaceIPC::EffectCommand generateContinuousPlay(const BasicHapticEventData& data);
-	static NullSpaceIPC::EffectCommand generateOneshotPlay(const BasicHapticEventData& data);
+	static NullSpaceIPC::EffectCommand generateContinuousPlay(Location area, const BasicHapticEventData& data);
+	static NullSpaceIPC::EffectCommand generateOneshotPlay(Location area, const BasicHapticEventData& data);
 	static NullSpaceIPC::EffectCommand generateHalt(Location area);
 };
 

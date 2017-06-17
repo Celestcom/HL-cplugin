@@ -28,9 +28,6 @@
     <Filter Include="src\Events">
       <UniqueIdentifier>{7162C20E-5D1A-045C-C621-DDB7B2F89E4C}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Wire">
-      <UniqueIdentifier>{B3B127CF-9F7E-82DA-C897-7082B4C3B768}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\json">
       <UniqueIdentifier>{164732CF-0214-8DDA-2B2D-7B821759C268}</UniqueIdentifier>
     </Filter>
@@ -99,28 +96,13 @@
     <ClInclude Include="..\src\Events\CurveEvent.h">
       <Filter>src\Events</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Events\PlayableEvent.h">
+      <Filter>src\Events</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\ExceptionSafeCall.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\HapticArgs.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticCache.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticClasses.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticDirectoryTools.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticEvent.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticEventGenerator.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\HapticQueue.h">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\HapticsPlayer.h">
@@ -177,23 +159,8 @@
     <ClInclude Include="..\src\PlaybackHandle.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\PriorityModel.h">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\RegionTree.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Wire\EncodingOperations.h">
-      <Filter>src\Wire</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Wire\FlatbuffDecoder.h">
-      <Filter>src\Wire</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Wire\Wire.h">
-      <Filter>src\Wire</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Wire\ijsonserializable.h">
-      <Filter>src\Wire</Filter>
     </ClInclude>
     <ClInclude Include="..\src\json\json-forwards.h">
       <Filter>src\json</Filter>
@@ -263,25 +230,10 @@
     <ClCompile Include="..\src\Events\CurveEvent.cpp">
       <Filter>src\Events</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Events\PlayableEvent.cpp">
+      <Filter>src\Events</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\HapticArgs.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\HapticCache.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\HapticClasses.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\HapticDirectoryTools.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\HapticEvent.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\HapticEventGenerator.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\HapticQueue.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\HapticsPlayer.cpp">
@@ -315,9 +267,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\PlaybackHandle.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\PriorityModel.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\src\RegionTree.cpp">
