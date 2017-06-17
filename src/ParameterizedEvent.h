@@ -49,7 +49,7 @@ public:
 
 private:
 	NSVR_EventType m_type;
-	std::vector<event_param> m_properties;
+	std::vector<event_param> m_params;
 	std::mutex m_propLock;
 
 	event_param* findParam(const char* key);
@@ -82,7 +82,7 @@ inline void ParameterizedEvent::updateOrAdd(const char * key, T val)
 		existing->value = val;
 	}
 	else {
-		m_properties.emplace_back(key, val);
+		m_params.emplace_back(key, val);
 	}
 }
 

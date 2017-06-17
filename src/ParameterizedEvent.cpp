@@ -6,23 +6,23 @@
 
 ParameterizedEvent::ParameterizedEvent(NSVR_EventType type): 
 	m_type(type),
-	m_properties()
+	m_params()
 {
 	//average event key count is 5, so preemptively reserve that much
 	//change if proves unnecessary
-	m_properties.reserve(5);
+	m_params.reserve(5);
 }
 
 
 ParameterizedEvent::ParameterizedEvent(ParameterizedEvent && other):
 	m_type(other.m_type),
-	m_properties(std::move(other.m_properties))
+	m_params(std::move(other.m_params))
 {
 }
 
 ParameterizedEvent::ParameterizedEvent(const ParameterizedEvent & other) :
 	m_type(other.m_type),
-	m_properties(other.m_properties)
+	m_params(other.m_params)
 {
 }
 
@@ -67,12 +67,11 @@ event_param* ParameterizedEvent::findParam(const char * key)
 
 const event_param * ParameterizedEvent::findParam(const char * key) const
 {
-	for (std::size_t i = 0; i < m_properties.size(); i++) {
-		if (strcmp(m_properties.at(i).key.c_str(), key) == 0) {
-			return &m_properties.at(i);
+	for (const auto& param : m_params) {
+		if (strcmp(param.key.c_str(), key) == 0) {
+			return &param;
 		}
 	}
-
 	return nullptr;
 }
 
