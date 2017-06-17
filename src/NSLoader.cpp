@@ -182,23 +182,33 @@ NSVR_RETURN(void) NSVR_Event_Release(NSVR_Event ** eventPtr)
 NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event * event, const char * key, float value)
  {
 	 RETURN_IF_NULL(event);
+	 RETURN_IF_NULL(key);
 
 	 return ExceptionGuard([&] {
-		// BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
-		//	 "[Event " << event << "] SetFloat  " << key << " to " << value;
-		 return AS_TYPE(ParameterizedEvent, event)->SetFloat(key, value);
+		 return AS_TYPE(ParameterizedEvent, event)->Set<float>(key, value);
 	 });
  }
+
+NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event * event, const char * key, float * values, unsigned int length)
+{
+	RETURN_IF_NULL(event);
+
+	return ExceptionGuard([&] {
+		//should check for zero length or no?
+		std::vector<float> vec;
+		vec.reserve(length);
+		memcpy_s(&vec[0], vec.size(), &values[0], length);
+		return AS_TYPE(ParameterizedEvent, event)->Set(key, std::move(vec));
+	});
+}
 
 NSVR_RETURN(NSVR_Result)NSVR_Event_SetInteger(NSVR_Event * event, const char * key, int value)
  {
 	 RETURN_IF_NULL(event);
+	 RETURN_IF_NULL(key);
 
 	 return ExceptionGuard([&] {
-		// BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-			// "[Event " << event << "] SetInteger  " << key << " to " << value;
-
-		 return AS_TYPE(ParameterizedEvent, event)->SetInt(key, value);
+		 return AS_TYPE(ParameterizedEvent, event)->Set<int>(key, value);
 	 });
  }
 

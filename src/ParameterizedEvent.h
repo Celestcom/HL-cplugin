@@ -16,7 +16,8 @@
 typedef boost::variant<
 	float, 
 	int,
-	std::vector<float>
+	std::vector<float>,
+	std::vector<int>
 > EventValue;
 
 
@@ -31,12 +32,12 @@ struct event_param {
 class ParameterizedEvent
 {
 public:
-	ParameterizedEvent(NSVR_EventType);
+	explicit ParameterizedEvent(NSVR_EventType);
 	ParameterizedEvent(ParameterizedEvent&&);
 	ParameterizedEvent(const ParameterizedEvent&);
 	~ParameterizedEvent() {}
-
-
+	template<class T>
+	bool Set(const char* key, T value);
 	bool SetFloat(const char* key, float value);
 	bool SetInt(const char* key, int value);
 	bool SetFloats(const char* key, float* values, unsigned int length);
@@ -58,6 +59,14 @@ private:
 	template<typename T>
 	void updateOrAdd(const char* key, T val);
 };
+
+template<class T>
+inline bool ParameterizedEvent::Set(const char * key, T value)
+{
+	std::lock_guard<std::mutex> guard(m_propLock);
+	updateOrAdd<T>(key, value);
+	return true;
+}
 
 template<typename T>
 inline T ParameterizedEvent::Get(const char * key, T defaultValue) const

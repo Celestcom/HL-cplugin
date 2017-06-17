@@ -147,6 +147,7 @@ extern "C" {
 	NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType type);
 	NSVR_RETURN(void)		 NSVR_Event_Release(NSVR_Event** event);
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event* event, const char* key, float value);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event* event, const char* key, float* values, unsigned int length);
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetInteger(NSVR_Event* event, const char* key, int value);
 
 

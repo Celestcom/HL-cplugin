@@ -7,6 +7,8 @@
 #include <boost/uuid/uuid.hpp>
 #include "../EventRegistry.h"
 #include "../HapticsPlayer.h"
+#include "../ParameterizedEvent.h"
+
 #include <functional>
 #include <chrono>
 
@@ -611,7 +613,50 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 }
 
 
+TEST_CASE("The events system works", "[EventSystem]") {
 
+	ParameterizedEvent event(NSVR_EventType_BasicHapticEvent);
+
+	SECTION("You should be able to get out what you put in") {
+		event.Set("key1", 1.0f);
+		REQUIRE(event.Get("key1", 999.0f) == Approx(1.0f));
+
+		event.Set("key2", 1);
+		REQUIRE(event.Get("key2", 999) == 1);
+
+		event.Set("key3", std::vector<int>({ 1 }));
+		REQUIRE(event.Get("key3", std::vector<int>({ 999 })).at(0) == 1);
+	}
+
+	SECTION("You should get a default value if you supply a wrong key") {
+		event.Set("key1", 1.0f);
+		REQUIRE(event.Get("key2", 999) == 999);
+	}
+
+	SECTION("You should get a default value if you supply the wrong type") {
+		event.Set("key1", 1.0f);
+		REQUIRE(event.Get("key1", 999) == 999);
+	}
+
+	SECTION("If you overwrite a key with a different value, you should get the new value out") {
+		event.Set("key1", 1.0f);
+		event.Set("key1", 2.0f);
+		REQUIRE(event.Get("key1", 999.0f) == Approx(2.0f));
+	}
+
+	SECTION("If you overwrite a key with a different type, you should get the new type out") {
+		event.Set("key1", 1.0f);
+		event.Set("key1", 2);
+		REQUIRE(event.Get("key1", 999) == 2);
+	}
+
+	SECTION("If you request a key that isn't present, you should get the default value") {
+		REQUIRE(event.Get("key1", 999) == 999);
+		REQUIRE(event.Get("key2", 999.0f) == 999.0f);
+		REQUIRE(event.Get("key3", std::vector<float>({ 999.0f })).at(0) == Approx(999.0f));
+		REQUIRE(event.Get("key4", std::vector<int>({ 999 })).at(0) == 999);
+	}
+}
 
 
 int main(int argc, char* argv[]) {
