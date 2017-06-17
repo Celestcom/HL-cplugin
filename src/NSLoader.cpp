@@ -169,8 +169,8 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType
 NSVR_RETURN(void) NSVR_Event_Release(NSVR_Event ** eventPtr)
  {
 	ExceptionGuard([&] {
-		BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() 
-			<<"[Event " << *eventPtr << "] Release ";
+		//BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() 
+		//	<<"[Event " << *eventPtr << "] Release ";
 
 		delete AS_TYPE(ParameterizedEvent, *eventPtr);
 		*eventPtr = nullptr;
@@ -184,8 +184,8 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event * event, const char * ke
 	 RETURN_IF_NULL(event);
 
 	 return ExceptionGuard([&] {
-		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
-			 "[Event " << event << "] SetFloat  " << key << " to " << value;
+		// BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
+		//	 "[Event " << event << "] SetFloat  " << key << " to " << value;
 		 return AS_TYPE(ParameterizedEvent, event)->SetFloat(key, value);
 	 });
  }
@@ -195,8 +195,8 @@ NSVR_RETURN(NSVR_Result)NSVR_Event_SetInteger(NSVR_Event * event, const char * k
 	 RETURN_IF_NULL(event);
 
 	 return ExceptionGuard([&] {
-		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-			 "[Event " << event << "] SetInteger  " << key << " to " << value;
+		// BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+			// "[Event " << event << "] SetInteger  " << key << " to " << value;
 
 		 return AS_TYPE(ParameterizedEvent, event)->SetInt(key, value);
 	 });
@@ -208,8 +208,8 @@ NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr)
 	 return ExceptionGuard([&] {
 
 		 *timelinePtr = AS_TYPE(NSVR_Timeline, new EventList());
-		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-			 "[Timeline " << *timelinePtr << "] Create";
+		// BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+		//	 "[Timeline " << *timelinePtr << "] Create";
 
 		 return NSVR_Success_Unqualified;
 	 });
@@ -220,8 +220,8 @@ NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr)
 NSVR_RETURN(void) NSVR_Timeline_Release(NSVR_Timeline ** listPtr)
  {
 	ExceptionGuard([&] {
-		BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-			"[Timeline " << *listPtr << "] Release";
+		//BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
+		//	"[Timeline " << *listPtr << "] Release";
 
 		delete AS_TYPE(EventList, *listPtr);
 		*listPtr = nullptr;
@@ -236,8 +236,8 @@ NSVR_RETURN(NSVR_Result) NSVR_Timeline_AddEvent(NSVR_Timeline * list, NSVR_Event
 	 RETURN_IF_NULL(event);
 
 	 return ExceptionGuard([&] {
-		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
-			 "[Timeline " << list << "] AddEvent " << event;
+		// BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
+		//	 "[Timeline " << list << "] AddEvent " << event;
 
 		return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(ParameterizedEvent, event));
 	 });

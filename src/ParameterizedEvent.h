@@ -11,10 +11,18 @@
 #define VALIDATE_KEY(key)
 #endif
 
-typedef boost::variant<float, int, std::vector<float>> EventValue;
-struct event_attribute {
-	event_attribute();
-	event_attribute(const char* key, EventValue);
+
+//The possible attribute types that an event can have
+typedef boost::variant<
+	float, 
+	int,
+	std::vector<float>
+> EventValue;
+
+
+struct event_param {
+	event_param();
+	event_param(const char* key, EventValue);
 	std::string key;
 	EventValue value;
 };
@@ -24,9 +32,11 @@ class ParameterizedEvent
 {
 public:
 	ParameterizedEvent(NSVR_EventType);
-	~ParameterizedEvent() {}
 	ParameterizedEvent(ParameterizedEvent&&);
 	ParameterizedEvent(const ParameterizedEvent&);
+	~ParameterizedEvent() {}
+
+
 	bool SetFloat(const char* key, float value);
 	bool SetInt(const char* key, int value);
 	bool SetFloats(const char* key, float* values, unsigned int length);
@@ -38,16 +48,44 @@ public:
 	NSVR_EventType type() const;
 
 private:
-	event_attribute* findAttribute(const char* key);
-	const event_attribute* findAttribute(const char* key) const;
-	template<typename T>
-	void update_or_add(const char* key, T val);
-	std::vector<event_attribute> m_properties;
 	NSVR_EventType m_type;
+	std::vector<event_param> m_properties;
 	std::mutex m_propLock;
+
+	event_param* findParam(const char* key);
+	const event_param* findParam(const char* key) const;
 	
-	
+	template<typename T>
+	void updateOrAdd(const char* key, T val);
 };
+
+template<typename T>
+inline T ParameterizedEvent::Get(const char * key, T defaultValue) const
+{
+	try {
+		if (const event_param* prop = findParam(key)) {
+			return boost::get<T>(prop->value);
+		}
+		else {
+			return defaultValue;
+		}
+	}
+	catch (const boost::bad_get&) {
+		return defaultValue;
+	}
+}
+
+template<typename T>
+inline void ParameterizedEvent::updateOrAdd(const char * key, T val)
+{
+	if (event_param* existing = findParam(key)) {
+		existing->value = val;
+	}
+	else {
+		m_properties.emplace_back(key, val);
+	}
+}
+
 
 
 template<class T>
@@ -63,41 +101,4 @@ inline T maximum_bound(T max, T value) {
 template<class T>
 inline T constrain(T min, T val, T max) {
 	return std::clamp<T>(val, min, max);
-}
-
-template<typename T>
-inline T ParameterizedEvent::Get(const char * key, T defaultValue) const
-{
-	try {
-		if (const event_attribute* prop = findAttribute(key)) {
-			return  boost::get<T>(prop->value);
-		}
-		else {
-			return defaultValue;
-		}
-	}
-	catch (const boost::bad_get&) {
-		BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
-			"[ParameterizedEvent " << this << "] Bad get! key = " << key << " T = " << typeid(T).name();
-		for (const auto& prop : m_properties) {
-			BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
-				"\t " << prop.key << ": type = " << prop.value.which();
-		}
-	}
-	return defaultValue;
-	
-}
-
-template<typename T>
-inline void ParameterizedEvent::update_or_add(const char * key, T val)
-{
-	//BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
-	//	"[ParameterizedEvent] Setting key " << key << " to type T = " << typeid(T).name();
-	event_attribute* existing = findAttribute(key);
-	if (existing != nullptr) {
-		existing->value = val;
-	}
-	else {
-		m_properties.emplace_back(key, val);
-	}
 }

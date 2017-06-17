@@ -6,6 +6,7 @@
 
 EventList::EventList():m_events(), m_eventLock()
 {
+	m_events.reserve(1);
 }
 
 //Precondition: event is not null

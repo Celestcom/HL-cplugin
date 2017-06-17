@@ -566,6 +566,9 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 			REQUIRE(player.GetNumLiveEffects() == 0);
 		}
 
+
+		
+
 	}
 
 	SECTION("When you play an effect, it should .. work") {
@@ -600,7 +603,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	
 
 
-
+	
 	
 		
 	
