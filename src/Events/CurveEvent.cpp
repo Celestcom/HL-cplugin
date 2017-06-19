@@ -33,6 +33,7 @@ bool CurveEvent::parse(const ParameterizedEvent& ev)
 	m_timePoints = ev.Get("time-offsets", std::vector<float>({}));
 	m_volumes = ev.Get("magnitudes", std::vector<float>({}));
 	m_area = ev.Get("area", (int)AreaFlag::None);
+	return true;
 }
 
 bool CurveEvent::isEqual(const PlayableEvent& other) const
