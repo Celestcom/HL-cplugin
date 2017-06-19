@@ -19,6 +19,9 @@ public:
 
 	
 
+
+	virtual bool parse(const ParameterizedEvent&) override;
+
 private:
 	float m_time;
 	uint32_t m_area;
@@ -27,6 +30,9 @@ private:
 	std::vector<float> m_timePoints;
 	
 
+
+
+	virtual bool isEqual(const PlayableEvent& other) const override;
 
 };
 
