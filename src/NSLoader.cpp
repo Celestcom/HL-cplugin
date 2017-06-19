@@ -265,12 +265,8 @@ NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSV
 		 auto timeline = AS_TYPE(EventList, timelinePtr);
 		 auto handle = AS_TYPE(PlaybackHandle, handlePtr);
 
-		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-			 "[Timeline " << timelinePtr << "] Transmit to handle " << handle;
-
+		
 		 if (handle->handle != 0) {
-			 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-				 "[Timeline " << timelinePtr << "] (releasing previous handle) " << handle;
 			 engine->ReleaseHandle(handle->handle);
 		 }
 		

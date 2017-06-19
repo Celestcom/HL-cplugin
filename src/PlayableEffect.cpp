@@ -153,16 +153,8 @@ void PlayableEffect::Update(float dt)
 	
 	while (current != m_effects.end()) {
 		if (isTimeExpired(*current)) {
-			BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-				"[Effect " << boost::hash<boost::uuids::uuid>()(m_id) << "] Spawning new event";
+			
 			std::vector<std::string> regions =  extractRegions(*current);
-
-			std::string result = std::accumulate(regions.begin(), regions.end(), std::string("regions= "), [](std::string reg,const auto& region) {
-				reg += region + ", ";
-				return reg;
-			});
-			BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-				"\t " << result;
 			
 			for (const auto& region : regions) {
 				auto consumers = m_registry.GetEventDrivers(region);

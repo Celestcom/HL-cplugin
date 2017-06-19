@@ -51,7 +51,6 @@ CommandBuffer HardlightDevice::GenerateHardwareCommands(float dt)
 	CommandBuffer result;
 	for (auto& driver : m_drivers) {
 		CommandBuffer cl = driver->update(dt);
-		//std::reverse(cl.begin(), cl.end()); todo: see if necessary order is already created
 		result.insert(result.begin(), cl.begin(), cl.end());
 	}
 	return result;

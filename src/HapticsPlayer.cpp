@@ -92,8 +92,6 @@ HapticHandle HapticsPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>> e
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 	HapticHandle handle = nextHandle();
 	boost::uuids::uuid uuid = m_uuidGenerator();
-	BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-		"[Player] Creating effect with external handle " << handle;
 	m_outsideToInternal[handle] = uuid;
 	addNewEffect(uuid, std::move(events));
 
