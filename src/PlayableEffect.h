@@ -18,7 +18,6 @@ std::vector<std::string> extractRegions(const std::unique_ptr<PlayableEvent> & e
 
 
 
-
 class RegionVisitor : public boost::static_visitor<std::vector<std::string>> {
 private:
 public:
@@ -27,13 +26,15 @@ public:
 };
 using PlayablePtr = std::unique_ptr<PlayableEvent>;
 
+class ClientMessenger;
+
 class PlayableEffect 
 {
 public:
 
 
 	//Precondition: the vector is not empty
-	PlayableEffect(std::vector<PlayablePtr>&& effects, EventRegistry& reg, boost::uuids::random_generator&);
+	PlayableEffect(std::vector<PlayablePtr>&& effects, EventRegistry& reg, boost::uuids::random_generator& gen, ClientMessenger& messenger);
 	PlayableEffect(const PlayableEffect&) = delete;
 	PlayableEffect(PlayableEffect&&);
 	~PlayableEffect();
@@ -69,6 +70,7 @@ private:
 	std::vector<std::unique_ptr<PlayableEvent>>::iterator m_lastExecutedEffect;
 	boost::uuids::uuid m_id;
 
+	ClientMessenger& m_messenger;
 	bool m_released;
 
 	void reset();

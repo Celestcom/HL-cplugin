@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include "NSLoader_fwds.h"
 class ParameterizedEvent;
+
+namespace NullSpaceIPC {
+	class HighLevelEvent;
+}
 class PlayableEvent {
 public:
 	PlayableEvent() {};
@@ -13,7 +17,7 @@ public:
 	virtual float duration() const = 0;
 	virtual NSVR_EventType type() const = 0;
 	virtual bool parse(const ParameterizedEvent&) = 0;
-
+	virtual void serialize(NullSpaceIPC::HighLevelEvent& event) const = 0;
 	bool operator<(const PlayableEvent& rhs) const;
 
 	static std::unique_ptr<PlayableEvent> make(NSVR_EventType type);

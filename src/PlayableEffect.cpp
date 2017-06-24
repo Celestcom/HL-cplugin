@@ -13,6 +13,13 @@
 #include <functional>
 #include <chrono>
 
+
+#include "ClientMessenger.h"
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#include "HighLevelEvent.pb.h"
+#pragma warning(pop)
+
 template<typename T>
 T time(std::function<void()> fn) {
 	auto then = std::chrono::high_resolution_clock::now();
@@ -22,13 +29,14 @@ T time(std::function<void()> fn) {
 }
 
 
-PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry& reg, boost::uuids::random_generator& uuid) :
+PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry& reg, boost::uuids::random_generator& uuid, ClientMessenger& messenger) :
 	m_effects(std::move(effects)),
 	m_state(PlaybackState::IDLE),
 	m_registry(reg),
 	m_id(uuid()),
 	m_time(0),
-	m_released(false)
+	m_released(false),
+	m_messenger(messenger)
 {
 	assert(!m_effects.empty());
 
@@ -66,7 +74,8 @@ PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
 	m_time(rhs.m_time),
 	m_released(rhs.m_released),
 	m_activeDrivers(rhs.m_activeDrivers),
-	m_lastExecutedEffect(m_effects.begin())
+	m_lastExecutedEffect(m_effects.begin()),
+	m_messenger(rhs.m_messenger)
 {
 	
 }
@@ -135,7 +144,19 @@ void PlayableEffect::Pause()
 	
 }
 
+NullSpaceIPC::HighLevelEvent makeEvent(const boost::uuids::uuid& parentId, const PlayablePtr& event) {
+	
+	
+	std::vector<char> rawIdBytes(parentId.size());
+	std::copy(parentId.begin(), parentId.begin(), rawIdBytes.begin());
 
+	using namespace NullSpaceIPC;
+	HighLevelEvent abstract_event;
+	UUID* parent_id = abstract_event.mutable_parent_id();
+	parent_id->set_value(rawIdBytes.data(), rawIdBytes.size());
+	event->serialize(abstract_event);
+	return abstract_event;
+}
 void PlayableEffect::Update(float dt)
 {
 	if (m_state == PlaybackState::IDLE || m_state == PlaybackState::PAUSED) {
@@ -154,18 +175,25 @@ void PlayableEffect::Update(float dt)
 	while (current != m_effects.end()) {
 		if (isTimeExpired(*current)) {
 			
+			using namespace NullSpaceIPC;
+			
+			HighLevelEvent event = makeEvent(m_id, *current);
+
 			std::vector<std::string> regions =  extractRegions(*current);
 			
 			for (const auto& region : regions) {
-				auto consumers = m_registry.GetEventDrivers(region);
-				if (consumers) {
-					//need translator from registry's leaves to area flags for backwards compat?
-					std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
-						assert(current->get()->area() != 0);
-							consumer->createRetained(m_id, *current);
-						m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
-					});
-				}
+
+				event.set_region(region);
+				m_messenger.WriteEvent(event);
+				//auto consumers = m_registry.GetEventDrivers(region);
+				//if (consumers) {
+				//	//need translator from registry's leaves to area flags for backwards compat?
+				//	std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
+				//		assert(current->get()->area() != 0);
+				//			consumer->createRetained(m_id, *current);
+				//		m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
+				//	});
+				//}
 			}
 				
 			std::advance(current, 1);

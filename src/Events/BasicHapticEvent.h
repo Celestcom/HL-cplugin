@@ -4,6 +4,7 @@
 #include "PlayableEvent.h"
 #include "NSLoader.h"
 
+
 class BasicHapticEvent : public PlayableEvent {
 public:	
 	BasicHapticEvent();
@@ -17,6 +18,7 @@ public:
 	float duration() const override;
 	NSVR_EventType type() const override;
 	bool parse(const ParameterizedEvent&) override;
+	void serialize(NullSpaceIPC::HighLevelEvent& event) const override;
 	static constexpr NSVR_EventType descriptor = NSVR_EventType::NSVR_EventType_BasicHapticEvent;
 
 private:
@@ -30,6 +32,7 @@ private:
 
 
 	virtual bool isEqual(const PlayableEvent& other) const override;
+
 
 };
 

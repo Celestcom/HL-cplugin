@@ -1,7 +1,10 @@
 #include "stdafx.h"
 #include "BasicHapticEvent.h"
 #include "Locator.h"
-
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#include "HighLevelEvent.pb.h"
+#pragma warning(pop)
 
 BasicHapticEvent::BasicHapticEvent() : 
 	PlayableEvent(),
@@ -45,9 +48,6 @@ bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 	m_time = ev.Get<float>("time", 0.0f);
 	m_strength = ev.Get<float>("strength", 1.0f);
 	m_duration = ev.Get<float>("duration", 0.0f);
-	//todo: replace with valid location
-	static_assert(sizeof(int) == 4, "sizeof int should be 4");
-	static_assert(sizeof(uint32_t) == 4, "sizeof uint32_t should be 4");
 	m_area = ev.Get<int>("area", (int)AreaFlag::None);
 	m_requestedEffectFamily = ev.Get<int>("effect", 1);
 	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
@@ -67,6 +67,15 @@ bool BasicHapticEvent::isEqual(const PlayableEvent& other) const
 		&& m_parsedEffectFamily == ev.m_parsedEffectFamily
 		&& m_area == ev.m_area
 		&& m_duration == ev.m_duration;
+}
+
+void BasicHapticEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
+{
+	using namespace NullSpaceIPC;
+	SimpleHaptic* simple = event.mutable_simple_haptic();
+	simple->set_duration(m_duration);
+	simple->set_effect(m_requestedEffectFamily);
+	simple->set_strength(m_strength);
 }
 
 float BasicHapticEvent::strength() const

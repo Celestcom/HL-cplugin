@@ -10,6 +10,8 @@
 #include <functional>
 #include <chrono>
 
+#include "EventRegistry.h"
+#include "ClientMessenger.h"
 template<typename T>
 T time(std::function<void()> fn) {
 	auto then = std::chrono::high_resolution_clock::now();
@@ -22,7 +24,7 @@ T time(std::function<void()> fn) {
 using namespace std;
 
 
-HapticsPlayer::HapticsPlayer(EventRegistry& registry):
+HapticsPlayer::HapticsPlayer(EventRegistry& registry, ClientMessenger& messenger):
 	m_playerPaused(false),
 	m_effectsLock(),
 	m_registry(registry),
@@ -31,7 +33,8 @@ HapticsPlayer::HapticsPlayer(EventRegistry& registry):
 	m_effects(),
 	m_outsideToInternal(),
 	m_uuidGenerator(),
-	m_currentHandleId(0)
+	m_currentHandleId(0),
+	m_messenger(messenger)
 {	
 }
 
@@ -102,7 +105,7 @@ HapticHandle HapticsPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>> e
 
 void HapticsPlayer::addNewEffect(const boost::uuids::uuid& id, std::vector<std::unique_ptr<PlayableEvent>>&& events) {
 	
-	PlayableEffect temp(std::move(events), m_registry, m_uuidGenerator);
+	PlayableEffect temp(std::move(events), m_registry, m_uuidGenerator, m_messenger);
 	m_effects.insert(std::make_pair(m_hasher(id), std::move(temp)));
 }
 

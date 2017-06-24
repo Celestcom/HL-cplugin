@@ -6,7 +6,6 @@
 #include "PlayableEffect.h"
 #include "BasicHapticEvent.h"
 #include <mutex>
-#include "EventRegistry.h"
 #include <atomic>
 typedef uint32_t HapticHandle;
 
@@ -15,11 +14,13 @@ typedef uint32_t HapticHandle;
 //RetainedEventPlayer
 //EffectPlayer
 
+class ClientMessenger;
+class EventRegistry;
 class HapticsPlayer
 {
 public:
 
-	HapticsPlayer(EventRegistry& registry);
+	HapticsPlayer(EventRegistry& registry, ClientMessenger& messenger);
 	~HapticsPlayer();
 
 	void Update(float dt);
@@ -59,5 +60,7 @@ private:
 	boost::optional<PlayableEffect&> findExistingPlayable(HapticHandle h);
 	void addNewEffect(const boost::uuids::uuid&, std::vector<std::unique_ptr<PlayableEvent>>&& events);
 	HapticHandle nextHandle();
+
+	ClientMessenger& m_messenger;
 };
 

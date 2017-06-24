@@ -13,6 +13,7 @@
 #pragma warning(disable : 4267)
 #include "EffectCommand.pb.h"
 #include "DriverCommand.pb.h"
+#include "HighLevelEvent.pb.h"
 #pragma warning(pop)
 
 typedef struct NSVR_ServiceInfo_ NSVR_ServiceInfo;
@@ -25,6 +26,7 @@ public:
 	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
 	boost::optional<NullSpace::SharedMemory::SuitsConnectionInfo> ReadSuits();
 	void WriteCommand(const NullSpaceIPC::DriverCommand& d);
+	void WriteEvent(const NullSpaceIPC::HighLevelEvent& e);
 	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
 	boost::optional<std::string> ReadLog();
 

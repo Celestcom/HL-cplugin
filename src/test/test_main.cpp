@@ -8,7 +8,8 @@
 #include "../EventRegistry.h"
 #include "../HapticsPlayer.h"
 #include "../ParameterizedEvent.h"
-
+#include <boost/asio/io_service.hpp>
+#include "../ClientMessenger.h"
 #include <functional>
 #include <chrono>
 
@@ -451,7 +452,12 @@ std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 }
 TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	EventRegistry registry;
-	HapticsPlayer player(registry);
+
+	//Now I see why we shouldn't have classes take hard references to resources.
+	//Messenger should probably be an interface, else we need it to test HapticsPlayer
+	boost::asio::io_service io;
+	ClientMessenger m(io);
+	HapticsPlayer player(registry, m);
 
 	REQUIRE(player.GetNumLiveEffects() == 0);
 	REQUIRE(player.GetNumReleasedEffects() == 0);
@@ -577,6 +583,10 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		HardlightDevice device;
 		device.RegisterDrivers(registry);
 		
+		//Hello. You are here because a test is failing. 
+		//I am in the process of restructuring the plugin such that all of these
+		//operations happen in the Service. So right now, the device won't generate any commands
+		//because I'm sending them directly to the service, where they will be processed further. 
 		HapticHandle h = player.Create(makePlayables());
 		player.Play(h);
 		player.Update(DELTA_TIME);

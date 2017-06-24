@@ -75,7 +75,7 @@ Engine::Engine() :
 	m_ioService(),
 	m_messenger(m_ioService.GetIOService()),
 	m_registry(),
-	m_player(m_registry),
+	m_player(m_registry, m_messenger),
 	m_currentHandleId(0),
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
 	m_hapticsTimestep(m_ioService.GetIOService(), m_hapticsExecutionInterval),

@@ -2,11 +2,12 @@
 #include "ClientMessenger.h"
 //#include "Locator.h"
 #include <boost\bind.hpp>
-
+#include <boost/log/trivial.hpp>
 
 #pragma warning(push)
 #pragma warning(disable: 4267)
 #include "EffectCommand.pb.h"
+#include "HighLevelEvent.pb.h"
 #pragma warning(pop)
 
 #include "NSLoader.h"
@@ -58,6 +59,20 @@ void ClientMessenger::WriteCommand(const NullSpaceIPC::DriverCommand & d)
 		catch (const boost::interprocess::interprocess_exception&) {
 			//probably full queue
 			//should log
+		}
+	}
+}
+
+void ClientMessenger::WriteEvent(const NullSpaceIPC::HighLevelEvent & e)
+{
+	std::string binaryData;
+	e.SerializeToString(&binaryData);
+	if (m_hapticsStream) {
+		try {
+			m_hapticsStream->Push(binaryData.data(), e.ByteSize());
+		}
+		catch (const boost::interprocess::interprocess_exception& e) {
+			BOOST_LOG_TRIVIAL(warning) << "[ClientMessenger] Unable to push to haptics stream! " << e.what();
 		}
 	}
 }
