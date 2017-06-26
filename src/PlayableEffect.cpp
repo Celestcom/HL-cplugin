@@ -146,14 +146,19 @@ void PlayableEffect::Pause()
 
 NullSpaceIPC::HighLevelEvent makeEvent(const boost::uuids::uuid& parentId, const PlayablePtr& event) {
 	
-	
-	std::vector<char> rawIdBytes(parentId.size());
-	std::copy(parentId.begin(), parentId.begin(), rawIdBytes.begin());
+
 
 	using namespace NullSpaceIPC;
 	HighLevelEvent abstract_event;
-	UUID* parent_id = abstract_event.mutable_parent_id();
-	parent_id->set_value(rawIdBytes.data(), rawIdBytes.size());
+
+	//Right now, we are using UUID. We shouldn't be truncating a UUID like I am below.
+	//Todo: generate our own random IDs, say, from 0 to 2^64 - 1.
+	//The other option which I have tried is to send over a byte array representing the full
+	//UUID. I think this is overkill, and it means we need to pass it on the hardware plugins as well.
+	uint64_t truncatedId;
+	memcpy_s(&truncatedId, sizeof(truncatedId), parentId.data, sizeof uint64_t);
+	
+	abstract_event.set_parent_id(truncatedId);
 	event->serialize(abstract_event);
 	return abstract_event;
 }
@@ -251,46 +256,34 @@ void PlayableEffect::Release()
 	
 }
 
+
+NullSpaceIPC::HighLevelEvent makePlaybackEvent(const boost::uuids::uuid& parentId, NullSpaceIPC::PlaybackEvent::Command command) {
+	using namespace NullSpaceIPC;
+	HighLevelEvent event;
+
+	uint64_t truncatedId;
+	memcpy_s(&truncatedId, sizeof(truncatedId), parentId.data, sizeof uint64_t);
+
+	event.set_parent_id(truncatedId);
+
+	PlaybackEvent* playback_event = event.mutable_playback_event();
+	playback_event->set_command(command);
+	return event;
+}
 void PlayableEffect::reset()
 {
 	m_time = 0;
 	m_lastExecutedEffect = m_effects.begin();
-	
-
-	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
-		if (auto p = hd.lock()){
-			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset);
-		}
-		else {
-			//the driver was removed, probably physically, so we don't need to worry about it
-		}
-	});
+	m_messenger.WriteEvent(makePlaybackEvent(m_id, NullSpaceIPC::PlaybackEvent_Command_CANCEL));
 }
 
 void PlayableEffect::pause()
 {
-	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
-		if (auto p = hd.lock()) {
-			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Pause);
-		}
-		else {
-			//the driver was removed, probably physically, so we don't need to worry about it
-		}
-	});
+	m_messenger.WriteEvent(makePlaybackEvent(m_id, NullSpaceIPC::PlaybackEvent_Command_PAUSE));
 }
 
 void PlayableEffect::resume() {
-	//Now here's an interesting case. What if they unplug and switch suits with an effect paused? We want to resume on the new hardware right?
-	//So if we fail to obtain the ptr, we should probably re-try to put this on a new set of drivers! But not now.
-
-	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
-		if (auto p = hd.lock()) {
-			p->controlRetained(m_id, NSVR_PlaybackCommand::NSVR_PlaybackCommand_Play);
-		}
-		else {
-			//the driver was removed, probably physically, so we don't need to worry about it
-		}
-	});
+	m_messenger.WriteEvent(makePlaybackEvent(m_id, NullSpaceIPC::PlaybackEvent_Command_UNPAUSE));
 }
 
 
