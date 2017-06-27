@@ -182,24 +182,10 @@ void PlayableEffect::Update(float dt)
 			
 			using namespace NullSpaceIPC;
 			
-			HighLevelEvent event = makeEvent(m_id, *current);
-
-			std::vector<std::string> regions =  extractRegions(*current);
-			
-			for (const auto& region : regions) {
-
-				event.set_region(region);
-				m_messenger.WriteEvent(event);
-				//auto consumers = m_registry.GetEventDrivers(region);
-				//if (consumers) {
-				//	//need translator from registry's leaves to area flags for backwards compat?
-				//	std::for_each(consumers->begin(), consumers->end(), [&](auto& consumer) {
-				//		assert(current->get()->area() != 0);
-				//			consumer->createRetained(m_id, *current);
-				//		m_activeDrivers.insert(std::weak_ptr<HardwareDriver>(consumer));
-				//	});
-				//}
-			}
+			HighLevelEvent event = makeEvent(m_id, *current);			
+		
+			m_messenger.WriteEvent(event);
+				
 				
 			std::advance(current, 1);
 		}
@@ -293,114 +279,6 @@ RegionVisitor::RegionVisitor()
 }
 
 
-std::array<std::string, 32> regionmap = {
-
-	"left_forearm",
-	"left_upper_arm",
-	"left_shoulder",
-	"left_back",
-	"left_upper_chest",
-	"left_upper_ab",
-	"left_mid_ab",
-	"left_lower_ab",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"right_forearm",
-	"right_upper_arm",
-	"right_shoulder",
-	"right_back",
-	"right_upper_chest",
-	"right_upper_ab",
-	"right_mid_ab",
-	"right_lower_ab",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved"
-};
-	
 
 
-std::vector<std::string> extractRegions(const PlayablePtr & event) 
-{
-	auto& translator = Locator::getTranslator();
-	std::vector<std::string> regions;
-	uint32_t area = event->area();
-	std::bitset<32> areas(area);
-	for (std::size_t i = 0; i < areas.size(); i++) {
-		if (areas.test(i)) {
-			regions.push_back(regionmap[i]);
-		}
-	}
-	/*
-	for (uint32_t bit = 1; area >= bit; bit *= 2)
-	{
-		if (area & bit) {
-			switch (AreaFlag(bit)) {
-			case AreaFlag::Forearm_Left:
-				regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Left));
-				break;
-			case AreaFlag::Upper_Arm_Left:
-				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Left));
-				break;
-			case AreaFlag::Shoulder_Left:
-				regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Left));
-				break;
-			case AreaFlag::Back_Left:
-				regions.push_back(translator.ToRegionString(AreaFlag::Back_Left));
-				break;
-			case AreaFlag::Chest_Left:
-				regions.push_back(translator.ToRegionString(AreaFlag::Chest_Left));
-				break;
-			case AreaFlag::Upper_Ab_Left:
-				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Left));
-				break;
-			case AreaFlag::Mid_Ab_Left:
-				regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Left));
-				break;
-			case AreaFlag::Lower_Ab_Left:
-				regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Left));
-				break;
-			case AreaFlag::Forearm_Right:
-				regions.push_back(translator.ToRegionString(AreaFlag::Forearm_Right));
-				break;
-			case AreaFlag::Upper_Arm_Right:
-				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Arm_Right));
-				break;
-			case AreaFlag::Shoulder_Right:
-				regions.push_back(translator.ToRegionString(AreaFlag::Shoulder_Right));
-				break;
-			case AreaFlag::Back_Right:
-				regions.push_back(translator.ToRegionString(AreaFlag::Back_Right));
-				break;
-			case AreaFlag::Chest_Right:
-				regions.push_back(translator.ToRegionString(AreaFlag::Chest_Right));
-				break;
-			case AreaFlag::Upper_Ab_Right:
-				regions.push_back(translator.ToRegionString(AreaFlag::Upper_Ab_Right));
-				break;
-			case AreaFlag::Mid_Ab_Right:
-				regions.push_back(translator.ToRegionString(AreaFlag::Mid_Ab_Right));
-				break;
-			case AreaFlag::Lower_Ab_Right:
-				regions.push_back(translator.ToRegionString(AreaFlag::Lower_Ab_Right));
-				break;
-			default:
-				break;
-			}
-		}
-	}
-	*/
-	return regions;
-}
 
