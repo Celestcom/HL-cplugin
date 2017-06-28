@@ -334,6 +334,7 @@
     <ClInclude Include="..\src\NSLoader_Errors.h" />
     <ClInclude Include="..\src\NSLoader_Internal.h" />
     <ClInclude Include="..\src\NSLoader_fwds.h" />
+    <ClInclude Include="..\src\NSUtils.h" />
     <ClInclude Include="..\src\ParameterizedEvent.h" />
     <ClInclude Include="..\src\PlayableEffect.h" />
     <ClInclude Include="..\src\PlaybackHandle.h" />

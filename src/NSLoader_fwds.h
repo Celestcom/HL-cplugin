@@ -1,7 +1,8 @@
 #pragma once
 
 typedef struct NSVR_System_ NSVR_System;
-
+typedef struct NSVR_Event_ NSVR_Event;
+typedef struct NSVR_Timeline_ NSVR_Timeline;
 
 typedef struct NSVR_Timeline_ NSVR_Timeline;
 

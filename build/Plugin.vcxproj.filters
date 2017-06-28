@@ -150,6 +150,9 @@
     <ClInclude Include="..\src\NSLoader_fwds.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\NSUtils.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\ParameterizedEvent.h">
       <Filter>src</Filter>
     </ClInclude>
