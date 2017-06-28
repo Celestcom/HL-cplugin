@@ -55,15 +55,18 @@ int Engine::DumpDeviceDiagnostics()
 int Engine::SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int length)
 {
 	auto& translator = Locator::getTranslator();
+
+	using namespace NullSpaceIPC;
+	HighLevelEvent event;
+	auto realtime = event.mutable_realtime_haptic();
 	for (unsigned int i = 0; i < length; i++) {
 		
 		auto region = translator.ToRegionString(AreaFlag(areas[i]));
-		using namespace NullSpaceIPC;
-		HighLevelEvent event;
-		auto realtime = event.mutable_realtime_haptic();
-		auto mags = realtime->mutable_magnitudes();
-		
+		auto magnitude = realtime->add_magnitudes();
+		magnitude->set_region(std::move(region));
+		magnitude->set_strength(static_cast<float>(strengths[i]) / 255.0f);	
 	}
+	m_messenger.WriteEvent(event);
 
 	return NSVR_Success_Unqualified;
 }

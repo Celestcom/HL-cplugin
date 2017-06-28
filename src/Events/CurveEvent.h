@@ -3,7 +3,10 @@
 #include "ParameterizedEvent.h"
 #include "PlayableEvent.h"
 #include "NSLoader.h"
-
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#include "HighLevelEvent.pb.h"
+#pragma warning(pop)
 
 class CurveEvent : public PlayableEvent {
 public:
@@ -21,6 +24,9 @@ public:
 
 
 	virtual bool parse(const ParameterizedEvent&) override;
+
+
+	virtual void serialize(NullSpaceIPC::HighLevelEvent& event) const override;
 
 private:
 	float m_time;

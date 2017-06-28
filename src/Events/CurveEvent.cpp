@@ -36,6 +36,23 @@ bool CurveEvent::parse(const ParameterizedEvent& ev)
 	return true;
 }
 
+void CurveEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
+{
+	using namespace NullSpaceIPC;
+	auto curve = event.mutable_curve_haptic();
+	
+	auto regions = extractRegions(*this);
+	for (const auto& region : regions) {
+		curve->add_regions(region);
+	}
+
+	for (auto i = 0; i < m_timePoints.size(); i++) {
+		auto sample = curve->add_samples();
+		sample->set_time(m_timePoints[i]);
+		sample->set_magnitude(m_volumes[i]);
+	}
+}
+
 bool CurveEvent::isEqual(const PlayableEvent& other) const
 {
 	const auto& ev = static_cast<const CurveEvent&>(other);
