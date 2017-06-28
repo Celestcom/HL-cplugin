@@ -13,7 +13,7 @@
 #else 
 	#define NSLOADER_INTERNAL_API
 #endif
-#define NSVR_RETURN_INTERNAL(ReturnType) NSLOADER_INTERNAL_API ReturnType __stdcall
+#define NSVR_RETURN_INTERNAL(ReturnType) NSLOADER_INTERNAL_API ReturnType __cdecl
 
 #ifdef __cplusplus
 extern "C" {

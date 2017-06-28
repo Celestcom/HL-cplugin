@@ -13,7 +13,7 @@
 #else 
 	#define NSLOADER_INTERNAL_API
 #endif
-#define NSVR_RETURN_INTERNAL(ReturnType) NSLOADER_INTERNAL_API ReturnType __stdcall
+#define NSVR_RETURN_INTERNAL(ReturnType) NSLOADER_INTERNAL_API ReturnType __cdecl
 
 #ifdef __cplusplus
 extern "C" {
@@ -31,6 +31,8 @@ extern "C" {
 		}
 
 		NSVR_Event_Release(&event);
+
+		return NSVR_Success_Unqualified;
 	}
 
 	NSVR_RETURN_INTERNAL(int) NSVR_Util_BasicHapticEvent_Create(NSVR_Timeline* timeline,
@@ -51,6 +53,8 @@ extern "C" {
 		NSVR_Timeline_AddEvent(timeline, event);
 
 		NSVR_Event_Release(&event);
+
+		return NSVR_Success_Unqualified;
 
 	}
 

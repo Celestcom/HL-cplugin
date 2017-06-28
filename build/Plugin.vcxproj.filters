@@ -272,6 +272,9 @@
     <ClCompile Include="..\src\NSLoader_Internal.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\NSUtils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\ParameterizedEvent.cpp">
       <Filter>src</Filter>
     </ClCompile>

@@ -15,7 +15,7 @@
 #define NSLOADER_API_VERSION ((NSLOADER_API_VERSION_MAJOR << 16) | NSLOADER_API_VERSION_MINOR)
 
 
-#define NSVR_RETURN(ReturnType) NSLOADER_API ReturnType __stdcall
+#define NSVR_RETURN(ReturnType) NSLOADER_API ReturnType __cdecl
 
 
 

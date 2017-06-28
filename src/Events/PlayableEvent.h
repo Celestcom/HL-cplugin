@@ -25,7 +25,6 @@ public:
 
 	bool operator==(const PlayableEvent& other) const;
 
-	std::vector<PlayablePtr> spawnChildEvents() {}
 
 private:
 	virtual bool isEqual(const PlayableEvent& other) const = 0;
