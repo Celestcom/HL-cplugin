@@ -6,21 +6,27 @@ EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|UnitTestWin32 = Debug|UnitTestWin32
+		Debug|UnitTestWin64 = Debug|UnitTestWin64
 		Debug|Win32 = Debug|Win32
 		Debug|Win64 = Debug|Win64
 		Release|UnitTestWin32 = Release|UnitTestWin32
+		Release|UnitTestWin64 = Release|UnitTestWin64
 		Release|Win32 = Release|Win32
 		Release|Win64 = Release|Win64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Debug|UnitTestWin32.ActiveCfg = Debug UnitTestWin32|Win32
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Debug|UnitTestWin32.Build.0 = Debug UnitTestWin32|Win32
+		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Debug|UnitTestWin64.ActiveCfg = Debug UnitTestWin64|x64
+		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Debug|UnitTestWin64.Build.0 = Debug UnitTestWin64|x64
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Debug|Win32.ActiveCfg = Debug|Win32
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Debug|Win32.Build.0 = Debug|Win32
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Debug|Win64.ActiveCfg = Debug Win64|x64
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Debug|Win64.Build.0 = Debug Win64|x64
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Release|UnitTestWin32.ActiveCfg = Release UnitTestWin32|Win32
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Release|UnitTestWin32.Build.0 = Release UnitTestWin32|Win32
+		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Release|UnitTestWin64.ActiveCfg = Release UnitTestWin64|x64
+		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Release|UnitTestWin64.Build.0 = Release UnitTestWin64|x64
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Release|Win32.ActiveCfg = Release|Win32
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Release|Win32.Build.0 = Release|Win32
 		{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}.Release|Win64.ActiveCfg = Release Win64|x64

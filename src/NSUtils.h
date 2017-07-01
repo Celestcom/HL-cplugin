@@ -19,6 +19,7 @@
 extern "C" {
 #endif
 
+
 	NSVR_RETURN_INTERNAL(int) NSVR_Util_Curve_Create(NSVR_Timeline* timeline, float time, float* time_offsets, float* mags, unsigned int length) {
 		NSVR_Event* event;
 		//should be RealtimeEvent or something     ---v

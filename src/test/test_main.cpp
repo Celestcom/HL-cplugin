@@ -12,6 +12,8 @@
 #include "../ClientMessenger.h"
 #include <functional>
 #include <chrono>
+#include "../SharedCommunication/readablesharedvector.h"
+#include "../SharedCommunication/SharedTypes.h"
 
 template<typename T>
 T time(std::function<void()> fn) {
@@ -59,6 +61,10 @@ bool isContCommand(const NullSpaceIPC::EffectCommand& command) {
 	return command.command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS;
 }
 
+TEST_CASE("The stuff", "[HellYea]") {
+	ReadableSharedVector<NullSpace::SharedMemory::Quaternion> sharedMem("ns-tracking-mem1", "ns-tracking-quats");
+	sharedMem.Get(0);
+}
 
 TEST_CASE("The zone model works", "[ZoneModel]") {
 	ZoneModel model(Location::Chest_Left);

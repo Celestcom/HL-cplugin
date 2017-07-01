@@ -3,8 +3,9 @@
 #include "ReadableSharedQueue.h"
 #include "ReadableSharedObject.h"
 #include "WritableSharedQueue.h"
+#include "ReadableSharedTracking.h"
+#include "ReadableSharedVector.h"
 #include "SharedTypes.h"
-//#include "Encoder.h"
 #include <boost\optional.hpp>
 #include <boost\asio.hpp>
 #include <boost\chrono.hpp>
@@ -52,7 +53,7 @@ private:
 	//Stream of commands to send to driver, such as ENABLE_TRACKING, DISABLE_TRACKING, etc.
 	std::unique_ptr<WritableSharedQueue> m_commandStream;
 
-
+	std::unique_ptr<ReadableSharedTracking> m_tracking;
 
 	//We use a sentinel to see if the driver is responsive/exists
 	boost::asio::deadline_timer m_sentinelTimer;

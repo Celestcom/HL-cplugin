@@ -33,10 +33,21 @@ ClientMessenger::~ClientMessenger()
 
 boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 {
-	if (m_trackingData) {
-		return m_trackingData->Read();
+	//if (m_trackingData) {
+	//	return m_trackingData->Read();
+	//}
+	//return boost::optional<TrackingUpdate>();
+
+	if (m_tracking) {
+		TrackingUpdate t = { };
+		NullSpace::SharedMemory::Quaternion def = {0};
+		NullSpace::SharedMemory::Quaternion quat = m_tracking->TryRead("chest", def);
+		t.chest = quat;
+		return t;
 	}
-	return boost::optional<TrackingUpdate>();
+	else {
+		return boost::none;
+	}
 }
 
 boost::optional<SuitsConnectionInfo> ClientMessenger::ReadSuits()
@@ -154,6 +165,7 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		m_trackingData = std::make_unique<ReadableSharedObject<TrackingUpdate>>("ns-tracking-data");
 		m_suitConnectionInfo = std::make_unique<ReadableSharedObject<SuitsConnectionInfo>>("ns-suit-data");
 		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
+		m_tracking = std::make_unique<ReadableSharedTracking>();
 	}
 	catch (const boost::interprocess::interprocess_exception& e) {
 		BOOST_LOG_TRIVIAL(error) << "Failed to make shared objects: " << e.what();

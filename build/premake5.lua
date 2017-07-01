@@ -3,7 +3,7 @@
 
 workspace "Plugin"
 	configurations {"Debug", "Release"}
-	platforms {"Win32", "Win64", "UnitTestWin32"}
+	platforms {"Win32", "Win64", "UnitTestWin32", "UnitTestWin64"}
 	language "C++"
 	
 	
@@ -75,7 +75,7 @@ project "Plugin"
 
 	filter {"platforms:Win32 or platforms:Win64"}
 		kind "SharedLib"
-	filter {"platforms:UnitTestWin32"}
+	filter {"platforms:UnitTest*"}
 		kind "ConsoleApp"
 
 	-- input: libprotobuf
@@ -106,6 +106,15 @@ project "Plugin"
 			path.join(protobuf_win32_dir, "Release")
 		}
 
+		filter {"platforms:UnitTestWin64", "configurations:Debug"}
+		libdirs {
+			path.join(protobuf_win64_dir, "Debug")
+		}
+	filter {"platforms:UnitTestWin64", "configurations:Release"}
+		libdirs {
+			path.join(protobuf_win64_dir, "Release")
+		}
+
 
 	filter "platforms:Win32 or platforms:UnitTestWin32" 
 		system "Windows"
@@ -114,7 +123,7 @@ project "Plugin"
 			boost_win32_dir
 		}
 		defines {"WIN32"}
-	filter "platforms:Win64"
+	filter "platforms:Win64 or platforms:UnitTestWin64"
 		system "Windows"
 		architecture "x86_64"
 		libdirs {
