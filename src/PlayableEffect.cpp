@@ -257,10 +257,16 @@ NullSpaceIPC::HighLevelEvent makePlaybackEvent(const boost::uuids::uuid& parentI
 	playback_event->set_command(command);
 	return event;
 }
-void PlayableEffect::reset()
+
+
+void PlayableEffect::scrubToBegin()
 {
 	m_time = 0;
 	m_lastExecutedEffect = m_effects.begin();
+}
+
+void PlayableEffect::reset()
+{
 	m_messenger.WriteEvent(makePlaybackEvent(m_id, NullSpaceIPC::PlaybackEvent_Command_CANCEL));
 }
 
