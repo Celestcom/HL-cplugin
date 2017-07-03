@@ -484,7 +484,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		REQUIRE(player.GetNumLiveEffects() == 1);
 
 		auto info = player.GetHandleInfo(h);
-		REQUIRE(!info->Playing());
+		REQUIRE(info->State() != 0); //this enum should be exposed. 0 = playing
 		REQUIRE(info->CurrentTime() == Approx(0.0f));
 	}
 
@@ -499,7 +499,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Pause(h);
 
 		info = player.GetHandleInfo(h);
-		REQUIRE(!info->Playing());
+		REQUIRE(info->State() != NSVR_EffectInfo_State_Playing);
 		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME));
 	}
 
@@ -513,8 +513,8 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Stop(h);
 
 		info = player.GetHandleInfo(h);
-		REQUIRE(!info->Playing());
-		REQUIRE(info->CurrentTime() == Approx(0.0f));
+		REQUIRE(info->State() != NSVR_EffectInfo_State_Playing);
+		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME));
 	}
 
 	SECTION("Resuming an effect should work") {
@@ -530,7 +530,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Update(DELTA_TIME);
 
 		info = player.GetHandleInfo(h);
-		REQUIRE(info->Playing());
+		REQUIRE(info->State() == NSVR_EffectInfo_State_Playing);
 		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME * 2));
 	}
 
@@ -544,8 +544,8 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Play(h);
 		player.Update(info->Duration() + DELTA_TIME);
 		info = player.GetHandleInfo(h);
-		REQUIRE(!info->Playing());
-		REQUIRE(info->CurrentTime() == Approx(0.0f));
+		REQUIRE(info->State() != NSVR_EffectInfo_State_Playing);
+		REQUIRE(info->CurrentTime() == Approx(info->Duration() + DELTA_TIME));
 	}
 
 	SECTION("Releasing an effect should work") {

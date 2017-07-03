@@ -26,7 +26,7 @@ int PlaybackHandle::Command(NSVR_PlaybackCommand command)
 
 
 
-int PlaybackHandle::GetHandleInfo(NSVR_HandleInfo* infoPtr)
+int PlaybackHandle::GetHandleInfo(NSVR_EffectInfo* infoPtr)
 {
 	if (engine != nullptr) {
 		return engine->GetHandleInfo(handle, infoPtr);

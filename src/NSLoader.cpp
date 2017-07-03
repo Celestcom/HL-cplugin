@@ -318,7 +318,7 @@ NSVR_RETURN(void) NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr)
 
 
 
-NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_GetInfo(NSVR_PlaybackHandle* handlePtr, NSVR_HandleInfo* infoPtr)
+NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_GetInfo(NSVR_PlaybackHandle* handlePtr, NSVR_EffectInfo* infoPtr)
 {
 	RETURN_IF_NULL(handlePtr);
 	RETURN_IF_NULL(infoPtr);

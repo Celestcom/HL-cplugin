@@ -48,7 +48,7 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry&
 
 	pruneDuplicates(m_effects);
 
-	reset();
+	scrubToBegin();
 }
 
 void PlayableEffect::sortByTime(std::vector<PlayablePtr>& playables)
@@ -89,6 +89,7 @@ void PlayableEffect::Play()
 {
 	switch (m_state) {
 	case PlaybackState::IDLE:
+		scrubToBegin();
 		m_state = PlaybackState::PLAYING;
 		break;
 	case PlaybackState::PAUSED:
@@ -232,7 +233,7 @@ bool PlayableEffect::IsReleased() const
 
 PlayableInfo PlayableEffect::GetInfo() const
 {
-	return PlayableInfo(GetTotalDuration(), m_time, m_state == PlaybackState::PLAYING);
+	return PlayableInfo(GetTotalDuration(), m_time, (int)m_state);
 }
 
 void PlayableEffect::Release()

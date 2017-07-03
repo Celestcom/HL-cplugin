@@ -13,7 +13,7 @@ public:
 
 
 	int Command(NSVR_PlaybackCommand command);
-	int GetHandleInfo(NSVR_HandleInfo* infoPtr);
+	int GetHandleInfo(NSVR_EffectInfo* infoPtr);
 
 	uint32_t handle;
 	Engine* engine;

@@ -73,6 +73,7 @@ private:
 	ClientMessenger& m_messenger;
 	bool m_released;
 
+	void scrubToBegin();
 	void reset();
 	void pause();
 	void resume();

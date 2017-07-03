@@ -6,7 +6,7 @@ struct PlayableInfo {
 private:
 	float _totalPlaytime;
 	float _currentTime;
-	bool _isPlaying;
+	int _state;
 public:
 	float Duration() const {
 		return _totalPlaytime;
@@ -14,13 +14,13 @@ public:
 	float CurrentTime() const {
 		return _currentTime;
 	}
-	bool Playing() const {
-		return _isPlaying;
+	int State() const {
+		return _state;
 	}
-	PlayableInfo(float duration, float currentTime, bool playing) :
+	PlayableInfo(float duration, float currentTime, int playing) :
 		_totalPlaytime(duration),
 		_currentTime(currentTime),
-		_isPlaying(playing) {}
+		_state(playing) {}
 };
 
 
