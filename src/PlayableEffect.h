@@ -71,6 +71,7 @@ private:
 
 	bool m_released;
 
+	void scrubToBegin();
 	void reset();
 	void pause();
 	void resume();

@@ -502,7 +502,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 
 		info = player.GetHandleInfo(h);
 		REQUIRE(info->State() != NSVR_EffectInfo_State_Playing);
-		REQUIRE(info->CurrentTime() == Approx(0.0f));
+		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME));
 	}
 
 	SECTION("Resuming an effect should work") {
@@ -533,7 +533,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Update(info->Duration() + DELTA_TIME);
 		info = player.GetHandleInfo(h);
 		REQUIRE(info->State() != NSVR_EffectInfo_State_Playing);
-		REQUIRE(info->CurrentTime() == Approx(0.0f));
+		REQUIRE(info->CurrentTime() == Approx(info->Duration() + DELTA_TIME));
 	}
 
 	SECTION("Releasing an effect should work") {
