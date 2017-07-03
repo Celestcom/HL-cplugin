@@ -40,7 +40,7 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry&
 
 	pruneDuplicates(m_effects);
 
-	reset();
+	scrubToBegin();
 }
 
 void PlayableEffect::sortByTime(std::vector<PlayablePtr>& playables)
@@ -80,6 +80,7 @@ void PlayableEffect::Play()
 {
 	switch (m_state) {
 	case PlaybackState::IDLE:
+		scrubToBegin();
 		m_state = PlaybackState::PLAYING;
 		break;
 	case PlaybackState::PAUSED:
@@ -213,7 +214,7 @@ bool PlayableEffect::IsReleased() const
 
 PlayableInfo PlayableEffect::GetInfo() const
 {
-	return PlayableInfo(GetTotalDuration(), m_time, m_state == PlaybackState::PLAYING);
+	return PlayableInfo(GetTotalDuration(), m_time, (int)m_state);
 }
 
 void PlayableEffect::Release()
@@ -223,11 +224,14 @@ void PlayableEffect::Release()
 	
 }
 
-void PlayableEffect::reset()
+void PlayableEffect::scrubToBegin()
 {
 	m_time = 0;
 	m_lastExecutedEffect = m_effects.begin();
-	
+}
+
+void PlayableEffect::reset()
+{
 
 	std::for_each(m_activeDrivers.begin(), m_activeDrivers.end(), [&](std::weak_ptr<HardwareDriver> hd) {
 		if (auto p = hd.lock()){
