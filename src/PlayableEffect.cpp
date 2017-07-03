@@ -213,7 +213,7 @@ bool PlayableEffect::IsReleased() const
 
 PlayableInfo PlayableEffect::GetInfo() const
 {
-	return PlayableInfo(GetTotalDuration(), m_time, m_state == PlaybackState::PLAYING);
+	return PlayableInfo(GetTotalDuration(), m_time, (int)m_state);
 }
 
 void PlayableEffect::Release()

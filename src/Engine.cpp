@@ -32,11 +32,12 @@ void Engine::executeTimestep()
 	
 }
 
-int Engine::GetHandleInfo(uint32_t m_handle, NSVR_HandleInfo* infoPtr) 
+int Engine::GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr) 
 {
 	if (auto info = m_player.GetHandleInfo(HapticHandle(m_handle))) {
 		infoPtr->Duration = info->Duration();
 		infoPtr->Elapsed = info->CurrentTime();
+		infoPtr->PlaybackState = static_cast<NSVR_EffectInfo_State>(info->State());
 		return NSVR_Success_Unqualified;
 	}
 	else {
