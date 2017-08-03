@@ -15,6 +15,7 @@
 #include "EngineIsAlive.h"
 #include "EngineCommand.h"
 
+struct BodyView;
 class Engine
 {
 public:
@@ -68,5 +69,7 @@ private:
 	void setupUserFacingLogSink();
 
 	void setupFileLogSink();
+public:
+	int UpdateView(BodyView* view);
 };
 

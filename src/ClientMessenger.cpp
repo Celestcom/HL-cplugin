@@ -120,6 +120,17 @@ boost::optional<std::string> ClientMessenger::ReadLog()
 
 }
 
+std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
+{
+	std::vector<NullSpace::SharedMemory::RegionPair> pairs;
+	std::size_t eles = m_bodyView->size();
+	pairs.reserve(eles);
+	for (int i = 0; i < eles; i++) {
+		pairs.push_back(m_bodyView->Get(i));
+	}
+	return pairs;
+}
+
 bool ClientMessenger::ConnectedToService(NSVR_ServiceInfo* info)
 {
 
@@ -166,6 +177,7 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		m_suitConnectionInfo = std::make_unique<ReadableSharedObject<SuitsConnectionInfo>>("ns-suit-data");
 		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
 		m_tracking = std::make_unique<ReadableSharedTracking>();
+		m_bodyView = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>>("ns-bodyview-mem", "ns-bodyview-vec");
 	}
 	catch (const boost::interprocess::interprocess_exception& e) {
 		BOOST_LOG_TRIVIAL(error) << "Failed to make shared objects: " << e.what();

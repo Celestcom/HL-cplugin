@@ -6,7 +6,8 @@ void ZoneModel::Put(LiveBasicHapticEvent event) {
 }
 
 void ZoneModel::Remove(boost::uuids::uuid id) {
-	incomingCommands.push(UserCommand(id, UserCommand::Command::Remove));
+	removeAllChildren(id);
+	//incomingCommands.push(UserCommand(id, UserCommand::Command::Remove));
 }
 
 void ZoneModel::Play(boost::uuids::uuid id) {

@@ -31,6 +31,7 @@ public:
 	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
 	boost::optional<std::string> ReadLog();
 
+	std::vector<NullSpace::SharedMemory::RegionPair> ReadBodyView();
 	bool ConnectedToService(NSVR_ServiceInfo* info);
 
 private:
@@ -55,6 +56,7 @@ private:
 
 	std::unique_ptr<ReadableSharedTracking> m_tracking;
 
+	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>> m_bodyView;
 	//We use a sentinel to see if the driver is responsive/exists
 	boost::asio::deadline_timer m_sentinelTimer;
 

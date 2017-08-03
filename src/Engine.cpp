@@ -16,7 +16,7 @@
 #include "IHapticDevice.h"
 #include "Devices/HardlightDevice/hardlightdevice.h"
 #include "Locator.h"
-
+#include "BodyView.h"
 void Engine::executeTimestep()
 {
 	
@@ -130,6 +130,12 @@ void Engine::setupFileLogSink()
 }
 
 
+
+int Engine::UpdateView(BodyView* view)
+{
+	view->pairs = m_messenger.ReadBodyView();
+	return NSVR_Success_Unqualified;
+}
 
 void Engine::setupUserFacingLogSink()
 {

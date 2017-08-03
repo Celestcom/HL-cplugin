@@ -42,6 +42,9 @@
     <ClInclude Include="..\src\AreaParser.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\BodyView.h">
+      <Filter>src</Filter>
+    </ClInclude>
     <ClInclude Include="..\src\ClientMessenger.h">
       <Filter>src</Filter>
     </ClInclude>

@@ -2,7 +2,7 @@
 
 #include "Engine.h"
 #include "ExceptionSafeCall.h"
-
+#include "BodyView.h"
 #define AS_TYPE(Type, Obj) reinterpret_cast<Type *>(Obj)
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
@@ -110,4 +110,70 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System* systemPtr, uin
 		return AS_TYPE(Engine, systemPtr)->SetStrengths(strengths, areas, length);
 	});
 
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_Create(NSVR_BodyView** body)
+{
+	return ExceptionGuard([&] {
+		*body = AS_TYPE(NSVR_BodyView, new BodyView());
+		return NSVR_Success_Unqualified;
+	});
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_Release(NSVR_BodyView ** body)
+{
+	return ExceptionGuard([&] {
+		delete AS_TYPE(BodyView, *body);
+		*body = nullptr;
+		return NSVR_Success_Unqualified;
+	});
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_Poll(NSVR_BodyView * body, NSVR_System * system)
+{
+	RETURN_IF_NULL(system);
+	RETURN_IF_NULL(body);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, system)->UpdateView(AS_TYPE(BodyView, body));
+	});
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeCount(NSVR_BodyView * body, uint32_t * outNodeCount)
+{
+	RETURN_IF_NULL(body);
+
+	return ExceptionGuard([&] {
+		//todo: be defensive about overflow?
+		*outNodeCount = static_cast<uint32_t>(AS_TYPE(BodyView, body)->pairs.size());
+		return NSVR_Success_Unqualified;
+	});
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeType(NSVR_BodyView * body, uint32_t nodeIndex, uint32_t * outType)
+{
+	return ExceptionGuard([&] {
+		return AS_TYPE(BodyView, body)->getNodeType(nodeIndex, outType);
+	});
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeRegion(NSVR_BodyView * body, uint32_t nodeIndex, uint64_t * outRegion)
+{
+	return ExceptionGuard([&] {
+		return AS_TYPE(BodyView, body)->getNodeRegion(nodeIndex, outRegion);
+	});
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetIntensity(NSVR_BodyView * body, uint32_t nodeIndex, float * outIntensity)
+{
+	return ExceptionGuard([&] {
+		return AS_TYPE(BodyView, body)->getIntensity(nodeIndex, outIntensity);
+	});
+}
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetColor(NSVR_BodyView * body, uint32_t nodeIndex, NSVR_Color * outColor)
+{
+	return ExceptionGuard([&] {
+		return AS_TYPE(BodyView, body)->getNodeColor(nodeIndex, outColor);
+	});
 }
