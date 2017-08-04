@@ -122,12 +122,24 @@ boost::optional<std::string> ClientMessenger::ReadLog()
 
 std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
 {
+	//Todo: make a safer scheme for accessing these objects. If you forget to check for nullptr,
+	//then we'll have a read access violation if the shared mem didn't initialize. 
+	//Perhaps we make a wrapper for these.
+	// Api could be like boost::optional value_or
+	// return bodyView.try([](BodyView* view) {
+	//       //do whatever needs to be done
+	// }); 
+
 	std::vector<NullSpace::SharedMemory::RegionPair> pairs;
-	std::size_t eles = m_bodyView->size();
-	pairs.reserve(eles);
-	for (int i = 0; i < eles; i++) {
-		pairs.push_back(m_bodyView->Get(i));
+	
+	if (m_bodyView) {
+		std::size_t eles = m_bodyView->size();
+		pairs.reserve(eles);
+		for (int i = 0; i < eles; i++) {
+			pairs.push_back(m_bodyView->Get(i));
+		}
 	}
+	
 	return pairs;
 }
 
@@ -173,10 +185,10 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		//Locator::Logger().Log("ClientMessenger", "Attempting to create all the other shared objects");
 
 		m_hapticsStream = std::make_unique<WritableSharedQueue>("ns-haptics-data");
-		m_trackingData = std::make_unique<ReadableSharedObject<TrackingUpdate>>("ns-tracking-data");
+	//	m_trackingData = std::make_unique<ReadableSharedObject<TrackingUpdate>>("ns-tracking-data");
 		m_suitConnectionInfo = std::make_unique<ReadableSharedObject<SuitsConnectionInfo>>("ns-suit-data");
 		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
-		m_tracking = std::make_unique<ReadableSharedTracking>();
+	//	m_tracking = std::make_unique<ReadableSharedTracking>();
 		m_bodyView = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>>("ns-bodyview-mem", "ns-bodyview-vec");
 	}
 	catch (const boost::interprocess::interprocess_exception& e) {
