@@ -14,7 +14,7 @@
 #include <chrono>
 #include "../SharedCommunication/readablesharedvector.h"
 #include "../SharedCommunication/SharedTypes.h"
-
+#include "NSLoader_Internal.h"
 template<typename T>
 T time(std::function<void()> fn) {
 	auto then = std::chrono::high_resolution_clock::now();
@@ -674,7 +674,16 @@ TEST_CASE("The events system works", "[EventSystem]") {
 	}
 }
 
+TEST_CASE("BodyView should work") {
+	boost::asio::io_service io;
+	
+	ClientMessenger m(io);
+	io.run_one();
 
+	SECTION("The shared memory should instantiate") {
+		auto r = m.ReadBodyView();
+	}
+}
 int main(int argc, char* argv[]) {
 	int result = Catch::Session().run(argc, argv);
 

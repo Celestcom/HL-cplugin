@@ -24,7 +24,7 @@ struct BodyView {
 	int getIntensity(uint32_t nodeIndex, float * outIntensity)
 	{
 		//perhaps be defensive and reject request if wrong type
-		*outIntensity = pairs[nodeIndex].intensity.intensity;
+		*outIntensity = pairs[nodeIndex].Value.data_3;
 		return NSVR_Success_Unqualified;
 	}
 
@@ -32,11 +32,11 @@ struct BodyView {
 
 	int getNodeColor(uint32_t nodeIndex, NSVR_Color * outColor)
 	{
-		const auto& col = pairs[nodeIndex].color;
+		const auto& col = pairs[nodeIndex].Value;
 		//this may not work. 
 		//todo: test
 
-		*outColor = { col.r, col.g, col.b, col.a };
+		*outColor = { col.data_0, col.data_1, col.data_2, col.data_3 };
 		/*outColor->r = col.r;
 		outColor->g = col.g;
 		outColor->b = col.b;

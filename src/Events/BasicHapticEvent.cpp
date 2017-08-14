@@ -76,7 +76,7 @@ void BasicHapticEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
 	simple->set_duration(m_duration);
 	simple->set_effect(m_requestedEffectFamily);
 	simple->set_strength(m_strength);
-	
+
 	auto regions = extractRegions(*this);
 	for (const auto& region : regions) {
 		simple->add_regions(region);

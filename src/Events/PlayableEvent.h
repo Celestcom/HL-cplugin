@@ -31,7 +31,7 @@ private:
 };
 
 
-std::vector<std::string> extractRegions(const PlayableEvent& event);
+std::vector<uint32_t> extractRegions(const PlayableEvent& event);
 
 bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);
 bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);

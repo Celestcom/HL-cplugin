@@ -7,6 +7,7 @@
 #include <typeinfo>
 #include "Locator.h"
 #include <bitset>
+#include "SharedTypes.h"
 bool PlayableEvent::operator<(const PlayableEvent & rhs) const
 {
 	return this->time() < rhs.time();
@@ -50,47 +51,30 @@ bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_pt
 }
 
 
-
-std::array<std::string, 32> regionMap = {
-
-	"left_forearm",
-	"left_upper_arm",
-	"left_shoulder",
-	"left_back",
-	"left_upper_chest",
-	"left_upper_ab",
-	"left_mid_ab",
-	"left_lower_ab",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"right_forearm",
-	"right_upper_arm",
-	"right_shoulder",
-	"right_back",
-	"right_upper_chest",
-	"right_upper_ab",
-	"right_mid_ab",
-	"right_lower_ab",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved",
-	"reserved"
+std::unordered_map<uint32_t, NullSpace::SharedMemory::nsvr_region> regionMap =
+{
+{ 0, NullSpace::SharedMemory::nsvr_region::nsvr_region_forearm_left },
+{ 1,  NullSpace::SharedMemory::nsvr_region::nsvr_region_upperarm_left },
+{ 2, NullSpace::SharedMemory::nsvr_region::nsvr_region_shoulder_left},
+{ 3, NullSpace::SharedMemory::nsvr_region::nsvr_region_back_left},
+{ 4, NullSpace::SharedMemory::nsvr_region::nsvr_region_chest_left},
+{ 5, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_upper_left},
+{ 6, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_middle_left},
+{ 7, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_lower_left},
+{ 16, NullSpace::SharedMemory::nsvr_region::nsvr_region_forearm_right },
+{ 17, NullSpace::SharedMemory::nsvr_region::nsvr_region_upperarm_right },
+{ 18, NullSpace::SharedMemory::nsvr_region::nsvr_region_shoulder_right},
+{ 19, NullSpace::SharedMemory::nsvr_region::nsvr_region_back_right},
+{ 20, NullSpace::SharedMemory::nsvr_region::nsvr_region_chest_right},
+{21, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_upper_right},
+{ 22, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_middle_right},
+{23, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_lower_right}
 };
 
-std::vector<std::string> extractRegions(const PlayableEvent & event)
+std::vector<uint32_t> extractRegions(const PlayableEvent & event)
 {
 	auto& translator = Locator::getTranslator();
-	std::vector<std::string> regions;
+	std::vector<uint32_t> regions;
 	std::bitset<32> areas(event.area());
 	regions.reserve(areas.count());
 
