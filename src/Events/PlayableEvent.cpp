@@ -51,25 +51,26 @@ bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_pt
 }
 
 
-std::unordered_map<uint32_t, NullSpace::SharedMemory::nsvr_region> regionMap =
+std::unordered_map<uint32_t, NullSpace::SharedMemory::nsvr_shared_region> regionMap =
 {
-{ 0, NullSpace::SharedMemory::nsvr_region::nsvr_region_forearm_left },
-{ 1,  NullSpace::SharedMemory::nsvr_region::nsvr_region_upperarm_left },
-{ 2, NullSpace::SharedMemory::nsvr_region::nsvr_region_shoulder_left},
-{ 3, NullSpace::SharedMemory::nsvr_region::nsvr_region_back_left},
-{ 4, NullSpace::SharedMemory::nsvr_region::nsvr_region_chest_left},
-{ 5, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_upper_left},
-{ 6, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_middle_left},
-{ 7, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_lower_left},
-{ 16, NullSpace::SharedMemory::nsvr_region::nsvr_region_forearm_right },
-{ 17, NullSpace::SharedMemory::nsvr_region::nsvr_region_upperarm_right },
-{ 18, NullSpace::SharedMemory::nsvr_region::nsvr_region_shoulder_right},
-{ 19, NullSpace::SharedMemory::nsvr_region::nsvr_region_back_right},
-{ 20, NullSpace::SharedMemory::nsvr_region::nsvr_region_chest_right},
-{21, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_upper_right},
-{ 22, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_middle_right},
-{23, NullSpace::SharedMemory::nsvr_region::nsvr_region_abs_lower_right}
+	{ 0, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_forearm_left },
+	{ 1,  NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_upperarm_left },
+	{ 2, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_shoulder_left },
+	{ 3, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_back_left },
+	{ 4, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_chest_left },
+	{ 5, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_abs_upper_left },
+	{ 6, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_abs_middle_left },
+	{ 7, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_abs_lower_left },
+	{ 16, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_forearm_right },
+	{ 17, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_upperarm_right },
+	{ 18, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_shoulder_right },
+	{ 19, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_back_right },
+	{ 20, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_chest_right },
+	{ 21, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_abs_upper_right },
+	{ 22, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_abs_middle_right },
+	{ 23, NullSpace::SharedMemory::nsvr_shared_region::nsvr_region_abs_lower_right }
 };
+
 
 std::vector<uint32_t> extractRegions(const PlayableEvent & event)
 {
