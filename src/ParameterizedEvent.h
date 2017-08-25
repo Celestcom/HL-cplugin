@@ -2,7 +2,8 @@
 #include "NSLoader_fwds.h"
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>
-
+#include <mutex>
+#include <vector>
 //#define DO_VALIDATION
 
 #ifdef DO_VALIDATION

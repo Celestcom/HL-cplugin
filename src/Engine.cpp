@@ -14,7 +14,6 @@
 #include <boost/core/null_deleter.hpp>
 #include "MyTestLog.h"
 #include "IHapticDevice.h"
-#include "Devices/HardlightDevice/hardlightdevice.h"
 #include "Locator.h"
 #include "BodyView.h"
 void Engine::executeTimestep()
@@ -24,11 +23,11 @@ void Engine::executeTimestep()
 	auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
 	
 	m_player.Update(dt);
-	auto commands = m_hardlightSuit->GenerateHardwareCommands(dt);
+//	auto commands = m_hardlightSuit->GenerateHardwareCommands(dt);
 	
-	for (const auto& command : commands) {
-		m_messenger.WriteHaptics(command);
-	}
+	//for (const auto& command : commands) {
+	//	m_messenger.WriteHaptics(command);
+	//}
 	
 }
 
@@ -94,8 +93,8 @@ Engine::Engine() :
 
 	boost::log::core::get()->set_logging_enabled(false);
 
-	m_hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
-	m_hardlightSuit->RegisterDrivers(m_registry);
+	//m_hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
+	//m_hardlightSuit->RegisterDrivers(m_registry);
 
 
 	m_hapticsTimestep.SetEvent([this]() {

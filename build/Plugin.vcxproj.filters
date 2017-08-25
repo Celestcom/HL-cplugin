@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="NS_Unreal_SDK">
@@ -18,12 +18,6 @@
     </Filter>
     <Filter Include="src">
       <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Devices">
-      <UniqueIdentifier>{1F5A9D73-8B0F-1669-1404-104080B80C6D}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="src\Devices\HardlightDevice">
-      <UniqueIdentifier>{7584AFCF-E191-DDB5-6A78-D9A0D684A96C}</UniqueIdentifier>
     </Filter>
     <Filter Include="src\Events">
       <UniqueIdentifier>{7162C20E-5D1A-045C-C621-DDB7B2F89E4C}</UniqueIdentifier>
@@ -47,27 +41,6 @@
     </ClInclude>
     <ClInclude Include="..\src\ClientMessenger.h">
       <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Devices\HardlightDevice\HardlightMk3Firmware.h">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Devices\HardlightDevice\HardlightMk3ZoneDriver.h">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Devices\HardlightDevice\LiveBasicHapticEvent.h">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Devices\HardlightDevice\MotorStateChanger.h">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Devices\HardlightDevice\RtpModel.h">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Devices\HardlightDevice\ZoneModel.h">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Devices\HardlightDevice\hardlightdevice.h">
-      <Filter>src\Devices\HardlightDevice</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Encoder.h">
       <Filter>src</Filter>
@@ -205,27 +178,6 @@
     </ClCompile>
     <ClCompile Include="..\src\ClientMessenger.cpp">
       <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Devices\HardlightDevice\HardlightDevice.cpp">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Devices\HardlightDevice\HardlightMk3Firmware.cpp">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Devices\HardlightDevice\HardlightMk3ZoneDriver.cpp">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Devices\HardlightDevice\LiveBasicHapticEvent.cpp">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Devices\HardlightDevice\MotorStateChanger.cpp">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Devices\HardlightDevice\RtpModel.cpp">
-      <Filter>src\Devices\HardlightDevice</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Devices\HardlightDevice\ZoneModel.cpp">
-      <Filter>src\Devices\HardlightDevice</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Engine.cpp">
       <Filter>src</Filter>
