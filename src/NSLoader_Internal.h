@@ -53,7 +53,6 @@ extern "C" {
 	/* Immediate API */
 	typedef struct NSVR_BodyView NSVR_BodyView;
 
-	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Sample(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount);
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, int length);
 
 
@@ -62,7 +61,7 @@ extern "C" {
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_Poll(NSVR_BodyView* body, NSVR_System* system);
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeCount(NSVR_BodyView* body, uint32_t* outNodeCount);
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeType(NSVR_BodyView * body, uint32_t nodeIndex, uint32_t* outType);
-	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeRegion(NSVR_BodyView * body, uint32_t nodeIndex, uint64_t* outRegion);
+	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeRegion(NSVR_BodyView * body, uint32_t nodeIndex, uint32_t* outRegion);
 
 	//only valid if nodeType == intensity
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetIntensity(NSVR_BodyView * body, uint32_t nodeIndex, float* outIntensity);

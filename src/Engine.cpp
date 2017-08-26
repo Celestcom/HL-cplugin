@@ -23,12 +23,7 @@ void Engine::executeTimestep()
 	auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
 	
 	m_player.Update(dt);
-//	auto commands = m_hardlightSuit->GenerateHardwareCommands(dt);
-	
-	//for (const auto& command : commands) {
-	//	m_messenger.WriteHaptics(command);
-	//}
-	
+
 }
 
 int Engine::GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr) 
@@ -405,25 +400,6 @@ int Engine::SubmitRawCommand(uint8_t * buffer, int length)
 	command.set_command(NullSpaceIPC::DriverCommand_Command_RAW_COMMAND);
 	command.set_raw_command(buffer, length);
 	m_messenger.WriteCommand(command);
-	return NSVR_Success_Unqualified;
-}
-
-int Engine::Sample(uint16_t * strengths, uint32_t * areas, uint32_t* families, int length, unsigned int * resultCount)
-{
-	auto samples = m_hardlightSuit->QueryDrivers();
-
-	std::size_t max_num_effects = std::min<std::size_t>(length, samples.size());
-	for (std::size_t i = 0; i < max_num_effects; i++) {
-		const auto& effect = samples[i];
-	
-		strengths[i] = effect.strength;
-		families[i] = effect.family;
-		areas[i] = static_cast<uint32_t>(effect.area);
-
-	}
-
-	*resultCount = static_cast<unsigned int>(samples.size());
-
 	return NSVR_Success_Unqualified;
 }
 

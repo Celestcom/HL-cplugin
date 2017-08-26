@@ -13,7 +13,7 @@ struct BodyView {
 
 
 
-	int getNodeRegion(uint32_t nodeIndex, uint64_t * outRegion)
+	int getNodeRegion(uint32_t nodeIndex, uint32_t * outRegion)
 	{
 		*outRegion = pairs[nodeIndex].Region;
 		return NSVR_Success_Unqualified;

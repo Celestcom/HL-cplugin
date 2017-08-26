@@ -79,22 +79,7 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_System_DumpDeviceDiagnostics(NSVR_System*
 }
 
 
-NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Sample(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount)
-{
-	RETURN_IF_NULL(systemPtr);
-	RETURN_IF_NULL(strengths);
-	RETURN_IF_NULL(areas);
-	RETURN_IF_NULL(resultCount);
 
-	if (length < 16) {
-		return NSVR_Error_InvalidArgument;
-	}
-
-	return ExceptionGuard([&] {
-		return AS_TYPE(Engine, systemPtr)->Sample(strengths, areas, families, length, resultCount);
-	});
-
-}
 
 NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, int length)
 {
@@ -157,7 +142,7 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeType(NSVR_BodyView * body
 	});
 }
 
-NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeRegion(NSVR_BodyView * body, uint32_t nodeIndex, uint64_t * outRegion)
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeRegion(NSVR_BodyView * body, uint32_t nodeIndex, uint32_t * outRegion)
 {
 	return ExceptionGuard([&] {
 		return AS_TYPE(BodyView, body)->getNodeRegion(nodeIndex, outRegion);
