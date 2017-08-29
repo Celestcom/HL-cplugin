@@ -39,6 +39,26 @@ int Engine::GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr)
 	}
 }
 
+int Engine::GetSystems(NSVR_DeviceInfo * array, uint32_t inLength, uint32_t * outArrayLength)
+{
+	//todo: should be doing a timestamp check to see if connected to service.
+	auto systems = m_messenger.ReadSystems();
+
+	std::size_t upperBound = std::min<std::size_t>(inLength, systems.size());
+	*outArrayLength = upperBound;
+	for (std::size_t i = 0; i < upperBound; i++) {
+		memcpy_s(array[i].ProductName, 128, systems[i].SystemName, 128);
+
+	}
+	return NSVR_Success_Unqualified;
+}
+
+int Engine::GetNumSystems(uint32_t * outAmount)
+{
+	*outAmount = m_messenger.ReadSystems().size();
+	return 1;
+}
+
 int Engine::DumpDeviceDiagnostics()
 {
 	NullSpaceIPC::DriverCommand command;
@@ -178,33 +198,6 @@ uint32_t Engine::GenerateHandle()
 	//todo: bounds check
 	m_currentHandleId += 1;
 	return m_currentHandleId;
-}
-
-int Engine::PollDevice(NSVR_DeviceInfo * device)
-{
-	//when polling for devices, we want to either fill in the device info struct or return an error if no devices present.
-	
-	if (auto optionalResponse = m_messenger.ReadSuits()) {
-		auto suits = optionalResponse.get();
-		if ((std::time(nullptr) - suits.timestamp) > 1) {
-			return NSVR_Error_ServiceDisconnected;
-		}
-		for (int i = 0; i < 4; i++) {
-			if (suits.SuitsFound[i]) {
-				auto sStatus = suits.Suits[i].Status;
-				if (sStatus == NullSpace::SharedMemory::Connected) {
-					//here, we'd make sure to check if device == nullptr if we were filling the struct.
-					//The user doesn't care about the results, so we just return success.
-
-
-					return NSVR_Success_Unqualified;
-				}
-			}
-		}
-		return NSVR_Error_NoDevicePresent;
-	} 
-
-	return NSVR_Error_ServiceDisconnected;
 }
 
 

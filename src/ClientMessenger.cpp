@@ -50,14 +50,19 @@ boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 	}
 }
 
-boost::optional<SuitsConnectionInfo> ClientMessenger::ReadSuits()
+std::vector<NullSpace::SharedMemory::SystemInfo> ClientMessenger::ReadSystems()
 {
-	if (m_suitConnectionInfo) {
-		return m_suitConnectionInfo->Read();
+	std::vector<NullSpace::SharedMemory::SystemInfo> info;
+	if (m_systems) {
+		for (std::size_t i = 0; i < m_systems->size(); i++) {
+			info.push_back(m_systems->Get(i));
+		}
+		
 	}
+	return info;
 
-	return boost::optional<SuitsConnectionInfo>();
 }
+
 
 void ClientMessenger::WriteCommand(const NullSpaceIPC::DriverCommand & d)
 {
@@ -186,8 +191,8 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 
 		m_hapticsStream = std::make_unique<WritableSharedQueue>("ns-haptics-data");
 	//	m_trackingData = std::make_unique<ReadableSharedObject<TrackingUpdate>>("ns-tracking-data");
-		m_suitConnectionInfo = std::make_unique<ReadableSharedObject<SuitsConnectionInfo>>("ns-suit-data");
 		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
+		m_systems = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::SystemInfo>>("ns-device-mem", "ns-device-data");
 	//	m_tracking = std::make_unique<ReadableSharedTracking>();
 		m_bodyView = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>>("ns-bodyview-mem", "ns-bodyview-vec");
 	}

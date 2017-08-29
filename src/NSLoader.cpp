@@ -50,14 +50,23 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System * systemPtr, NSV
 }
 
 
-NSVR_RETURN(NSVR_Result) NSVR_System_GetDeviceInfo(NSVR_System * systemPtr, NSVR_DeviceInfo * infoPtr)
+NSVR_RETURN(NSVR_Result) NSVR_System_GetNumSystemsPresent(NSVR_System * systemPtr, uint32_t * outAmount)
 {
 	RETURN_IF_NULL(systemPtr);
-
 	return ExceptionGuard([&] {
-		return AS_TYPE(Engine, systemPtr)->PollDevice(infoPtr);
+		return AS_TYPE(Engine, systemPtr)->GetNumSystems( outAmount);
 	});
 }
+
+NSVR_RETURN(NSVR_Result) NSVR_System_GetSystemsPresent(NSVR_System * systemPtr, NSVR_DeviceInfo * infoArray, uint32_t inArrayLength, uint32_t* outArrayLength)
+{
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, systemPtr)->GetSystems(infoArray, inArrayLength, outArrayLength );
+	});
+}
+
+
 
 NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr)
 {

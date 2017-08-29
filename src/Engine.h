@@ -46,6 +46,9 @@ public:
 	int SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int length);
 	int GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr);
 
+	int GetSystems(NSVR_DeviceInfo* array, uint32_t inLength, uint32_t* outArrayLength);
+	int GetNumSystems(uint32_t* outAmount);
+
 private:
 	IoService m_ioService;
 	NSVR_TrackingUpdate m_cachedTrackingUpdate;

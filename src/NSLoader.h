@@ -85,9 +85,7 @@ extern "C" {
 
 	typedef struct NSVR_DeviceInfo_ {
 		char ProductName[128];
-		short FirmwareMajor;
-		short FirmwareMinor;
-		//tracking capabilities?
+		
 	} NSVR_DeviceInfo;
 
 
@@ -139,7 +137,9 @@ extern "C" {
 
 
 	/* Devices */
-	NSVR_RETURN(NSVR_Result) NSVR_System_GetDeviceInfo(NSVR_System* systemPtr, NSVR_DeviceInfo* infoPtr);
+
+	NSVR_RETURN(NSVR_Result) NSVR_System_GetNumSystemsPresent(NSVR_System* systemPtr, uint32_t *outAmount);
+	NSVR_RETURN(NSVR_Result) NSVR_System_GetSystemsPresent(NSVR_System* systemPtr, NSVR_DeviceInfo* infoArray, uint32_t arrayLength, uint32_t* amountActuallyRetrieved);
 
 	/* Tracking */
 	NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Poll(NSVR_System* ptr, NSVR_TrackingUpdate* updatePtr);
@@ -159,7 +159,7 @@ extern "C" {
 
 
 	/* Timelines */
-	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Create(NSVR_Timeline** eventListPtr);
+	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Create( NSVR_Timeline** eventListPtr);
 	NSVR_RETURN(void)		 NSVR_Timeline_Release(NSVR_Timeline** listPtr);
 	NSVR_RETURN(NSVR_Result) NSVR_Timeline_AddEvent(NSVR_Timeline* list, NSVR_Event* event);
 	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline* timeline, NSVR_System* systemPtr, NSVR_PlaybackHandle* handlePr);

@@ -127,6 +127,7 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_Poll(NSVR_BodyView * body, NSVR_
 NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeCount(NSVR_BodyView * body, uint32_t * outNodeCount)
 {
 	RETURN_IF_NULL(body);
+	RETURN_IF_NULL(outNodeCount);
 
 	return ExceptionGuard([&] {
 		//todo: be defensive about overflow?
@@ -137,6 +138,8 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeCount(NSVR_BodyView * bod
 
 NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeType(NSVR_BodyView * body, uint32_t nodeIndex, uint32_t * outType)
 {
+	RETURN_IF_NULL(body);
+	RETURN_IF_NULL(outType);
 	return ExceptionGuard([&] {
 		return AS_TYPE(BodyView, body)->getNodeType(nodeIndex, outType);
 	});
@@ -144,6 +147,9 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeType(NSVR_BodyView * body
 
 NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeRegion(NSVR_BodyView * body, uint32_t nodeIndex, uint32_t * outRegion)
 {
+
+	RETURN_IF_NULL(body);
+	RETURN_IF_NULL(outRegion);
 	return ExceptionGuard([&] {
 		return AS_TYPE(BodyView, body)->getNodeRegion(nodeIndex, outRegion);
 	});
@@ -151,6 +157,10 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetNodeRegion(NSVR_BodyView * bo
 
 NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetIntensity(NSVR_BodyView * body, uint32_t nodeIndex, float * outIntensity)
 {
+
+	RETURN_IF_NULL(body);
+	RETURN_IF_NULL(outIntensity);
+
 	return ExceptionGuard([&] {
 		return AS_TYPE(BodyView, body)->getIntensity(nodeIndex, outIntensity);
 	});
@@ -158,6 +168,10 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetIntensity(NSVR_BodyView * bod
 
 NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_GetColor(NSVR_BodyView * body, uint32_t nodeIndex, NSVR_Color * outColor)
 {
+
+	RETURN_IF_NULL(body);
+	RETURN_IF_NULL(outColor);
+
 	return ExceptionGuard([&] {
 		return AS_TYPE(BodyView, body)->getNodeColor(nodeIndex, outColor);
 	});

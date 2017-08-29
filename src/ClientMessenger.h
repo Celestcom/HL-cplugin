@@ -25,7 +25,7 @@ public:
 	~ClientMessenger();
 
 	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
-	boost::optional<NullSpace::SharedMemory::SuitsConnectionInfo> ReadSuits();
+	std::vector<NullSpace::SharedMemory::SystemInfo> ReadSystems();
 	void WriteCommand(const NullSpaceIPC::DriverCommand& d);
 	void WriteEvent(const NullSpaceIPC::HighLevelEvent& e);
 	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
@@ -41,10 +41,9 @@ private:
 	//Read the most up-to-date tracking data from this object
 	std::unique_ptr<ReadableSharedObject<NullSpace::SharedMemory::TrackingUpdate>> m_trackingData;
 
+	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::SystemInfo>> m_systems;
 	//Read the most up-to-date suit connection information from this object
 	// 
-	std::unique_ptr<ReadableSharedObject<NullSpace::SharedMemory::SuitsConnectionInfo>> m_suitConnectionInfo;
-
 	//Get logging info from engine. Note: only one consumer can reliably get the debug info
 	std::unique_ptr<ReadableSharedQueue> m_logStream;
 
