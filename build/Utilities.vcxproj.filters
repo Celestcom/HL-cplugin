@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="NS_Unreal_SDK">
+      <UniqueIdentifier>{4D8460DB-B944-DC11-827F-258FEEFE20EE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NS_Unreal_SDK\src">
+      <UniqueIdentifier>{E4A08FE5-50B7-8D7B-992E-199D05845E03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NS_Unreal_SDK\src\Driver">
+      <UniqueIdentifier>{3FAB3787-2BD0-8607-541B-6C97409F8525}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NS_Unreal_SDK\src\Driver\SharedCommunication">
+      <UniqueIdentifier>{FB0CEF67-E71F-EFC0-9009-CCAD7CFB8B0E}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{2DAB880B-99B4-887C-2230-9F7C8E38947C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Plugin">
+      <UniqueIdentifier>{2BD3BE27-178B-0075-8092-D9D06C699B65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Utilities">
+      <UniqueIdentifier>{D86B3A83-442C-B6B9-0D67-FF3679E6FA95}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\Plugin\NSLoader.h">
+      <Filter>src\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plugin\NSLoader_Errors.h">
+      <Filter>src\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utilities\PathFinder.h">
+      <Filter>src\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utilities\stdafx.h">
+      <Filter>src\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Utilities\utilities.h">
+      <Filter>src\Utilities</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
+      <Filter>NS_Unreal_SDK\src\Driver\SharedCommunication</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utilities\PathFinder.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utilities\main.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utilities\stdafx.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Utilities\utilities.cpp">
+      <Filter>src\Utilities</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

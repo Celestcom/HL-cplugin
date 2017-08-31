@@ -18,7 +18,8 @@ typedef boost::variant<
 	float, 
 	int,
 	std::vector<float>,
-	std::vector<int>
+	std::vector<int>,
+	uint32_t
 > EventValue;
 
 

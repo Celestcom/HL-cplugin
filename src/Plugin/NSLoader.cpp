@@ -68,6 +68,24 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetSystemsPresent(NSVR_System * systemPtr, 
 
 
 
+NSVR_RETURN(NSVR_Result) NSVR_System_GetNextSystem(NSVR_System * system, NSVR_DeviceInfo * info)
+{
+	if (info->_internal == nullptr) {
+		Snapshot<NSVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
+		info->_internal = snapshot;
+	}
+
+	if (AS_TYPE(Engine, system)->IsFinishedIterating(AS_TYPE(Snapshot<NSVR_DeviceInfo>, info->_internal))) {
+		AS_TYPE(Engine, system)->DestroyIterator(AS_TYPE(Snapshot<NSVR_DeviceInfo>, info->_internal));
+		info->_internal = nullptr;
+		return false;
+	}
+	memcpy_s(info->ProductName, 128, AS_TYPE(Snapshot<NSVR_DeviceInfo>, info->_internal)->NextItem().ProductName, 128);
+	return true;
+
+
+}
+
 NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr)
 {
 
@@ -211,7 +229,7 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event * event, const char * k
 	});
 }
 
-NSVR_RETURN(NSVR_Result)NSVR_Event_SetInteger(NSVR_Event * event, const char * key, int value)
+NSVR_RETURN(NSVR_Result)NSVR_Event_SetInt(NSVR_Event * event, const char * key, int value)
  {
 	 RETURN_IF_NULL(event);
 	 RETURN_IF_NULL(key);
@@ -220,6 +238,15 @@ NSVR_RETURN(NSVR_Result)NSVR_Event_SetInteger(NSVR_Event * event, const char * k
 		 return AS_TYPE(ParameterizedEvent, event)->Set<int>(key, value);
 	 });
  }
+
+NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event * event, const char * key, uint32_t value)
+{
+	RETURN_IF_NULL(event);
+	RETURN_IF_NULL(key);
+	return ExceptionGuard([&] {
+		return AS_TYPE(ParameterizedEvent, event)->Set<uint32_t>(key, value);
+	});
+}
 
 NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr)
  {

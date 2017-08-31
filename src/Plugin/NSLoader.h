@@ -84,6 +84,7 @@ extern "C" {
 
 
 	typedef struct NSVR_DeviceInfo_ {
+		void *_internal;
 		char ProductName[128];
 		
 	} NSVR_DeviceInfo;
@@ -106,6 +107,9 @@ extern "C" {
 		NSVR_EffectInfo_State PlaybackState;
 	} NSVR_EffectInfo;
 	
+
+
+	NSVR_RETURN(NSVR_Result) NSVR_System_GetNextSystem(NSVR_System* system, NSVR_DeviceInfo* info);
 	//Instantiates a new NSVR system context
 	NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr);
 
@@ -155,7 +159,8 @@ extern "C" {
 	NSVR_RETURN(void)		 NSVR_Event_Release(NSVR_Event** event);
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event* event, const char* key, float value);
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event* event, const char* key, float* values, unsigned int length);
-	NSVR_RETURN(NSVR_Result) NSVR_Event_SetInteger(NSVR_Event* event, const char* key, int value);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetInt(NSVR_Event* event, const char* key, int value);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event* event, const char* key, uint32_t value);
 
 
 	/* Timelines */

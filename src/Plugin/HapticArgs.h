@@ -1,7 +1,7 @@
 #pragma once
 #include "Enums.h"
 #include <string>
-
+#include "AreaFlags.h"
 inline void hash_combine(std::size_t& seed) { }
 
 template <typename T, typename... Rest>

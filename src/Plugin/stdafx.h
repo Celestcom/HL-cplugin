@@ -5,7 +5,6 @@
 
 #pragma once
 
-#include "targetver.h"
 
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
@@ -46,7 +45,5 @@
 #include <boost/bimap/unordered_set_of.hpp>
 #include <boost/interprocess/ipc/message_queue.hpp>
 
-/* NullSpace */
-#include "AreaFlags.h"
 
 // TODO: reference additional headers your program requires here

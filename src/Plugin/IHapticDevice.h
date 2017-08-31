@@ -2,7 +2,7 @@
 #include "EventRegistry.h"
 #include "EffectCommand.pb.h"
 
-
+#include "AreaFlags.h"
 typedef std::vector<NullSpaceIPC::EffectCommand> CommandBuffer;
 
 struct HapticDisplayInfo {

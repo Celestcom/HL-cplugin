@@ -48,8 +48,8 @@ extern "C" {
 		NSVR_Event_SetFloat(event, "time", time);
 		NSVR_Event_SetFloat(event, "strength", strength);
 		NSVR_Event_SetFloat(event, "duration", duration);
-		NSVR_Event_SetInteger(event, "area", area);
-		NSVR_Event_SetInteger(event, "effect", effect);
+		NSVR_Event_SetInt(event, "area", area);
+		NSVR_Event_SetInt(event, "effect", effect);
 
 		NSVR_Timeline_AddEvent(timeline, event);
 

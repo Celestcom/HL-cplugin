@@ -67,10 +67,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{F4F95FCA-E09B-8AA0-C956-9EF4B59711F1}</ProjectGuid>
+    <ProjectGuid>{010A8043-6D74-34BA-B6B2-E55F225C120F}</ProjectGuid>
     <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>Plugin</RootNamespace>
+    <RootNamespace>Utilities</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -151,58 +151,58 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>bin\Debug\Win32\</OutDir>
-    <IntDir>obj\Win32\Debug\Plugin\</IntDir>
-    <TargetName>NSLoader</TargetName>
+    <OutDir>bin\Utilities\Debug\Win32\</OutDir>
+    <IntDir>obj\Win32\Debug\Utilities\</IntDir>
+    <TargetName>HardlightUtilities</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>bin\Debug\Win64\</OutDir>
-    <IntDir>obj\Win64\Debug\Plugin\</IntDir>
-    <TargetName>NSLoader</TargetName>
+    <OutDir>bin\Utilities\Debug\Win64\</OutDir>
+    <IntDir>obj\Win64\Debug\Utilities\</IntDir>
+    <TargetName>HardlightUtilities</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>bin\Debug\UnitTestWin32\</OutDir>
-    <IntDir>obj\UnitTestWin32\Debug\Plugin\</IntDir>
-    <TargetName>NSLoader</TargetName>
+    <OutDir>bin\Utilities\Debug\UnitTestWin32\</OutDir>
+    <IntDir>obj\UnitTestWin32\Debug\Utilities\</IntDir>
+    <TargetName>HardlightUtilities</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin64|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <OutDir>bin\Debug\UnitTestWin64\</OutDir>
-    <IntDir>obj\UnitTestWin64\Debug\Plugin\</IntDir>
-    <TargetName>NSLoader</TargetName>
+    <OutDir>bin\Utilities\Debug\UnitTestWin64\</OutDir>
+    <IntDir>obj\UnitTestWin64\Debug\Utilities\</IntDir>
+    <TargetName>HardlightUtilities</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>bin\Release\Win32\</OutDir>
-    <IntDir>obj\Win32\Release\Plugin\</IntDir>
-    <TargetName>NSLoader</TargetName>
+    <OutDir>bin\Utilities\Release\Win32\</OutDir>
+    <IntDir>obj\Win32\Release\Utilities\</IntDir>
+    <TargetName>HardlightUtilities</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>bin\Release\Win64\</OutDir>
-    <IntDir>obj\Win64\Release\Plugin\</IntDir>
-    <TargetName>NSLoader</TargetName>
+    <OutDir>bin\Utilities\Release\Win64\</OutDir>
+    <IntDir>obj\Win64\Release\Utilities\</IntDir>
+    <TargetName>HardlightUtilities</TargetName>
     <TargetExt>.dll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>bin\Release\UnitTestWin32\</OutDir>
-    <IntDir>obj\UnitTestWin32\Release\Plugin\</IntDir>
-    <TargetName>NSLoader</TargetName>
+    <OutDir>bin\Utilities\Release\UnitTestWin32\</OutDir>
+    <IntDir>obj\UnitTestWin32\Release\Utilities\</IntDir>
+    <TargetName>HardlightUtilities</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>bin\Release\UnitTestWin64\</OutDir>
-    <IntDir>obj\UnitTestWin64\Release\Plugin\</IntDir>
-    <TargetName>NSLoader</TargetName>
+    <OutDir>bin\Utilities\Release\UnitTestWin64\</OutDir>
+    <IntDir>obj\UnitTestWin64\Release\Utilities\</IntDir>
+    <TargetName>HardlightUtilities</TargetName>
     <TargetExt>.exe</TargetExt>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -210,9 +210,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;..\src\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -222,9 +221,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Debug;D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ImportLibrary>bin\Debug\Win32\NSLoader.lib</ImportLibrary>
+      <AdditionalDependencies>NSLoader.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Libraries\boost\boost_1_61_0\stage\win32\lib;bin\Debug\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>bin\Utilities\Debug\Win32\HardlightUtilities.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">
@@ -232,9 +231,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;..\src\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -244,9 +242,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Debug;D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ImportLibrary>bin\Debug\Win64\NSLoader.lib</ImportLibrary>
+      <AdditionalDependencies>NSLoader.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Libraries\boost\boost_1_61_0\stage\x64\lib;bin\Debug\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>bin\Utilities\Debug\Win64\HardlightUtilities.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">
@@ -254,9 +252,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;..\src\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -266,8 +263,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Debug;D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>NSLoader.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Libraries\boost\boost_1_61_0\stage\win32\lib;bin\Debug\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -276,9 +273,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;..\src\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -288,8 +284,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Debug;D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>NSLoader.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>D:\Libraries\boost\boost_1_61_0\stage\x64\lib;bin\Debug\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -298,9 +294,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;..\src\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -312,9 +307,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Release;D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ImportLibrary>bin\Release\Win32\NSLoader.lib</ImportLibrary>
+      <AdditionalLibraryDirectories>D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>bin\Utilities\Release\Win32\HardlightUtilities.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">
@@ -322,9 +316,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;..\src\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -336,9 +329,8 @@
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Release;D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <ImportLibrary>bin\Release\Win64\NSLoader.lib</ImportLibrary>
+      <AdditionalLibraryDirectories>D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImportLibrary>bin\Utilities\Release\Win64\HardlightUtilities.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">
@@ -346,9 +338,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;..\src\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -360,8 +351,7 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Release;D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -370,9 +360,8 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
-      <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <PreprocessorDefinitions>NSLOADER_EXPORTS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;..\src\Utilities;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -384,53 +373,16 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Release;D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Plugin\AreaFlags.h" />
-    <ClInclude Include="..\src\Plugin\AreaParser.h" />
-    <ClInclude Include="..\src\Plugin\BodyView.h" />
-    <ClInclude Include="..\src\Plugin\ClientMessenger.h" />
-    <ClInclude Include="..\src\Plugin\Encoder.h" />
-    <ClInclude Include="..\src\Plugin\Engine.h" />
-    <ClInclude Include="..\src\Plugin\EngineCommand.h" />
-    <ClInclude Include="..\src\Plugin\EngineIsAlive.h" />
-    <ClInclude Include="..\src\Plugin\EnumTranslator.h" />
-    <ClInclude Include="..\src\Plugin\Enums.h" />
-    <ClInclude Include="..\src\Plugin\EventList.h" />
-    <ClInclude Include="..\src\Plugin\EventRegistry.h" />
-    <ClInclude Include="..\src\Plugin\Events\BasicHapticEvent.h" />
-    <ClInclude Include="..\src\Plugin\Events\CurveEvent.h" />
-    <ClInclude Include="..\src\Plugin\Events\PlayableEvent.h" />
-    <ClInclude Include="..\src\Plugin\ExceptionSafeCall.h" />
-    <ClInclude Include="..\src\Plugin\HapticArgs.h" />
-    <ClInclude Include="..\src\Plugin\HapticsPlayer.h" />
-    <ClInclude Include="..\src\Plugin\HardwareDriver.h" />
-    <ClInclude Include="..\src\Plugin\HexUtils.h" />
-    <ClInclude Include="..\src\Plugin\IHapticDevice.h" />
-    <ClInclude Include="..\src\Plugin\IPlayable.h" />
-    <ClInclude Include="..\src\Plugin\IRetainedEvent.h" />
-    <ClInclude Include="..\src\Plugin\ITimeOffset.h" />
-    <ClInclude Include="..\src\Plugin\IoService.h" />
-    <ClInclude Include="..\src\Plugin\JsonSerializer.h" />
-    <ClInclude Include="..\src\Plugin\Locator.h" />
-    <ClInclude Include="..\src\Plugin\MyTestLog.h" />
     <ClInclude Include="..\src\Plugin\NSLoader.h" />
     <ClInclude Include="..\src\Plugin\NSLoader_Errors.h" />
-    <ClInclude Include="..\src\Plugin\NSLoader_Internal.h" />
-    <ClInclude Include="..\src\Plugin\NSLoader_fwds.h" />
-    <ClInclude Include="..\src\Plugin\NSUtils.h" />
-    <ClInclude Include="..\src\Plugin\ParameterizedEvent.h" />
-    <ClInclude Include="..\src\Plugin\PlayableEffect.h" />
-    <ClInclude Include="..\src\Plugin\PlaybackHandle.h" />
-    <ClInclude Include="..\src\Plugin\RegionTree.h" />
-    <ClInclude Include="..\src\Plugin\json\json-forwards.h" />
-    <ClInclude Include="..\src\Plugin\json\json.h" />
-    <ClInclude Include="..\src\Plugin\stdafx.h" />
-    <ClInclude Include="..\src\Plugin\targetver.h" />
+    <ClInclude Include="..\src\Utilities\PathFinder.h" />
+    <ClInclude Include="..\src\Utilities\stdafx.h" />
+    <ClInclude Include="..\src\Utilities\utilities.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -443,92 +395,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\DeviceEvent.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\DriverCommand.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\EffectCommand.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\ExecutionCommand.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\HapticEffect.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\HighLevelEvent.pb.cc">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="..\src\Plugin\AreaParser.cpp" />
-    <ClCompile Include="..\src\Plugin\ClientMessenger.cpp" />
-    <ClCompile Include="..\src\Plugin\Engine.cpp" />
-    <ClCompile Include="..\src\Plugin\EnumTranslator.cpp" />
-    <ClCompile Include="..\src\Plugin\EventList.cpp" />
-    <ClCompile Include="..\src\Plugin\EventRegistry.cpp" />
-    <ClCompile Include="..\src\Plugin\Events\BasicHapticEvent.cpp" />
-    <ClCompile Include="..\src\Plugin\Events\CurveEvent.cpp" />
-    <ClCompile Include="..\src\Plugin\Events\PlayableEvent.cpp" />
-    <ClCompile Include="..\src\Plugin\HapticArgs.cpp" />
-    <ClCompile Include="..\src\Plugin\HapticsPlayer.cpp" />
-    <ClCompile Include="..\src\Plugin\HardwareDriver.cpp" />
-    <ClCompile Include="..\src\Plugin\HexUtils.cpp" />
-    <ClCompile Include="..\src\Plugin\IoService.cpp" />
-    <ClCompile Include="..\src\Plugin\Locator.cpp" />
-    <ClCompile Include="..\src\Plugin\MyTestLog.cpp" />
-    <ClCompile Include="..\src\Plugin\NSLoader.cpp" />
-    <ClCompile Include="..\src\Plugin\NSLoader_Internal.cpp" />
-    <ClCompile Include="..\src\Plugin\NSUtils.cpp" />
-    <ClCompile Include="..\src\Plugin\ParameterizedEvent.cpp" />
-    <ClCompile Include="..\src\Plugin\PlayableEffect.cpp" />
-    <ClCompile Include="..\src\Plugin\PlaybackHandle.cpp" />
-    <ClCompile Include="..\src\Plugin\RegionTree.cpp" />
-    <ClCompile Include="..\src\Plugin\dllmain.cpp" />
-    <ClCompile Include="..\src\Plugin\jsoncpp.cpp" />
-    <ClCompile Include="..\src\Plugin\stdafx.cpp">
+    <ClCompile Include="..\src\Utilities\PathFinder.cpp" />
+    <ClCompile Include="..\src\Utilities\main.cpp" />
+    <ClCompile Include="..\src\Utilities\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">Create</PrecompiledHeader>
@@ -538,16 +407,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\src\Plugin\test\test_main.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Win64|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="..\src\Utilities\utilities.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

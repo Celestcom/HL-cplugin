@@ -59,6 +59,39 @@ int Engine::GetNumSystems(uint32_t * outAmount)
 	return 1;
 }
 
+Snapshot<NSVR_DeviceInfo>* Engine::TakeDeviceSnapshot()
+{
+	auto systems = m_messenger.ReadSystems();
+	auto snapshot = std::make_unique<Snapshot<NSVR_DeviceInfo>>();
+	for (const auto& system : systems) {
+		NSVR_DeviceInfo info = { 0 };
+		memcpy_s(info.ProductName, 128, system.SystemName, 128);
+		snapshot->items.push_back(std::move(info));
+	}
+	snapshot->currentItem = snapshot->items.begin();
+
+	m_snapshots.push_back(std::move(snapshot));
+	return m_snapshots.back().get();
+}
+//
+//bool Engine::IsFinishedIterating(Snapshot* snapshot) const
+//{
+//	auto it =std::find_if(m_snapshots.begin(), m_snapshots.end(), [snapshot](const auto& snapshotPtr) { return snapshotPtr.get() == snapshot; });
+//	if (it != m_snapshots.end()) {
+//		return (*it)->currentItem == (*it)->systems.end();
+//	}
+//	return true;
+//}
+
+void Engine::DestroyIterator(Snapshot<NSVR_DeviceInfo>* device)
+{
+	m_snapshots.erase(
+		std::remove_if(m_snapshots.begin(), m_snapshots.end(), [device](const auto& snapshotPtr) {return snapshotPtr.get() == device; }),
+		m_snapshots.end()
+	);
+}
+
+
 int Engine::DumpDeviceDiagnostics()
 {
 	NullSpaceIPC::DriverCommand command;
@@ -150,6 +183,7 @@ int Engine::UpdateView(BodyView* view)
 	view->pairs = m_messenger.ReadBodyView();
 	return NSVR_Success_Unqualified;
 }
+
 
 void Engine::setupUserFacingLogSink()
 {
