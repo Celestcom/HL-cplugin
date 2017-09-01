@@ -17,7 +17,7 @@ public:
 	static constexpr NSVR_EventType descriptor = NSVR_EventType::NSVR_EventType_CurveHapticEvent;
 	virtual float duration() const override;
 	virtual float time() const override;
-	virtual uint32_t area() const override;
+	virtual std::vector<uint32_t> area() const override;
 
 
 	

@@ -84,9 +84,11 @@ private:
 	HapticsPlayer m_player;
 
 	boost::posix_time::milliseconds m_hapticsExecutionInterval;
-	void executeTimestep();
+	void executeTimestep(std::chrono::milliseconds dt);
 
 	ScheduledEvent m_hapticsTimestep;
+
+	std::chrono::time_point<std::chrono::steady_clock> m_lastHapticsTimestep;
 
 	boost::shared_ptr<MyTestLog> m_log;
 

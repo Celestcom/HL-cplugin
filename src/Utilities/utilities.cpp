@@ -19,7 +19,9 @@ NSVR_RETURN(NSVR_Result) NSVR_Util_Strike(NSVR_Timeline * inTimeline, NSVR_Util_
 		
 		NSVR_Event_SetFloat(event, "time", i * offsetDelta);
 		NSVR_Event_SetFloat(event, "duration", 0.0);
-		NSVR_Event_SetUInt32(event, "area", static_cast<uint32_t>(path[i]));
+		uint32_t region = static_cast<uint32_t>(path[i]);
+
+		NSVR_Event_SetUInt32s(event, "area", &region, 1);
 		NSVR_Event_SetInt(event, "effect", params->Effect);
 
 		NSVR_Timeline_AddEvent(inTimeline, event);

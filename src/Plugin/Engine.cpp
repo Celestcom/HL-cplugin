@@ -16,13 +16,14 @@
 #include "IHapticDevice.h"
 #include "Locator.h"
 #include "BodyView.h"
-void Engine::executeTimestep()
+#include <chrono>
+void Engine::executeTimestep(std::chrono::milliseconds dt)
 {
 	
 	constexpr auto fraction_of_second = (1.0f / 1000.f);
-	auto dt = m_hapticsExecutionInterval.total_milliseconds() * fraction_of_second;
+	auto real_dt = dt.count() * fraction_of_second;
 	
-	m_player.Update(dt);
+	m_player.Update(real_dt);
 
 }
 
@@ -129,6 +130,7 @@ Engine::Engine() :
 	m_currentHandleId(0),
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
 	m_hapticsTimestep(m_ioService.GetIOService(), m_hapticsExecutionInterval),
+	m_lastHapticsTimestep(),
 	m_cachedTrackingUpdate({})
 {
 
@@ -144,10 +146,13 @@ Engine::Engine() :
 	//m_hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
 	//m_hardlightSuit->RegisterDrivers(m_registry);
 
-
+	
 	m_hapticsTimestep.SetEvent([this]() {
 		try {
-			executeTimestep();
+			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_lastHapticsTimestep);
+
+			executeTimestep(elapsed);
+			m_lastHapticsTimestep = std::chrono::high_resolution_clock::now();
 		}
 		catch (const std::exception& e) {
 			BOOST_LOG_TRIVIAL(error) << "[PluginMain] Fatal error executing timestep: " << e.what();

@@ -14,7 +14,7 @@ public:
 	virtual ~PlayableEvent() {};
 
 	virtual float time() const = 0;
-	virtual uint32_t area() const = 0;
+	virtual std::vector<uint32_t> area() const = 0;
 	virtual float duration() const = 0;
 	virtual NSVR_EventType type() const = 0;
 	virtual bool parse(const ParameterizedEvent&) = 0;
@@ -31,7 +31,7 @@ private:
 };
 
 
-std::vector<uint64_t> extractRegions(const PlayableEvent& event);
+std::vector<uint32_t> extractRegions(const PlayableEvent& event);
 
 bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);
 bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);

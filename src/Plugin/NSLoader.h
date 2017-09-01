@@ -23,6 +23,40 @@
 extern "C" {
 #endif
 
+	
+	const uint32_t NSVR_SUBREGION_BLOCK = 1000000;
+
+	const uint32_t nsvr_region_unknown = 0;
+	const uint32_t nsvr_region_body = 1 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_torso = 2 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_torso_front = 3 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_chest_left = 4 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_chest_right = 5 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_upper_ab_left = 6 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_middle_ab_left = 7 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_lower_ab_left = 8 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_upper_ab_right = 9 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_middle_ab_right = 10 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_lower_ab_right = 11 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_torso_back = 12 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_torso_left = 13 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_torso_right = 14 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_upper_back_left = 15 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_upper_back_right = 16 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_upper_arm_left = 17 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_lower_arm_left = 18 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_upper_arm_right = 19 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_lower_arm_right = 20 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_shoulder_left = 21 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_shoulder_right = 22 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_upper_leg_left = 23 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_lower_leg_left = 24 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_upper_leg_right = 25 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_lower_leg_right = 26 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_head = 27 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_palm_left = 28 * NSVR_SUBREGION_BLOCK;
+	const uint32_t nsvr_region_palm_right = 29 * NSVR_SUBREGION_BLOCK;
+
 	// System represents the NSVR plugin context. 
 	typedef struct NSVR_System_ NSVR_System;
 
@@ -161,6 +195,8 @@ extern "C" {
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event* event, const char* key, float* values, unsigned int length);
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetInt(NSVR_Event* event, const char* key, int value);
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event* event, const char* key, uint32_t value);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, const char * key, uint32_t* array, unsigned int length);
+
 
 
 	/* Timelines */

@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "PathFinder.h"
 #include "utilities.h"
 int main() {
 
@@ -9,13 +8,14 @@ int main() {
 
 	NSVR_Util_StrikeParams params = { 0 };
 	params.Effect = NSVR_Effect_Click;
-	params.FromRegion = static_cast<uint32_t>(PathFinder::named_region::identifier_lower_ab_left);
-	params.ToRegion = static_cast<uint32_t>(PathFinder::named_region::identifier_chest_right);
+	params.FromRegion = nsvr_region_chest_left;
+	params.ToRegion = nsvr_region_lower_ab_right;
 	params.TotalDuration = 4.0;
 
 	NSVR_Timeline* timeline;
 	NSVR_Timeline_Create(&timeline);
 	NSVR_Util_Strike(timeline, &params);
+
 
 
 	NSVR_PlaybackHandle* handle;
@@ -27,9 +27,17 @@ int main() {
 
 
 
-
-	std::cin.get();
 	NSVR_PlaybackHandle_Command(handle, NSVR_PlaybackCommand_Play);
+
+	while (true) {
+		NSVR_EffectInfo info = { 0 };
+		NSVR_PlaybackHandle_GetInfo(handle, &info);
+		std::cout << info.Elapsed << '\n';
+		if (info.PlaybackState == NSVR_EffectInfo_State_Idle) {
+			NSVR_PlaybackHandle_Command(handle, NSVR_PlaybackCommand_Play);
+		}
+
+	}
 	std::cin.get();
 	return 0;
 }

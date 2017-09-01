@@ -22,9 +22,9 @@ float CurveEvent::time() const
 	return m_time;
 }
 
-uint32_t CurveEvent::area() const
+std::vector<uint32_t> CurveEvent::area() const
 {
-	return m_area;
+	return std::vector<uint32_t>{m_area};
 }
 
 bool CurveEvent::parse(const ParameterizedEvent& ev)
@@ -46,7 +46,7 @@ void CurveEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
 		curve->add_regions(region);
 	}
 
-	for (auto i = 0; i < m_timePoints.size(); i++) {
+	for (std::size_t i = 0; i < m_timePoints.size(); i++) {
 		auto sample = curve->add_samples();
 		sample->set_time(m_timePoints[i]);
 		sample->set_magnitude(m_volumes[i]);

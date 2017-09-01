@@ -46,10 +46,17 @@ bool ParameterizedEvent::SetFloats(const char * key, float * values, unsigned in
 {
 	std::lock_guard<std::mutex> guard(m_propLock);
 	VALIDATE_KEY(key);
-	std::vector<float> vec;
-	vec.reserve(length);
-	memcpy_s(&vec[0], vec.size(), &values[0], length);
+	std::vector<float> vec(values, values + length);
 	updateOrAdd<std::vector<float>>(key, std::move(vec));
+	return true;
+}
+
+bool ParameterizedEvent::SetUInt32s(const char * key, uint32_t * values, unsigned int length)
+{
+	std::lock_guard<std::mutex> guard(m_propLock);
+	VALIDATE_KEY(key);
+	std::vector<uint32_t> vec(values, values + length);
+	updateOrAdd<std::vector<uint32_t>>(key, std::move(vec));
 	return true;
 }
 

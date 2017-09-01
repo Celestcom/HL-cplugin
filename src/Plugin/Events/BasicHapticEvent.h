@@ -13,7 +13,7 @@ public:
 	uint32_t effectFamily() const;
 
 	/* PlayableEvent impl */
-	uint32_t area() const override;
+	std::vector<uint32_t> area() const override;
 	float time() const override;
 	float duration() const override;
 	NSVR_EventType type() const override;
@@ -25,7 +25,7 @@ private:
 	float m_time;
 	float m_strength;
 	float m_duration;
-	uint32_t m_area;
+	std::vector<uint32_t> m_area;
 	std::string m_parsedEffectFamily;
 	uint32_t m_requestedEffectFamily;
 

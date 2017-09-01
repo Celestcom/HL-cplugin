@@ -248,6 +248,16 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event * event, const char * k
 	});
 }
 
+NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, const char * key, uint32_t* array, unsigned int length)
+{
+	RETURN_IF_NULL(event);
+	RETURN_IF_NULL(key);
+	return ExceptionGuard([&] {
+		return AS_TYPE(ParameterizedEvent, event)->SetUInt32s(key, array, length);
+	});
+}
+
+
 NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr)
  {
 

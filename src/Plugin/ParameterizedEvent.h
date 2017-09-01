@@ -19,6 +19,7 @@ typedef boost::variant<
 	int,
 	std::vector<float>,
 	std::vector<int>,
+	std::vector<uint32_t>,
 	uint32_t
 > EventValue;
 
@@ -43,7 +44,7 @@ public:
 	bool SetFloat(const char* key, float value);
 	bool SetInt(const char* key, int value);
 	bool SetFloats(const char* key, float* values, unsigned int length);
-	
+	bool SetUInt32s(const char* key, uint32_t* values, unsigned int length);
 	
 	template<typename T>
 	T Get(const char* key, T defaultValue) const;
