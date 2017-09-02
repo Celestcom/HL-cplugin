@@ -322,24 +322,32 @@ NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSV
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Timeline_Interleave(NSVR_Timeline * sourceA, NSVR_Timeline * sourceB, NSVR_Timeline * result, float offset)
+NSVR_RETURN(NSVR_Result) NSVR_Timeline_Combine(NSVR_Timeline * timeline, NSVR_Timeline * mixin, float offset)
 {
-	RETURN_IF_NULL(sourceA);
-	RETURN_IF_NULL(sourceB);
-	RETURN_IF_NULL(result);
 
-	if (sourceA == result) {
-		AS_TYPE(EventList, sourceA)->Interleave(AS_TYPE(EventList, sourceB), offset);
+	///Ya know what nahhh
+
+	//This is complicated
+	//We need a case for a == b == c
+
+	// and a == b
+
+	//it should prolly just be add(source, mixin)
+
+
+	RETURN_IF_NULL(timeline);
+	RETURN_IF_NULL(mixin);
+
+	if (timeline != mixin) {
+		AS_TYPE(EventList, timeline)->Interleave(AS_TYPE(EventList, mixin), offset);
 		return NSVR_Success_Unqualified;
-	}
-	else if (sourceB == result) {
-		AS_TYPE(EventList, sourceB)->Interleave(AS_TYPE(EventList, sourceA), offset);
 	}
 	else {
-		AS_TYPE(EventList, result)->Interleave(AS_TYPE(EventList, sourceA), offset);
-		AS_TYPE(EventList, result)->Interleave(AS_TYPE(EventList, sourceB), offset);
+		AS_TYPE(EventList, timeline)->Dupe(offset);
 		return NSVR_Success_Unqualified;
+
 	}
+	
 
 	return NSVR_Error_Unknown;
 }

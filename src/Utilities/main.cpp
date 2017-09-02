@@ -33,7 +33,7 @@ int main() {
 	params2.Effect = NSVR_Effect_Double_Click;
 	NSVR_Util_Emanation(mixin1, &params2);
 
-	NSVR_Timeline_Interleave(mixin1, timeline, timeline, 0.3);
+	NSVR_Timeline_Combine(timeline, mixin1, 0.2f);
 
 	NSVR_PlaybackHandle* handle;
 	NSVR_PlaybackHandle_Create(&handle);

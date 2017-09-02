@@ -18,5 +18,6 @@ private:
 	std::mutex m_eventLock;
 public:
 	void Interleave(EventList* source, float offset);
+	void Dupe(float offset);
 };
 

@@ -204,7 +204,7 @@ extern "C" {
 	NSVR_RETURN(void)		 NSVR_Timeline_Release(NSVR_Timeline** listPtr);
 	NSVR_RETURN(NSVR_Result) NSVR_Timeline_AddEvent(NSVR_Timeline* list, NSVR_Event* event);
 	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline* timeline, NSVR_System* systemPtr, NSVR_PlaybackHandle* handlePr);
-	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Interleave(NSVR_Timeline* sourceA, NSVR_Timeline* sourceB, NSVR_Timeline* result, float offset);
+	NSVR_RETURN(NSVR_Result) NSVR_Timeline_Combine(NSVR_Timeline* timeline, NSVR_Timeline* mixin, float offset);
 	
 
 	/* Playback */

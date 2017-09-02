@@ -39,9 +39,21 @@ bool EventList::empty() const
 
 void EventList::Interleave(EventList* source, float offset)
 {
+	
+
 	for (ParameterizedEvent event : source->m_events) {
 		event.Set("time", event.Get("time", 0.0f) + offset);
 		m_events.push_back(event);
 	}
 	//m_events.insert(m_events.end(), source->m_events.begin(), source->m_events.end());
+}
+
+void EventList::Dupe(float offset)
+{
+	auto copy = m_events;
+	for (auto event : copy) {
+		event.Set("time", event.Get("time", 0.0f) + offset);
+		m_events.push_back(event);
+
+	}
 }
