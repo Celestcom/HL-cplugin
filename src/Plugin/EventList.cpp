@@ -13,7 +13,7 @@ EventList::EventList():m_events(), m_eventLock()
 int EventList::AddEvent(ParameterizedEvent * event)
 {	
 	std::lock_guard<std::mutex> guard(m_eventLock);
-	m_events.push_back(ParameterizedEvent(*event));
+	m_events.push_back(*event);
 	
 	return NSVR_Success_Unqualified;
 }
@@ -35,4 +35,13 @@ std::vector<ParameterizedEvent> EventList::events()
 bool EventList::empty() const
 {
 	return m_events.empty();
+}
+
+void EventList::Interleave(EventList* source, float offset)
+{
+	for (ParameterizedEvent event : source->m_events) {
+		event.Set("time", event.Get("time", 0.0f) + offset);
+		m_events.push_back(event);
+	}
+	//m_events.insert(m_events.end(), source->m_events.begin(), source->m_events.end());
 }

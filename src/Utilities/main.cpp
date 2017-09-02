@@ -8,15 +8,32 @@ int main() {
 
 	NSVR_Util_StrikeParams params = { 0 };
 	params.Effect = NSVR_Effect_Click;
-	params.FromRegion = nsvr_region_chest_left;
-	params.ToRegion = nsvr_region_lower_ab_right;
-	params.TotalDuration = 4.0;
+	params.FromRegion = nsvr_region_lower_arm_left;
+	params.ToRegion = nsvr_region_lower_arm_right;
+	params.TotalDuration = 0.0;
 
 	NSVR_Timeline* timeline;
 	NSVR_Timeline_Create(&timeline);
-	NSVR_Util_Strike(timeline, &params);
+//	NSVR_Util_Strike(timeline, &params);
+
+	NSVR_Util_EmanationParams params2 = { 0 };
+	params2.Depth = 4;
+	params2.Effect = NSVR_Effect_Buzz;
+	params2.FromRegion = nsvr_region_shoulder_right;
+	params2.FromStrength = 1.0;
+	params2.ToStrength = 1.0f;
+	params2.TotalDuration = 4.0;
 
 
+	NSVR_Util_Emanation(timeline, &params2);
+
+	NSVR_Timeline* mixin1;
+	NSVR_Timeline_Create(&mixin1);
+
+	params2.Effect = NSVR_Effect_Double_Click;
+	NSVR_Util_Emanation(mixin1, &params2);
+
+	NSVR_Timeline_Interleave(mixin1, timeline, timeline, 0.3);
 
 	NSVR_PlaybackHandle* handle;
 	NSVR_PlaybackHandle_Create(&handle);
@@ -25,19 +42,11 @@ int main() {
 
 	NSVR_Timeline_Release(&timeline);
 
-
-
-	NSVR_PlaybackHandle_Command(handle, NSVR_PlaybackCommand_Play);
-
 	while (true) {
-		NSVR_EffectInfo info = { 0 };
-		NSVR_PlaybackHandle_GetInfo(handle, &info);
-		std::cout << info.Elapsed << '\n';
-		if (info.PlaybackState == NSVR_EffectInfo_State_Idle) {
-			NSVR_PlaybackHandle_Command(handle, NSVR_PlaybackCommand_Play);
-		}
-
+		std::cin.get();
+		NSVR_PlaybackHandle_Command(handle, NSVR_PlaybackCommand_Play);
 	}
+
 	std::cin.get();
 	return 0;
 }

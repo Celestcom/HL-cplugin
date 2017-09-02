@@ -16,5 +16,7 @@ public:
 private:
 	std::vector<ParameterizedEvent> m_events;
 	std::mutex m_eventLock;
+public:
+	void Interleave(EventList* source, float offset);
 };
 

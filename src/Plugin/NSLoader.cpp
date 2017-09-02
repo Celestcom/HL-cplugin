@@ -322,6 +322,28 @@ NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSV
 	 });
  }
 
+NSVR_RETURN(NSVR_Result) NSVR_Timeline_Interleave(NSVR_Timeline * sourceA, NSVR_Timeline * sourceB, NSVR_Timeline * result, float offset)
+{
+	RETURN_IF_NULL(sourceA);
+	RETURN_IF_NULL(sourceB);
+	RETURN_IF_NULL(result);
+
+	if (sourceA == result) {
+		AS_TYPE(EventList, sourceA)->Interleave(AS_TYPE(EventList, sourceB), offset);
+		return NSVR_Success_Unqualified;
+	}
+	else if (sourceB == result) {
+		AS_TYPE(EventList, sourceB)->Interleave(AS_TYPE(EventList, sourceA), offset);
+	}
+	else {
+		AS_TYPE(EventList, result)->Interleave(AS_TYPE(EventList, sourceA), offset);
+		AS_TYPE(EventList, result)->Interleave(AS_TYPE(EventList, sourceB), offset);
+		return NSVR_Success_Unqualified;
+	}
+
+	return NSVR_Error_Unknown;
+}
+
 
 NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_Create(NSVR_PlaybackHandle ** handlePtr)
  {
