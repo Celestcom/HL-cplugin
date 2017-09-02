@@ -14,21 +14,21 @@ ParameterizedEvent::ParameterizedEvent(NSVR_EventType type):
 }
 
 
-ParameterizedEvent::ParameterizedEvent(ParameterizedEvent && other):
-	m_type(other.m_type),
-	m_params(std::move(other.m_params))
-{
-}
+//ParameterizedEvent::ParameterizedEvent(ParameterizedEvent && other):
+//	m_type(other.m_type),
+//	m_params(std::move(other.m_params))
+//{
+//}
 
-ParameterizedEvent::ParameterizedEvent(const ParameterizedEvent & other) :
-	m_type(other.m_type),
-	m_params(other.m_params)
-{
-}
+//ParameterizedEvent::ParameterizedEvent(const ParameterizedEvent & other) :
+//	m_type(other.m_type),
+//	m_params(other.m_params)
+//{
+//}
 
 bool ParameterizedEvent::SetFloat(const char * key, float value)
 {
-	std::lock_guard<std::mutex> guard(m_propLock);
+//	std::lock_guard<std::mutex> guard(m_propLock);
 	VALIDATE_KEY(key);
 	updateOrAdd<float>(key, value);
 	return true;
@@ -36,7 +36,7 @@ bool ParameterizedEvent::SetFloat(const char * key, float value)
 
 bool ParameterizedEvent::SetInt(const char * key, int value)
 {
-	std::lock_guard<std::mutex> guard(m_propLock);
+//	std::lock_guard<std::mutex> guard(m_propLock);
 	VALIDATE_KEY(key);
 	updateOrAdd<int>(key, value);
 	return true;
@@ -44,7 +44,7 @@ bool ParameterizedEvent::SetInt(const char * key, int value)
 
 bool ParameterizedEvent::SetFloats(const char * key, float * values, unsigned int length)
 {
-	std::lock_guard<std::mutex> guard(m_propLock);
+//	std::lock_guard<std::mutex> guard(m_propLock);
 	VALIDATE_KEY(key);
 	std::vector<float> vec(values, values + length);
 	updateOrAdd<std::vector<float>>(key, std::move(vec));
@@ -53,7 +53,7 @@ bool ParameterizedEvent::SetFloats(const char * key, float * values, unsigned in
 
 bool ParameterizedEvent::SetUInt32s(const char * key, uint32_t * values, unsigned int length)
 {
-	std::lock_guard<std::mutex> guard(m_propLock);
+//	std::lock_guard<std::mutex> guard(m_propLock);
 	VALIDATE_KEY(key);
 	std::vector<uint32_t> vec(values, values + length);
 	updateOrAdd<std::vector<uint32_t>>(key, std::move(vec));

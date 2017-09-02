@@ -36,9 +36,8 @@ class ParameterizedEvent
 {
 public:
 	explicit ParameterizedEvent(NSVR_EventType);
-	ParameterizedEvent(ParameterizedEvent&&);
-	ParameterizedEvent(const ParameterizedEvent&);
-	~ParameterizedEvent() {}
+	//ParameterizedEvent(ParameterizedEvent&&);
+//	ParameterizedEvent(const ParameterizedEvent&);
 	template<class T>
 	bool Set(const char* key, T value);
 	bool SetFloat(const char* key, float value);
@@ -54,7 +53,7 @@ public:
 private:
 	NSVR_EventType m_type;
 	std::vector<event_param> m_params;
-	std::mutex m_propLock;
+	//std::mutex m_propLock;
 
 	event_param* findParam(const char* key);
 	const event_param* findParam(const char* key) const;
@@ -66,7 +65,7 @@ private:
 template<class T>
 inline bool ParameterizedEvent::Set(const char * key, T value)
 {
-	std::lock_guard<std::mutex> guard(m_propLock);
+//	std::lock_guard<std::mutex> guard(m_propLock);
 	updateOrAdd<T>(key, value);
 	return true;
 }
