@@ -15,6 +15,14 @@
 #include "EngineIsAlive.h"
 #include "EngineCommand.h"
 
+
+//The point of this is to enable the user to have something like
+// NSVR_Struct_Thing widget = {0};
+// while (NSVR_HasNext(&widget)) {
+//	//do things with widget
+// }
+// The HiddenIterator sticks itself into the void* _internal variable of the struct. 
+
 template<typename T>
 class HiddenIterator {
 public:

@@ -56,9 +56,13 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System * systemPtr, NSV
 
 NSVR_RETURN(NSVR_Result) NSVR_System_GetNextDevice(NSVR_System * system, NSVR_DeviceInfo * info)
 {
-	//I like this API from the user perspective, but I've implemented it pretty badly. It needs to be reimplemented.
+	
 	//User perspective: while (GetNextDevice(&device)) { //do stuff with device }
-	//Since it's a snapshot, there's no problem with the data being pulled out from under it
+	//Since it's a copy of the underlying data, there's no problem with the data being pulled out from under it
+	
+	//First use setup. Assumes that the _internal field is nullptr. If it is not nullptr, this will not work. 
+	//Maybe this function shouldn't do two things. Maybe it should be split into an init and a next. 
+	
 	if (info->_internal == nullptr) {
 		HiddenIterator<NSVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
 		info->_internal = snapshot;
@@ -66,14 +70,15 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetNextDevice(NSVR_System * system, NSVR_De
 
 
 	HiddenIterator<NSVR_DeviceInfo>* iterator = AS_TYPE(HiddenIterator<NSVR_DeviceInfo>, info->_internal);
+	
 	if (iterator->Finished()) {
 		AS_TYPE(Engine, system)->DestroyIterator(iterator);
 		info->_internal = nullptr;
 		return false;
-
 	}
 
 	iterator->NextItem(info);
+
 	return true;
 
 
