@@ -35,7 +35,8 @@ NSVR_RETURN(NSVR_Result) NSVR_Util_Strike(NSVR_Timeline * inTimeline, NSVR_Util_
 NSVR_RETURN(NSVR_Result) NSVR_Util_Emanation(NSVR_Timeline * inTimeline, NSVR_Util_EmanationParams * params)
 {
 	static PathFinder search;
-	auto path = search.Emanation(static_cast<PathFinder::named_region>(params->FromRegion), params->Depth);
+	auto direction = params->Gather ? PathFinder::EmanationDirection::Inward : PathFinder::EmanationDirection::Outward;
+	auto path = search.Emanation(static_cast<PathFinder::named_region>(params->FromRegion), params->Depth, direction);
 	float offsetDelta = params->TotalDuration / path.size();
 	float strengthDelta = (params->ToStrength - params->FromStrength) / path.size();
 

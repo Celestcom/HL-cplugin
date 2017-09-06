@@ -65,8 +65,8 @@ public:
 	int SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length);
 	int GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr);
 
-	int GetSystems(NSVR_DeviceInfo* array, uint32_t inLength, uint32_t* outArrayLength);
-	int GetNumSystems(uint32_t* outAmount);
+	int GetDevices(NSVR_DeviceInfo* array, uint32_t inLength, uint32_t* outArrayLength);
+	int GetNumDevices(uint32_t* outAmount);
 
 	Snapshot<NSVR_DeviceInfo>* TakeDeviceSnapshot();
 

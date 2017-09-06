@@ -18,6 +18,7 @@ typedef struct NSVR_Util_EmanationParams {
 	float FromStrength;
 	float ToStrength;
 	float TotalDuration;
+	bool Gather;
 
 } NSVR_Util_EmanationParams;
 NSVR_RETURN(NSVR_Result) NSVR_Util_Strike(NSVR_Timeline* inTimeline, NSVR_Util_StrikeParams* params);

@@ -96,7 +96,7 @@ std::vector<PathFinder::named_region> PathFinder::ShortestPath(named_region from
 
 }
 
-std::vector<std::vector<PathFinder::named_region>> PathFinder::Emanation(named_region from, unsigned int depth)
+std::vector<std::vector<PathFinder::named_region>> PathFinder::Emanation(named_region from, unsigned int depth, EmanationDirection dir)
 {
 	std::vector<std::vector<named_region>> stages;
 
@@ -132,7 +132,14 @@ std::vector<std::vector<PathFinder::named_region>> PathFinder::Emanation(named_r
 		if (elementsToDepthIncrease == 0) {
 			if (!potentialNextStage.empty()) { stages.push_back(potentialNextStage); }
 			currentDepth += 1;
-			if (currentDepth == depth) { return stages; }
+			if (currentDepth == depth) { 
+				if (dir == EmanationDirection::Inward) {
+					std::reverse(stages.begin(), stages.end());
+				}
+				return stages; 
+			
+			
+			}
 			elementsToDepthIncrease = nextElementsToDepthIncrease;
 			nextElementsToDepthIncrease = 0;
 			potentialNextStage.clear();
@@ -140,6 +147,9 @@ std::vector<std::vector<PathFinder::named_region>> PathFinder::Emanation(named_r
 
 	}
 
+	if (dir == EmanationDirection::Inward) {
+		std::reverse(stages.begin(), stages.end());
+	}
 	return stages;
 
 }

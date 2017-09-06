@@ -25,7 +25,7 @@ public:
 	~ClientMessenger();
 
 	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
-	std::vector<NullSpace::SharedMemory::SystemInfo> ReadSystems();
+	std::vector<NullSpace::SharedMemory::DeviceInfo> ReadDevices();
 	void WriteCommand(const NullSpaceIPC::DriverCommand& d);
 	void WriteEvent(const NullSpaceIPC::HighLevelEvent& e);
 	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
@@ -34,6 +34,7 @@ public:
 	std::vector<NullSpace::SharedMemory::RegionPair> ReadBodyView();
 	bool ConnectedToService(NSVR_ServiceInfo* info);
 
+	
 private:
 	//Write haptics to the suit using this shared queue
 	std::unique_ptr<WritableSharedQueue> m_hapticsStream;
@@ -41,7 +42,7 @@ private:
 	//Read the most up-to-date tracking data from this object
 	std::unique_ptr<ReadableSharedObject<NullSpace::SharedMemory::TrackingUpdate>> m_trackingData;
 
-	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::SystemInfo>> m_systems;
+	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>> m_systems;
 	//Read the most up-to-date suit connection information from this object
 	// 
 	//Get logging info from engine. Note: only one consumer can reliably get the debug info

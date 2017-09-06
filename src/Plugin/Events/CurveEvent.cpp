@@ -32,7 +32,7 @@ bool CurveEvent::parse(const ParameterizedEvent& ev)
 	m_time = ev.Get("time", 0.0f);
 	m_timePoints = ev.Get("time-offsets", std::vector<float>({}));
 	m_volumes = ev.Get("magnitudes", std::vector<float>({}));
-	m_area = ev.Get("area", (int)AreaFlag::None);
+	m_area = ev.Get("area", nsvr_region_unknown);
 	return true;
 }
 

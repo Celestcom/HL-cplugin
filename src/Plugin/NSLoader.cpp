@@ -50,26 +50,15 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System * systemPtr, NSV
 }
 
 
-NSVR_RETURN(NSVR_Result) NSVR_System_GetNumSystemsPresent(NSVR_System * systemPtr, uint32_t * outAmount)
+
+
+
+
+NSVR_RETURN(NSVR_Result) NSVR_System_GetNextDevice(NSVR_System * system, NSVR_DeviceInfo * info)
 {
-	RETURN_IF_NULL(systemPtr);
-	return ExceptionGuard([&] {
-		return AS_TYPE(Engine, systemPtr)->GetNumSystems( outAmount);
-	});
-}
-
-NSVR_RETURN(NSVR_Result) NSVR_System_GetSystemsPresent(NSVR_System * systemPtr, NSVR_DeviceInfo * infoArray, uint32_t inArrayLength, uint32_t* outArrayLength)
-{
-
-	return ExceptionGuard([&] {
-		return AS_TYPE(Engine, systemPtr)->GetSystems(infoArray, inArrayLength, outArrayLength );
-	});
-}
-
-
-
-NSVR_RETURN(NSVR_Result) NSVR_System_GetNextSystem(NSVR_System * system, NSVR_DeviceInfo * info)
-{
+	//I like this API from the user perspective, but I've implemented it pretty badly. It needs to be reimplemented.
+	//User perspective: while (GetNextDevice(&device)) { //do stuff with device }
+	//Since it's a snapshot, there's no problem with the data being pulled out from under it
 	if (info->_internal == nullptr) {
 		Snapshot<NSVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
 		info->_internal = snapshot;
@@ -80,7 +69,11 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetNextSystem(NSVR_System * system, NSVR_De
 		info->_internal = nullptr;
 		return false;
 	}
-	memcpy_s(info->ProductName, 128, AS_TYPE(Snapshot<NSVR_DeviceInfo>, info->_internal)->NextItem().ProductName, 128);
+
+	auto snapshot = AS_TYPE(Snapshot<NSVR_DeviceInfo>, info->_internal)->NextItem();
+	auto oldPtr = info->_internal;
+	*info = snapshot;
+	info->_internal = oldPtr;
 	return true;
 
 
@@ -221,11 +214,8 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event * event, const char * k
 	RETURN_IF_NULL(event);
 
 	return ExceptionGuard([&] {
-		//should check for zero length or no?
-		std::vector<float> vec;
-		vec.reserve(length);
-		memcpy_s(&vec[0], vec.size(), &values[0], length);
-		return AS_TYPE(ParameterizedEvent, event)->Set(key, std::move(vec));
+		
+		return AS_TYPE(ParameterizedEvent, event)->SetFloats(key, values, length);
 	});
 }
 

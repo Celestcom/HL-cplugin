@@ -117,9 +117,15 @@ extern "C" {
 	} NSVR_EventType;
 
 
+	typedef enum NSVR_DeviceStatus {
+		NSVR_DeviceStatus_Unknown = 0,
+		NSVR_DeviceStatus_Connected = 1,
+		NSVR_DeviceStatus_Disconnected = 2
+	} NSVR_DeviceStatus;
 	typedef struct NSVR_DeviceInfo_ {
 		void *_internal;
 		char ProductName[128];
+		NSVR_DeviceStatus Status;
 		
 	} NSVR_DeviceInfo;
 
@@ -143,7 +149,7 @@ extern "C" {
 	
 
 
-	NSVR_RETURN(NSVR_Result) NSVR_System_GetNextSystem(NSVR_System* system, NSVR_DeviceInfo* info);
+	NSVR_RETURN(NSVR_Result) NSVR_System_GetNextDevice(NSVR_System* system, NSVR_DeviceInfo* info);
 	//Instantiates a new NSVR system context
 	NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr);
 
@@ -162,7 +168,6 @@ extern "C" {
 	
 
 
-	//Returns true if a suit is plugged in and the service is running, else false
 	NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System* systemPtr, NSVR_ServiceInfo* infoPtr);
 
 	//note:
@@ -174,10 +179,7 @@ extern "C" {
 	NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Destroy(NSVR_System* ptr);
 
 
-	/* Devices */
 
-	NSVR_RETURN(NSVR_Result) NSVR_System_GetNumSystemsPresent(NSVR_System* systemPtr, uint32_t *outAmount);
-	NSVR_RETURN(NSVR_Result) NSVR_System_GetSystemsPresent(NSVR_System* systemPtr, NSVR_DeviceInfo* infoArray, uint32_t arrayLength, uint32_t* amountActuallyRetrieved);
 
 	/* Tracking */
 	NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Poll(NSVR_System* ptr, NSVR_TrackingUpdate* updatePtr);

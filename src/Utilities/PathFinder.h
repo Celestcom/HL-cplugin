@@ -5,9 +5,12 @@
 class PathFinder {
 public:
 	using named_region = NullSpace::SharedMemory::nsvr_shared_region;
-
+	enum class EmanationDirection {
+		Outward,
+		Inward
+	};
 	std::vector<named_region> ShortestPath(named_region from, named_region to) const;
-	std::vector<std::vector<named_region>> Emanation(named_region from, unsigned int depth);
+	std::vector<std::vector<named_region>> Emanation(named_region from, unsigned int depth, EmanationDirection dir);
 	PathFinder();
 private:
 	std::unordered_map<named_region, std::vector<named_region>> m_edges;

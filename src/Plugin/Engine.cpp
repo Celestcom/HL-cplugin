@@ -40,33 +40,33 @@ int Engine::GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr)
 	}
 }
 
-int Engine::GetSystems(NSVR_DeviceInfo * array, uint32_t inLength, uint32_t * outArrayLength)
+int Engine::GetDevices(NSVR_DeviceInfo * array, uint32_t inLength, uint32_t * outArrayLength)
 {
 	//todo: should be doing a timestamp check to see if connected to service.
-	auto systems = m_messenger.ReadSystems();
+	auto systems = m_messenger.ReadDevices();
 
 	std::size_t upperBound = std::min<std::size_t>(inLength, systems.size());
 	*outArrayLength = upperBound;
 	for (std::size_t i = 0; i < upperBound; i++) {
-		memcpy_s(array[i].ProductName, 128, systems[i].SystemName, 128);
-
+		memcpy_s(array[i].ProductName, 128, systems[i].DeviceName, 128);
 	}
 	return NSVR_Success_Unqualified;
 }
 
-int Engine::GetNumSystems(uint32_t * outAmount)
+int Engine::GetNumDevices(uint32_t * outAmount)
 {
-	*outAmount = m_messenger.ReadSystems().size();
+	*outAmount = m_messenger.ReadDevices().size();
 	return 1;
 }
 
 Snapshot<NSVR_DeviceInfo>* Engine::TakeDeviceSnapshot()
 {
-	auto systems = m_messenger.ReadSystems();
+	auto systems = m_messenger.ReadDevices();
 	auto snapshot = std::make_unique<Snapshot<NSVR_DeviceInfo>>();
 	for (const auto& system : systems) {
 		NSVR_DeviceInfo info = { 0 };
-		memcpy_s(info.ProductName, 128, system.SystemName, 128);
+		memcpy_s(info.ProductName, 128, system.DeviceName, 128);
+		info.Status = static_cast<NSVR_DeviceStatus>(system.Status);
 		snapshot->items.push_back(std::move(info));
 	}
 	snapshot->currentItem = snapshot->items.begin();
