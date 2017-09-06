@@ -81,20 +81,21 @@ NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_System_DumpDeviceDiagnostics(NSVR_System*
 
 
 
-NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, int length)
+
+
+NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System * systemPtr, uint32_t * regions, double * amplitudes, uint32_t length)
 {
 	RETURN_IF_NULL(systemPtr);
-	RETURN_IF_NULL(strengths);
-	RETURN_IF_NULL(areas);
+	RETURN_IF_NULL(regions);
+	RETURN_IF_NULL(amplitudes);
 
 	if (length < 0) {
 		return NSVR_Error_InvalidArgument;
 	}
 
 	return ExceptionGuard([&] {
-		return AS_TYPE(Engine, systemPtr)->SetStrengths(strengths, areas, length);
+		return AS_TYPE(Engine, systemPtr)->SetStrengths(regions, amplitudes, length);
 	});
-
 }
 
 NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_Create(NSVR_BodyView** body)

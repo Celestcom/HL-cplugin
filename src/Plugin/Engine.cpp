@@ -101,7 +101,7 @@ int Engine::DumpDeviceDiagnostics()
 	return NSVR_Success_Unqualified;
 }
 
-int Engine::SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int length)
+int Engine::SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length)
 {
 	auto& translator = Locator::getTranslator();
 
@@ -109,11 +109,9 @@ int Engine::SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int leng
 	HighLevelEvent event;
 	auto realtime = event.mutable_realtime_haptic();
 	for (unsigned int i = 0; i < length; i++) {
-		
-		auto region = translator.ToRegionString(AreaFlag(areas[i]));
 		auto magnitude = realtime->add_magnitudes();
-		magnitude->set_region(std::move(region));
-		magnitude->set_strength(static_cast<float>(strengths[i]) / 255.0f);	
+		magnitude->set_region(regions[i]);
+		magnitude->set_strength(amplitudes[i]);	
 	}
 	m_messenger.WriteEvent(event);
 

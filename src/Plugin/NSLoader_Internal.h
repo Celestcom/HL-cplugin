@@ -53,8 +53,8 @@ extern "C" {
 	/* Immediate API */
 	typedef struct NSVR_BodyView NSVR_BodyView;
 
-	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System* systemPtr, uint16_t* strengths, uint32_t* areas, int length);
 
+	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_Immediate_Set(NSVR_System* systemPtr, uint32_t* regions, double* amplitudes, uint32_t length);
 
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_Create(NSVR_BodyView** body);
 	NSVR_RETURN_INTERNAL(NSVR_Result) NSVR_BodyView_Release(NSVR_BodyView** body);

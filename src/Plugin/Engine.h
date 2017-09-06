@@ -62,7 +62,7 @@ public:
 	int Sample(uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount);
 
 	int DumpDeviceDiagnostics();
-	int SetStrengths(uint16_t* strengths, uint32_t* areas, unsigned int length);
+	int SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length);
 	int GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr);
 
 	int GetSystems(NSVR_DeviceInfo* array, uint32_t inLength, uint32_t* outArrayLength);
