@@ -16,18 +16,22 @@
 #include "EngineCommand.h"
 
 template<typename T>
-struct Snapshot {
+class HiddenIterator {
 public:
-	typename std::vector<T>::iterator currentItem;
-	std::vector<T> items;
-	Snapshot() : items() {
-		currentItem = items.begin();
+	HiddenIterator(std::vector<T> items) : m_items(items) { m_currentItem = m_items.begin(); }
+	void NextItem(T* original) {
+		*original = *m_currentItem;
+		original->_internal = this;
+		m_currentItem++;
 	}
-	T NextItem() {
-		T result = *currentItem;
-		currentItem = ++currentItem;
-		return result;
+	bool Finished() {
+		return m_currentItem == m_items.end();
 	}
+private:
+	std::vector<T> m_items;
+	typename std::vector<T>::iterator m_currentItem;
+
+	
 };
 
 class SnapshotContainer {
@@ -68,10 +72,10 @@ public:
 	int GetDevices(NSVR_DeviceInfo* array, uint32_t inLength, uint32_t* outArrayLength);
 	int GetNumDevices(uint32_t* outAmount);
 
-	Snapshot<NSVR_DeviceInfo>* TakeDeviceSnapshot();
+	HiddenIterator<NSVR_DeviceInfo>* TakeDeviceSnapshot();
 
 	template<typename T>
-	bool IsFinishedIterating(Snapshot<T>* param1) const;
+	bool IsFinishedIterating(HiddenIterator<T>* param1) const;
 private:
 	IoService m_ioService;
 	NSVR_TrackingUpdate m_cachedTrackingUpdate;
@@ -92,7 +96,7 @@ private:
 
 	boost::shared_ptr<MyTestLog> m_log;
 
-	std::vector<std::unique_ptr<Snapshot<NSVR_DeviceInfo>>> m_snapshots;
+	std::vector<std::unique_ptr<HiddenIterator<NSVR_DeviceInfo>>> m_snapshots;
 
 
 	void setupUserFacingLogSink();
@@ -100,11 +104,11 @@ private:
 	void setupFileLogSink();
 public:
 	int UpdateView(BodyView* view);
-	void DestroyIterator(Snapshot<NSVR_DeviceInfo>* device);
+	void DestroyIterator(HiddenIterator<NSVR_DeviceInfo>* device);
 };
 
 template<typename T>
-bool Engine::IsFinishedIterating(Snapshot<T>* param1) const
+bool Engine::IsFinishedIterating(HiddenIterator<T>* param1) const
 {
 	return param1->currentItem == param1->items.end();
 //	auto it =std::find_if(m_snapshots.begin(), m_snapshots.end(), [snapshot](const auto& snapshotPtr) { return snapshotPtr.get() == snapshot; });

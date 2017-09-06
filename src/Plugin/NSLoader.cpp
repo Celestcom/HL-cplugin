@@ -60,20 +60,20 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetNextDevice(NSVR_System * system, NSVR_De
 	//User perspective: while (GetNextDevice(&device)) { //do stuff with device }
 	//Since it's a snapshot, there's no problem with the data being pulled out from under it
 	if (info->_internal == nullptr) {
-		Snapshot<NSVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
+		HiddenIterator<NSVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
 		info->_internal = snapshot;
 	}
 
-	if (AS_TYPE(Engine, system)->IsFinishedIterating(AS_TYPE(Snapshot<NSVR_DeviceInfo>, info->_internal))) {
-		AS_TYPE(Engine, system)->DestroyIterator(AS_TYPE(Snapshot<NSVR_DeviceInfo>, info->_internal));
+
+	HiddenIterator<NSVR_DeviceInfo>* iterator = AS_TYPE(HiddenIterator<NSVR_DeviceInfo>, info->_internal);
+	if (iterator->Finished()) {
+		AS_TYPE(Engine, system)->DestroyIterator(iterator);
 		info->_internal = nullptr;
 		return false;
+
 	}
 
-	auto snapshot = AS_TYPE(Snapshot<NSVR_DeviceInfo>, info->_internal)->NextItem();
-	auto oldPtr = info->_internal;
-	*info = snapshot;
-	info->_internal = oldPtr;
+	iterator->NextItem(info);
 	return true;
 
 
