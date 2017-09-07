@@ -155,8 +155,8 @@ bool ClientMessenger::ConnectedToService(NSVR_ServiceInfo* info)
 
 	if (m_connectedToService) {
 		if (info != nullptr) {
-			info->ServiceMajor = 0;
-			info->ServiceMinor = 0;
+			info->ServiceMajor = m_serviceVersion.ServiceMajor;
+			info->ServiceMinor = m_serviceVersion.ServiceMinor;
 		}
 		return true;
 	}
@@ -176,7 +176,7 @@ void ClientMessenger::startAttemptEstablishConnection()
 void ClientMessenger::attemptEstablishConnection(const boost::system::error_code &)
 {
 	try {
-		m_sentinel = std::make_unique<ReadableSharedObject<std::time_t>>("ns-sentinel");
+		m_sentinel = std::make_unique<ReadableSharedObject<NullSpace::SharedMemory::SentinelObject>>("ns-sentinel");
 
 	}
 	catch (const boost::interprocess::interprocess_exception&) {
@@ -239,8 +239,8 @@ void ClientMessenger::monitorConnection(const boost::system::error_code & ec)
 {
 	if (!ec) {
 	//	Locator::Logger().Log("ClientMessenger", "Reading the sentinal..");
-
-		std::time_t lastDriverTimestamp = m_sentinel->Read();
+		auto info = m_sentinel->Read();
+		std::time_t lastDriverTimestamp = info.TimeStamp;
 		//assumes that the current time is >= the read time
 		auto time = boost::chrono::duration_cast<boost::chrono::milliseconds>(
 			boost::chrono::seconds(std::time(nullptr) - lastDriverTimestamp)
@@ -248,6 +248,7 @@ void ClientMessenger::monitorConnection(const boost::system::error_code & ec)
 
 		if (time <= m_sentinalTimeout) {
 			m_connectedToService = true;
+			m_serviceVersion = info.Info;
 			//we are connected, so keep monitoring
 			//Locator::Logger().Log("ClientMessenger", "All good!");
 

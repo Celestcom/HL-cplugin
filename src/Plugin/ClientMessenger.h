@@ -36,6 +36,7 @@ public:
 
 	
 private:
+	NullSpace::SharedMemory::ServiceInfo m_serviceVersion;
 	//Write haptics to the suit using this shared queue
 	std::unique_ptr<WritableSharedQueue> m_hapticsStream;
 
@@ -49,7 +50,7 @@ private:
 	std::unique_ptr<ReadableSharedQueue> m_logStream;
 
 	//Sentinel to see if the driver is running
-	std::unique_ptr<ReadableSharedObject<std::time_t>> m_sentinel;
+	std::unique_ptr<ReadableSharedObject<NullSpace::SharedMemory::SentinelObject>> m_sentinel;
 
 	//Stream of commands to send to driver, such as ENABLE_TRACKING, DISABLE_TRACKING, etc.
 	std::unique_ptr<WritableSharedQueue> m_commandStream;

@@ -244,6 +244,32 @@ TEST_CASE("The events system works", "[EventSystem]") {
 	}
 }
 
+TEST_CASE("Retrieving the service version should work") {
+	boost::asio::io_service io;
+
+	ClientMessenger m(io);
+	io.run_one();
+	io.run_one();
+	io.run_one();
+	io.run_one();
+	io.run_one();
+
+	//This is a weird case setup,  I just want to see if it works
+	SECTION("So does it?") {
+		NSVR_ServiceInfo info = { 0 };
+		auto v = m.ConnectedToService(&info);
+		if (v) {
+			if (info.ServiceMajor == 0) {
+				REQUIRE(info.ServiceMinor > 0);
+			}
+			else {
+				REQUIRE(info.ServiceMinor >= 0);
+				REQUIRE(info.ServiceMajor >= 1);
+			}
+		}
+		
+	}
+}
 TEST_CASE("BodyView should work") {
 	boost::asio::io_service io;
 	
