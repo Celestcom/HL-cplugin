@@ -142,7 +142,7 @@ std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
 	if (m_bodyView) {
 		std::size_t eles = m_bodyView->size();
 		pairs.reserve(eles);
-		for (int i = 0; i < eles; i++) {
+		for (std::size_t i = 0; i < eles; i++) {
 			pairs.push_back(m_bodyView->Get(i));
 		}
 	}
