@@ -58,20 +58,20 @@ extern "C" {
 	const uint32_t nsvr_region_palm_right = 29 * NSVR_SUBREGION_BLOCK;
 
 	// System represents the NSVR plugin context. 
-	typedef struct NSVR_System_ NSVR_System;
+	typedef struct NSVR_System NSVR_System;
 
 	// Events tell the hardware to do certain things, like play a haptic effect. 
-	typedef struct NSVR_Event_ NSVR_Event;
+	typedef struct NSVR_Event NSVR_Event;
 
 	// Timelines are event containers, where each event has a specific time offset. 
-	typedef struct NSVR_Timeline_ NSVR_Timeline;
+	typedef struct NSVR_Timeline NSVR_Timeline;
 
 	// A PlaybackHandle is used to start, stop, and reset timelines which have been transmitted to the
 	// system. 
-	typedef struct NSVR_PlaybackHandle_ NSVR_PlaybackHandle;
+	typedef struct NSVR_PlaybackHandle NSVR_PlaybackHandle;
 
 
-	typedef enum NSVR_Effect_ {
+	typedef enum NSVR_Effect {
 		NSVR_Effect_Bump = 1,
 		NSVR_Effect_Buzz = 2,
 		NSVR_Effect_Click = 3,
@@ -101,7 +101,7 @@ extern "C" {
 	};
 
 
-	typedef enum NSVR_PlaybackCommand_
+	typedef enum NSVR_PlaybackCommand
 	{
 		NSVR_PlaybackCommand_Play = 0,
 		NSVR_PlaybackCommand_Pause,
@@ -110,46 +110,80 @@ extern "C" {
 
 
 
-	typedef enum NSVR_EventType_ {
+	typedef enum NSVR_EventType {
 		NSVR_EventType_BasicHapticEvent = 1,
 		NSVR_EventType_CurveHapticEvent = 2,
 		NSVR_EventType_Max = 65535
 	} NSVR_EventType;
 
-
+	typedef enum NSVR_DeviceConcept {
+		NSVR_DeviceConcept_Unknown,
+		NSVR_DeviceConcept_Suit,
+		NSVR_DeviceConcept_Controller,
+		NSVR_DeviceConcept_Headwear,
+		NSVR_DeviceConcept_Gun,
+		NSVR_DeviceConcept_Sword
+	} NSVR_DeviceConcept;
 	typedef enum NSVR_DeviceStatus {
 		NSVR_DeviceStatus_Unknown = 0,
 		NSVR_DeviceStatus_Connected = 1,
 		NSVR_DeviceStatus_Disconnected = 2
 	} NSVR_DeviceStatus;
-	typedef struct NSVR_DeviceInfo_ {
-		void *_internal;
-		char ProductName[128];
+	typedef struct NSVR_DeviceInfo {
+		uint32_t Id;
+		char Name[128];
+		NSVR_DeviceConcept Concept;
 		NSVR_DeviceStatus Status;
 		
 	} NSVR_DeviceInfo;
 
 
-	typedef struct NSVR_ServiceInfo_ {
+	typedef enum NSVR_NodeType {
+		NSVR_NodeType_Unknown = 0,
+		NSVR_NodeType_Haptic,
+		NSVR_NodeType_LED,
+		NSVR_NodeType_InertialTracker,
+		NSVR_NodeType_AbsoluteTracker
+	} NSVR_NodeType;
+	typedef struct NSVR_NodeInfo {
+		uint64_t Id;
+		char Name[128];
+		NSVR_NodeType Type;
+
+	} NSVR_NodeInfo;
+	typedef struct NSVR_DeviceInfo_Iter {
+		void* _internal;
+		NSVR_DeviceInfo DeviceInfo;
+	} NSVR_DeviceInfo_Iter;
+
+	typedef struct NSVR_NodeInfo_Iter {
+		void* _internal;
+		NSVR_NodeInfo NodeInfo;
+	} NSVR_NodeInfo_Iter;
+	typedef struct NSVR_ServiceInfo {
 		unsigned int ServiceMajor;
 		unsigned int ServiceMinor;
 	} NSVR_ServiceInfo;
 
-	typedef enum NSVR_EffectInfo_State_ {
+	typedef enum NSVR_EffectInfo_State {
 		NSVR_EffectInfo_State_Playing,
 		NSVR_EffectInfo_State_Paused,
 		NSVR_EffectInfo_State_Idle
 	} NSVR_EffectInfo_State;
 
-	typedef struct NSVR_EffectInfo_ {
+	typedef struct NSVR_EffectInfo {
 		float Duration;
 		float Elapsed;
 		NSVR_EffectInfo_State PlaybackState;
 	} NSVR_EffectInfo;
 	
 
+	NSVR_RETURN(NSVR_Result) NSVR_DeviceInfo_Iter_Init(NSVR_DeviceInfo_Iter* iter);
+	NSVR_RETURN(bool) NSVR_DeviceInfo_Iter_Next(NSVR_DeviceInfo_Iter* iter, NSVR_System* system);
 
-	NSVR_RETURN(NSVR_Result) NSVR_System_GetNextDevice(NSVR_System* system, NSVR_DeviceInfo* info);
+	NSVR_RETURN(NSVR_Result) NSVR_NodeInfo_Iter_Init(NSVR_NodeInfo_Iter* iter);
+	NSVR_RETURN(bool) NSVR_NodeInfo_Iter_Next(NSVR_NodeInfo_Iter* iter, NSVR_System* system);
+
 	//Instantiates a new NSVR system context
 	NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr);
 
@@ -170,11 +204,9 @@ extern "C" {
 
 	NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System* systemPtr, NSVR_ServiceInfo* infoPtr);
 
-	//note:
-	//Should rename to NSVR_System_Haptics_Suspend
-	//Should rename to NSVR_System_Haptics_Resume
+
 	/* Haptics engine */ 
-	NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Pause(NSVR_System* ptr);
+	NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Suspend(NSVR_System* ptr);
 	NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Resume(NSVR_System* ptr);
 	NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Destroy(NSVR_System* ptr);
 

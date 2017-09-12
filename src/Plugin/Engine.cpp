@@ -40,18 +40,7 @@ int Engine::GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr)
 	}
 }
 
-int Engine::GetDevices(NSVR_DeviceInfo * array, uint32_t inLength, uint32_t * outArrayLength)
-{
-	//todo: should be doing a timestamp check to see if connected to service.
-	auto systems = m_messenger.ReadDevices();
 
-	std::size_t upperBound = std::min<std::size_t>(inLength, systems.size());
-	*outArrayLength = upperBound;
-	for (std::size_t i = 0; i < upperBound; i++) {
-		memcpy_s(array[i].ProductName, 128, systems[i].DeviceName, 128);
-	}
-	return NSVR_Success_Unqualified;
-}
 
 int Engine::GetNumDevices(uint32_t * outAmount)
 {
@@ -65,25 +54,52 @@ HiddenIterator<NSVR_DeviceInfo>* Engine::TakeDeviceSnapshot()
 
 	std::vector<NSVR_DeviceInfo> devices;
 	for (const auto& system : systems) {
-		NSVR_DeviceInfo info = { 0 };
-		memcpy_s(info.ProductName, 128, system.DeviceName, 128);
-		info.Status = static_cast<NSVR_DeviceStatus>(system.Status);
-		devices.push_back(std::move(info));
+		NSVR_DeviceInfo deviceInfo = { 0 };
+		memcpy_s(deviceInfo.Name, 128, system.DeviceName, 128);
+		deviceInfo.Status = static_cast<NSVR_DeviceStatus>(system.Status);
+		deviceInfo.Id = system.Id;
+		deviceInfo.Concept = static_cast<NSVR_DeviceConcept>(system.Concept);
+		devices.push_back(std::move(deviceInfo));
 	}
 	
 	auto snapshot = std::make_unique<HiddenIterator<NSVR_DeviceInfo>>(devices);
-	m_snapshots.push_back(std::move(snapshot));
-	return m_snapshots.back().get();
+	m_deviceSnapshots.push_back(std::move(snapshot));
+	return m_deviceSnapshots.back().get();
+}
+
+HiddenIterator<NSVR_NodeInfo>* Engine::TakeNodeSnapshot()
+{
+	auto nodes_raw = m_messenger.ReadNodes();
+	std::vector<NSVR_NodeInfo> nodes;
+	for (const auto& node : nodes_raw) {
+		NSVR_NodeInfo nodeInfo = { 0 };
+		memcpy_s(nodeInfo.Name, 128, node.NodeName, 128);
+		nodeInfo.Id = node.Id;
+		nodeInfo.Type = static_cast<NSVR_NodeType>(node.Type);
+		nodes.push_back(std::move(nodeInfo));
+	}
+
+	auto snapshot = std::make_unique<HiddenIterator<NSVR_NodeInfo>>(nodes);
+	m_nodeSnapshots.push_back(std::move(snapshot));
+	return m_nodeSnapshots.back().get();
 }
 
 void Engine::DestroyIterator(HiddenIterator<NSVR_DeviceInfo>* device)
 {
-	m_snapshots.erase(
-		std::remove_if(m_snapshots.begin(), m_snapshots.end(), [device](const auto& snapshotPtr) {return snapshotPtr.get() == device; }),
-		m_snapshots.end()
+	m_deviceSnapshots.erase(
+		std::remove_if(m_deviceSnapshots.begin(), m_deviceSnapshots.end(), [device](const auto& snapshotPtr) {return snapshotPtr.get() == device; }),
+		m_deviceSnapshots.end()
 	);
 }
 
+
+void Engine::DestroyIterator(HiddenIterator<NSVR_NodeInfo>* nodes)
+{
+	m_nodeSnapshots.erase(
+		std::remove_if(m_nodeSnapshots.begin(), m_nodeSnapshots.end(), [nodes](const auto& snapshotPtr) {return snapshotPtr.get() == nodes; }),
+		m_nodeSnapshots.end()
+	);
+}
 
 int Engine::DumpDeviceDiagnostics()
 {
@@ -121,7 +137,9 @@ Engine::Engine() :
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
 	m_hapticsTimestep(m_ioService.GetIOService(), m_hapticsExecutionInterval),
 	m_lastHapticsTimestep(),
-	m_cachedTrackingUpdate({})
+	m_cachedTrackingUpdate({}),
+	m_deviceSnapshots(),
+	m_nodeSnapshots()
 {
 
 	
@@ -372,6 +390,7 @@ int Engine::PollTracking(NSVR_TrackingUpdate* q)
 		return NSVR_Success_NoDataAvailable;
 	}
 }
+
 
 int Engine::PollLogs(NSVR_LogEntry * entry)
 {

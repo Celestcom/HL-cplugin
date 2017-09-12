@@ -51,7 +51,7 @@ bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_pt
 }
 
 
-std::unordered_map<uint32_t, NullSpace::SharedMemory::nsvr_shared_region> regionMap =
+std::unordered_map<uint32_t, NullSpace::SharedMemory::nsvr_shared_region::_enumerated> regionMap =
 {
 	{ 0, NullSpace::SharedMemory::nsvr_shared_region::identifier_lower_arm_left },
 	{ 1,  NullSpace::SharedMemory::nsvr_shared_region::identifier_upper_arm_left },

@@ -24,3 +24,6 @@ typedef struct NSVR_Util_EmanationParams {
 NSVR_RETURN(NSVR_Result) NSVR_Util_Strike(NSVR_Timeline* inTimeline, NSVR_Util_StrikeParams* params);
 
 NSVR_RETURN(NSVR_Result) NSVR_Util_Emanation(NSVR_Timeline* inTimeline, NSVR_Util_EmanationParams* params);
+
+
+NSVR_RETURN(NSVR_Result) NSVR_Util_TestDevices(NSVR_System* system);

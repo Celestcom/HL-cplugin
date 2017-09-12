@@ -17,7 +17,7 @@
 #include "HighLevelEvent.pb.h"
 #pragma warning(pop)
 
-typedef struct NSVR_ServiceInfo_ NSVR_ServiceInfo;
+typedef struct NSVR_ServiceInfo NSVR_ServiceInfo;
 class ClientMessenger
 {
 public:
@@ -26,6 +26,7 @@ public:
 
 	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
 	std::vector<NullSpace::SharedMemory::DeviceInfo> ReadDevices();
+	std::vector<NullSpace::SharedMemory::NodeInfo> ReadNodes();
 	void WriteCommand(const NullSpaceIPC::DriverCommand& d);
 	void WriteEvent(const NullSpaceIPC::HighLevelEvent& e);
 	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
@@ -43,6 +44,7 @@ private:
 	//Read the most up-to-date tracking data from this object
 	std::unique_ptr<ReadableSharedObject<NullSpace::SharedMemory::TrackingUpdate>> m_trackingData;
 
+	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::NodeInfo>> m_nodes;
 	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>> m_systems;
 	//Read the most up-to-date suit connection information from this object
 	// 

@@ -29,7 +29,6 @@ public:
 	HiddenIterator(std::vector<T> items) : m_items(items) { m_currentItem = m_items.begin(); }
 	void NextItem(T* original) {
 		*original = *m_currentItem;
-		original->_internal = this;
 		m_currentItem++;
 	}
 	bool Finished() {
@@ -77,13 +76,18 @@ public:
 	int SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length);
 	int GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr);
 
-	int GetDevices(NSVR_DeviceInfo* array, uint32_t inLength, uint32_t* outArrayLength);
 	int GetNumDevices(uint32_t* outAmount);
 
 	HiddenIterator<NSVR_DeviceInfo>* TakeDeviceSnapshot();
+	HiddenIterator<NSVR_NodeInfo>* TakeNodeSnapshot();
 
 	template<typename T>
 	bool IsFinishedIterating(HiddenIterator<T>* param1) const;
+
+	int UpdateView(BodyView* view);
+	void DestroyIterator(HiddenIterator<NSVR_DeviceInfo>* device);
+	void DestroyIterator(HiddenIterator<NSVR_NodeInfo>* nodes);
+
 private:
 	IoService m_ioService;
 	NSVR_TrackingUpdate m_cachedTrackingUpdate;
@@ -104,15 +108,14 @@ private:
 
 	boost::shared_ptr<MyTestLog> m_log;
 
-	std::vector<std::unique_ptr<HiddenIterator<NSVR_DeviceInfo>>> m_snapshots;
-
+	std::vector<std::unique_ptr<HiddenIterator<NSVR_DeviceInfo>>> m_deviceSnapshots;
+	std::vector<std::unique_ptr<HiddenIterator<NSVR_NodeInfo>>> m_nodeSnapshots;
 
 	void setupUserFacingLogSink();
 
 	void setupFileLogSink();
-public:
-	int UpdateView(BodyView* view);
-	void DestroyIterator(HiddenIterator<NSVR_DeviceInfo>* device);
+
+	
 };
 
 template<typename T>

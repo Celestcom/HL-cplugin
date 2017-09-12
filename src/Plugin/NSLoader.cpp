@@ -54,35 +54,70 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System * systemPtr, NSV
 
 
 
-NSVR_RETURN(NSVR_Result) NSVR_System_GetNextDevice(NSVR_System * system, NSVR_DeviceInfo * info)
+NSVR_RETURN(NSVR_Result) NSVR_DeviceInfo_Iter_Init(NSVR_DeviceInfo_Iter * iter)
 {
-	
-	//User perspective: while (GetNextDevice(&device)) { //do stuff with device }
-	//Since it's a copy of the underlying data, there's no problem with the data being pulled out from under it
-	
-	//First use setup. Assumes that the _internal field is nullptr. If it is not nullptr, this will not work. 
-	//Maybe this function shouldn't do two things. Maybe it should be split into an init and a next. 
-	
-	if (info->_internal == nullptr) {
-		HiddenIterator<NSVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
-		info->_internal = snapshot;
-	}
-
-
-	HiddenIterator<NSVR_DeviceInfo>* iterator = AS_TYPE(HiddenIterator<NSVR_DeviceInfo>, info->_internal);
-	
-	if (iterator->Finished()) {
-		AS_TYPE(Engine, system)->DestroyIterator(iterator);
-		info->_internal = nullptr;
-		return false;
-	}
-
-	iterator->NextItem(info);
-
-	return true;
-
-
+	iter->_internal = nullptr;
+	iter->DeviceInfo = { 0 };
+	return NSVR_Success_Unqualified;
 }
+
+NSVR_RETURN(bool) NSVR_DeviceInfo_Iter_Next(NSVR_DeviceInfo_Iter* iter, NSVR_System* system)
+{
+
+	RETURN_IF_NULL(iter);
+	RETURN_IF_NULL(system);
+	return ExceptionGuard([iter, system]() {
+		if (iter->_internal == nullptr) {
+			HiddenIterator<NSVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
+			iter->_internal = snapshot;
+		}
+
+
+		HiddenIterator<NSVR_DeviceInfo>* iterator = AS_TYPE(HiddenIterator<NSVR_DeviceInfo>, iter->_internal);
+
+		if (iterator->Finished()) {
+			AS_TYPE(Engine, system)->DestroyIterator(iterator);
+			iter->_internal = nullptr;
+			return false;
+		}
+
+		iterator->NextItem(&iter->DeviceInfo);
+
+		return true;
+	});
+}
+
+NSVR_RETURN(NSVR_Result) NSVR_NodeInfo_Iter_Init(NSVR_NodeInfo_Iter * iter)
+{
+	iter->_internal = nullptr;
+	iter->NodeInfo = { 0 };
+	return NSVR_Success_Unqualified;
+}
+
+NSVR_RETURN(bool) NSVR_NodeInfo_Iter_Next(NSVR_NodeInfo_Iter * iter, NSVR_System * system)
+{
+	RETURN_IF_NULL(iter);
+	RETURN_IF_NULL(system);
+
+	return ExceptionGuard([iter, system]() {
+
+		if (iter->_internal == nullptr) {
+			HiddenIterator<NSVR_NodeInfo>* snapshot = AS_TYPE(Engine, system)->TakeNodeSnapshot();
+			iter->_internal = snapshot;
+		}
+
+		HiddenIterator<NSVR_NodeInfo>* iterator = AS_TYPE(HiddenIterator<NSVR_NodeInfo>, iter->_internal);
+		if (iterator->Finished()) {
+			AS_TYPE(Engine, system)->DestroyIterator(iterator);
+			iter->_internal = nullptr;
+			return false;
+		}
+
+		iterator->NextItem(&iter->NodeInfo);
+		return true;
+	});
+}
+
 
 NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr)
 {
@@ -116,7 +151,8 @@ NSVR_RETURN(void) NSVR_System_Release(NSVR_System** ptr)
 }
 
 
-NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Pause(NSVR_System* ptr)
+
+NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Suspend(NSVR_System* ptr)
  {
 	 RETURN_IF_NULL(ptr);
 

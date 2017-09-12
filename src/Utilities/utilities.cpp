@@ -59,3 +59,17 @@ NSVR_RETURN(NSVR_Result) NSVR_Util_Emanation(NSVR_Timeline * inTimeline, NSVR_Ut
 
 	return NSVR_Success_Unqualified;
 }
+
+NSVR_RETURN(NSVR_Result) NSVR_Util_TestDevices(NSVR_System * system)
+{
+	NSVR_Timeline timeline;
+
+	float offset = 0.25;
+	while (NSVR_System_GetNextDevice(device)) {
+		while (NSVR_System_GetNextNode(device.id, node)) {
+			NSVR_Util_Strike(timeline, node.location, prev.location, 0.25);
+		}
+	}
+
+
+}
