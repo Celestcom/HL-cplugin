@@ -72,23 +72,6 @@ std::unordered_map<uint32_t, NullSpace::SharedMemory::nsvr_shared_region::_enume
 };
 
 
-std::vector<uint32_t> extractRegions(const PlayableEvent & event)
-{
-	/*auto& translator = Locator::getTranslator();
-	std::vector<uint64_t> regions;
-	std::bitset<32> areas(event.area());
-	regions.reserve(areas.count());
-
-	for (std::size_t i = 0; i < areas.size(); i++) {
-		if (areas.test(i)) {
-			regions.push_back(static_cast<uint64_t>(regionMap.at(i)));
-		}
-	}
-
-
-	return regions;*/
-	return event.area();
-}
 
 bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs) {
 	return *lhs == *rhs;

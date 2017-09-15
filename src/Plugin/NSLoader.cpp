@@ -22,8 +22,10 @@
 
 #ifdef NULL_ARGUMENT_CHECKS
 #define RETURN_IF_NULL(ptr) do { if (ptr == nullptr) { return (NSVR_Result) NSVR_Error_NullArgument; }} while (0)
+#define RETURN_FALSE_IF_NULL(ptr) do {if (ptr == nullptr) { return false;}} while (0)
 #else
 #define RETURN_IF_NULL(ptr)
+#define RETURN_FALSE_IF_NULL(ptr)
 #endif
 
 
@@ -64,8 +66,8 @@ NSVR_RETURN(NSVR_Result) NSVR_DeviceInfo_Iter_Init(NSVR_DeviceInfo_Iter * iter)
 NSVR_RETURN(bool) NSVR_DeviceInfo_Iter_Next(NSVR_DeviceInfo_Iter* iter, NSVR_System* system)
 {
 
-	RETURN_IF_NULL(iter);
-	RETURN_IF_NULL(system);
+	RETURN_FALSE_IF_NULL(iter);
+	RETURN_FALSE_IF_NULL(system);
 	return ExceptionGuard([iter, system]() {
 		if (iter->_internal == nullptr) {
 			HiddenIterator<NSVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
@@ -96,8 +98,8 @@ NSVR_RETURN(NSVR_Result) NSVR_NodeInfo_Iter_Init(NSVR_NodeInfo_Iter * iter)
 
 NSVR_RETURN(bool) NSVR_NodeInfo_Iter_Next(NSVR_NodeInfo_Iter * iter, NSVR_System * system)
 {
-	RETURN_IF_NULL(iter);
-	RETURN_IF_NULL(system);
+	RETURN_FALSE_IF_NULL(iter);
+	RETURN_FALSE_IF_NULL(system);
 
 	return ExceptionGuard([iter, system]() {
 

@@ -14,7 +14,6 @@ public:
 	virtual ~PlayableEvent() {};
 
 	virtual float time() const = 0;
-	virtual std::vector<uint32_t> area() const = 0;
 	virtual float duration() const = 0;
 	virtual NSVR_EventType type() const = 0;
 	virtual bool parse(const ParameterizedEvent&) = 0;

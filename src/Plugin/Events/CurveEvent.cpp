@@ -41,10 +41,9 @@ void CurveEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
 	using namespace NullSpaceIPC;
 	auto curve = event.mutable_curve_haptic();
 	
-	auto regions = extractRegions(*this);
-	for (const auto& region : regions) {
-		curve->add_regions(region);
-	}
+	
+	curve->add_regions(m_area);
+	
 
 	for (std::size_t i = 0; i < m_timePoints.size(); i++) {
 		auto sample = curve->add_samples();

@@ -23,6 +23,19 @@
 extern "C" {
 #endif
 
+
+	typedef enum NSVR_EventKeys {
+		NSVR_EventKey_Invalid = 0,
+		/* Required keys*/
+		NSVR_EventKey_Time_Float,
+		NSVR_EventKey_SimpleHaptic_Duration_Float,
+		NSVR_EventKey_SimpleHaptic_Strength_Float,
+		NSVR_EventKey_SimpleHaptic_Effect_Int,
+		NSVR_EventKey_SimpleHaptic_Region
+
+		
+
+	} NSVR_EventKeys;
 	
 	const uint32_t NSVR_SUBREGION_BLOCK = 1000000;
 

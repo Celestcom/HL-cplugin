@@ -15,18 +15,18 @@ public:
 
 	NSVR_EventType type() const override;
 	static constexpr NSVR_EventType descriptor = NSVR_EventType::NSVR_EventType_CurveHapticEvent;
-	virtual float duration() const override;
-	virtual float time() const override;
-	virtual std::vector<uint32_t> area() const override;
+	float duration() const override;
+	float time() const override;
+	 std::vector<uint32_t> area() const;
 
 
 	
 
 
-	virtual bool parse(const ParameterizedEvent&) override;
+	bool parse(const ParameterizedEvent&) override;
 
 
-	virtual void serialize(NullSpaceIPC::HighLevelEvent& event) const override;
+	void serialize(NullSpaceIPC::HighLevelEvent& event) const override;
 
 private:
 	float m_time;

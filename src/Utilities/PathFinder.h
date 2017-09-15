@@ -4,7 +4,7 @@
 #include "SharedTypes.h"
 class PathFinder {
 public:
-	using named_region = NullSpace::SharedMemory::nsvr_shared_region;
+	using named_region = NullSpace::SharedMemory::nsvr_shared_region::_enumerated;
 	enum class EmanationDirection {
 		Outward,
 		Inward

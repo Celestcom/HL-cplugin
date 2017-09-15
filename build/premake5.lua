@@ -184,7 +184,7 @@ project "Utilities"
 
 	
 	plugin_debug_win32_dir = "bin/Debug/Win32/"
-
+	plugin_release_win32_dir = "bin/Release/Win32/"
 
 	boost_win32_dir = "D:/Libraries/boost/boost_1_61_0/stage/win32/lib"
 	boost_win64_dir = "D:/Libraries/boost/boost_1_61_0/stage/x64/lib"
@@ -235,6 +235,10 @@ project "Utilities"
 	filter "configurations:Release"
 		defines {"NDEBUG"}
 		optimize "On" 
+		libdirs {
+			plugin_release_win32_dir
+		}
+		links {"NSLoader"}
 
 	filter {"system:Windows"}
 		defines {"_WINDOWS", "_USRDLL"}

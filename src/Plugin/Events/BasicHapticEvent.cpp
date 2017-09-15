@@ -21,11 +21,6 @@ BasicHapticEvent::BasicHapticEvent() :
 
 
 
-std::vector<uint32_t> BasicHapticEvent::area() const
-{
-	return m_area;
-}
-
 float BasicHapticEvent::time() const
 {
 	return m_time;
@@ -48,6 +43,7 @@ bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 	m_time = ev.Get<float>("time", 0.0f);
 	m_strength = ev.Get<float>("strength", 1.0f);
 	m_duration = ev.Get<float>("duration", 0.0f);
+
 	m_area = ev.Get<std::vector<uint32_t>>("area", {0});
 	m_requestedEffectFamily = ev.Get<int>("effect", 1);
 	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
@@ -77,8 +73,7 @@ void BasicHapticEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
 	simple->set_effect(m_requestedEffectFamily);
 	simple->set_strength(m_strength);
 
-	auto regions = extractRegions(*this);
-	for (const auto& region : regions) {
+	for (const auto& region : m_area) {
 		simple->add_regions(region);
 	}
 	
