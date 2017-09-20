@@ -3,7 +3,6 @@
 #include "ParameterizedEvent.h"
 #include "NSLoader.h"
 #include "BasicHapticEvent.h"
-#include "CurveEvent.h"
 #include <typeinfo>
 #include "Locator.h"
 #include <bitset>
@@ -18,11 +17,8 @@ PlayableEvent::make(NSVR_EventType type)
 {
 	std::unique_ptr<PlayableEvent> possibleEvent;
 	switch (type) {
-	case NSVR_EventType::NSVR_EventType_BasicHapticEvent:
+	case NSVR_EventType::NSVR_EventType_SimpleHaptic:
 		possibleEvent = std::make_unique<BasicHapticEvent>();
-		break;
-	case NSVR_EventType::NSVR_EventType_CurveHapticEvent:
-		possibleEvent = std::make_unique<CurveEvent>();
 		break;
 	default:
 		break;

@@ -242,17 +242,16 @@ NSVR_RETURN(void) NSVR_Event_Release(NSVR_Event ** eventPtr)
 	});
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event * event, const char * key, float value)
+NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event * event, NSVR_EventKey key, float value)
  {
 	 RETURN_IF_NULL(event);
-	 RETURN_IF_NULL(key);
 
 	 return ExceptionGuard([&] {
 		 return AS_TYPE(ParameterizedEvent, event)->Set<float>(key, value);
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event * event, const char * key, float * values, unsigned int length)
+NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event * event, NSVR_EventKey key, float * values, unsigned int length)
 {
 	RETURN_IF_NULL(event);
 
@@ -262,29 +261,26 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event * event, const char * k
 	});
 }
 
-NSVR_RETURN(NSVR_Result)NSVR_Event_SetInt(NSVR_Event * event, const char * key, int value)
+NSVR_RETURN(NSVR_Result)NSVR_Event_SetInt(NSVR_Event * event, NSVR_EventKey key, int value)
  {
 	 RETURN_IF_NULL(event);
-	 RETURN_IF_NULL(key);
 
 	 return ExceptionGuard([&] {
 		 return AS_TYPE(ParameterizedEvent, event)->Set<int>(key, value);
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event * event, const char * key, uint32_t value)
+NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event * event, NSVR_EventKey key, uint32_t value)
 {
 	RETURN_IF_NULL(event);
-	RETURN_IF_NULL(key);
 	return ExceptionGuard([&] {
 		return AS_TYPE(ParameterizedEvent, event)->Set<uint32_t>(key, value);
 	});
 }
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, const char * key, uint32_t* array, unsigned int length)
+NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, NSVR_EventKey key, uint32_t* array, unsigned int length)
 {
 	RETURN_IF_NULL(event);
-	RETURN_IF_NULL(key);
 	return ExceptionGuard([&] {
 		return AS_TYPE(ParameterizedEvent, event)->SetUInt32s(key, array, length);
 	});

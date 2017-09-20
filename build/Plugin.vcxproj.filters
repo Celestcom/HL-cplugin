@@ -72,9 +72,6 @@
     <ClInclude Include="..\src\Plugin\Events\BasicHapticEvent.h">
       <Filter>src\Plugin\Events</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Plugin\Events\CurveEvent.h">
-      <Filter>src\Plugin\Events</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Plugin\Events\PlayableEvent.h">
       <Filter>src\Plugin\Events</Filter>
     </ClInclude>
@@ -198,9 +195,6 @@
       <Filter>src\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\Events\BasicHapticEvent.cpp">
-      <Filter>src\Plugin\Events</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Plugin\Events\CurveEvent.cpp">
       <Filter>src\Plugin\Events</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\Events\PlayableEvent.cpp">

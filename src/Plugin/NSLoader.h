@@ -24,18 +24,19 @@ extern "C" {
 #endif
 
 
-	typedef enum NSVR_EventKeys {
+	typedef enum NSVR_EventKey {
 		NSVR_EventKey_Invalid = 0,
 		/* Required keys*/
 		NSVR_EventKey_Time_Float,
-		NSVR_EventKey_SimpleHaptic_Duration_Float,
+
+		NSVR_EventKey_SimpleHaptic_Duration_Float = 1000,
 		NSVR_EventKey_SimpleHaptic_Strength_Float,
 		NSVR_EventKey_SimpleHaptic_Effect_Int,
-		NSVR_EventKey_SimpleHaptic_Region
+		NSVR_EventKey_SimpleHaptic_Region_UInt32s,
 
-		
+		NSVR_EventKey_Max = 4294967295
 
-	} NSVR_EventKeys;
+	} NSVR_EventKey;
 	
 	const uint32_t NSVR_SUBREGION_BLOCK = 1000000;
 
@@ -124,8 +125,8 @@ extern "C" {
 
 
 	typedef enum NSVR_EventType {
-		NSVR_EventType_BasicHapticEvent = 1,
-		NSVR_EventType_CurveHapticEvent = 2,
+		NSVR_EventType_Unknown = 0,
+		NSVR_EventType_SimpleHaptic = 1,
 		NSVR_EventType_Max = 65535
 	} NSVR_EventType;
 
@@ -238,11 +239,11 @@ extern "C" {
 	/* Events */
 	NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType type);
 	NSVR_RETURN(void)		 NSVR_Event_Release(NSVR_Event** event);
-	NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event* event, const char* key, float value);
-	NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event* event, const char* key, float* values, unsigned int length);
-	NSVR_RETURN(NSVR_Result) NSVR_Event_SetInt(NSVR_Event* event, const char* key, int value);
-	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event* event, const char* key, uint32_t value);
-	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, const char * key, uint32_t* array, unsigned int length);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event* event, NSVR_EventKey key, float value);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event* event, NSVR_EventKey key, float* values, unsigned int length);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetInt(NSVR_Event* event, NSVR_EventKey key, int value);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event* event, NSVR_EventKey key, uint32_t value);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, NSVR_EventKey key, uint32_t* array, unsigned int length);
 
 
 

@@ -47,13 +47,14 @@ bool isContCommand(const NullSpaceIPC::EffectCommand& command) {
 std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 	std::vector<std::unique_ptr<PlayableEvent>> events;
 	BasicHapticEvent a;
-	ParameterizedEvent e(NSVR_EventType_BasicHapticEvent);
-	e.SetInt("area", (int)AreaFlag::Chest_Both);
-	e.SetFloat("time", 0.0f);
+	ParameterizedEvent e(NSVR_EventType_SimpleHaptic);
+	std::vector<uint32_t> region = { nsvr_region_upper_ab_left };
+	e.SetUInt32s(NSVR_EventKey_SimpleHaptic_Region_UInt32s, region.data(), 1);
+	e.SetFloat(NSVR_EventKey_Time_Float, 0.0f);
 	
 	a.parse(e);
 	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
-	e.SetFloat("time", 1.0f);
+	e.SetFloat(NSVR_EventKey_Time_Float, 1.0f);
 	a.parse(e);
 	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
 	return events;
@@ -201,46 +202,46 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 
 TEST_CASE("The events system works", "[EventSystem]") {
 
-	ParameterizedEvent event(NSVR_EventType_BasicHapticEvent);
+	ParameterizedEvent event(NSVR_EventType_SimpleHaptic);
 
 	SECTION("You should be able to get out what you put in") {
-		event.Set("key1", 1.0f);
-		REQUIRE(event.Get("key1", 999.0f) == Approx(1.0f));
+		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Duration_Float, 999.0f) == Approx(1.0f));
 
-		event.Set("key2", 1);
-		REQUIRE(event.Get("key2", 999) == 1);
+		event.Set(NSVR_EventKey_SimpleHaptic_Effect_Int, 1);
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Effect_Int, 999) == 1);
 
-		event.Set("key3", std::vector<int>({ 1 }));
-		REQUIRE(event.Get("key3", std::vector<int>({ 999 })).at(0) == 1);
+		event.Set(static_cast<NSVR_EventKey>(10001), std::vector<int>({ 1 }));
+		REQUIRE(event.Get(static_cast<NSVR_EventKey>(10001), std::vector<int>({ 999 })).at(0) == 1);
 	}
 
 	SECTION("You should get a default value if you supply a wrong key") {
-		event.Set("key1", 1.0f);
-		REQUIRE(event.Get("key2", 999) == 999);
+		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Effect_Int, 999) == 999);
 	}
 
 	SECTION("You should get a default value if you supply the wrong type") {
-		event.Set("key1", 1.0f);
-		REQUIRE(event.Get("key1", 999) == 999);
+		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Duration_Float, 999) == 999);
 	}
 
 	SECTION("If you overwrite a key with a different value, you should get the new value out") {
-		event.Set("key1", 1.0f);
-		event.Set("key1", 2.0f);
-		REQUIRE(event.Get("key1", 999.0f) == Approx(2.0f));
+		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 2.0f);
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Duration_Float, 999.0f) == Approx(2.0f));
 	}
 
 	SECTION("If you overwrite a key with a different type, you should get the new type out") {
-		event.Set("key1", 1.0f);
-		event.Set("key1", 2);
-		REQUIRE(event.Get("key1", 999) == 2);
+		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 2);
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Duration_Float, 999) == 2);
 	}
 
 	SECTION("If you request a key that isn't present, you should get the default value") {
-		REQUIRE(event.Get("key1", 999) == 999);
-		REQUIRE(event.Get("key2", 999.0f) == 999.0f);
-		REQUIRE(event.Get("key3", std::vector<float>({ 999.0f })).at(0) == Approx(999.0f));
-		REQUIRE(event.Get("key4", std::vector<int>({ 999 })).at(0) == 999);
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Duration_Float, 999) == 999);
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Effect_Int, 999.0f) == 999.0f);
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Strength_Float, std::vector<float>({ 999.0f })).at(0) == Approx(999.0f));
+		REQUIRE(event.Get(NSVR_EventKey_SimpleHaptic_Region_UInt32s, std::vector<int>({ 999 })).at(0) == 999);
 	}
 }
 

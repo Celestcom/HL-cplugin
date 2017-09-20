@@ -18,7 +18,7 @@ public:
 	NSVR_EventType type() const override;
 	bool parse(const ParameterizedEvent&) override;
 	void serialize(NullSpaceIPC::HighLevelEvent& event) const override;
-	static constexpr NSVR_EventType descriptor = NSVR_EventType::NSVR_EventType_BasicHapticEvent;
+	static constexpr NSVR_EventType descriptor = NSVR_EventType::NSVR_EventType_SimpleHaptic;
 
 private:
 	float m_time;

@@ -6,11 +6,6 @@
 #include <vector>
 //#define DO_VALIDATION
 
-#ifdef DO_VALIDATION
-#define VALIDATE_KEY(key) do { if (!validate(key)) { return false; } } while (0)
-#else 
-#define VALIDATE_KEY(key)
-#endif
 
 
 //The possible attribute types that an event can have
@@ -26,8 +21,8 @@ typedef boost::variant<
 
 struct event_param {
 	event_param();
-	event_param(const char* key, EventValue);
-	std::string key;
+	event_param(NSVR_EventKey key, EventValue);
+	NSVR_EventKey key;
 	EventValue value;
 };
 
@@ -39,14 +34,14 @@ public:
 	//ParameterizedEvent(ParameterizedEvent&&);
 //	ParameterizedEvent(const ParameterizedEvent&);
 	template<class T>
-	bool Set(const char* key, T value);
-	bool SetFloat(const char* key, float value);
-	bool SetInt(const char* key, int value);
-	bool SetFloats(const char* key, float* values, unsigned int length);
-	bool SetUInt32s(const char* key, uint32_t* values, unsigned int length);
+	bool Set(NSVR_EventKey key, T value);
+	bool SetFloat(NSVR_EventKey key, float value);
+	bool SetInt(NSVR_EventKey key, int value);
+	bool SetFloats(NSVR_EventKey key, float* values, unsigned int length);
+	bool SetUInt32s(NSVR_EventKey key, uint32_t* values, unsigned int length);
 	
 	template<typename T>
-	T Get(const char* key, T defaultValue) const;
+	T Get(NSVR_EventKey key, T defaultValue) const;
 
 	NSVR_EventType type() const;
 
@@ -55,15 +50,15 @@ private:
 	std::vector<event_param> m_params;
 	//std::mutex m_propLock;
 
-	event_param* findParam(const char* key);
-	const event_param* findParam(const char* key) const;
+	event_param* findParam(NSVR_EventKey key);
+	const event_param* findParam(NSVR_EventKey key) const;
 	
 	template<typename T>
-	void updateOrAdd(const char* key, T val);
+	void updateOrAdd(NSVR_EventKey key, T val);
 };
 
 template<class T>
-inline bool ParameterizedEvent::Set(const char * key, T value)
+inline bool ParameterizedEvent::Set(NSVR_EventKey key, T value)
 {
 //	std::lock_guard<std::mutex> guard(m_propLock);
 	updateOrAdd<T>(key, value);
@@ -71,7 +66,7 @@ inline bool ParameterizedEvent::Set(const char * key, T value)
 }
 
 template<typename T>
-inline T ParameterizedEvent::Get(const char * key, T defaultValue) const
+inline T ParameterizedEvent::Get(NSVR_EventKey key, T defaultValue) const
 {
 	try {
 		if (const event_param* prop = findParam(key)) {
@@ -87,7 +82,7 @@ inline T ParameterizedEvent::Get(const char * key, T defaultValue) const
 }
 
 template<typename T>
-inline void ParameterizedEvent::updateOrAdd(const char * key, T val)
+inline void ParameterizedEvent::updateOrAdd(NSVR_EventKey key, T val)
 {
 	if (event_param* existing = findParam(key)) {
 		existing->value = val;

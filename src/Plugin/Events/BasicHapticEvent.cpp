@@ -40,12 +40,12 @@ uint32_t BasicHapticEvent::effectFamily() const
 bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 {
 
-	m_time = ev.Get<float>("time", 0.0f);
-	m_strength = ev.Get<float>("strength", 1.0f);
-	m_duration = ev.Get<float>("duration", 0.0f);
+	m_time = ev.Get<float>(NSVR_EventKey_Time_Float, 0.0f);
+	m_strength = ev.Get<float>(NSVR_EventKey_SimpleHaptic_Strength_Float, 1.0f);
+	m_duration = ev.Get<float>(NSVR_EventKey_SimpleHaptic_Duration_Float, 0.0f);
 
-	m_area = ev.Get<std::vector<uint32_t>>("area", {0});
-	m_requestedEffectFamily = ev.Get<int>("effect", 1);
+	m_area = ev.Get<std::vector<uint32_t>>(NSVR_EventKey_SimpleHaptic_Region_UInt32s, {0});
+	m_requestedEffectFamily = ev.Get<int>(NSVR_EventKey_SimpleHaptic_Effect_Int, 1);
 	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
 	m_parsedEffectFamily = effect;
 	
