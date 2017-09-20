@@ -34,7 +34,7 @@ extern "C" {
 		NSVR_EventKey_SimpleHaptic_Effect_Int,
 		NSVR_EventKey_SimpleHaptic_Region_UInt32s,
 
-		NSVR_EventKey_Max = 4294967295
+		NSVR_EventKey_Max = 2147483647
 
 	} NSVR_EventKey;
 	
@@ -95,7 +95,7 @@ extern "C" {
 		NSVR_Effect_Tick = 11,
 		NSVR_Effect_Double_Click = 4,
 		NSVR_Effect_Triple_Click = 16,
-		NSVR_Effect_Max = 4294967295
+		NSVR_Effect_Max = 2147483647
 	} NSVR_Effect;
 
 	struct NSVR_Quaternion {
