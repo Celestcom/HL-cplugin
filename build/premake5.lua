@@ -13,7 +13,7 @@ project "Plugin"
 
 	
 	targetdir "bin/%{cfg.buildcfg}/%{cfg.platform}"
-	targetname "NSLoader"
+	targetname "Hardlight"
 	
 	-- dependencies
 	protobuf_incl_dir = "D:/protobuf-3.0.0/cmake/build/solution/include"
@@ -182,7 +182,6 @@ project "Utilities"
 		"../src/Plugin/NSLoader_Errors.h"
 	}
 
-	
 	plugin_debug_win32_dir = "bin/Debug/Win32/"
 	plugin_release_win32_dir = "bin/Release/Win32/"
 
@@ -230,7 +229,7 @@ project "Utilities"
 		--need to fix this so we have correct win32 win64 debug/release
 			plugin_debug_win32_dir
 		}
-		links { "NSLoader"}
+		links { "Hardlight"}
 	
 	filter "configurations:Release"
 		defines {"NDEBUG"}
@@ -238,7 +237,7 @@ project "Utilities"
 		libdirs {
 			plugin_release_win32_dir
 		}
-		links {"NSLoader"}
+		links {"Hardlight"}
 
 	filter {"system:Windows"}
 		defines {"_WINDOWS", "_USRDLL"}
