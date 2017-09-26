@@ -96,15 +96,15 @@ NSVR_RETURN(NSVR_Result) NSVR_NodeInfo_Iter_Init(NSVR_NodeInfo_Iter * iter)
 	return NSVR_Success_Unqualified;
 }
 
-NSVR_RETURN(bool) NSVR_NodeInfo_Iter_Next(NSVR_NodeInfo_Iter * iter, NSVR_System * system)
+NSVR_RETURN(bool) NSVR_NodeInfo_Iter_Next(NSVR_NodeInfo_Iter * iter, uint32_t device_id, NSVR_System * system)
 {
 	RETURN_FALSE_IF_NULL(iter);
 	RETURN_FALSE_IF_NULL(system);
 
-	return ExceptionGuard([iter, system]() {
+	return ExceptionGuard([iter, system, device_id]() {
 
 		if (iter->_internal == nullptr) {
-			HiddenIterator<NSVR_NodeInfo>* snapshot = AS_TYPE(Engine, system)->TakeNodeSnapshot();
+			HiddenIterator<NSVR_NodeInfo>* snapshot = AS_TYPE(Engine, system)->TakeNodeSnapshot(device_id);
 			iter->_internal = snapshot;
 		}
 
@@ -257,7 +257,7 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event * event, NSVR_EventKey 
 
 	return ExceptionGuard([&] {
 		
-		return AS_TYPE(ParameterizedEvent, event)->SetFloats(key, values, length);
+		return AS_TYPE(ParameterizedEvent, event)->Set(key, values, length);
 	});
 }
 
@@ -274,7 +274,7 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event * event, NSVR_EventKey 
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
-		return AS_TYPE(ParameterizedEvent, event)->Set<uint32_t>(key, value);
+		return AS_TYPE(ParameterizedEvent, event)->Set(key, value);
 	});
 }
 
@@ -282,7 +282,16 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, NSVR_EventKey
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
-		return AS_TYPE(ParameterizedEvent, event)->SetUInt32s(key, array, length);
+		return AS_TYPE(ParameterizedEvent, event)->Set(key, array, length);
+	});
+}
+
+NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt64s(NSVR_Event * event, NSVR_EventKey key, uint64_t * array, unsigned int length)
+{
+	RETURN_IF_NULL(event);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(ParameterizedEvent, event)->Set(key, array, length);
 	});
 }
 

@@ -79,7 +79,7 @@ public:
 	int GetNumDevices(uint32_t* outAmount);
 
 	HiddenIterator<NSVR_DeviceInfo>* TakeDeviceSnapshot();
-	HiddenIterator<NSVR_NodeInfo>* TakeNodeSnapshot();
+	HiddenIterator<NSVR_NodeInfo>* TakeNodeSnapshot(uint32_t device_id);
 
 	template<typename T>
 	bool IsFinishedIterating(HiddenIterator<T>* param1) const;

@@ -67,16 +67,18 @@ HiddenIterator<NSVR_DeviceInfo>* Engine::TakeDeviceSnapshot()
 	return m_deviceSnapshots.back().get();
 }
 
-HiddenIterator<NSVR_NodeInfo>* Engine::TakeNodeSnapshot()
+HiddenIterator<NSVR_NodeInfo>* Engine::TakeNodeSnapshot(uint32_t device_id)
 {
 	auto nodes_raw = m_messenger.ReadNodes();
 	std::vector<NSVR_NodeInfo> nodes;
 	for (const auto& node : nodes_raw) {
-		NSVR_NodeInfo nodeInfo = { 0 };
-		memcpy_s(nodeInfo.Name, 128, node.NodeName, 128);
-		nodeInfo.Id = node.Id;
-		nodeInfo.Type = static_cast<NSVR_NodeType>(node.Type);
-		nodes.push_back(std::move(nodeInfo));
+		if ((node.Id >> 32) == device_id) {
+			NSVR_NodeInfo nodeInfo = { 0 };
+			memcpy_s(nodeInfo.Name, 128, node.NodeName, 128);
+			nodeInfo.Id = node.Id;
+			nodeInfo.Type = static_cast<NSVR_NodeType>(node.Type);
+			nodes.push_back(std::move(nodeInfo));
+		}
 	}
 
 	auto snapshot = std::make_unique<HiddenIterator<NSVR_NodeInfo>>(nodes);

@@ -36,7 +36,7 @@ extern "C" {
 		NSVR_Event_SetFloat(event, NSVR_EventKey_Time_Float, time);
 		NSVR_Event_SetFloat(event, NSVR_EventKey_SimpleHaptic_Strength_Float, strength);
 		NSVR_Event_SetFloat(event, NSVR_EventKey_SimpleHaptic_Duration_Float, duration);
-		NSVR_Event_SetUInt32s(event, NSVR_EventKey_SimpleHaptic_Region_UInt32s, regions, regionsCount);
+		NSVR_Event_SetUInt32s(event, NSVR_EventKey_SimpleHaptic_Regions_UInt32s, regions, regionsCount);
 		NSVR_Event_SetInt(event, NSVR_EventKey_SimpleHaptic_Effect_Int, effect);
 
 		NSVR_Timeline_AddEvent(timeline, event);

@@ -8,7 +8,7 @@
 class BasicHapticEvent : public PlayableEvent {
 public:	
 	BasicHapticEvent();
-
+	using Where = boost::variant<std::vector<uint32_t>, std::vector<uint64_t>>;
 	float strength() const;
 	uint32_t effectFamily() const;
 
@@ -24,7 +24,7 @@ private:
 	float m_time;
 	float m_strength;
 	float m_duration;
-	std::vector<uint32_t> m_area;
+	Where m_area;
 	std::string m_parsedEffectFamily;
 	uint32_t m_requestedEffectFamily;
 

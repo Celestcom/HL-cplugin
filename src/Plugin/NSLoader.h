@@ -32,7 +32,8 @@ extern "C" {
 		NSVR_EventKey_SimpleHaptic_Duration_Float = 1000,
 		NSVR_EventKey_SimpleHaptic_Strength_Float,
 		NSVR_EventKey_SimpleHaptic_Effect_Int,
-		NSVR_EventKey_SimpleHaptic_Region_UInt32s,
+		NSVR_EventKey_SimpleHaptic_Regions_UInt32s,
+		NSVR_EventKey_SimpleHaptic_Nodes_UInt64s,
 
 		NSVR_EventKey_Max = 2147483647
 
@@ -196,7 +197,7 @@ extern "C" {
 	NSVR_RETURN(bool) NSVR_DeviceInfo_Iter_Next(NSVR_DeviceInfo_Iter* iter, NSVR_System* system);
 
 	NSVR_RETURN(NSVR_Result) NSVR_NodeInfo_Iter_Init(NSVR_NodeInfo_Iter* iter);
-	NSVR_RETURN(bool) NSVR_NodeInfo_Iter_Next(NSVR_NodeInfo_Iter* iter, NSVR_System* system);
+	NSVR_RETURN(bool) NSVR_NodeInfo_Iter_Next(NSVR_NodeInfo_Iter* iter, uint32_t device_id, NSVR_System* system);
 
 	//Instantiates a new NSVR system context
 	NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr);
@@ -244,6 +245,7 @@ extern "C" {
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetInt(NSVR_Event* event, NSVR_EventKey key, int value);
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event* event, NSVR_EventKey key, uint32_t value);
 	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, NSVR_EventKey key, uint32_t* array, unsigned int length);
+	NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt64s(NSVR_Event * event, NSVR_EventKey key, uint64_t* array, unsigned int length);
 
 
 

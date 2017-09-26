@@ -11,7 +11,7 @@ BasicHapticEvent::BasicHapticEvent() :
 	m_time(0),
 	m_strength(1),
 	m_duration(0),
-	m_area(0)
+	m_area()
 {
 	m_parsedEffectFamily = "click";
 	m_requestedEffectFamily = Locator::getTranslator().ToEffectFamily(m_parsedEffectFamily);
@@ -19,7 +19,27 @@ BasicHapticEvent::BasicHapticEvent() :
 
 
 
+class where_visitor : public boost::static_visitor<void> {
 
+public:
+	where_visitor(NullSpaceIPC::SimpleHaptic* haptic) : m_haptic(haptic) {
+
+	}
+	void operator()(const std::vector<uint32_t>& regions) {
+		auto mut_regions = m_haptic->mutable_regions();
+		for (uint32_t region : regions) {
+			mut_regions->add_regions(region);
+		}
+	}
+	void operator()(const std::vector<uint64_t>& nodes) {
+		auto mut_nodes = m_haptic->mutable_nodes();
+		for (uint64_t node : nodes) {
+			mut_nodes->add_nodes(node);
+		}
+	}
+private:
+	NullSpaceIPC::SimpleHaptic* m_haptic;
+};
 
 float BasicHapticEvent::time() const
 {
@@ -40,12 +60,25 @@ uint32_t BasicHapticEvent::effectFamily() const
 bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 {
 
-	m_time = ev.Get<float>(NSVR_EventKey_Time_Float, 0.0f);
-	m_strength = ev.Get<float>(NSVR_EventKey_SimpleHaptic_Strength_Float, 1.0f);
-	m_duration = ev.Get<float>(NSVR_EventKey_SimpleHaptic_Duration_Float, 0.0f);
+	m_time = ev.GetOr<float>(NSVR_EventKey_Time_Float, 0.0f);
+	m_strength = ev.GetOr<float>(NSVR_EventKey_SimpleHaptic_Strength_Float, 1.0f);
+	m_duration = ev.GetOr<float>(NSVR_EventKey_SimpleHaptic_Duration_Float, 0.0f);
 
-	m_area = ev.Get<std::vector<uint32_t>>(NSVR_EventKey_SimpleHaptic_Region_UInt32s, {0});
-	m_requestedEffectFamily = ev.Get<int>(NSVR_EventKey_SimpleHaptic_Effect_Int, 1);
+	std::vector<uint32_t> regions;
+	std::vector<uint64_t> nodes;
+	if (ev.TryGet(NSVR_EventKey_SimpleHaptic_Regions_UInt32s, &regions)) {
+		m_area = regions;
+	}
+	else if (ev.TryGet(NSVR_EventKey_SimpleHaptic_Nodes_UInt64s, &nodes)) {
+		m_area = nodes;
+	}
+	else {
+		//possibly should fail here. Need to make clear where failures happen with event parsing.
+		m_area = std::vector<uint32_t>{ nsvr_region_unknown };
+	}
+
+
+	m_requestedEffectFamily = ev.GetOr<int>(NSVR_EventKey_SimpleHaptic_Effect_Int, 1);
 	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
 	m_parsedEffectFamily = effect;
 	
@@ -73,11 +106,9 @@ void BasicHapticEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
 	simple->set_effect(m_requestedEffectFamily);
 	simple->set_strength(m_strength);
 
-	for (const auto& region : m_area) {
-		simple->add_regions(region);
-	}
+	where_visitor where(simple);
+	boost::apply_visitor(where, m_area);
 	
-
 }
 
 float BasicHapticEvent::strength() const

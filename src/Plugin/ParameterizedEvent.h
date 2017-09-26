@@ -15,6 +15,7 @@ typedef boost::variant<
 	std::vector<float>,
 	std::vector<int>,
 	std::vector<uint32_t>,
+	std::vector<uint64_t>,
 	uint32_t
 > EventValue;
 
@@ -35,14 +36,18 @@ public:
 //	ParameterizedEvent(const ParameterizedEvent&);
 	template<class T>
 	bool Set(NSVR_EventKey key, T value);
-	bool SetFloat(NSVR_EventKey key, float value);
-	bool SetInt(NSVR_EventKey key, int value);
-	bool SetFloats(NSVR_EventKey key, float* values, unsigned int length);
-	bool SetUInt32s(NSVR_EventKey key, uint32_t* values, unsigned int length);
-	
+//	bool SetFloat(NSVR_EventKey key, float value);
+//	bool SetInt(NSVR_EventKey key, int value);
+	//bool SetFloats(NSVR_EventKey key, float* values, unsigned int length);
+//	bool SetUInt32s(NSVR_EventKey key, uint32_t* values, unsigned int length);
+	//bool SetUInt64s(NSVR_EventKey key, uint64_t* values, unsigned int length);
+	template<typename ArrayType>
+	bool Set(NSVR_EventKey key, ArrayType* values, unsigned int length);
 	template<typename T>
-	T Get(NSVR_EventKey key, T defaultValue) const;
+	T GetOr(NSVR_EventKey key, T defaultValue) const;
 
+	template<typename T>
+	bool TryGet(NSVR_EventKey key, T* outVal) const;
 	NSVR_EventType type() const;
 
 private:
@@ -65,8 +70,16 @@ inline bool ParameterizedEvent::Set(NSVR_EventKey key, T value)
 	return true;
 }
 
+template<typename ArrayType>
+inline bool ParameterizedEvent::Set(NSVR_EventKey key, ArrayType * values, unsigned int length)
+{
+	std::vector<ArrayType> vec(values, values + length);
+	updateOrAdd<std::vector<ArrayType>>(key, std::move(vec));
+	return true;
+}
+
 template<typename T>
-inline T ParameterizedEvent::Get(NSVR_EventKey key, T defaultValue) const
+inline T ParameterizedEvent::GetOr(NSVR_EventKey key, T defaultValue) const
 {
 	try {
 		if (const event_param* prop = findParam(key)) {
@@ -78,6 +91,25 @@ inline T ParameterizedEvent::Get(NSVR_EventKey key, T defaultValue) const
 	}
 	catch (const boost::bad_get&) {
 		return defaultValue;
+	}
+}
+
+template<typename T>
+bool ParameterizedEvent::TryGet(NSVR_EventKey key, T* outVal) const
+{
+	try {
+		if (const event_param* prop = findParam(key)) {
+			*outVal = boost::get<T>(prop->value);
+			return true;
+		}
+		else {
+			*outVal = T();
+			return false;
+		}
+	}
+	catch (const boost::bad_get&) {
+		*outVal = T();
+		return false;
 	}
 }
 
