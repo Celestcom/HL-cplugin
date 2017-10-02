@@ -22,23 +22,25 @@ BasicHapticEvent::BasicHapticEvent() :
 class where_visitor : public boost::static_visitor<void> {
 
 public:
-	where_visitor(NullSpaceIPC::SimpleHaptic* haptic) : m_haptic(haptic) {
+	using e = BasicHapticEvent;
+	where_visitor(NullSpaceIPC::Location* location) : m_location(location) {
 
 	}
-	void operator()(const std::vector<uint32_t>& regions) {
-		auto mut_regions = m_haptic->mutable_regions();
-		for (uint32_t region : regions) {
-			mut_regions->add_regions(region);
+	void operator()(const std::vector<e::Loc<e::region>>& regions) {
+		
+		auto mut_regions = m_location->mutable_regions();
+		for (auto region : regions) {
+			mut_regions->add_regions(region.value);
 		}
 	}
-	void operator()(const std::vector<uint64_t>& nodes) {
-		auto mut_nodes = m_haptic->mutable_nodes();
-		for (uint64_t node : nodes) {
-			mut_nodes->add_nodes(node);
+	void operator()(const std::vector<e::Loc<e::node>>& nodes) {
+		auto mut_nodes = m_location->mutable_nodes();
+		for (auto node : nodes) {
+			mut_nodes->add_nodes(node.value);
 		}
 	}
 private:
-	NullSpaceIPC::SimpleHaptic* m_haptic;
+	NullSpaceIPC::Location* m_location;
 };
 
 float BasicHapticEvent::time() const
@@ -57,6 +59,15 @@ uint32_t BasicHapticEvent::effectFamily() const
 	return m_requestedEffectFamily;
 }
 
+template<typename Phantom, typename Original>
+std::vector<Phantom> wrap_type(const std::vector<Original>& original) {
+	std::vector<Phantom> desired;
+	desired.reserve(original.size());
+	for (const auto& item : original) {
+		desired.push_back(Phantom{item });
+	}
+	return desired;
+}
 bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 {
 
@@ -65,16 +76,16 @@ bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 	m_duration = ev.GetOr<float>(NSVR_EventKey_SimpleHaptic_Duration_Float, 0.0f);
 
 	std::vector<uint32_t> regions;
-	std::vector<uint64_t> nodes;
+	std::vector<uint32_t> nodes;
 	if (ev.TryGet(NSVR_EventKey_SimpleHaptic_Regions_UInt32s, &regions)) {
-		m_area = regions;
+		m_area = wrap_type<Loc<region>>(regions);
 	}
-	else if (ev.TryGet(NSVR_EventKey_SimpleHaptic_Nodes_UInt64s, &nodes)) {
-		m_area = nodes;
+	else if (ev.TryGet(NSVR_EventKey_SimpleHaptic_Nodes_UInt32s, &nodes)) {
+		m_area = wrap_type<Loc<node>>(nodes);
 	}
 	else {
 		//possibly should fail here. Need to make clear where failures happen with event parsing.
-		m_area = std::vector<uint32_t>{ nsvr_region_unknown };
+		//m_area = { Loc<region>(nsvr_region_unknown) };
 	}
 
 
@@ -101,12 +112,13 @@ bool BasicHapticEvent::isEqual(const PlayableEvent& other) const
 void BasicHapticEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
 {
 	using namespace NullSpaceIPC;
-	SimpleHaptic* simple = event.mutable_simple_haptic();
+	LocationalEvent* location = event.mutable_locational_event();
+	SimpleHaptic* simple = location->mutable_simple_haptic();
 	simple->set_duration(m_duration);
 	simple->set_effect(m_requestedEffectFamily);
 	simple->set_strength(m_strength);
 
-	where_visitor where(simple);
+	where_visitor where(location->mutable_location());
 	boost::apply_visitor(where, m_area);
 	
 }

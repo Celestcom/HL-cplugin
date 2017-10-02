@@ -8,7 +8,20 @@
 class BasicHapticEvent : public PlayableEvent {
 public:	
 	BasicHapticEvent();
-	using Where = boost::variant<std::vector<uint32_t>, std::vector<uint64_t>>;
+	
+	template<typename T>
+	struct Loc {
+		uint32_t value;
+		explicit Loc(uint32_t val) : value(val) {}
+		Loc() : value(0) {}
+	
+	};
+
+	
+	struct node {};
+	struct region {};
+
+	using Where = boost::variant<std::vector<Loc<node>>, std::vector<Loc<region>>>;
 	float strength() const;
 	uint32_t effectFamily() const;
 
@@ -34,6 +47,7 @@ private:
 
 
 };
-
+template<typename T>
+bool operator==(const BasicHapticEvent::Loc<T>& lhs, const BasicHapticEvent::Loc<T>& rhs) { return lhs.value == rhs.value; }
 
 typedef boost::variant<BasicHapticEvent> SuitEvent;

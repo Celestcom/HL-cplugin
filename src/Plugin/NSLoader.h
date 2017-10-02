@@ -33,7 +33,7 @@ extern "C" {
 		NSVR_EventKey_SimpleHaptic_Strength_Float,
 		NSVR_EventKey_SimpleHaptic_Effect_Int,
 		NSVR_EventKey_SimpleHaptic_Regions_UInt32s,
-		NSVR_EventKey_SimpleHaptic_Nodes_UInt64s,
+		NSVR_EventKey_SimpleHaptic_Nodes_UInt32s,
 
 		NSVR_EventKey_Max = 2147483647
 
@@ -161,7 +161,7 @@ extern "C" {
 		NSVR_NodeType_AbsoluteTracker
 	} NSVR_NodeType;
 	typedef struct NSVR_NodeInfo {
-		uint64_t Id;
+		uint32_t Id;
 		char Name[128];
 		NSVR_NodeType Type;
 

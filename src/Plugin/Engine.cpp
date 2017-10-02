@@ -72,7 +72,8 @@ HiddenIterator<NSVR_NodeInfo>* Engine::TakeNodeSnapshot(uint32_t device_id)
 	auto nodes_raw = m_messenger.ReadNodes();
 	std::vector<NSVR_NodeInfo> nodes;
 	for (const auto& node : nodes_raw) {
-		if ((node.Id >> 32) == device_id) {
+		//special case: they want ALL nodes, regardless of device, then specify device_id 0
+		if ((node.DeviceId) == device_id || device_id == 0) {
 			NSVR_NodeInfo nodeInfo = { 0 };
 			memcpy_s(nodeInfo.Name, 128, node.NodeName, 128);
 			nodeInfo.Id = node.Id;
@@ -113,7 +114,8 @@ int Engine::DumpDeviceDiagnostics()
 
 int Engine::SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length)
 {
-	auto& translator = Locator::getTranslator();
+	throw std::runtime_error("reimplement");
+	/*auto& translator = Locator::getTranslator();
 
 	using namespace NullSpaceIPC;
 	HighLevelEvent event;
@@ -124,7 +126,7 @@ int Engine::SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length)
 		magnitude->set_strength(amplitudes[i]);	
 	}
 	m_messenger.WriteEvent(event);
-
+*/
 	return NSVR_Success_Unqualified;
 }
 
