@@ -24,7 +24,7 @@ struct BodyView {
 	int getIntensity(uint32_t nodeIndex, float * outIntensity)
 	{
 		//perhaps be defensive and reject request if wrong type
-		*outIntensity = pairs[nodeIndex].Value.data_3;
+		*outIntensity = pairs[nodeIndex].Value.data_0;
 		return NSVR_Success_Unqualified;
 	}
 
