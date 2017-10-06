@@ -71,16 +71,16 @@ std::vector<Phantom> wrap_type(const std::vector<Original>& original) {
 bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 {
 
-	m_time = ev.GetOr<float>(NSVR_EventKey_Time_Float, 0.0f);
-	m_strength = ev.GetOr<float>(NSVR_EventKey_SimpleHaptic_Strength_Float, 1.0f);
-	m_duration = ev.GetOr<float>(NSVR_EventKey_SimpleHaptic_Duration_Float, 0.0f);
+	m_time = ev.GetOr<float>(HLVR_EventKey_Time_Float, 0.0f);
+	m_strength = ev.GetOr<float>(HLVR_EventKey_SimpleHaptic_Strength_Float, 1.0f);
+	m_duration = ev.GetOr<float>(HLVR_EventKey_SimpleHaptic_Duration_Float, 0.0f);
 
 	std::vector<uint32_t> regions;
 	std::vector<uint32_t> nodes;
-	if (ev.TryGet(NSVR_EventKey_SimpleHaptic_Regions_UInt32s, &regions)) {
+	if (ev.TryGet(HLVR_EventKey_SimpleHaptic_Regions_UInt32s, &regions)) {
 		m_area = wrap_type<Loc<region>>(regions);
 	}
-	else if (ev.TryGet(NSVR_EventKey_SimpleHaptic_Nodes_UInt32s, &nodes)) {
+	else if (ev.TryGet(HLVR_EventKey_SimpleHaptic_Nodes_UInt32s, &nodes)) {
 		m_area = wrap_type<Loc<node>>(nodes);
 	}
 	else {
@@ -89,7 +89,7 @@ bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 	}
 
 
-	m_requestedEffectFamily = ev.GetOr<int>(NSVR_EventKey_SimpleHaptic_Effect_Int, 1);
+	m_requestedEffectFamily = ev.GetOr<int>(HLVR_EventKey_SimpleHaptic_Effect_Int, 1);
 	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
 	m_parsedEffectFamily = effect;
 	
@@ -130,7 +130,7 @@ float BasicHapticEvent::strength() const
 
 
 
-NSVR_EventType BasicHapticEvent::type() const
+HLVR_EventType BasicHapticEvent::type() const
 {
 	return descriptor;
 }

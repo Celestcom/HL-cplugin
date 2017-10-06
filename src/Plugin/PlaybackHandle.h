@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include "NSLoader_fwds.h"
+#include "HLVR_Forwards.h"
 
 
 
@@ -11,9 +11,10 @@ public:
 	PlaybackHandle();
 	PlaybackHandle(const PlaybackHandle&) = delete;
 
-
-	int Command(NSVR_PlaybackCommand command);
-	int GetHandleInfo(NSVR_EffectInfo* infoPtr);
+	int Pause();
+	int Play();
+	int Reset();
+	int GetHandleInfo(HLVR_EffectInfo* infoPtr);
 
 	uint32_t handle;
 	Engine* engine;

@@ -2,7 +2,7 @@
 #include <boost/optional.hpp>
 #include <stdint.h>
 #include <array>
-#include "NSLoader_fwds.h"
+#include "HLVR_Forwards.h"
 class ParameterizedEvent;
 
 namespace NullSpaceIPC {
@@ -15,12 +15,12 @@ public:
 
 	virtual float time() const = 0;
 	virtual float duration() const = 0;
-	virtual NSVR_EventType type() const = 0;
+	virtual HLVR_EventType type() const = 0;
 	virtual bool parse(const ParameterizedEvent&) = 0;
 	virtual void serialize(NullSpaceIPC::HighLevelEvent& event) const = 0;
 	bool operator<(const PlayableEvent& rhs) const;
 
-	static std::unique_ptr<PlayableEvent> make(NSVR_EventType type);
+	static std::unique_ptr<PlayableEvent> make(HLVR_EventType type);
 
 	bool operator==(const PlayableEvent& other) const;
 

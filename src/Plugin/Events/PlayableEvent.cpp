@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "PlayableEvent.h"
 #include "ParameterizedEvent.h"
-#include "NSLoader.h"
+#include "HLVR.h"
 #include "BasicHapticEvent.h"
 #include <typeinfo>
 #include "Locator.h"
@@ -13,11 +13,11 @@ bool PlayableEvent::operator<(const PlayableEvent & rhs) const
 }
 
 std::unique_ptr<PlayableEvent>
-PlayableEvent::make(NSVR_EventType type)
+PlayableEvent::make(HLVR_EventType type)
 {
 	std::unique_ptr<PlayableEvent> possibleEvent;
 	switch (type) {
-	case NSVR_EventType::NSVR_EventType_SimpleHaptic:
+	case HLVR_EventType::HLVR_EventType_SimpleHaptic:
 		possibleEvent = std::make_unique<BasicHapticEvent>();
 		break;
 	default:

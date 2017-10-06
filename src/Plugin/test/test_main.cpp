@@ -4,7 +4,6 @@
 #include "../AreaFlags.h"
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid.hpp>
-#include "../EventRegistry.h"
 #include "../HapticsPlayer.h"
 #include "../ParameterizedEvent.h"
 #include <boost/asio/io_service.hpp>
@@ -13,7 +12,7 @@
 #include <chrono>
 #include "../SharedCommunication/readablesharedvector.h"
 #include "../SharedCommunication/SharedTypes.h"
-#include "NSLoader_Internal.h"
+#include "HLVR_Experimental.h"
 template<typename T>
 T time(std::function<void()> fn) {
 	auto then = std::chrono::high_resolution_clock::now();
@@ -47,26 +46,25 @@ bool isContCommand(const NullSpaceIPC::EffectCommand& command) {
 std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 	std::vector<std::unique_ptr<PlayableEvent>> events;
 	BasicHapticEvent a;
-	ParameterizedEvent e(NSVR_EventType_SimpleHaptic);
-	std::vector<uint32_t> region = { nsvr_region_upper_ab_left };
-	e.Set(NSVR_EventKey_SimpleHaptic_Regions_UInt32s, region.data(), 1);
-	e.Set(NSVR_EventKey_Time_Float, 0.0f);
+	ParameterizedEvent e(HLVR_EventType_SimpleHaptic);
+	std::vector<uint32_t> region = { hlvr_region_upper_ab_left };
+	e.Set(HLVR_EventKey_SimpleHaptic_Regions_UInt32s, region.data(), 1);
+	e.Set(HLVR_EventKey_Time_Float, 0.0f);
 	
 	a.parse(e);
 	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
-	e.Set(NSVR_EventKey_Time_Float, 1.0f);
+	e.Set(HLVR_EventKey_Time_Float, 1.0f);
 	a.parse(e);
 	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
 	return events;
 }
 TEST_CASE("The haptics player works", "[HapticsPlayer]") {
-	EventRegistry registry;
 
 	//Now I see why we shouldn't have classes take hard references to resources.
 	//Messenger should probably be an interface, else we need it to test HapticsPlayer
 	boost::asio::io_service io;
 	ClientMessenger m(io);
-	HapticsPlayer player(registry, m);
+	HapticsPlayer player( m);
 
 	REQUIRE(player.GetNumLiveEffects() == 0);
 	REQUIRE(player.GetNumReleasedEffects() == 0);
@@ -102,7 +100,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Pause(h);
 
 		info = player.GetHandleInfo(h);
-		REQUIRE(info->State() != NSVR_EffectInfo_State_Playing);
+		REQUIRE(info->State() != HLVR_EffectInfo_State_Playing);
 		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME));
 	}
 
@@ -116,7 +114,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Stop(h);
 
 		info = player.GetHandleInfo(h);
-		REQUIRE(info->State() != NSVR_EffectInfo_State_Playing);
+		REQUIRE(info->State() != HLVR_EffectInfo_State_Playing);
 		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME));
 	}
 
@@ -133,7 +131,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Update(DELTA_TIME);
 
 		info = player.GetHandleInfo(h);
-		REQUIRE(info->State() == NSVR_EffectInfo_State_Playing);
+		REQUIRE(info->State() == HLVR_EffectInfo_State_Playing);
 		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME * 2));
 	}
 
@@ -147,7 +145,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Play(h);
 		player.Update(info->Duration() + DELTA_TIME);
 		info = player.GetHandleInfo(h);
-		REQUIRE(info->State() != NSVR_EffectInfo_State_Playing);
+		REQUIRE(info->State() != HLVR_EffectInfo_State_Playing);
 		REQUIRE(info->CurrentTime() == Approx(info->Duration() + DELTA_TIME));
 	}
 
@@ -202,63 +200,63 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 
 TEST_CASE("The events system works", "[EventSystem]") {
 
-	ParameterizedEvent event(NSVR_EventType_SimpleHaptic);
+	ParameterizedEvent event(HLVR_EventType_SimpleHaptic);
 
 	SECTION("You should be able to get out what you put in") {
-		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Duration_Float, 999.0f) == Approx(1.0f));
+		event.Set(HLVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Duration_Float, 999.0f) == Approx(1.0f));
 
-		event.Set(NSVR_EventKey_SimpleHaptic_Effect_Int, 1);
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Effect_Int, 999) == 1);
+		event.Set(HLVR_EventKey_SimpleHaptic_Effect_Int, 1);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Effect_Int, 999) == 1);
 
-		event.Set(static_cast<NSVR_EventKey>(10001), std::vector<int>({ 1 }));
-		REQUIRE(event.GetOr(static_cast<NSVR_EventKey>(10001), std::vector<int>({ 999 })).at(0) == 1);
+		event.Set(static_cast<HLVR_EventKey>(10001), std::vector<int>({ 1 }));
+		REQUIRE(event.GetOr(static_cast<HLVR_EventKey>(10001), std::vector<int>({ 999 })).at(0) == 1);
 	}
 
 	SECTION("You should get a default value if you supply a wrong key") {
-		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Effect_Int, 999) == 999);
+		event.Set(HLVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Effect_Int, 999) == 999);
 	}
 
 	SECTION("You should get a default value if you supply the wrong type") {
-		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Duration_Float, 999) == 999);
+		event.Set(HLVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Duration_Float, 999) == 999);
 	}
 
 	SECTION("If you overwrite a key with a different value, you should get the new value out") {
-		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
-		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 2.0f);
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Duration_Float, 999.0f) == Approx(2.0f));
+		event.Set(HLVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		event.Set(HLVR_EventKey_SimpleHaptic_Duration_Float, 2.0f);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Duration_Float, 999.0f) == Approx(2.0f));
 	}
 
 	SECTION("If you overwrite a key with a different type, you should get the new type out") {
-		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
-		event.Set(NSVR_EventKey_SimpleHaptic_Duration_Float, 2);
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Duration_Float, 999) == 2);
+		event.Set(HLVR_EventKey_SimpleHaptic_Duration_Float, 1.0f);
+		event.Set(HLVR_EventKey_SimpleHaptic_Duration_Float, 2);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Duration_Float, 999) == 2);
 	}
 
 	SECTION("If you request a key that isn't present, you should get the default value") {
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Duration_Float, 999) == 999);
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Effect_Int, 999.0f) == 999.0f);
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Strength_Float, std::vector<float>({ 999.0f })).at(0) == Approx(999.0f));
-		REQUIRE(event.GetOr(NSVR_EventKey_SimpleHaptic_Regions_UInt32s, std::vector<int>({ 999 })).at(0) == 999);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Duration_Float, 999) == 999);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Effect_Int, 999.0f) == 999.0f);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Strength_Float, std::vector<float>({ 999.0f })).at(0) == Approx(999.0f));
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Regions_UInt32s, std::vector<int>({ 999 })).at(0) == 999);
 	}
 
 	SECTION("TryGet will return false if the key is not found") {
 		int x;
-		REQUIRE(!event.TryGet(NSVR_EventKey_SimpleHaptic_Effect_Int, &x));
+		REQUIRE(!event.TryGet(HLVR_EventKey_SimpleHaptic_Effect_Int, &x));
 	}
 
 	SECTION("TryGet will return default value if the key is not found") {
 		int x = 152;
-		event.TryGet(NSVR_EventKey_SimpleHaptic_Effect_Int, &x);
+		event.TryGet(HLVR_EventKey_SimpleHaptic_Effect_Int, &x);
 		REQUIRE(x == 0);
 	}
 
 	SECTION("TryGet will return the value if found") {
 		int x;
-		event.Set(NSVR_EventKey_SimpleHaptic_Effect_Int, 152);
-		REQUIRE(event.TryGet(NSVR_EventKey_SimpleHaptic_Effect_Int, &x));
+		event.Set(HLVR_EventKey_SimpleHaptic_Effect_Int, 152);
+		REQUIRE(event.TryGet(HLVR_EventKey_SimpleHaptic_Effect_Int, &x));
 		REQUIRE(x == 152);
 	}
 }
@@ -275,15 +273,15 @@ TEST_CASE("Retrieving the service version should work") {
 
 	//This is a weird case setup,  I just want to see if it works
 	SECTION("So does it?") {
-		NSVR_ServiceInfo info = { 0 };
+		HLVR_PlatformInfo info = { 0 };
 		auto v = m.ConnectedToService(&info);
 		if (v) {
-			if (info.ServiceMajor == 0) {
-				REQUIRE(info.ServiceMinor > 0);
+			if (info.MajorVersion == 0) {
+				REQUIRE(info.MinorVersion > 0);
 			}
 			else {
-				REQUIRE(info.ServiceMinor >= 0);
-				REQUIRE(info.ServiceMajor >= 1);
+				REQUIRE(info.MinorVersion >= 0);
+				REQUIRE(info.MajorVersion >= 1);
 			}
 		}
 		

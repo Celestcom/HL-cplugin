@@ -8,10 +8,9 @@
 #include "HapticsPlayer.h"
 #include "ScheduledEvent.h"
 #include "EventList.h"
-#include "NSLoader.h"
+#include "HLVR.h"
 #include "MyTestLog.h"
-#include "IHapticDevice.h"
-#include "NSLoader_Internal.h"
+#include "HLVR_Experimental.h"
 #include "EngineIsAlive.h"
 #include "EngineCommand.h"
 
@@ -53,19 +52,18 @@ public:
 
 
 	~Engine();
-	int PollStatus(NSVR_ServiceInfo*);
+	int PollStatus(HLVR_PlatformInfo*);
 	uint32_t GenerateHandle();
-	int PollDevice(NSVR_DeviceInfo *);
+	int PollDevice(HLVR_DeviceInfo *);
 	bool DoEngineCommand(::EngineCommand command);
-	int GetEngineStats(NSVR_SystemStats* stats);
-	void HandleCommand(unsigned int handle, NSVR_PlaybackCommand);
+	void HandlePause(unsigned int handle);
+	void HandlePlay(unsigned int handle);
+	void HandleReset(unsigned int handle);
 	void ReleaseHandle(unsigned int handle);
 	int CreateEffect(EventList * list, HapticHandle * handle);
-	int  PollTracking(NSVR_TrackingUpdate* q);
+	int  PollTracking(HLVR_TrackingUpdate* q);
 
-	int PollLogs(NSVR_LogEntry* entry);
 
-	int EnableAudio(NSVR_AudioOptions* options);
 	int DisableAudio();
 
 	int SubmitRawCommand(uint8_t* buffer, int length);
@@ -74,29 +72,27 @@ public:
 
 	int DumpDeviceDiagnostics();
 	int SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length);
-	int GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr);
+	int GetHandleInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr);
 
 	int GetNumDevices(uint32_t* outAmount);
 
-	HiddenIterator<NSVR_DeviceInfo>* TakeDeviceSnapshot();
-	HiddenIterator<NSVR_NodeInfo>* TakeNodeSnapshot(uint32_t device_id);
+	HiddenIterator<HLVR_DeviceInfo>* TakeDeviceSnapshot();
+	HiddenIterator<HLVR_NodeInfo>* TakeNodeSnapshot(uint32_t device_id);
 
 	template<typename T>
 	bool IsFinishedIterating(HiddenIterator<T>* param1) const;
 
 	int UpdateView(BodyView* view);
-	void DestroyIterator(HiddenIterator<NSVR_DeviceInfo>* device);
-	void DestroyIterator(HiddenIterator<NSVR_NodeInfo>* nodes);
+	void DestroyIterator(HiddenIterator<HLVR_DeviceInfo>* device);
+	void DestroyIterator(HiddenIterator<HLVR_NodeInfo>* nodes);
 
 private:
 	IoService m_ioService;
-	NSVR_TrackingUpdate m_cachedTrackingUpdate;
+	HLVR_TrackingUpdate m_cachedTrackingUpdate;
 	uint32_t m_currentHandleId;
 	bool m_isHapticsSystemPlaying;
 	ClientMessenger m_messenger;
-	EventRegistry m_registry;
 
-	std::unique_ptr<IHapticDevice> m_hardlightSuit;
 	HapticsPlayer m_player;
 
 	boost::posix_time::milliseconds m_hapticsExecutionInterval;
@@ -108,8 +104,8 @@ private:
 
 	boost::shared_ptr<MyTestLog> m_log;
 
-	std::vector<std::unique_ptr<HiddenIterator<NSVR_DeviceInfo>>> m_deviceSnapshots;
-	std::vector<std::unique_ptr<HiddenIterator<NSVR_NodeInfo>>> m_nodeSnapshots;
+	std::vector<std::unique_ptr<HiddenIterator<HLVR_DeviceInfo>>> m_deviceSnapshots;
+	std::vector<std::unique_ptr<HiddenIterator<HLVR_NodeInfo>>> m_nodeSnapshots;
 
 	void setupUserFacingLogSink();
 

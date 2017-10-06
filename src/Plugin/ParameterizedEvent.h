@@ -1,5 +1,5 @@
 #pragma once
-#include "NSLoader_fwds.h"
+#include "HLVR_Forwards.h"
 #include <boost/variant.hpp>
 #include <boost/optional.hpp>
 #include <mutex>
@@ -11,19 +11,20 @@
 //The possible attribute types that an event can have
 typedef boost::variant<
 	float, 
-	int,
 	std::vector<float>,
+	int,
 	std::vector<int>,
+	uint32_t,
 	std::vector<uint32_t>,
-	std::vector<uint64_t>,
-	uint32_t
+	uint64_t,
+	std::vector<uint64_t>
 > EventValue;
 
 
 struct event_param {
 	event_param();
-	event_param(NSVR_EventKey key, EventValue);
-	NSVR_EventKey key;
+	event_param(HLVR_EventKey key, EventValue);
+	HLVR_EventKey key;
 	EventValue value;
 };
 
@@ -31,39 +32,39 @@ struct event_param {
 class ParameterizedEvent
 {
 public:
-	explicit ParameterizedEvent(NSVR_EventType);
+	explicit ParameterizedEvent(HLVR_EventType);
 	//ParameterizedEvent(ParameterizedEvent&&);
 //	ParameterizedEvent(const ParameterizedEvent&);
 	template<class T>
-	bool Set(NSVR_EventKey key, T value);
-//	bool SetFloat(NSVR_EventKey key, float value);
-//	bool SetInt(NSVR_EventKey key, int value);
-	//bool SetFloats(NSVR_EventKey key, float* values, unsigned int length);
-//	bool SetUInt32s(NSVR_EventKey key, uint32_t* values, unsigned int length);
-	//bool SetUInt64s(NSVR_EventKey key, uint64_t* values, unsigned int length);
+	bool Set(HLVR_EventKey key, T value);
+//	bool SetFloat(HLVR_EventKey key, float value);
+//	bool SetInt(HLVR_EventKey key, int value);
+	//bool SetFloats(HLVR_EventKey key, float* values, unsigned int length);
+//	bool SetUInt32s(HLVR_EventKey key, uint32_t* values, unsigned int length);
+	//bool SetUInt64s(HLVR_EventKey key, uint64_t* values, unsigned int length);
 	template<typename ArrayType>
-	bool Set(NSVR_EventKey key, ArrayType* values, unsigned int length);
+	bool Set(HLVR_EventKey key, ArrayType* values, unsigned int length);
 	template<typename T>
-	T GetOr(NSVR_EventKey key, T defaultValue) const;
+	T GetOr(HLVR_EventKey key, T defaultValue) const;
 
 	template<typename T>
-	bool TryGet(NSVR_EventKey key, T* outVal) const;
-	NSVR_EventType type() const;
+	bool TryGet(HLVR_EventKey key, T* outVal) const;
+	HLVR_EventType type() const;
 
 private:
-	NSVR_EventType m_type;
+	HLVR_EventType m_type;
 	std::vector<event_param> m_params;
 	//std::mutex m_propLock;
 
-	event_param* findParam(NSVR_EventKey key);
-	const event_param* findParam(NSVR_EventKey key) const;
+	event_param* findParam(HLVR_EventKey key);
+	const event_param* findParam(HLVR_EventKey key) const;
 	
 	template<typename T>
-	void updateOrAdd(NSVR_EventKey key, T val);
+	void updateOrAdd(HLVR_EventKey key, T val);
 };
 
 template<class T>
-inline bool ParameterizedEvent::Set(NSVR_EventKey key, T value)
+inline bool ParameterizedEvent::Set(HLVR_EventKey key, T value)
 {
 //	std::lock_guard<std::mutex> guard(m_propLock);
 	updateOrAdd<T>(key, value);
@@ -71,7 +72,7 @@ inline bool ParameterizedEvent::Set(NSVR_EventKey key, T value)
 }
 
 template<typename ArrayType>
-inline bool ParameterizedEvent::Set(NSVR_EventKey key, ArrayType * values, unsigned int length)
+inline bool ParameterizedEvent::Set(HLVR_EventKey key, ArrayType * values, unsigned int length)
 {
 	std::vector<ArrayType> vec(values, values + length);
 	updateOrAdd<std::vector<ArrayType>>(key, std::move(vec));
@@ -79,7 +80,7 @@ inline bool ParameterizedEvent::Set(NSVR_EventKey key, ArrayType * values, unsig
 }
 
 template<typename T>
-inline T ParameterizedEvent::GetOr(NSVR_EventKey key, T defaultValue) const
+inline T ParameterizedEvent::GetOr(HLVR_EventKey key, T defaultValue) const
 {
 	try {
 		if (const event_param* prop = findParam(key)) {
@@ -95,7 +96,7 @@ inline T ParameterizedEvent::GetOr(NSVR_EventKey key, T defaultValue) const
 }
 
 template<typename T>
-bool ParameterizedEvent::TryGet(NSVR_EventKey key, T* outVal) const
+bool ParameterizedEvent::TryGet(HLVR_EventKey key, T* outVal) const
 {
 	try {
 		if (const event_param* prop = findParam(key)) {
@@ -114,7 +115,7 @@ bool ParameterizedEvent::TryGet(NSVR_EventKey key, T* outVal) const
 }
 
 template<typename T>
-inline void ParameterizedEvent::updateOrAdd(NSVR_EventKey key, T val)
+inline void ParameterizedEvent::updateOrAdd(HLVR_EventKey key, T val)
 {
 	if (event_param* existing = findParam(key)) {
 		existing->value = val;

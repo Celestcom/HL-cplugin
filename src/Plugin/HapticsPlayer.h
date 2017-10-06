@@ -20,7 +20,7 @@ class HapticsPlayer
 {
 public:
 
-	HapticsPlayer(EventRegistry& registry, ClientMessenger& messenger);
+	HapticsPlayer(ClientMessenger& messenger);
 	~HapticsPlayer();
 
 	void Update(float dt);
@@ -42,7 +42,6 @@ public:
 	std::size_t GetNumReleasedEffects();
 private:
 	bool m_playerPaused;
-	EventRegistry& m_registry;
 
 	boost::hash<boost::uuids::uuid> m_hasher;
 	boost::uuids::random_generator m_uuidGenerator;

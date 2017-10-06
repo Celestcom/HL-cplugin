@@ -10,7 +10,7 @@
 #include "HighLevelEvent.pb.h"
 #pragma warning(pop)
 
-#include "NSLoader.h"
+#include "HLVR.h"
 
 using namespace NullSpace::SharedMemory;
 ClientMessenger::ClientMessenger(boost::asio::io_service& io):
@@ -162,13 +162,13 @@ std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
 	return pairs;
 }
 
-bool ClientMessenger::ConnectedToService(NSVR_ServiceInfo* info)
+bool ClientMessenger::ConnectedToService(HLVR_PlatformInfo* info)
 {
 
 	if (m_connectedToService) {
 		if (info != nullptr) {
-			info->ServiceMajor = m_serviceVersion.ServiceMajor;
-			info->ServiceMinor = m_serviceVersion.ServiceMinor;
+			info->MajorVersion = m_serviceVersion.MajorVersion;
+			info->MinorVersion = m_serviceVersion.MinorVersion;
 		}
 		return true;
 	}

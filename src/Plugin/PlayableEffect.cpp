@@ -3,7 +3,7 @@
 #include "Locator.h"
 #include <iostream>
 #include "BasicHapticEvent.h"
-#include "NSLoader.h"
+#include "HLVR.h"
 #include <memory>
 #include <iterator>
 #include <numeric>
@@ -29,10 +29,9 @@ T time(std::function<void()> fn) {
 }
 
 
-PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,EventRegistry& reg, boost::uuids::random_generator& uuid, ClientMessenger& messenger) :
+PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,boost::uuids::random_generator& uuid, ClientMessenger& messenger) :
 	m_effects(std::move(effects)),
 	m_state(PlaybackState::IDLE),
-	m_registry(reg),
 	m_id(uuid()),
 	m_time(0),
 	m_released(false),
@@ -69,11 +68,9 @@ void PlayableEffect::pruneDuplicates(std::vector<PlayablePtr>& playables) {
 PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
 	m_effects(std::move(rhs.m_effects)),
 	m_state(rhs.m_state),
-	m_registry(rhs.m_registry),
 	m_id(rhs.m_id),
 	m_time(rhs.m_time),
 	m_released(rhs.m_released),
-	m_activeDrivers(rhs.m_activeDrivers),
 	m_lastExecutedEffect(m_effects.begin()),
 	m_messenger(rhs.m_messenger)
 {

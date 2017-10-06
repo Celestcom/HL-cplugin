@@ -1,10 +1,8 @@
 #pragma once
 #include "IPlayable.h"
 #include "BasicHapticEvent.h"
-#include "EventRegistry.h"
 #include <set>
 #include <boost\uuid\random_generator.hpp>
-#include "HardwareDriver.h"
 
 template<typename T>
 struct weak_ptr_less_than {
@@ -34,7 +32,7 @@ public:
 
 
 	//Precondition: the vector is not empty
-	PlayableEffect(std::vector<PlayablePtr>&& effects, EventRegistry& reg, boost::uuids::random_generator& gen, ClientMessenger& messenger);
+	PlayableEffect(std::vector<PlayablePtr>&& effects, boost::uuids::random_generator& gen, ClientMessenger& messenger);
 	PlayableEffect(const PlayableEffect&) = delete;
 	PlayableEffect(PlayableEffect&&);
 	~PlayableEffect();
@@ -63,10 +61,8 @@ private:
 	PlaybackState m_state;
 
 	float m_time;
-	EventRegistry& m_registry;
 	std::vector<std::unique_ptr<PlayableEvent>> m_effects;
 
-	std::set<std::weak_ptr<HardwareDriver>, weak_ptr_less_than<HardwareDriver>> m_activeDrivers;
 	std::vector<std::unique_ptr<PlayableEvent>>::iterator m_lastExecutedEffect;
 	boost::uuids::uuid m_id;
 

@@ -2,7 +2,7 @@
 #include <boost/variant.hpp>
 #include "ParameterizedEvent.h"
 #include "PlayableEvent.h"
-#include "NSLoader.h"
+#include "HLVR.h"
 
 
 class BasicHapticEvent : public PlayableEvent {
@@ -28,10 +28,10 @@ public:
 	/* PlayableEvent impl */
 	float time() const override;
 	float duration() const override;
-	NSVR_EventType type() const override;
+	HLVR_EventType type() const override;
 	bool parse(const ParameterizedEvent&) override;
 	void serialize(NullSpaceIPC::HighLevelEvent& event) const override;
-	static constexpr NSVR_EventType descriptor = NSVR_EventType::NSVR_EventType_SimpleHaptic;
+	static constexpr HLVR_EventType descriptor = HLVR_EventType::HLVR_EventType_SimpleHaptic;
 
 private:
 	float m_time;

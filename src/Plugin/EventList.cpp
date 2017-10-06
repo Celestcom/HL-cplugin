@@ -2,8 +2,8 @@
 #include "EventList.h"
 
 #include "ParameterizedEvent.h"
-#include "NSLoader_Errors.h"
-#include "NSLoader.h"
+#include "HLVR_Errors.h"
+#include "HLVR.h"
 EventList::EventList():m_events(), m_eventLock()
 {
 	m_events.reserve(1);
@@ -15,7 +15,7 @@ int EventList::AddEvent(ParameterizedEvent * event)
 	std::lock_guard<std::mutex> guard(m_eventLock);
 	m_events.push_back(*event);
 	
-	return NSVR_Success_Unqualified;
+	return HLVR_Ok;
 }
 
 
@@ -42,7 +42,7 @@ void EventList::Interleave(EventList* source, float offset)
 	
 
 	for (ParameterizedEvent event : source->m_events) {
-		event.Set(NSVR_EventKey_Time_Float, event.GetOr(NSVR_EventKey_Time_Float, 0.0f) + offset);
+		event.Set(HLVR_EventKey_Time_Float, event.GetOr(HLVR_EventKey_Time_Float, 0.0f) + offset);
 		m_events.push_back(event);
 	}
 	//m_events.insert(m_events.end(), source->m_events.begin(), source->m_events.end());
@@ -52,7 +52,7 @@ void EventList::Dupe(float offset)
 {
 	auto copy = m_events;
 	for (auto event : copy) {
-		event.Set(NSVR_EventKey_Time_Float, event.GetOr(NSVR_EventKey_Time_Float, 0.0f) + offset);
+		event.Set(HLVR_EventKey_Time_Float, event.GetOr(HLVR_EventKey_Time_Float, 0.0f) + offset);
 		m_events.push_back(event);
 
 	}

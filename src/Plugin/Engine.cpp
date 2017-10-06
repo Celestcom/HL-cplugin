@@ -4,7 +4,7 @@
 #include <boost/log/support/date_time.hpp>
 #include <boost\bind.hpp>
 #include "EventList.h"
-#include "NSLoader_Internal.h"
+#include "HLVR_Experimental.h"
 #include <chrono>
 
 #include <boost/log/core.hpp>
@@ -13,7 +13,6 @@
 #include <boost/log/trivial.hpp>
 #include <boost/core/null_deleter.hpp>
 #include "MyTestLog.h"
-#include "IHapticDevice.h"
 #include "Locator.h"
 #include "BodyView.h"
 #include <chrono>
@@ -27,16 +26,16 @@ void Engine::executeTimestep(std::chrono::milliseconds dt)
 
 }
 
-int Engine::GetHandleInfo(uint32_t m_handle, NSVR_EffectInfo* infoPtr) 
+int Engine::GetHandleInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) 
 {
 	if (auto info = m_player.GetHandleInfo(HapticHandle(m_handle))) {
 		infoPtr->Duration = info->Duration();
 		infoPtr->Elapsed = info->CurrentTime();
-		infoPtr->PlaybackState = static_cast<NSVR_EffectInfo_State>(info->State());
-		return NSVR_Success_Unqualified;
+		infoPtr->PlaybackState = static_cast<HLVR_EffectInfo_State>(info->State());
+		return HLVR_Ok;
 	}
 	else {
-		return NSVR_Error_NoSuchHandle;
+		return HLVR_Error_NoSuchHandle;
 	}
 }
 
@@ -48,46 +47,46 @@ int Engine::GetNumDevices(uint32_t * outAmount)
 	return 1;
 }
 
-HiddenIterator<NSVR_DeviceInfo>* Engine::TakeDeviceSnapshot()
+HiddenIterator<HLVR_DeviceInfo>* Engine::TakeDeviceSnapshot()
 {
 	auto systems = m_messenger.ReadDevices();
 
-	std::vector<NSVR_DeviceInfo> devices;
+	std::vector<HLVR_DeviceInfo> devices;
 	for (const auto& system : systems) {
-		NSVR_DeviceInfo deviceInfo = { 0 };
+		HLVR_DeviceInfo deviceInfo = { 0 };
 		memcpy_s(deviceInfo.Name, 128, system.DeviceName, 128);
-		deviceInfo.Status = static_cast<NSVR_DeviceStatus>(system.Status);
+		deviceInfo.Status = static_cast<HLVR_DeviceStatus>(system.Status);
 		deviceInfo.Id = system.Id;
-		deviceInfo.Concept = static_cast<NSVR_DeviceConcept>(system.Concept);
+		deviceInfo.Concept = static_cast<HLVR_DeviceConcept>(system.Concept);
 		devices.push_back(std::move(deviceInfo));
 	}
 	
-	auto snapshot = std::make_unique<HiddenIterator<NSVR_DeviceInfo>>(devices);
+	auto snapshot = std::make_unique<HiddenIterator<HLVR_DeviceInfo>>(devices);
 	m_deviceSnapshots.push_back(std::move(snapshot));
 	return m_deviceSnapshots.back().get();
 }
 
-HiddenIterator<NSVR_NodeInfo>* Engine::TakeNodeSnapshot(uint32_t device_id)
+HiddenIterator<HLVR_NodeInfo>* Engine::TakeNodeSnapshot(uint32_t device_id)
 {
 	auto nodes_raw = m_messenger.ReadNodes();
-	std::vector<NSVR_NodeInfo> nodes;
+	std::vector<HLVR_NodeInfo> nodes;
 	for (const auto& node : nodes_raw) {
 		//special case: they want ALL nodes, regardless of device, then specify device_id 0
 		if ((node.DeviceId) == device_id || device_id == 0) {
-			NSVR_NodeInfo nodeInfo = { 0 };
+			HLVR_NodeInfo nodeInfo = { 0 };
 			memcpy_s(nodeInfo.Name, 128, node.NodeName, 128);
 			nodeInfo.Id = node.Id;
-			nodeInfo.Type = static_cast<NSVR_NodeType>(node.Type);
+			nodeInfo.Concept = static_cast<HLVR_NodeConcept>(node.Type);
 			nodes.push_back(std::move(nodeInfo));
 		}
 	}
 
-	auto snapshot = std::make_unique<HiddenIterator<NSVR_NodeInfo>>(nodes);
+	auto snapshot = std::make_unique<HiddenIterator<HLVR_NodeInfo>>(nodes);
 	m_nodeSnapshots.push_back(std::move(snapshot));
 	return m_nodeSnapshots.back().get();
 }
 
-void Engine::DestroyIterator(HiddenIterator<NSVR_DeviceInfo>* device)
+void Engine::DestroyIterator(HiddenIterator<HLVR_DeviceInfo>* device)
 {
 	m_deviceSnapshots.erase(
 		std::remove_if(m_deviceSnapshots.begin(), m_deviceSnapshots.end(), [device](const auto& snapshotPtr) {return snapshotPtr.get() == device; }),
@@ -96,7 +95,7 @@ void Engine::DestroyIterator(HiddenIterator<NSVR_DeviceInfo>* device)
 }
 
 
-void Engine::DestroyIterator(HiddenIterator<NSVR_NodeInfo>* nodes)
+void Engine::DestroyIterator(HiddenIterator<HLVR_NodeInfo>* nodes)
 {
 	m_nodeSnapshots.erase(
 		std::remove_if(m_nodeSnapshots.begin(), m_nodeSnapshots.end(), [nodes](const auto& snapshotPtr) {return snapshotPtr.get() == nodes; }),
@@ -109,7 +108,7 @@ int Engine::DumpDeviceDiagnostics()
 	NullSpaceIPC::DriverCommand command;
 	command.set_command(NullSpaceIPC::DriverCommand_Command_DUMP_DEVICE_DIAGNOSTICS);
 	m_messenger.WriteCommand(command);
-	return NSVR_Success_Unqualified;
+	return HLVR_Ok;
 }
 
 int Engine::SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length)
@@ -127,7 +126,7 @@ int Engine::SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length)
 	}
 	m_messenger.WriteEvent(event);
 */
-	return NSVR_Success_Unqualified;
+	return HLVR_Ok;
 }
 
 Engine::Engine() :
@@ -135,8 +134,7 @@ Engine::Engine() :
 	m_isHapticsSystemPlaying(true),
 	m_ioService(),
 	m_messenger(m_ioService.GetIOService()),
-	m_registry(),
-	m_player(m_registry, m_messenger),
+	m_player( m_messenger),
 	m_currentHandleId(0),
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
 	m_hapticsTimestep(m_ioService.GetIOService(), m_hapticsExecutionInterval),
@@ -154,9 +152,6 @@ Engine::Engine() :
 	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
 	boost::log::core::get()->set_logging_enabled(false);
-
-	//m_hardlightSuit = std::unique_ptr<IHapticDevice>(new HardlightDevice());
-	//m_hardlightSuit->RegisterDrivers(m_registry);
 
 	
 	m_hapticsTimestep.SetEvent([this]() {
@@ -198,7 +193,7 @@ void Engine::setupFileLogSink()
 int Engine::UpdateView(BodyView* view)
 {
 	view->pairs = m_messenger.ReadBodyView();
-	return NSVR_Success_Unqualified;
+	return HLVR_Ok;
 }
 
 
@@ -231,15 +226,15 @@ Engine::~Engine()
 	}
 }
 
-int Engine::PollStatus(NSVR_ServiceInfo* info)
+int Engine::PollStatus(HLVR_PlatformInfo* info)
 {
 	if (m_messenger.ConnectedToService(info)) {
 	
-			return NSVR_Success_Unqualified;
+			return HLVR_Ok;
 		
 	}
 
-	return NSVR_Error_ServiceDisconnected;
+	return HLVR_Error_NotConnected;
 
 	
 }
@@ -288,45 +283,32 @@ bool Engine::DoEngineCommand(::EngineCommand command)
 	return true;
 }
 
-int Engine::GetEngineStats(NSVR_SystemStats * stats)
-{
-	stats->NumLiveEffects = static_cast<unsigned int>(m_player.GetNumLiveEffects());
-	stats->NumOrphanedEffects = static_cast<unsigned int>(m_player.GetNumReleasedEffects());
-	return NSVR_Success_Unqualified;
-}
+
+
 
 
 
 void Engine::ReleaseHandle(unsigned int handle)
 {
-	HapticHandle h = HapticHandle(handle);
-	m_player.Release(h);
+	m_player.Release(HapticHandle{ handle });
 }
 
 
 
-
-void Engine::HandleCommand(unsigned int handle, NSVR_PlaybackCommand c)
+void Engine::HandlePause(unsigned int handle)
 {
-	HapticHandle h = HapticHandle(handle);
-	switch (c) {
-	case NSVR_PlaybackCommand::NSVR_PlaybackCommand_Pause:
-		m_player.Pause(h);
-		break;
-	case NSVR_PlaybackCommand::NSVR_PlaybackCommand_Play:
-		m_player.Play(h);
-		break;
-	case 3: //release
-		m_player.Release(h);
-		break;
-	case NSVR_PlaybackCommand::NSVR_PlaybackCommand_Reset:
-		m_player.Stop(h);
-		break;
-	default:
-		break;
-	}
-	
+	m_player.Pause(HapticHandle{ handle });
 }
+void Engine::HandlePlay(unsigned int handle)
+{
+	m_player.Play(HapticHandle{ handle });
+}
+void Engine::HandleReset(unsigned int handle)
+{
+	m_player.Stop(HapticHandle{ handle });
+}
+
+
 
 
 
@@ -352,7 +334,7 @@ extractPlayables(const std::vector<ParameterizedEvent>& events) {
 int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 {
 	if (list == nullptr) {
-		return NSVR_Error_NullArgument;
+		return HLVR_Error_NullArgument;
 	}
 	//enforces precondition on PlayableEffect to not have an empty effects list
 	if (list->empty()) {
@@ -361,90 +343,90 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 	else {
 		HapticHandle h = m_player.Create(extractPlayables(list->events()));
 		*handle = h;
-		return NSVR_Success_Unqualified;
+		return HLVR_Ok;
 	}
 
-	return NSVR_Error_Unknown;
+	return HLVR_Error_Unknown;
 
 
 }
 
 
-void copyQuaternion(NSVR_Quaternion& lhs, const NullSpace::SharedMemory::Quaternion& rhs) {
+void copyQuaternion(HLVR_Quaternion& lhs, const NullSpace::SharedMemory::Quaternion& rhs) {
 	lhs.w = rhs.w;
 	lhs.x = rhs.x;
 	lhs.y = rhs.y;
 	lhs.z = rhs.z;
 }
 
-void copyTracking(NSVR_TrackingUpdate& lhs, const NullSpace::SharedMemory::TrackingUpdate& rhs) {
+void copyTracking(HLVR_TrackingUpdate& lhs, const NullSpace::SharedMemory::TrackingUpdate& rhs) {
 	copyQuaternion(lhs.chest, rhs.chest);
 	copyQuaternion(lhs.left_upper_arm, rhs.left_upper_arm);
 	copyQuaternion(lhs.right_upper_arm, rhs.right_upper_arm);
 }
 
-int Engine::PollTracking(NSVR_TrackingUpdate* q)
+int Engine::PollTracking(HLVR_TrackingUpdate* q)
 {
 	
 	if (auto trackingUpdate = m_messenger.ReadTracking()) {
 		copyTracking(*q, *trackingUpdate);
-		return NSVR_Success_Unqualified;
+		return HLVR_Ok;
 	}
 	else {
-		return NSVR_Success_NoDataAvailable;
+		return HLVR_Ok_NoDataAvailable;
 	}
 }
 
 
-int Engine::PollLogs(NSVR_LogEntry * entry)
-{
-	if (auto logEntry = m_log->Poll()) {
-		auto str = *logEntry;
-		entry->Length = static_cast<uint32_t>(str.length());
-		strncpy_s(entry->Message, 512, str.c_str(), 512);
-		entry->Message[511] = '\0';
-		return NSVR_Success_Unqualified;
-	}
-	else {
-		return NSVR_Success_NoDataAvailable;
-	}
-}
+//int Engine::PollLogs(NSVR_LogEntry * entry)
+//{
+//	if (auto logEntry = m_log->Poll()) {
+//		auto str = *logEntry;
+//		entry->Length = static_cast<uint32_t>(str.length());
+//		strncpy_s(entry->Message, 512, str.c_str(), 512);
+//		entry->Message[511] = '\0';
+//		return NSVR_Success_Unqualified;
+//	}
+//	else {
+//		return NSVR_Success_NoDataAvailable;
+//	}
+//}
 
-int Engine::EnableAudio(NSVR_AudioOptions* optionsPtr)
-{
-	NullSpaceIPC::DriverCommand command;
-	command.set_command(NullSpaceIPC::DriverCommand_Command_ENABLE_AUDIO);
-	if (optionsPtr == nullptr) {
-		(*command.mutable_params())["audio_min"] = 0x04;
-		(*command.mutable_params())["audio_max"] = 0x22;
-		(*command.mutable_params())["peak_time"] = 0x01;
-		(*command.mutable_params())["filter"] = 0x01;
-	}
-	else
-	{
-		(*command.mutable_params())["audio_min"] = std::min(std::max<int>(0, optionsPtr->AudioMin), 255);
-		(*command.mutable_params())["audio_max"] = std::min(std::max<int>(0, optionsPtr->AudioMax), 255);
-		(*command.mutable_params())["peak_time"] = std::min(std::max<int>(0, optionsPtr->PeakTime), 3);
-		(*command.mutable_params())["filter"] = std::min(std::max<int>(0, optionsPtr->Filter), 3);
-	}
-	m_messenger.WriteCommand(command);
-	return NSVR_Success_Unqualified;
-}
-
-int Engine::DisableAudio()
-{
-	NullSpaceIPC::DriverCommand command;
-	command.set_command(NullSpaceIPC::DriverCommand_Command_DISABLE_AUDIO);
-	m_messenger.WriteCommand(command);
-	return NSVR_Success_Unqualified;
-}
-
-int Engine::SubmitRawCommand(uint8_t * buffer, int length)
-{
-	NullSpaceIPC::DriverCommand command;
-	command.set_command(NullSpaceIPC::DriverCommand_Command_RAW_COMMAND);
-	command.set_raw_command(buffer, length);
-	m_messenger.WriteCommand(command);
-	return NSVR_Success_Unqualified;
-}
-
+//int Engine::EnableAudio(NSVR_AudioOptions* optionsPtr)
+//{
+//	NullSpaceIPC::DriverCommand command;
+//	command.set_command(NullSpaceIPC::DriverCommand_Command_ENABLE_AUDIO);
+//	if (optionsPtr == nullptr) {
+//		(*command.mutable_params())["audio_min"] = 0x04;
+//		(*command.mutable_params())["audio_max"] = 0x22;
+//		(*command.mutable_params())["peak_time"] = 0x01;
+//		(*command.mutable_params())["filter"] = 0x01;
+//	}
+//	else
+//	{
+//		(*command.mutable_params())["audio_min"] = std::min(std::max<int>(0, optionsPtr->AudioMin), 255);
+//		(*command.mutable_params())["audio_max"] = std::min(std::max<int>(0, optionsPtr->AudioMax), 255);
+//		(*command.mutable_params())["peak_time"] = std::min(std::max<int>(0, optionsPtr->PeakTime), 3);
+//		(*command.mutable_params())["filter"] = std::min(std::max<int>(0, optionsPtr->Filter), 3);
+//	}
+//	m_messenger.WriteCommand(command);
+//	return NSVR_Success_Unqualified;
+//}
+//
+//int Engine::DisableAudio()
+//{
+//	NullSpaceIPC::DriverCommand command;
+//	command.set_command(NullSpaceIPC::DriverCommand_Command_DISABLE_AUDIO);
+//	m_messenger.WriteCommand(command);
+//	return NSVR_Success_Unqualified;
+//}
+//
+//int Engine::SubmitRawCommand(uint8_t * buffer, int length)
+//{
+//	NullSpaceIPC::DriverCommand command;
+//	command.set_command(NullSpaceIPC::DriverCommand_Command_RAW_COMMAND);
+//	command.set_raw_command(buffer, length);
+//	m_messenger.WriteCommand(command);
+//	return NSVR_Success_Unqualified;
+//}
+//

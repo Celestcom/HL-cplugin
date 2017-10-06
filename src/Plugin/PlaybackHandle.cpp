@@ -2,7 +2,7 @@
 #include "PlaybackHandle.h"
 
 #include "EventList.h"
-#include "NSLoader.h"
+#include "HLVR.h"
 #include "Engine.h"
 
 PlaybackHandle::PlaybackHandle() : handle(0), engine{ nullptr }
@@ -10,27 +10,43 @@ PlaybackHandle::PlaybackHandle() : handle(0), engine{ nullptr }
 
 }
 
-
-int PlaybackHandle::Command(NSVR_PlaybackCommand command)
+int PlaybackHandle::Pause()
 {
 	if (engine != nullptr) {
-		engine->HandleCommand(handle, command);
-		return NSVR_Success_Unqualified;
+		engine->HandlePause(handle);
+		return HLVR_Ok;
 	}
-	
-	
-	return NSVR_Error_Unknown;
-	
+	return HLVR_Error_Unknown;
+
 }
 
 
+int PlaybackHandle::Play()
+{
+	if (engine != nullptr) {
+		engine->HandlePlay(handle);
+		return HLVR_Ok;
+	}
+	return HLVR_Error_Unknown;
+
+}
+
+int PlaybackHandle::Reset()
+{
+	if (engine != nullptr) {
+		engine->HandleReset(handle);
+		return HLVR_Ok;
+	}
+	return HLVR_Error_Unknown;
+
+}
 
 
-int PlaybackHandle::GetHandleInfo(NSVR_EffectInfo* infoPtr)
+int PlaybackHandle::GetHandleInfo(HLVR_EffectInfo* infoPtr)
 {
 	if (engine != nullptr) {
 		return engine->GetHandleInfo(handle, infoPtr);
 	}
-	return NSVR_Error_Unknown;
+	return HLVR_Error_Unknown;
 }
 

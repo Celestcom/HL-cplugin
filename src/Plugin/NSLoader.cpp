@@ -2,7 +2,7 @@
 //
 
 #include "stdafx.h"
-#include "NSLoader.h"
+#include "HLVR.h"
 #include "Engine.h"
 #include "EventList.h"
 #include "ParameterizedEvent.h"
@@ -17,11 +17,12 @@
 //comment this line if you want to disable argument null checking. Profile really hard before doing this.
 #define NULL_ARGUMENT_CHECKS
 
+#define RETURN(HLVR_Result_Value) return static_cast<HLVR_Result>(HLVR_Result_Value);
 
 
 
 #ifdef NULL_ARGUMENT_CHECKS
-#define RETURN_IF_NULL(ptr) do { if (ptr == nullptr) { return (NSVR_Result) NSVR_Error_NullArgument; }} while (0)
+#define RETURN_IF_NULL(ptr) do { if (ptr == nullptr) { return (HLVR_Result) HLVR_Error_NullArgument; }} while (0)
 #define RETURN_FALSE_IF_NULL(ptr) do {if (ptr == nullptr) { return false;}} while (0)
 #else
 #define RETURN_IF_NULL(ptr)
@@ -30,18 +31,18 @@
 
 
 
-NSVR_RETURN(unsigned int) NSVR_Version_Get(void)
+HLVR_RETURN(uint32_t) HLVR_Version_Get(void)
 {
-	return NSLOADER_API_VERSION;
+	return HLVR_API_VERSION;
 }
 
-NSVR_RETURN(int) NSVR_Version_IsCompatibleDLL(void)
+HLVR_RETURN(int) HLVR_Version_IsCompatibleDLL(void)
 {
-	unsigned int major = NSVR_Version_Get() >> 16;
-	return major == NSLOADER_API_VERSION_MAJOR;
+	unsigned int major = HLVR_Version_Get() >> 24;
+	return major == HLVR_API_VERSION_MAJOR;
 }
 
-NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System * systemPtr, NSVR_ServiceInfo * infoPtr)
+HLVR_RETURN(HLVR_Result) HLVR_Agent_GetPlatformInfo(HLVR_Agent * systemPtr, HLVR_PlatformInfo * infoPtr)
 {
 	RETURN_IF_NULL(systemPtr);
 
@@ -56,47 +57,47 @@ NSVR_RETURN(NSVR_Result) NSVR_System_GetServiceInfo(NSVR_System * systemPtr, NSV
 
 
 
-NSVR_RETURN(NSVR_Result) NSVR_DeviceInfo_Iter_Init(NSVR_DeviceInfo_Iter * iter)
+HLVR_RETURN(HLVR_Result) HLVR_DeviceIterator_Init(HLVR_DeviceIterator * iter)
 {
 	iter->_internal = nullptr;
 	iter->DeviceInfo = { 0 };
-	return NSVR_Success_Unqualified;
+	return HLVR_Ok;
 }
 
-NSVR_RETURN(bool) NSVR_DeviceInfo_Iter_Next(NSVR_DeviceInfo_Iter* iter, NSVR_System* system)
+HLVR_RETURN(HLVR_Result) HLVR_DeviceIterator_Next(HLVR_DeviceIterator* iter, HLVR_Agent* system)
 {
 
 	RETURN_FALSE_IF_NULL(iter);
 	RETURN_FALSE_IF_NULL(system);
 	return ExceptionGuard([iter, system]() {
 		if (iter->_internal == nullptr) {
-			HiddenIterator<NSVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
+			HiddenIterator<HLVR_DeviceInfo>* snapshot = AS_TYPE(Engine, system)->TakeDeviceSnapshot();
 			iter->_internal = snapshot;
 		}
 
 
-		HiddenIterator<NSVR_DeviceInfo>* iterator = AS_TYPE(HiddenIterator<NSVR_DeviceInfo>, iter->_internal);
+		HiddenIterator<HLVR_DeviceInfo>* iterator = AS_TYPE(HiddenIterator<HLVR_DeviceInfo>, iter->_internal);
 
 		if (iterator->Finished()) {
 			AS_TYPE(Engine, system)->DestroyIterator(iterator);
 			iter->_internal = nullptr;
-			return false;
+			RETURN(HLVR_Error_NoMoreDevices);
 		}
 
 		iterator->NextItem(&iter->DeviceInfo);
 
-		return true;
+		RETURN(HLVR_Ok);
 	});
 }
 
-NSVR_RETURN(NSVR_Result) NSVR_NodeInfo_Iter_Init(NSVR_NodeInfo_Iter * iter)
+HLVR_RETURN(HLVR_Result) HLVR_NodeIterator_Init(HLVR_NodeIterator * iter)
 {
 	iter->_internal = nullptr;
 	iter->NodeInfo = { 0 };
-	return NSVR_Success_Unqualified;
+	return HLVR_Ok;
 }
 
-NSVR_RETURN(bool) NSVR_NodeInfo_Iter_Next(NSVR_NodeInfo_Iter * iter, uint32_t device_id, NSVR_System * system)
+HLVR_RETURN(int) HLVR_NodeIterator_Next(HLVR_NodeIterator * iter, uint32_t device_id, HLVR_Agent * system)
 {
 	RETURN_FALSE_IF_NULL(iter);
 	RETURN_FALSE_IF_NULL(system);
@@ -104,30 +105,29 @@ NSVR_RETURN(bool) NSVR_NodeInfo_Iter_Next(NSVR_NodeInfo_Iter * iter, uint32_t de
 	return ExceptionGuard([iter, system, device_id]() {
 
 		if (iter->_internal == nullptr) {
-			HiddenIterator<NSVR_NodeInfo>* snapshot = AS_TYPE(Engine, system)->TakeNodeSnapshot(device_id);
+			HiddenIterator<HLVR_NodeInfo>* snapshot = AS_TYPE(Engine, system)->TakeNodeSnapshot(device_id);
 			iter->_internal = snapshot;
 		}
 
-		HiddenIterator<NSVR_NodeInfo>* iterator = AS_TYPE(HiddenIterator<NSVR_NodeInfo>, iter->_internal);
+		HiddenIterator<HLVR_NodeInfo>* iterator = AS_TYPE(HiddenIterator<HLVR_NodeInfo>, iter->_internal);
 		if (iterator->Finished()) {
 			AS_TYPE(Engine, system)->DestroyIterator(iterator);
 			iter->_internal = nullptr;
-			return false;
+			RETURN(HLVR_Error_NoMoreNodes);
 		}
 
 		iterator->NextItem(&iter->NodeInfo);
-		return true;
+		RETURN(HLVR_Ok);
 	});
 }
 
 
-NSVR_RETURN(NSVR_Result) NSVR_System_Create(NSVR_System** systemPtr)
+HLVR_RETURN(HLVR_Result) HLVR_Agent_Create(HLVR_Agent** systemPtr, HLVR_AgentConfiguration* config)
 {
-
-	return ExceptionGuard([&] { *systemPtr = AS_TYPE(NSVR_System, new Engine()); return NSVR_Success_Unqualified; });
+	return ExceptionGuard([&] { *systemPtr = AS_TYPE(HLVR_Agent, new Engine()); return HLVR_Ok; });
 }
 
-NSVR_RETURN(int) NSVR_Version_HasFeature(const char * feature)
+HLVR_RETURN(int) HLVR_Version_HasFeature(const char * feature)
 {
 	static std::set<std::string> features;
 
@@ -142,19 +142,19 @@ NSVR_RETURN(int) NSVR_Version_HasFeature(const char * feature)
 	return features.find(feature) != features.end();
 }
 
-NSVR_RETURN(void) NSVR_System_Release(NSVR_System** ptr)
+HLVR_RETURN(void) HLVR_Agent_Destroy(HLVR_Agent** ptr)
 {	
 	ExceptionGuard([&] {
 		delete AS_TYPE(Engine, *ptr);
 		*ptr = nullptr;
 
-		return NSVR_Success_Unqualified;
+		return HLVR_Ok;
 	});
 }
 
 
 
-NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Suspend(NSVR_System* ptr)
+HLVR_RETURN(HLVR_Result) HLVR_Agent_SuspendEffects(HLVR_Agent* ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -163,7 +163,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Suspend(NSVR_System* ptr)
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Resume(NSVR_System* ptr)
+HLVR_RETURN(HLVR_Result) HLVR_Agent_ResumeEffects(HLVR_Agent* ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -172,7 +172,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Resume(NSVR_System* ptr)
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Destroy(NSVR_System* ptr)
+HLVR_RETURN(HLVR_Result) HLVR_Agent_CancelEffects(HLVR_Agent* ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -183,7 +183,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Haptics_Destroy(NSVR_System* ptr)
 
 
 
-NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Poll(NSVR_System * ptr, NSVR_TrackingUpdate * updatePtr)
+HLVR_RETURN(HLVR_Result) HLVR_Agent_PollTracking(HLVR_Agent * ptr, HLVR_TrackingUpdate * updatePtr)
  {
 	 RETURN_IF_NULL(ptr);
 	 RETURN_IF_NULL(updatePtr);
@@ -194,7 +194,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Poll(NSVR_System * ptr, NSVR_Track
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Enable(NSVR_System * ptr)
+HLVR_RETURN(HLVR_Result) HLVR_Agent_EnableTracking(HLVR_Agent * ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -203,7 +203,7 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Enable(NSVR_System * ptr)
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Disable(NSVR_System * ptr)
+HLVR_RETURN(HLVR_Result) HLVR_Agent_DisableTracking(HLVR_Agent * ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -214,35 +214,32 @@ NSVR_RETURN(NSVR_Result) NSVR_System_Tracking_Disable(NSVR_System * ptr)
 
 
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_Create(NSVR_Event** eventPtr, NSVR_EventType type)
+HLVR_RETURN(HLVR_Result) HLVR_Event_Create(HLVR_Event** eventPtr, HLVR_EventType type)
  {
 	
 	return ExceptionGuard([&] {
 
 	
-		*eventPtr = AS_TYPE(NSVR_Event, new ParameterizedEvent(type));
+		*eventPtr = AS_TYPE(HLVR_Event, new ParameterizedEvent(type));
 		
 		BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
 			"[Event " << *eventPtr << "] Create ";
 
-		 return (NSVR_Result) NSVR_Success_Unqualified;
+		 return (HLVR_Result) HLVR_Ok;
 	 });
  }
 
-NSVR_RETURN(void) NSVR_Event_Release(NSVR_Event ** eventPtr)
+HLVR_RETURN(void) HLVR_Event_Destroy(HLVR_Event ** eventPtr)
  {
 	ExceptionGuard([&] {
-		//BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() 
-		//	<<"[Event " << *eventPtr << "] Release ";
-
 		delete AS_TYPE(ParameterizedEvent, *eventPtr);
 		*eventPtr = nullptr;
+		return HLVR_Ok;
 
-		return NSVR_Success_Unqualified;
 	});
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event * event, NSVR_EventKey key, float value)
+HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloat(HLVR_Event * event, HLVR_EventKey key, float value)
  {
 	 RETURN_IF_NULL(event);
 
@@ -251,7 +248,7 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloat(NSVR_Event * event, NSVR_EventKey k
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event * event, NSVR_EventKey key, float * values, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloats(HLVR_Event * event, HLVR_EventKey key, float * values, unsigned int length)
 {
 	RETURN_IF_NULL(event);
 
@@ -261,7 +258,7 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetFloats(NSVR_Event * event, NSVR_EventKey 
 	});
 }
 
-NSVR_RETURN(NSVR_Result)NSVR_Event_SetInt(NSVR_Event * event, NSVR_EventKey key, int value)
+HLVR_RETURN(HLVR_Result)HLVR_Event_SetInt(HLVR_Event * event, HLVR_EventKey key, int value)
  {
 	 RETURN_IF_NULL(event);
 
@@ -270,7 +267,15 @@ NSVR_RETURN(NSVR_Result)NSVR_Event_SetInt(NSVR_Event * event, NSVR_EventKey key,
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event * event, NSVR_EventKey key, uint32_t value)
+HLVR_RETURN(HLVR_Result) HLVR_Event_SetInts(HLVR_Event * event, HLVR_EventKey key, int * array, unsigned int length)
+{
+	RETURN_IF_NULL(event);
+	return ExceptionGuard([&] {
+		return AS_TYPE(ParameterizedEvent, event)->Set(key, array, length);
+	});
+}
+
+HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32(HLVR_Event * event, HLVR_EventKey key, uint32_t value)
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
@@ -278,7 +283,7 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32(NSVR_Event * event, NSVR_EventKey 
 	});
 }
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, NSVR_EventKey key, uint32_t* array, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32s(HLVR_Event * event, HLVR_EventKey key, uint32_t* array, unsigned int length)
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
@@ -286,7 +291,16 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt32s(NSVR_Event * event, NSVR_EventKey
 	});
 }
 
-NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt64s(NSVR_Event * event, NSVR_EventKey key, uint64_t * array, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64(HLVR_Event * event, HLVR_EventKey key, uint64_t value)
+{
+	RETURN_IF_NULL(event);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(ParameterizedEvent, event)->Set(key, value);
+	});
+}
+
+HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64s(HLVR_Event * event, HLVR_EventKey key, uint64_t * array, unsigned int length)
 {
 	RETURN_IF_NULL(event);
 
@@ -296,48 +310,40 @@ NSVR_RETURN(NSVR_Result) NSVR_Event_SetUInt64s(NSVR_Event * event, NSVR_EventKey
 }
 
 
-NSVR_RETURN(NSVR_Result)NSVR_Timeline_Create(NSVR_Timeline** timelinePtr)
+HLVR_RETURN(HLVR_Result) HLVR_Timeline_Create(HLVR_Timeline** timelinePtr)
  {
 
 	 return ExceptionGuard([&] {
 
-		 *timelinePtr = AS_TYPE(NSVR_Timeline, new EventList());
-		// BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-		//	 "[Timeline " << *timelinePtr << "] Create";
-
-		 return NSVR_Success_Unqualified;
+		 *timelinePtr = AS_TYPE(HLVR_Timeline, new EventList());
+		 return HLVR_Ok;
 	 });
  }
 
  
 
-NSVR_RETURN(void) NSVR_Timeline_Release(NSVR_Timeline ** listPtr)
+HLVR_RETURN(void) HLVR_Timeline_Destroy(HLVR_Timeline ** listPtr)
  {
 	ExceptionGuard([&] {
-		//BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-		//	"[Timeline " << *listPtr << "] Release";
 
 		delete AS_TYPE(EventList, *listPtr);
 		*listPtr = nullptr;
+		return HLVR_Ok;
 
-		return NSVR_Success_Unqualified;
 	});
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Timeline_AddEvent(NSVR_Timeline * list, NSVR_Event * event)
+HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * list, HLVR_Event * event)
  {
 	 RETURN_IF_NULL(list);
 	 RETURN_IF_NULL(event);
 
 	 return ExceptionGuard([&] {
-		// BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
-		//	 "[Timeline " << list << "] AddEvent " << event;
-
 		return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(ParameterizedEvent, event));
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSVR_System* systemPtr, NSVR_PlaybackHandle * handlePtr)
+HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(HLVR_Timeline * timelinePtr, HLVR_Agent* systemPtr, HLVR_Effect * handlePtr)
  {
 	 RETURN_IF_NULL(systemPtr);
 	 RETURN_IF_NULL(timelinePtr);
@@ -360,85 +366,81 @@ NSVR_RETURN(NSVR_Result) NSVR_Timeline_Transmit(NSVR_Timeline * timelinePtr, NSV
 	 });
  }
 
-NSVR_RETURN(NSVR_Result) NSVR_Timeline_Combine(NSVR_Timeline * timeline, NSVR_Timeline * mixin, float offset)
-{
-
-	///Ya know what nahhh
-
-	//This is complicated
-	//We need a case for a == b == c
-
-	// and a == b
-
-	//it should prolly just be add(source, mixin)
-
-
-	RETURN_IF_NULL(timeline);
-	RETURN_IF_NULL(mixin);
-
-	if (timeline != mixin) {
-		AS_TYPE(EventList, timeline)->Interleave(AS_TYPE(EventList, mixin), offset);
-		return NSVR_Success_Unqualified;
-	}
-	else {
-		AS_TYPE(EventList, timeline)->Dupe(offset);
-		return NSVR_Success_Unqualified;
-
-	}
-	
-
-	return NSVR_Error_Unknown;
-}
+//HLVR_RETURN(HLVR_Result) HLVR_Timeline_Combine(HLVR_Timeline * timeline, HLVR_Timeline * mixin, float offset)
+//{
+//
+//
+//
+//	RETURN_IF_NULL(timeline);
+//	RETURN_IF_NULL(mixin);
+//
+//	if (timeline != mixin) {
+//		AS_TYPE(EventList, timeline)->Interleave(AS_TYPE(EventList, mixin), offset);
+//		return NSVR_Success_Unqualified;
+//	}
+//	else {
+//		AS_TYPE(EventList, timeline)->Dupe(offset);
+//		return NSVR_Success_Unqualified;
+//
+//	}
+//	
+//
+//	return NSVR_Error_Unknown;
+//}
 
 
-NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_Create(NSVR_PlaybackHandle ** handlePtr)
+HLVR_RETURN(HLVR_Result) HLVR_Effect_Create(HLVR_Effect ** handlePtr)
  {
 
 	 return ExceptionGuard([&] {
-		 *handlePtr = AS_TYPE(NSVR_PlaybackHandle, new PlaybackHandle());
+		 *handlePtr = AS_TYPE(HLVR_Effect, new PlaybackHandle());
 		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
 			 "[Handle " << *handlePtr << "] Create";
 
-		 return NSVR_Success_Unqualified;
+		 return HLVR_Ok;
 	 });
 
 	 
 }
 
+HLVR_RETURN(HLVR_Result) HLVR_Effect_Pause(HLVR_Effect* effect) {
+	return ExceptionGuard([effect] {
+		return AS_TYPE(PlaybackHandle, effect)->Pause();
+	});
+}
+
+HLVR_RETURN(HLVR_Result) HLVR_Effect_Reset(HLVR_Effect* effect) {
+	return ExceptionGuard([effect] {
+		return AS_TYPE(PlaybackHandle, effect)->Reset();
+	});
+}
+
+HLVR_RETURN(HLVR_Result) HLVR_Effect_Play(HLVR_Effect* effect) {
+	return ExceptionGuard([effect] {
+		return AS_TYPE(PlaybackHandle, effect)->Play();
+	});
+}
 
 
-NSVR_RETURN(NSVR_Result)NSVR_PlaybackHandle_Command(NSVR_PlaybackHandle * handlePtr, NSVR_PlaybackCommand command)
- {
-	 RETURN_IF_NULL(handlePtr);
 
-	 return ExceptionGuard([&] {
-		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-			 "[Handle " << handlePtr << "] Command " << command;
-		return AS_TYPE(PlaybackHandle, handlePtr)->Command(command);
-	 });
- }
-
-NSVR_RETURN(void) NSVR_PlaybackHandle_Release(NSVR_PlaybackHandle** handlePtr)
+HLVR_RETURN(void) HLVR_Effect_Destroy(HLVR_Effect** handlePtr)
  {
 	ExceptionGuard([&] {
-		BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-			"[Handle " << *handlePtr << "] Release";
 		delete AS_TYPE(PlaybackHandle, *handlePtr);
 		*handlePtr = nullptr;
-
-		return NSVR_Success_Unqualified;
+		return HLVR_Ok;
 	});
  }
 
 
 
-NSVR_RETURN(NSVR_Result) NSVR_PlaybackHandle_GetInfo(NSVR_PlaybackHandle* handlePtr, NSVR_EffectInfo* infoPtr)
+HLVR_RETURN(HLVR_Result) HLVR_Effect_GetInfo(HLVR_Effect* effect, HLVR_EffectInfo* info)
 {
-	RETURN_IF_NULL(handlePtr);
-	RETURN_IF_NULL(infoPtr);
+	RETURN_IF_NULL(effect);
+	RETURN_IF_NULL(info);
 
 	return ExceptionGuard([&] {
-		return AS_TYPE(PlaybackHandle, handlePtr)->GetHandleInfo(infoPtr);
+		return AS_TYPE(PlaybackHandle, effect)->GetHandleInfo(info);
 	});
 }
 

@@ -31,7 +31,8 @@ project "Plugin"
 		"../src/Plugin",
 		"../src/Plugin/test",
 		"../src/Plugin/devices",
-		"../src/Plugin/events"
+		"../src/Plugin/events",
+		"../src/Plugin/include"
 	}
 
 	flags {
@@ -64,7 +65,7 @@ project "Plugin"
 	pchsource "../src/Plugin/stdafx.cpp"
 
 
-	defines {"NSLOADER_EXPORTS"}
+	defines {"HLVR_EXPORTS"}
 	filter {"files:**.pb.cc"}
 		flags {'NoPCH'}
 	filter {"files:**ScheduledEvent.cpp"}
@@ -192,7 +193,7 @@ project "Utilities"
 	pchsource "../src/Utilities/stdafx.cpp"
 
 
-	defines {"NSLOADER_EXPORTS"}
+	defines {"HLVR_EXPORTS"}
 	filter {"files:**.pb.cc"}
 		flags {'NoPCH'}
 	filter {"files:**ScheduledEvent.cpp"}
