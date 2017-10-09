@@ -25,7 +25,7 @@
 
 
 
-HLVR_RETURN_EXP(HLVR_Result) HLVR_Immediate_Set(HLVR_Agent * systemPtr, uint32_t * regions, double * amplitudes, uint32_t length)
+HLVR_RETURN_EXP(HLVR_Result) HLVR_Immediate_Set(HLVR_System * systemPtr, uint32_t * regions, double * amplitudes, uint32_t length)
 {
 	RETURN_IF_NULL(systemPtr);
 	RETURN_IF_NULL(regions);
@@ -57,7 +57,7 @@ HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_Release(HLVR_BodyView ** body)
 	});
 }
 
-HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_Poll(HLVR_BodyView * body, HLVR_Agent * system)
+HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_Poll(HLVR_BodyView * body, HLVR_System * system)
 {
 	RETURN_IF_NULL(system);
 	RETURN_IF_NULL(body);

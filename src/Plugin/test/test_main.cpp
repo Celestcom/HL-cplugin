@@ -48,7 +48,7 @@ std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 	BasicHapticEvent a;
 	ParameterizedEvent e(HLVR_EventType_SimpleHaptic);
 	std::vector<uint32_t> region = { hlvr_region_upper_ab_left };
-	e.Set(HLVR_EventKey_SimpleHaptic_Regions_UInt32s, region.data(), 1);
+	e.Set(HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s, region.data(), 1);
 	e.Set(HLVR_EventKey_Time_Float, 0.0f);
 	
 	a.parse(e);
@@ -239,7 +239,7 @@ TEST_CASE("The events system works", "[EventSystem]") {
 		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Duration_Float, 999) == 999);
 		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Effect_Int, 999.0f) == 999.0f);
 		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Strength_Float, std::vector<float>({ 999.0f })).at(0) == Approx(999.0f));
-		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Regions_UInt32s, std::vector<int>({ 999 })).at(0) == 999);
+		REQUIRE(event.GetOr(HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s, std::vector<int>({ 999 })).at(0) == 999);
 	}
 
 	SECTION("TryGet will return false if the key is not found") {

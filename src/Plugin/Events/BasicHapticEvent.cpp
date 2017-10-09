@@ -77,19 +77,19 @@ bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 
 	std::vector<uint32_t> regions;
 	std::vector<uint32_t> nodes;
-	if (ev.TryGet(HLVR_EventKey_SimpleHaptic_Regions_UInt32s, &regions)) {
+	if (ev.TryGet(HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s, &regions)) {
 		m_area = wrap_type<Loc<region>>(regions);
 	}
-	else if (ev.TryGet(HLVR_EventKey_SimpleHaptic_Nodes_UInt32s, &nodes)) {
+	else if (ev.TryGet(HLVR_EventKey_SimpleHaptic_Where_Nodes_UInt32s, &nodes)) {
 		m_area = wrap_type<Loc<node>>(nodes);
 	}
 	else {
 		//possibly should fail here. Need to make clear where failures happen with event parsing.
-		//m_area = { Loc<region>(nsvr_region_unknown) };
+		m_area = wrap_type<Loc<region>>(std::vector<uint32_t>{hlvr_region_UNKNOWN});
 	}
 
 
-	m_requestedEffectFamily = ev.GetOr<int>(HLVR_EventKey_SimpleHaptic_Effect_Int, 1);
+	m_requestedEffectFamily = ev.GetOr<int>(HLVR_EventKey_SimpleHaptic_Effect_Int, 3);
 	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
 	m_parsedEffectFamily = effect;
 	

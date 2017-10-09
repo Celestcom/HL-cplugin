@@ -33,15 +33,10 @@ class ParameterizedEvent
 {
 public:
 	explicit ParameterizedEvent(HLVR_EventType);
-	//ParameterizedEvent(ParameterizedEvent&&);
-//	ParameterizedEvent(const ParameterizedEvent&);
+
 	template<class T>
 	bool Set(HLVR_EventKey key, T value);
-//	bool SetFloat(HLVR_EventKey key, float value);
-//	bool SetInt(HLVR_EventKey key, int value);
-	//bool SetFloats(HLVR_EventKey key, float* values, unsigned int length);
-//	bool SetUInt32s(HLVR_EventKey key, uint32_t* values, unsigned int length);
-	//bool SetUInt64s(HLVR_EventKey key, uint64_t* values, unsigned int length);
+
 	template<typename ArrayType>
 	bool Set(HLVR_EventKey key, ArrayType* values, unsigned int length);
 	template<typename T>
@@ -54,7 +49,6 @@ public:
 private:
 	HLVR_EventType m_type;
 	std::vector<event_param> m_params;
-	//std::mutex m_propLock;
 
 	event_param* findParam(HLVR_EventKey key);
 	const event_param* findParam(HLVR_EventKey key) const;

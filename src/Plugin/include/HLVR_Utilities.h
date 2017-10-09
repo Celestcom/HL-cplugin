@@ -36,7 +36,7 @@ extern "C" {
 		HLVR_Event_SetFloat(event, HLVR_EventKey_Time_Float, time);
 		HLVR_Event_SetFloat(event, HLVR_EventKey_SimpleHaptic_Strength_Float, strength);
 		HLVR_Event_SetFloat(event, HLVR_EventKey_SimpleHaptic_Duration_Float, duration);
-		HLVR_Event_SetUInt32s(event, HLVR_EventKey_SimpleHaptic_Regions_UInt32s, regions, regionsCount);
+		HLVR_Event_SetUInt32s(event, HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s, regions, regionsCount);
 		HLVR_Event_SetInt(event, HLVR_EventKey_SimpleHaptic_Effect_Int, effect);
 
 		HLVR_Timeline_AddEvent(timeline, event);

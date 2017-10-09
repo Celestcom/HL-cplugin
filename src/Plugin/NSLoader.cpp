@@ -42,7 +42,7 @@ HLVR_RETURN(int) HLVR_Version_IsCompatibleDLL(void)
 	return major == HLVR_API_VERSION_MAJOR;
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_Agent_GetPlatformInfo(HLVR_Agent * systemPtr, HLVR_PlatformInfo * infoPtr)
+HLVR_RETURN(HLVR_Result) HLVR_System_GetPlatformInfo(HLVR_System * systemPtr, HLVR_PlatformInfo * infoPtr)
 {
 	RETURN_IF_NULL(systemPtr);
 
@@ -59,12 +59,14 @@ HLVR_RETURN(HLVR_Result) HLVR_Agent_GetPlatformInfo(HLVR_Agent * systemPtr, HLVR
 
 HLVR_RETURN(HLVR_Result) HLVR_DeviceIterator_Init(HLVR_DeviceIterator * iter)
 {
+	RETURN_IF_NULL(iter);
+
 	iter->_internal = nullptr;
 	iter->DeviceInfo = { 0 };
 	return HLVR_Ok;
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_DeviceIterator_Next(HLVR_DeviceIterator* iter, HLVR_Agent* system)
+HLVR_RETURN(HLVR_Result) HLVR_DeviceIterator_Next(HLVR_DeviceIterator* iter, HLVR_System* system)
 {
 
 	RETURN_FALSE_IF_NULL(iter);
@@ -97,7 +99,7 @@ HLVR_RETURN(HLVR_Result) HLVR_NodeIterator_Init(HLVR_NodeIterator * iter)
 	return HLVR_Ok;
 }
 
-HLVR_RETURN(int) HLVR_NodeIterator_Next(HLVR_NodeIterator * iter, uint32_t device_id, HLVR_Agent * system)
+HLVR_RETURN(int) HLVR_NodeIterator_Next(HLVR_NodeIterator * iter, uint32_t device_id, HLVR_System * system)
 {
 	RETURN_FALSE_IF_NULL(iter);
 	RETURN_FALSE_IF_NULL(system);
@@ -122,9 +124,9 @@ HLVR_RETURN(int) HLVR_NodeIterator_Next(HLVR_NodeIterator * iter, uint32_t devic
 }
 
 
-HLVR_RETURN(HLVR_Result) HLVR_Agent_Create(HLVR_Agent** systemPtr, HLVR_AgentConfiguration* config)
+HLVR_RETURN(HLVR_Result) HLVR_System_Create(HLVR_System** systemPtr, HLVR_SystemConfiguration* config)
 {
-	return ExceptionGuard([&] { *systemPtr = AS_TYPE(HLVR_Agent, new Engine()); return HLVR_Ok; });
+	return ExceptionGuard([&] { *systemPtr = AS_TYPE(HLVR_System, new Engine()); return HLVR_Ok; });
 }
 
 HLVR_RETURN(int) HLVR_Version_HasFeature(const char * feature)
@@ -142,7 +144,7 @@ HLVR_RETURN(int) HLVR_Version_HasFeature(const char * feature)
 	return features.find(feature) != features.end();
 }
 
-HLVR_RETURN(void) HLVR_Agent_Destroy(HLVR_Agent** ptr)
+HLVR_RETURN(void) HLVR_System_Destroy(HLVR_System** ptr)
 {	
 	ExceptionGuard([&] {
 		delete AS_TYPE(Engine, *ptr);
@@ -154,7 +156,7 @@ HLVR_RETURN(void) HLVR_Agent_Destroy(HLVR_Agent** ptr)
 
 
 
-HLVR_RETURN(HLVR_Result) HLVR_Agent_SuspendEffects(HLVR_Agent* ptr)
+HLVR_RETURN(HLVR_Result) HLVR_System_SuspendEffects(HLVR_System* ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -163,7 +165,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Agent_SuspendEffects(HLVR_Agent* ptr)
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Agent_ResumeEffects(HLVR_Agent* ptr)
+HLVR_RETURN(HLVR_Result) HLVR_System_ResumeEffects(HLVR_System* ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -172,7 +174,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Agent_ResumeEffects(HLVR_Agent* ptr)
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Agent_CancelEffects(HLVR_Agent* ptr)
+HLVR_RETURN(HLVR_Result) HLVR_System_CancelEffects(HLVR_System* ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -183,7 +185,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Agent_CancelEffects(HLVR_Agent* ptr)
 
 
 
-HLVR_RETURN(HLVR_Result) HLVR_Agent_PollTracking(HLVR_Agent * ptr, HLVR_TrackingUpdate * updatePtr)
+HLVR_RETURN(HLVR_Result) HLVR_System_PollTracking(HLVR_System * ptr, HLVR_TrackingUpdate * updatePtr)
  {
 	 RETURN_IF_NULL(ptr);
 	 RETURN_IF_NULL(updatePtr);
@@ -194,7 +196,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Agent_PollTracking(HLVR_Agent * ptr, HLVR_Tracking
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Agent_EnableTracking(HLVR_Agent * ptr)
+HLVR_RETURN(HLVR_Result) HLVR_System_EnableTracking(HLVR_System * ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -203,7 +205,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Agent_EnableTracking(HLVR_Agent * ptr)
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Agent_DisableTracking(HLVR_Agent * ptr)
+HLVR_RETURN(HLVR_Result) HLVR_System_DisableTracking(HLVR_System * ptr)
  {
 	 RETURN_IF_NULL(ptr);
 
@@ -343,7 +345,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * list, HLVR_Event
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(HLVR_Timeline * timelinePtr, HLVR_Agent* systemPtr, HLVR_Effect * handlePtr)
+HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(HLVR_Timeline * timelinePtr, HLVR_System* systemPtr, HLVR_Effect * handlePtr)
  {
 	 RETURN_IF_NULL(systemPtr);
 	 RETURN_IF_NULL(timelinePtr);

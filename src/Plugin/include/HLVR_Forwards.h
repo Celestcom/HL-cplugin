@@ -1,6 +1,6 @@
 #pragma once
 
-typedef struct HLVR_Agent HLVR_Agent;
+typedef struct HLVR_System HLVR_System;
 typedef struct HLVR_Event HLVR_Event;
 typedef struct HLVR_Timeline HLVR_Timeline;
 
