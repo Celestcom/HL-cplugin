@@ -7,7 +7,7 @@
 
 class BasicHapticEvent : public PlayableEvent {
 public:	
-	BasicHapticEvent();
+	BasicHapticEvent(float time);
 	
 	template<typename T>
 	struct Loc {
@@ -26,15 +26,14 @@ public:
 	uint32_t effectFamily() const;
 
 	/* PlayableEvent impl */
-	float time() const override;
 	float duration() const override;
 	HLVR_EventType type() const override;
 	bool parse(const ParameterizedEvent&) override;
+	std::vector<Validator> make_validators() const override;
 	void serialize(NullSpaceIPC::HighLevelEvent& event) const override;
 	static constexpr HLVR_EventType descriptor = HLVR_EventType::HLVR_EventType_SimpleHaptic;
 
 private:
-	float m_time;
 	float m_strength;
 	float m_duration;
 	Where m_area;

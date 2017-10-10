@@ -46,7 +46,10 @@ typedef enum HLVR_ErrorTypes {
 
 	/*Iteration */
 	HLVR_Error_NoMoreDevices = -6000,
-	HLVR_Error_NoMoreNodes = -7000
+	HLVR_Error_NoMoreNodes = -7000,
+
+	/* Timelines */
+	HLVR_Error_InvalidTimeOffset = -8000
 
 
 

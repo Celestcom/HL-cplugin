@@ -31,17 +31,17 @@ extern "C" {
 		unsigned int regionsCount
 		)
 	{
-		HLVR_Event* event;
-		HLVR_Event_Create(&event, HLVR_EventType_SimpleHaptic);
-		HLVR_Event_SetFloat(event, HLVR_EventKey_Time_Float, time);
-		HLVR_Event_SetFloat(event, HLVR_EventKey_SimpleHaptic_Strength_Float, strength);
-		HLVR_Event_SetFloat(event, HLVR_EventKey_SimpleHaptic_Duration_Float, duration);
-		HLVR_Event_SetUInt32s(event, HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s, regions, regionsCount);
-		HLVR_Event_SetInt(event, HLVR_EventKey_SimpleHaptic_Effect_Int, effect);
+		HLVR_EventData* event;
+		HLVR_EventData_Create(&event, HLVR_EventDataType_SimpleHaptic);
+		HLVR_EventData_SetFloat(event, HLVR_EventDataKey_Time_Float, time);
+		HLVR_EventData_SetFloat(event, HLVR_EventDataKey_SimpleHaptic_Strength_Float, strength);
+		HLVR_EventData_SetFloat(event, HLVR_EventDataKey_SimpleHaptic_Duration_Float, duration);
+		HLVR_EventData_SetUInt32s(event, HLVR_EventDataKey_SimpleHaptic_Where_Regions_UInt32s, regions, regionsCount);
+		HLVR_EventData_SetInt(event, HLVR_EventDataKey_SimpleHaptic_Effect_Int, effect);
 
 		HLVR_Timeline_AddEvent(timeline, event);
 
-		HLVR_Event_Destroy(&event);
+		HLVR_EventData_Destroy(&event);
 
 		return HLVR_Ok;
 

@@ -314,14 +314,14 @@ void Engine::HandleReset(unsigned int handle)
 
 
 std::vector<std::unique_ptr<PlayableEvent>> 
-extractPlayables(const std::vector<ParameterizedEvent>& events) {
+extractPlayables(const std::vector<TimeAndType>& events) {
 	
 	using PlayablePtr = std::unique_ptr<PlayableEvent>;
 	std::vector<PlayablePtr> playables;
 	playables.reserve(events.size());
 	for (const auto& event : events) {
-		if (auto newPlayable = PlayableEvent::make(event.type())) {
-			if (newPlayable->parse(event)) {
+		if (auto newPlayable = PlayableEvent::make(event.Type, event.TimeOffset)) {
+			if (newPlayable->parse(event.Data)) {
 				playables.push_back(std::move(newPlayable));
 			}
 		}

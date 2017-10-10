@@ -7,18 +7,43 @@
 #include "Locator.h"
 #include <bitset>
 #include "SharedTypes.h"
+
+
+
+
+Validator make_xor_constraint(Validator lhs, Validator rhs) {
+	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+		return lhs(event, results) ^ rhs(event, results);
+	};
+}
+
+Validator make_or_constraint(Validator lhs, Validator rhs) {
+	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+		return lhs(event, results) || rhs(event, results);
+	};
+}
+
+Validator make_and_constraint(Validator lhs, Validator rhs) {
+	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+		return lhs(event, results) && rhs(event, results);
+	};
+}
+
+
+
+
 bool PlayableEvent::operator<(const PlayableEvent & rhs) const
 {
 	return this->time() < rhs.time();
 }
 
 std::unique_ptr<PlayableEvent>
-PlayableEvent::make(HLVR_EventType type)
+PlayableEvent::make(HLVR_EventType type, float timeOffset)
 {
 	std::unique_ptr<PlayableEvent> possibleEvent;
 	switch (type) {
 	case HLVR_EventType::HLVR_EventType_SimpleHaptic:
-		possibleEvent = std::make_unique<BasicHapticEvent>();
+		possibleEvent = std::make_unique<BasicHapticEvent>(timeOffset);
 		break;
 	default:
 		break;
@@ -31,7 +56,7 @@ PlayableEvent::make(HLVR_EventType type)
 
 bool PlayableEvent::operator==(const PlayableEvent& other) const
 {
-	return typeid(*this) == typeid(other) && isEqual(other);
+	return typeid(*this) == typeid(other) && m_time == other.m_time &&  isEqual(other);
 }
 
 
@@ -73,3 +98,18 @@ bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::uniq
 	return *lhs == *rhs;
 }
 
+void PlayableEvent::debug_parse(const ParameterizedEvent & event, HLVR_EventData_ValidationResult * result) const
+{
+	*result = { 0 };
+
+	std::vector<HLVR_EventData_KeyParseResult> results;
+	std::vector<Validator> validators = make_validators();
+
+	for (auto& validator : validators) {
+		validator(event, &results);
+	}
+
+	std::copy(results.begin(), results.end(), result->Errors);
+
+	result->Count = results.size();
+}

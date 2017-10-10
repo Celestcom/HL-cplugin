@@ -26,30 +26,29 @@ extern "C" {
 	static const int32_t hlvr_int32max = 0x7FFFFFFF;
 	static const int32_t hlvr_int32min = -hlvr_int32max - 1;
 
-	/*! \enum HLVR_EventKey
-		\brief Used to specify which property to modify on an HLVR_Event. 
+	/*! \enum HLVR_EventDataKey
+		\brief Used to specify which property to modify on an HLVR_EventData. 
 	*/
-	typedef enum HLVR_EventKey {
-		HLVR_EventKey_UNKNOWN = 0,
+	typedef enum HLVR_EventDataKey {
+		HLVR_EventDataKey_UNKNOWN = 0,
 		/* Required keys*/
-		HLVR_EventKey_Time_Float,
 
 		/* Event-Specific keys*/
-		HLVR_EventKey_SimpleHaptic_Duration_Float = 1000,	//optional, defaults to 0 (natural waveform duration)
-		HLVR_EventKey_SimpleHaptic_Strength_Float,			//optional, default to 1.0
-		HLVR_EventKey_SimpleHaptic_Effect_Int,				//optional, defaults to HLVR_Waveform_Click
-		HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s,	//The 'Where' key can either be specified as a list of 1 or more regions,
-		HLVR_EventKey_SimpleHaptic_Where_Nodes_UInt32s,		//or a list of 1 or more nodes. Defaults to hlvr_region_UNKNOWN.
+		HLVR_EventDataKey_SimpleHaptic_Duration_Float = 1000,	//optional, defaults to 0 (natural waveform duration)
+		HLVR_EventDataKey_SimpleHaptic_Strength_Float,			//optional, default to 1.0
+		HLVR_EventDataKey_SimpleHaptic_Effect_Int,				//optional, defaults to HLVR_Waveform_Click
+		HLVR_EventDataKey_SimpleHaptic_Where_Regions_UInt32s,	//The 'Where' key can either be specified as a list of 1 or more regions,
+		HLVR_EventDataKey_SimpleHaptic_Where_Nodes_UInt32s,		//or a list of 1 or more nodes. Defaults to hlvr_region_UNKNOWN.
 
-		HLVR_EventKey_MIN = hlvr_int32min,
-		HLVR_EventKey_MAX = hlvr_int32max
+		HLVR_EventDataKey_MIN = hlvr_int32min,
+		HLVR_EventDataKey_MAX = hlvr_int32max
 
-	} HLVR_EventKey;
+	} HLVR_EventDataKey;
 	
 
 	const int32_t HLVR_SUBREGION_BLOCK = 1000000;
 	/*! \enum HLVR_Region
-		\brief A set of one ore more HLVR_Regions are used to specify where an HLVR_Event should take place. 
+		\brief A set of one ore more HLVR_Regions are used to specify where an HLVR_EventData should take place. 
 	
 		When higher fidelity devices are supported, more named regions will be added for convenience.
 		
@@ -100,18 +99,18 @@ extern "C" {
 	*/
 	typedef struct HLVR_System HLVR_System;
 
-	/*! \struct HLVR_Event
+	/*! \struct HLVR_EventData
 		\brief Opaque type representing a parameterizable event, used to create various effects on Hardlight-compatible hardware.
 
-		A commonly used HLVR_Event is the SimpleHaptic, which specifies a haptic event to be played on a particular set of hardware-defined nodes or regions.
+		A commonly used HLVR_EventData is the SimpleHaptic, which specifies a haptic event to be played on a particular set of hardware-defined nodes or regions.
 		Strength, duration, waveform, and location may be specified differently and then combined in an HLVR_Timeline to form a complete effect. 
 	*/
-	typedef struct HLVR_Event HLVR_Event;
+	typedef struct HLVR_EventData HLVR_EventData;
 
 	/*! \struct HLVR_Timeline
 		\brief Opaque type representing the fundamental time-ordered data source for HLVR_Effects. 
 
-		HLVR_Timelines are containers used to group together one or more HLVR_Events. Multiple different HLVR_EventTypes can exist within the same timeline. 
+		HLVR_Timelines are containers used to group together one or more HLVR_EventDatas. Multiple different HLVR_EventDataTypes can exist within the same timeline. 
 	*/
 	typedef struct HLVR_Timeline HLVR_Timeline;
 
@@ -162,8 +161,8 @@ extern "C" {
 	} HLVR_TrackingUpdate;
 
 
-	/*! \enum HLVR_EventType
-		\brief Used to specify which type of HLVR_Event should be created.
+	/*! \enum HLVR_EventDataType
+		\brief Used to specify which type of HLVR_EventData should be created.
 	*/
 	typedef enum HLVR_EventType {
 		HLVR_EventType_UNKNOWN = 0,
@@ -383,27 +382,50 @@ extern "C" {
 		@param type which type of event to create
 		@return 
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_Event_Create(HLVR_Event** event, HLVR_EventType type);
-	HLVR_RETURN(void)		 HLVR_Event_Destroy(HLVR_Event** event);
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_Create(HLVR_EventData** event);
+	HLVR_RETURN(void)		 HLVR_EventData_Destroy(HLVR_EventData** event);
 
-	HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloat(HLVR_Event* event, HLVR_EventKey key, float value);
-	HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloats(HLVR_Event* event, HLVR_EventKey key, float* values, unsigned int length);
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetFloat(HLVR_EventData* event, HLVR_EventDataKey key, float value);
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetFloats(HLVR_EventData* event, HLVR_EventDataKey key, float* values, unsigned int length);
 
-	HLVR_RETURN(HLVR_Result) HLVR_Event_SetInt(HLVR_Event* event, HLVR_EventKey key, int value);
-	HLVR_RETURN(HLVR_Result) HLVR_Event_SetInts(HLVR_Event* event, HLVR_EventKey key, int* array, unsigned int length);
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetInt(HLVR_EventData* event, HLVR_EventDataKey key, int value);
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetInts(HLVR_EventData* event, HLVR_EventDataKey key, int* array, unsigned int length);
 
-	HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32(HLVR_Event* event, HLVR_EventKey key, uint32_t value);
-	HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32s(HLVR_Event * event, HLVR_EventKey key, uint32_t* array, unsigned int length);
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt32(HLVR_EventData* event, HLVR_EventDataKey key, uint32_t value);
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt32s(HLVR_EventData * event, HLVR_EventDataKey key, uint32_t* array, unsigned int length);
 
-	HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64(HLVR_Event * event, HLVR_EventKey key, uint64_t value);
-	HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64s(HLVR_Event * event, HLVR_EventKey key, uint64_t* array, unsigned int length);
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt64(HLVR_EventData * event, HLVR_EventDataKey key, uint64_t value);
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt64s(HLVR_EventData * event, HLVR_EventDataKey key, uint64_t* array, unsigned int length);
 
+	//should put in Debug.h
+	typedef enum HLVR_EventData_KeyParseError {
+		HLVR_EventData_KeyParseError_UNKNOWN,
+		HLVR_EventData_KeyParseError_KeyRequired,
+		HLVR_EventData_KeyParseError_InvalidValue,
+		HLVR_EventData_KeyParseError_WrongValueType,
+		HLVR_EventData_KeyParseError_MIN = hlvr_int32min,
+		HLVR_EventData_KeyParseError_MAX = hlvr_int32max
+	} HLVR_EventData_KeyParseError;
 
-	//HLVR_Timeline_AddEvent(float timeOffsetSeconds, HLVR_EventData* data, HLVR_EventType type)
+	typedef struct HLVR_EventData_KeyParseResult {
+		HLVR_EventDataKey Key;
+		HLVR_EventData_KeyParseError Error;
+
+	} HLVR_EventData_KeyParseResult;
+	typedef struct HLVR_EventData_ValidationResult {
+		int Count;
+		HLVR_EventData_KeyParseResult Errors[32];
+	} HLVR_EventData_ValidationResult;
+
+	HLVR_RETURN(HLVR_Result) HLVR_EventData_Validate(HLVR_EventData* event, HLVR_EventType type, HLVR_EventData_ValidationResult* outResult);
+
+	//HLVR_Timeline_AddEvent(float timeOffsetSeconds, HLVR_EventDataData* data, HLVR_EventDataType type)
 	// Timelines 
+	HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline* timeline, float timeOffsetSeconds, HLVR_EventData* data, HLVR_EventType dataType); 
+
 	HLVR_RETURN(HLVR_Result) HLVR_Timeline_Create(HLVR_Timeline** eventListPtr);
 	HLVR_RETURN(void)		 HLVR_Timeline_Destroy(HLVR_Timeline** listPtr);
-	HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline* list, HLVR_Event* event);
+//	HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline* list, HLVR_EventData* event);
 	HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(HLVR_Timeline* timeline, HLVR_System* systemPtr, HLVR_Effect* handlePr);
 
 

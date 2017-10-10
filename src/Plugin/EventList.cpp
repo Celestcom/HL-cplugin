@@ -10,22 +10,19 @@ EventList::EventList():m_events(), m_eventLock()
 }
 
 //Precondition: event is not null
-int EventList::AddEvent(ParameterizedEvent * event)
+int EventList::AddEvent(TimeAndType event)
 {	
 	std::lock_guard<std::mutex> guard(m_eventLock);
-	m_events.push_back(*event);
+	m_events.push_back(std::move(event));
 	
 	return HLVR_Ok;
 }
 
 
-EventList::~EventList()
-{
-}
 
 
 
-std::vector<ParameterizedEvent> EventList::events()
+std::vector<TimeAndType> EventList::events()
 {
 	std::lock_guard<std::mutex> guard(m_eventLock);
 
@@ -41,18 +38,17 @@ void EventList::Interleave(EventList* source, float offset)
 {
 	
 
-	for (ParameterizedEvent event : source->m_events) {
-		event.Set(HLVR_EventKey_Time_Float, event.GetOr(HLVR_EventKey_Time_Float, 0.0f) + offset);
+	for (TimeAndType event : source->m_events) {
+		event.TimeOffset += offset;
 		m_events.push_back(event);
 	}
-	//m_events.insert(m_events.end(), source->m_events.begin(), source->m_events.end());
 }
 
 void EventList::Dupe(float offset)
 {
 	auto copy = m_events;
 	for (auto event : copy) {
-		event.Set(HLVR_EventKey_Time_Float, event.GetOr(HLVR_EventKey_Time_Float, 0.0f) + offset);
+		event.TimeOffset += offset;
 		m_events.push_back(event);
 
 	}
