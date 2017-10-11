@@ -40,29 +40,42 @@ HapticsPlayer::~HapticsPlayer()
 {
 }
 
-void HapticsPlayer::Play(HapticHandle hh)
+int HapticsPlayer::Play(HapticHandle hh)
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 	if (auto effect = findExistingPlayable(hh)) {
 		effect->Play();
+		return HLVR_Ok;
+	}
+	else {
+		return HLVR_Error_NoSuchHandle;
 	}
 }
 
-void HapticsPlayer::Pause(HapticHandle hh)
+int HapticsPlayer::Pause(HapticHandle hh)
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 	if (auto effect = findExistingPlayable(hh)) {
 		effect->Pause();
+		return HLVR_Ok;
+
+	}
+	else {
+		return HLVR_Error_NoSuchHandle;
 	}
 }
 
 
 
-void HapticsPlayer::Stop(HapticHandle hh)
+int HapticsPlayer::Stop(HapticHandle hh)
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 	if (auto effect = findExistingPlayable(hh)) {
 		effect->Stop();
+		return HLVR_Ok;
+
+	} else {
+		return HLVR_Error_NoSuchHandle;
 	}
 }
 

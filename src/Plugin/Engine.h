@@ -52,14 +52,14 @@ public:
 
 
 	~Engine();
-	int PollStatus(HLVR_PlatformInfo*);
+	int PollStatus(HLVR_RuntimeInfo*);
 	uint32_t GenerateHandle();
 	int PollDevice(HLVR_DeviceInfo *);
 	bool DoEngineCommand(::EngineCommand command);
-	void HandlePause(unsigned int handle);
-	void HandlePlay(unsigned int handle);
-	void HandleReset(unsigned int handle);
-	void ReleaseHandle(unsigned int handle);
+	int HandlePause(uint32_t handle);
+	int HandlePlay(uint32_t handle);
+	int HandleReset(uint32_t handle);
+	void ReleaseHandle(uint32_t handle);
 	int CreateEffect(EventList * list, HapticHandle * handle);
 	int  PollTracking(HLVR_TrackingUpdate* q);
 

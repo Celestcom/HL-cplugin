@@ -17,7 +17,7 @@
 #include "HighLevelEvent.pb.h"
 #pragma warning(pop)
 
-typedef struct HLVR_PlatformInfo HLVR_PlatformInfo;
+typedef struct HLVR_RuntimeInfo HLVR_RuntimeInfo;
 class ClientMessenger
 {
 public:
@@ -33,7 +33,7 @@ public:
 	boost::optional<std::string> ReadLog();
 
 	std::vector<NullSpace::SharedMemory::RegionPair> ReadBodyView();
-	bool ConnectedToService(HLVR_PlatformInfo* info);
+	bool ConnectedToService(HLVR_RuntimeInfo* info);
 
 	
 private:

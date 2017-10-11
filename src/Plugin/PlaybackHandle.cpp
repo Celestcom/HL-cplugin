@@ -13,19 +13,16 @@ PlaybackHandle::PlaybackHandle() : handle(0), engine{ nullptr }
 int PlaybackHandle::Pause()
 {
 	if (engine != nullptr) {
-		engine->HandlePause(handle);
-		return HLVR_Ok;
+		return engine->HandlePause(handle);
 	}
 	return HLVR_Error_Unspecified;
-
 }
 
 
 int PlaybackHandle::Play()
 {
 	if (engine != nullptr) {
-		engine->HandlePlay(handle);
-		return HLVR_Ok;
+		return engine->HandlePlay(handle);
 	}
 	return HLVR_Error_Unspecified;
 
@@ -34,8 +31,7 @@ int PlaybackHandle::Play()
 int PlaybackHandle::Reset()
 {
 	if (engine != nullptr) {
-		engine->HandleReset(handle);
-		return HLVR_Ok;
+		return engine->HandleReset(handle);
 	}
 	return HLVR_Error_Unspecified;
 

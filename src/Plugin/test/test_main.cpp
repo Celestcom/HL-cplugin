@@ -365,7 +365,7 @@ TEST_CASE("Retrieving the service version should work") {
 
 	//This is a weird case setup,  I just want to see if it works
 	SECTION("So does it?") {
-		HLVR_PlatformInfo info = { 0 };
+		HLVR_RuntimeInfo info = { 0 };
 		auto v = m.ConnectedToService(&info);
 		if (v) {
 			if (info.MajorVersion == 0) {

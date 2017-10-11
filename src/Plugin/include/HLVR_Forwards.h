@@ -1,5 +1,9 @@
+/*! \file HLVR_Forwards.h
+	\brief Forward declarations for the Hardlight API
+	\copyright Copyright 2017 NullSpace VR, Inc All Rights reserved.
+*/
+
 #pragma once
-/*! \file */
 
 typedef struct HLVR_System HLVR_System;
 typedef struct HLVR_Timeline HLVR_Timeline;
@@ -18,7 +22,7 @@ typedef struct HLVR_NodeIterator HLVR_NodeIterator;
 typedef struct HLVR_NodeInfo HLVR_NodeInfo;
 typedef enum HLVR_NodeConcept HLVR_NodeConcept;
 
-typedef struct HLVR_PlatformInfo HLVR_PlatformInfo;
+typedef struct HLVR_RuntimeInfo HLVR_RuntimeInfo;
 
 typedef struct HLVR_EffectInfo HLVR_EffectInfo;
 typedef enum HLVR_EffectInfo_State HLVR_EffectInfo_State;

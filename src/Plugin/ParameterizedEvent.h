@@ -38,7 +38,7 @@ public:
 	bool Set(HLVR_EventDataKey key, T value);
 
 	template<typename ArrayType>
-	bool Set(HLVR_EventDataKey key, ArrayType* values, unsigned int length);
+	bool Set(HLVR_EventDataKey key, const ArrayType* values, unsigned int length);
 	template<typename T>
 	T GetOr(HLVR_EventDataKey key, T defaultValue) const;
 
@@ -69,7 +69,7 @@ inline bool ParameterizedEvent::Set(HLVR_EventDataKey key, T value)
 }
 
 template<typename ArrayType>
-inline bool ParameterizedEvent::Set(HLVR_EventDataKey key, ArrayType * values, unsigned int length)
+inline bool ParameterizedEvent::Set(HLVR_EventDataKey key, const ArrayType * values, unsigned int length)
 {
 	std::vector<ArrayType> vec(values, values + length);
 	updateOrAdd<std::vector<ArrayType>>(key, std::move(vec));

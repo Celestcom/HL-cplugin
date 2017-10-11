@@ -226,7 +226,7 @@ Engine::~Engine()
 	}
 }
 
-int Engine::PollStatus(HLVR_PlatformInfo* info)
+int Engine::PollStatus(HLVR_RuntimeInfo* info)
 {
 	if (m_messenger.ConnectedToService(info)) {
 	
@@ -288,24 +288,24 @@ bool Engine::DoEngineCommand(::EngineCommand command)
 
 
 
-void Engine::ReleaseHandle(unsigned int handle)
+void Engine::ReleaseHandle(uint32_t handle)
 {
-	m_player.Release(HapticHandle{ handle });
+	m_player.Release(handle);
 }
 
 
 
-void Engine::HandlePause(unsigned int handle)
+int Engine::HandlePause(uint32_t handle)
 {
-	m_player.Pause(HapticHandle{ handle });
+	return m_player.Pause(handle);
 }
-void Engine::HandlePlay(unsigned int handle)
+int Engine::HandlePlay(uint32_t handle)
 {
-	m_player.Play(HapticHandle{ handle });
+	return m_player.Play(handle);
 }
-void Engine::HandleReset(unsigned int handle)
+int Engine::HandleReset(uint32_t handle)
 {
-	m_player.Stop(HapticHandle{ handle });
+	return m_player.Stop(handle);
 }
 
 

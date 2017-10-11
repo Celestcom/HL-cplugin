@@ -42,7 +42,7 @@ HLVR_RETURN(int) HLVR_Version_IsCompatibleDLL(void)
 	return major == HLVR_API_VERSION_MAJOR;
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_System_GetPlatformInfo(HLVR_System * systemPtr, HLVR_PlatformInfo * infoPtr)
+HLVR_RETURN(HLVR_Result) HLVR_System_GetRuntimeInfo(HLVR_System * systemPtr, HLVR_RuntimeInfo * infoPtr)
 {
 	RETURN_IF_NULL(systemPtr);
 
@@ -126,6 +126,7 @@ HLVR_RETURN(int) HLVR_NodeIterator_Next(HLVR_NodeIterator * iter, uint32_t devic
 
 HLVR_RETURN(HLVR_Result) HLVR_System_Create(HLVR_System** systemPtr, HLVR_SystemConfiguration* config)
 {
+	//todo: return an error if the service version is incompatible. Check registry key? Something?
 	return ExceptionGuard([&] { *systemPtr = AS_TYPE(HLVR_System, new Engine()); return HLVR_Ok; });
 }
 
@@ -250,7 +251,7 @@ HLVR_RETURN(HLVR_Result) HLVR_EventData_SetFloat(HLVR_EventData * event, HLVR_Ev
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_EventData_SetFloats(HLVR_EventData * event, HLVR_EventDataKey key, float * values, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetFloats(HLVR_EventData * event, HLVR_EventDataKey key, const float values[], unsigned int length)
 {
 	RETURN_IF_NULL(event);
 
@@ -269,7 +270,7 @@ HLVR_RETURN(HLVR_Result)HLVR_EventData_SetInt(HLVR_EventData * event, HLVR_Event
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_EventData_SetInts(HLVR_EventData * event, HLVR_EventDataKey key, int * array, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetInts(HLVR_EventData * event, HLVR_EventDataKey key, const int  array[], unsigned int length)
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
@@ -285,7 +286,7 @@ HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt32(HLVR_EventData * event, HLVR_E
 	});
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt32s(HLVR_EventData * event, HLVR_EventDataKey key, uint32_t* array, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt32s(HLVR_EventData * event, HLVR_EventDataKey key, const uint32_t array[], unsigned int length)
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
@@ -302,7 +303,7 @@ HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt64(HLVR_EventData * event, HLVR_E
 	});
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt64s(HLVR_EventData * event, HLVR_EventDataKey key, uint64_t * array, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt64s(HLVR_EventData * event, HLVR_EventDataKey key, const uint64_t  array[], unsigned int length)
 {
 	RETURN_IF_NULL(event);
 
@@ -351,7 +352,7 @@ HLVR_RETURN(HLVR_Result) HLVR_EventData_Validate(HLVR_EventData * event, HLVR_Ev
 	});
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * list, float timeOffsetSeconds, HLVR_EventData * event, HLVR_EventType type)
+HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * list, double timeOffsetSeconds, HLVR_EventData * event, HLVR_EventType type)
  {
 	 RETURN_IF_NULL(list);
 	 RETURN_IF_NULL(event);
@@ -360,8 +361,11 @@ HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * list, float time
 		 RETURN(HLVR_Error_InvalidTimeOffset);
 	 }
 
+	 //note we are taking the time offset as a double and then casting to float
+	 //if we need the precision later we can have it
+
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(EventList, list)->AddEvent(TimeAndType{ timeOffsetSeconds, type, *AS_TYPE(ParameterizedEvent, event) });
+		 return AS_TYPE(EventList, list)->AddEvent(TimeAndType{ static_cast<float>(timeOffsetSeconds), type, *AS_TYPE(ParameterizedEvent, event) });
 	 });
  }
 
@@ -388,41 +392,14 @@ HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(HLVR_Timeline * timelinePtr, HLV
 	 });
  }
 
-//HLVR_RETURN(HLVR_Result) HLVR_Timeline_Combine(HLVR_Timeline * timeline, HLVR_Timeline * mixin, float offset)
-//{
-//
-//
-//
-//	RETURN_IF_NULL(timeline);
-//	RETURN_IF_NULL(mixin);
-//
-//	if (timeline != mixin) {
-//		AS_TYPE(EventList, timeline)->Interleave(AS_TYPE(EventList, mixin), offset);
-//		return NSVR_Success_Unqualified;
-//	}
-//	else {
-//		AS_TYPE(EventList, timeline)->Dupe(offset);
-//		return NSVR_Success_Unqualified;
-//
-//	}
-//	
-//
-//	return NSVR_Error_Unknown;
-//}
 
 
 HLVR_RETURN(HLVR_Result) HLVR_Effect_Create(HLVR_Effect ** handlePtr)
  {
-
 	 return ExceptionGuard([&] {
 		 *handlePtr = AS_TYPE(HLVR_Effect, new PlaybackHandle());
-		 BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() <<
-			 "[Handle " << *handlePtr << "] Create";
-
 		 return HLVR_Ok;
-	 });
-
-	 
+	 }); 
 }
 
 HLVR_RETURN(HLVR_Result) HLVR_Effect_Pause(HLVR_Effect* effect) {

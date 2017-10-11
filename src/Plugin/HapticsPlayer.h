@@ -28,9 +28,9 @@ public:
 	HapticHandle Create(std::vector<std::unique_ptr<PlayableEvent>> events);
 	void Release(HapticHandle h);
 
-	void Play(HapticHandle h);
-	void Pause(HapticHandle h);
-	void Stop(HapticHandle h);
+	int Play(HapticHandle h);
+	int Pause(HapticHandle h);
+	int Stop(HapticHandle h);
 	
 	void PlayAll();
 	void PauseAll();
