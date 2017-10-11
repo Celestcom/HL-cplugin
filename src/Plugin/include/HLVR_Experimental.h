@@ -1,4 +1,6 @@
 #pragma once
+/*! \file */
+
 #include <stdint.h>
 #include "HLVR_Forwards.h"
 #include "HLVR_Errors.h"

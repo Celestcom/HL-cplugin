@@ -338,7 +338,7 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 	}
 	//enforces precondition on PlayableEffect to not have an empty effects list
 	if (list->empty()) {
-		return -1;
+		return HLVR_Error_EmptyTimeline;
 	}
 	else {
 		HapticHandle h = m_player.Create(extractPlayables(list->events()));
@@ -346,7 +346,7 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 		return HLVR_Ok;
 	}
 
-	return HLVR_Error_Unknown;
+	return HLVR_Error_Unspecified;
 
 
 }

@@ -13,7 +13,7 @@ template<typename T> HLVR_Result ExceptionGuard(T&& t) {
 	catch (const std::exception& e) {
 		BOOST_LOG_TRIVIAL(error) << std::this_thread::get_id() <<
 			"[NSLOADER] Exception: " << e.what();
-		return HLVR_Error_Unknown;
+		return HLVR_Error_Unspecified;
 	}
 #endif
 }

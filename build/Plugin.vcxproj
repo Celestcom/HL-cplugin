@@ -421,7 +421,6 @@
     <ClInclude Include="..\src\Plugin\include\HLVR_Errors.h" />
     <ClInclude Include="..\src\Plugin\include\HLVR_Experimental.h" />
     <ClInclude Include="..\src\Plugin\include\HLVR_Forwards.h" />
-    <ClInclude Include="..\src\Plugin\include\HLVR_Utilities.h" />
     <ClInclude Include="..\src\Plugin\json\json-forwards.h" />
     <ClInclude Include="..\src\Plugin\json\json.h" />
     <ClInclude Include="..\src\Plugin\stdafx.h" />

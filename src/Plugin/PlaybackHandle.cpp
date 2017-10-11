@@ -16,7 +16,7 @@ int PlaybackHandle::Pause()
 		engine->HandlePause(handle);
 		return HLVR_Ok;
 	}
-	return HLVR_Error_Unknown;
+	return HLVR_Error_Unspecified;
 
 }
 
@@ -27,7 +27,7 @@ int PlaybackHandle::Play()
 		engine->HandlePlay(handle);
 		return HLVR_Ok;
 	}
-	return HLVR_Error_Unknown;
+	return HLVR_Error_Unspecified;
 
 }
 
@@ -37,7 +37,7 @@ int PlaybackHandle::Reset()
 		engine->HandleReset(handle);
 		return HLVR_Ok;
 	}
-	return HLVR_Error_Unknown;
+	return HLVR_Error_Unspecified;
 
 }
 
@@ -47,6 +47,6 @@ int PlaybackHandle::GetHandleInfo(HLVR_EffectInfo* infoPtr)
 	if (engine != nullptr) {
 		return engine->GetHandleInfo(handle, infoPtr);
 	}
-	return HLVR_Error_Unknown;
+	return HLVR_Error_Unspecified;
 }
 
