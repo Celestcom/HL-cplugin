@@ -53,7 +53,8 @@ private:
 	void sortByTime(std::vector<PlayablePtr>& playables);
 
 	enum class PlaybackState {
-		PLAYING,
+	
+		PLAYING = 1,
 		PAUSED,
 		IDLE
 	};

@@ -3,8 +3,8 @@
 #include "HLVR.h"
 #include "BasicHapticEvent.h"
 
-ParameterizedEvent::ParameterizedEvent(HLVR_EventType type): 
-	m_type(type),
+ParameterizedEvent::ParameterizedEvent(): 
+	m_type(HLVR_EventType_UNKNOWN),
 	m_params()
 {
 	//average event key count is 5, so preemptively reserve that much
@@ -17,14 +17,24 @@ HLVR_EventType ParameterizedEvent::type() const
 	return m_type;
 }
 
-event_param* ParameterizedEvent::findParam(HLVR_EventKey key)
+bool ParameterizedEvent::HasKey(HLVR_EventDataKey key) const
+{
+	return findParam(key) != nullptr;
+}
+
+void ParameterizedEvent::setType(HLVR_EventType type)
+{
+	m_type = type;
+}
+
+event_param* ParameterizedEvent::findParam(HLVR_EventDataKey key)
 {
 	return const_cast<event_param*>(
 		static_cast<const ParameterizedEvent*>(this)->findParam(key)
 	);
 }
 
-const event_param * ParameterizedEvent::findParam(HLVR_EventKey key) const
+const event_param * ParameterizedEvent::findParam(HLVR_EventDataKey key) const
 {
 	for (const auto& param : m_params) {
 		if (param.key == key) {
@@ -40,7 +50,7 @@ event_param::event_param():
 {
 }
 
-event_param::event_param(HLVR_EventKey key, EventValue val):
+event_param::event_param(HLVR_EventDataKey key, EventValue val):
 	key(key),
 	value(val)
 {

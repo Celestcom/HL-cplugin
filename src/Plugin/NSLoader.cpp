@@ -216,13 +216,13 @@ HLVR_RETURN(HLVR_Result) HLVR_System_DisableTracking(HLVR_System * ptr)
 
 
 
-HLVR_RETURN(HLVR_Result) HLVR_Event_Create(HLVR_Event** eventPtr, HLVR_EventType type)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_Create(HLVR_EventData** eventPtr)
  {
 	
 	return ExceptionGuard([&] {
 
 	
-		*eventPtr = AS_TYPE(HLVR_Event, new ParameterizedEvent(type));
+		*eventPtr = AS_TYPE(HLVR_EventData, new ParameterizedEvent());
 		
 		BOOST_LOG_TRIVIAL(info) << std::this_thread::get_id() << 
 			"[Event " << *eventPtr << "] Create ";
@@ -231,7 +231,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_Create(HLVR_Event** eventPtr, HLVR_EventType
 	 });
  }
 
-HLVR_RETURN(void) HLVR_Event_Destroy(HLVR_Event ** eventPtr)
+HLVR_RETURN(void) HLVR_EventData_Destroy(HLVR_EventData ** eventPtr)
  {
 	ExceptionGuard([&] {
 		delete AS_TYPE(ParameterizedEvent, *eventPtr);
@@ -241,7 +241,7 @@ HLVR_RETURN(void) HLVR_Event_Destroy(HLVR_Event ** eventPtr)
 	});
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloat(HLVR_Event * event, HLVR_EventKey key, float value)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetFloat(HLVR_EventData * event, HLVR_EventDataKey key, float value)
  {
 	 RETURN_IF_NULL(event);
 
@@ -250,7 +250,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloat(HLVR_Event * event, HLVR_EventKey k
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloats(HLVR_Event * event, HLVR_EventKey key, float * values, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetFloats(HLVR_EventData * event, HLVR_EventDataKey key, float * values, unsigned int length)
 {
 	RETURN_IF_NULL(event);
 
@@ -260,7 +260,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloats(HLVR_Event * event, HLVR_EventKey 
 	});
 }
 
-HLVR_RETURN(HLVR_Result)HLVR_Event_SetInt(HLVR_Event * event, HLVR_EventKey key, int value)
+HLVR_RETURN(HLVR_Result)HLVR_EventData_SetInt(HLVR_EventData * event, HLVR_EventDataKey key, int value)
  {
 	 RETURN_IF_NULL(event);
 
@@ -269,7 +269,7 @@ HLVR_RETURN(HLVR_Result)HLVR_Event_SetInt(HLVR_Event * event, HLVR_EventKey key,
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Event_SetInts(HLVR_Event * event, HLVR_EventKey key, int * array, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetInts(HLVR_EventData * event, HLVR_EventDataKey key, int * array, unsigned int length)
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
@@ -277,7 +277,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetInts(HLVR_Event * event, HLVR_EventKey ke
 	});
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32(HLVR_Event * event, HLVR_EventKey key, uint32_t value)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt32(HLVR_EventData * event, HLVR_EventDataKey key, uint32_t value)
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
@@ -285,7 +285,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32(HLVR_Event * event, HLVR_EventKey 
 	});
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32s(HLVR_Event * event, HLVR_EventKey key, uint32_t* array, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt32s(HLVR_EventData * event, HLVR_EventDataKey key, uint32_t* array, unsigned int length)
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
@@ -293,7 +293,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32s(HLVR_Event * event, HLVR_EventKey
 	});
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64(HLVR_Event * event, HLVR_EventKey key, uint64_t value)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt64(HLVR_EventData * event, HLVR_EventDataKey key, uint64_t value)
 {
 	RETURN_IF_NULL(event);
 
@@ -302,7 +302,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64(HLVR_Event * event, HLVR_EventKey 
 	});
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64s(HLVR_Event * event, HLVR_EventKey key, uint64_t * array, unsigned int length)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt64s(HLVR_EventData * event, HLVR_EventDataKey key, uint64_t * array, unsigned int length)
 {
 	RETURN_IF_NULL(event);
 
@@ -335,13 +335,33 @@ HLVR_RETURN(void) HLVR_Timeline_Destroy(HLVR_Timeline ** listPtr)
 	});
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * list, HLVR_Event * event)
+HLVR_RETURN(HLVR_Result) HLVR_EventData_Validate(HLVR_EventData * event, HLVR_EventType type, HLVR_EventData_ValidationResult * outResult)
+{
+	RETURN_IF_NULL(event);
+	RETURN_IF_NULL(outResult);
+
+	return ExceptionGuard([&] {
+		auto p = PlayableEvent::make(type, 0.0f);
+		if (!p) {
+			RETURN(HLVR_Error_InvalidEventType);
+		}
+		p->debug_parse(*AS_TYPE(ParameterizedEvent, event), outResult);
+		
+		RETURN(HLVR_Ok);
+	});
+}
+
+HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * list, float timeOffsetSeconds, HLVR_EventData * event, HLVR_EventType type)
  {
 	 RETURN_IF_NULL(list);
 	 RETURN_IF_NULL(event);
 
+	 if (timeOffsetSeconds < 0.0f) {
+		 RETURN(HLVR_Error_InvalidTimeOffset);
+	 }
+
 	 return ExceptionGuard([&] {
-		return AS_TYPE(EventList, list)->AddEvent(AS_TYPE(ParameterizedEvent, event));
+		 return AS_TYPE(EventList, list)->AddEvent(TimeAndType{ timeOffsetSeconds, type, *AS_TYPE(ParameterizedEvent, event) });
 	 });
  }
 

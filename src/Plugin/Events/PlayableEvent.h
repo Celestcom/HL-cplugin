@@ -2,33 +2,116 @@
 #include <boost/optional.hpp>
 #include <stdint.h>
 #include <array>
-#include "HLVR_Forwards.h"
+#include "HLVR.h"
 class ParameterizedEvent;
 
 namespace NullSpaceIPC {
 	class HighLevelEvent;
 }
 
+using Validator = std::function<bool(const ParameterizedEvent&, std::vector<HLVR_EventData_KeyParseResult>*)>;
+
+template<typename T>
+using Predicate = std::function<bool(const T&)>;
+
+template<typename T>
+using Constraint = std::function<Validator(HLVR_EventDataKey, Predicate<T> c)>;
+
+
+
+struct key_req_t {};
+static const key_req_t key_required;
+
+
+template<typename T, typename Constraint>
+boost::optional<HLVR_EventData_KeyParseError> validate_helper(HLVR_EventDataKey key, const ParameterizedEvent& event, Constraint&& constraint) {
+	T value;
+	if (event.TryGet(key, &value)) {
+		if (!constraint(value)) {
+			return HLVR_EventData_KeyParseError_InvalidValue;
+		}
+	}
+	else {
+		return HLVR_EventData_KeyParseError_WrongValueType;
+	}
+
+
+	return boost::none;
+}
+
+
+
+template<typename T, typename Constraint>
+boost::optional<HLVR_EventData_KeyParseError> validate(HLVR_EventDataKey key, const ParameterizedEvent& event, Constraint&& constraint, key_req_t req) {
+
+	if (!event.HasKey(key)) {
+		return HLVR_EventData_KeyParseError_KeyRequired;
+	}
+
+	return validate_helper<T>(key, event, std::move(constraint));
+}
+
+template<typename T, typename Constraint>
+boost::optional<HLVR_EventData_KeyParseError> validate(HLVR_EventDataKey key, const ParameterizedEvent& event, Constraint&& constraint) {
+
+	if (!event.HasKey(key)) {
+		return boost::none;
+	}
+	return validate_helper<T>(key, event, std::move(constraint));
+}
+
+
+template<typename T>
+Validator make_constraint(HLVR_EventDataKey key, Predicate<T> c) {
+	return[key, fn = std::move(c)](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+		if (auto error = validate<T>(key, event, std::move(fn))) {
+			results->push_back(HLVR_EventData_KeyParseResult{ key, *error });
+			return false;
+		}
+		return true;
+	};
+}
+
+template<typename T>
+Validator make_required_constraint(HLVR_EventDataKey key, Predicate<T> c) {
+	return[key, fn = std::move(c)](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+		if (auto error = validate<T>(key, event, std::move(fn), key_required)) {
+			results->push_back(HLVR_EventData_KeyParseResult{ key, *error });
+			return false;
+		}
+		return true;
+	};
+}
+
+
+Validator make_xor_constraint(Validator lhs, Validator rhs);
+Validator make_or_constraint(Validator lhs, Validator rhs);
+
+Validator make_and_constraint(Validator lhs, Validator rhs);
+
+
 
 class PlayableEvent {
 public:
-	PlayableEvent() {};
+	PlayableEvent(float time):m_time(time) {};
 	virtual ~PlayableEvent() {};
-
-	virtual float time() const = 0;
+	void debug_parse(const ParameterizedEvent& event, HLVR_EventData_ValidationResult* result) const;
+	virtual std::vector<Validator> make_validators() const = 0;
+	float time() const { return m_time; }
 	virtual float duration() const = 0;
 	virtual HLVR_EventType type() const = 0;
 	virtual bool parse(const ParameterizedEvent&) = 0;
 	virtual void serialize(NullSpaceIPC::HighLevelEvent& event) const = 0;
 	bool operator<(const PlayableEvent& rhs) const;
 
-	static std::unique_ptr<PlayableEvent> make(HLVR_EventType type);
+	static std::unique_ptr<PlayableEvent> make(HLVR_EventType type, float timeOffset);
 
 	bool operator==(const PlayableEvent& other) const;
 
 
 private:
 	virtual bool isEqual(const PlayableEvent& other) const = 0;
+	float m_time;
 };
 
 

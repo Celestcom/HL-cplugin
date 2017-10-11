@@ -314,14 +314,14 @@ void Engine::HandleReset(unsigned int handle)
 
 
 std::vector<std::unique_ptr<PlayableEvent>> 
-extractPlayables(const std::vector<ParameterizedEvent>& events) {
+extractPlayables(const std::vector<TimeAndType>& events) {
 	
 	using PlayablePtr = std::unique_ptr<PlayableEvent>;
 	std::vector<PlayablePtr> playables;
 	playables.reserve(events.size());
 	for (const auto& event : events) {
-		if (auto newPlayable = PlayableEvent::make(event.type())) {
-			if (newPlayable->parse(event)) {
+		if (auto newPlayable = PlayableEvent::make(event.Type, event.TimeOffset)) {
+			if (newPlayable->parse(event.Data)) {
 				playables.push_back(std::move(newPlayable));
 			}
 		}
@@ -338,7 +338,7 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 	}
 	//enforces precondition on PlayableEffect to not have an empty effects list
 	if (list->empty()) {
-		return -1;
+		return HLVR_Error_EmptyTimeline;
 	}
 	else {
 		HapticHandle h = m_player.Create(extractPlayables(list->events()));
@@ -346,7 +346,7 @@ int Engine::CreateEffect(EventList * list, HapticHandle* handle)
 		return HLVR_Ok;
 	}
 
-	return HLVR_Error_Unknown;
+	return HLVR_Error_Unspecified;
 
 
 }
