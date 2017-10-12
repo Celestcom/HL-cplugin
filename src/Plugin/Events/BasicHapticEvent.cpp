@@ -118,8 +118,7 @@ bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 		m_area = wrap_type<Loc<node>>(nodes);
 	}
 	else {
-		//possibly should fail here. Need to make clear where failures happen with event parsing.
-		m_area = wrap_type<Loc<region>>(std::vector<uint32_t>{hlvr_region_UNKNOWN});
+		m_area = wrap_type<Loc<region>>(std::vector<uint32_t>{hlvr_region_body});
 	}
 
 

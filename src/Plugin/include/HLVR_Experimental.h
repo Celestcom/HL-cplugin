@@ -65,6 +65,8 @@ extern "C" {
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_EnableTracking(HLVR_System* ptr);
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_DisableTracking(HLVR_System* ptr);
 
+	HLVR_RETURN_EXP(HLVR_Result) HLVR_Stream_Push(HLVR_EventData* data, HLVR_EventType type);
+
 	
 
 #ifdef __cplusplus

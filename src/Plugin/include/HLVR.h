@@ -60,7 +60,7 @@ extern "C" {
 		HLVR_EventDataKey_SimpleHaptic_Duration_Float = 1000,	/*!< defaults to 0.0 (natural waveform duration) */
 		HLVR_EventDataKey_SimpleHaptic_Strength_Float,			/*!< default to 1.0 */
 		HLVR_EventDataKey_SimpleHaptic_Effect_Int,				/*!< defaults to HLVR_Waveform_Click */
-		HLVR_EventDataKey_SimpleHaptic_Where_Regions_UInt32s,	/*!< defaults to hlvr_region_UNKNOWN */
+		HLVR_EventDataKey_SimpleHaptic_Where_Regions_UInt32s,	/*!< defaults to hlvr_region_body */
 		HLVR_EventDataKey_SimpleHaptic_Where_Nodes_UInt32s,		/*!< defaults to using Where_Regions, see previous */
 
 		HLVR_EventDataKey_MIN = hlvr_int32min,
