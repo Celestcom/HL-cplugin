@@ -48,25 +48,25 @@ extern "C" {
 	*/
 	const uint32_t hlvr_allnodes = 0;
 
-	/*! Properties that can be set on an HLVR_EventData. 
+	/*! Properties that can be set on an HLVR_Event. 
 		
-		When a key has a common prefix, such as Where_Regions and Where_Nodes, it means that only one of keys
+		When a key has a common prefix, such as Where_Regions and Where_Nodes for SimpleHaptic, it means that only one of keys
 		should be specified. For example, a SimpleHaptic can target a particular set of device nodes, or a particular set of regions, but not both.
 	*/
-	typedef enum HLVR_EventDataKey {
-		HLVR_EventDataKey_UNKNOWN = 0,
+	typedef enum HLVR_EventKey {
+		HLVR_EventKey_UNKNOWN = 0,
 
 		/* Event-Specific keys */
-		HLVR_EventDataKey_SimpleHaptic_Duration_Float = 1000,	/*!< defaults to 0.0 (natural waveform duration) */
-		HLVR_EventDataKey_SimpleHaptic_Strength_Float,			/*!< default to 1.0 */
-		HLVR_EventDataKey_SimpleHaptic_Effect_Int,				/*!< defaults to HLVR_Waveform_Click */
-		HLVR_EventDataKey_SimpleHaptic_Where_Regions_UInt32s,	/*!< defaults to hlvr_region_body */
-		HLVR_EventDataKey_SimpleHaptic_Where_Nodes_UInt32s,		/*!< defaults to using Where_Regions, see previous */
+		HLVR_EventKey_SimpleHaptic_Duration_Float = 1000,	/*!< defaults to 0.0 (natural waveform duration) */
+		HLVR_EventKey_SimpleHaptic_Strength_Float,			/*!< default to 1.0 */
+		HLVR_EventKey_SimpleHaptic_Effect_Int,				/*!< defaults to HLVR_Waveform_Click */
+		HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s,	/*!< defaults to hlvr_region_body */
+		HLVR_EventKey_SimpleHaptic_Where_Nodes_UInt32s,		/*!< defaults to using Where_Regions, see previous */
 
-		HLVR_EventDataKey_MIN = hlvr_int32min,
-		HLVR_EventDataKey_MAX = hlvr_int32max
+		HLVR_EventKey_MIN = hlvr_int32min,
+		HLVR_EventKey_MAX = hlvr_int32max
 
-	} HLVR_EventDataKey;
+	} HLVR_EventKey;
 	
 	/*! Reserves space between regions */
 	const int32_t HLVR_SUBREGION_BLOCK = 1000000;
@@ -120,12 +120,12 @@ extern "C" {
 	/*! 
 		Opaque type used as a data source in the creation of effects to be played on Hardlight-compatible hardware.
 
-		Many different event types can be represented using HLVR_EventData, by setting key-value pairs and asking the API to interpret the data as a certain type of
+		Many different event types can be represented using HLVR_Event, by setting key-value pairs and asking the API to interpret the data as a certain type of
 		event. 
 
 		@see HLVR_Timeline_AddEvent
 	*/
-	typedef struct HLVR_EventData HLVR_EventData;
+	typedef struct HLVR_Event HLVR_Event;
 
 	/*! 
 		Opaque type representing a time-ordered data container which groups together one or more events.
@@ -140,6 +140,7 @@ extern "C" {
 	typedef struct HLVR_Effect HLVR_Effect;
 
 	
+	typedef struct HLVR_Event HLVR_Event;
 	/*!
 		General description of a device connected to the system.
 	*/
@@ -193,7 +194,7 @@ extern "C" {
 		directly targeted.
 
 		@see HLVR_Region
-		@see HLVR_EventData
+		@see HLVR_Event
 	*/
 	typedef enum HLVR_NodeConcept {
 		HLVR_NodeConcept_UNKNOWN = 0,
@@ -221,7 +222,7 @@ extern "C" {
 	/*!
 		Fundamental waveforms which may be combined to form more complex units of haptic feedback. 
 
-		@see HLVR_EventData
+		@see HLVR_Event
 	*/
 	typedef enum HLVR_Waveform {
 		HLVR_Waveform_UNKNOWN = 0,
@@ -363,10 +364,10 @@ extern "C" {
 	HLVR_RETURN(HLVR_Result) HLVR_System_Create(HLVR_System** system, HLVR_SystemConfiguration* config);
 
 	/*! Destroy the context, shutting down communication between this application and the Hardlight runtime service.
-		@param address of the target system pointer
+		@param system address of the target system pointer
 		@return void
 	*/
-	HLVR_RETURN(void) HLVR_System_Destroy(HLVR_System** ptr);
+	HLVR_RETURN(void) HLVR_System_Destroy(HLVR_System** system);
 
 	/*! Checks if this version of the API has a particular feature.
 		@param feature name of feature
@@ -506,15 +507,20 @@ extern "C" {
 
 	
 	
-	/*! Create a new HLVR_EventData object
+	/*! Create a new HLVR_Event object with a given type
+
+		To check if an event is valid, call HLVR_Event_Validate()
+		@param event address of the target event pointer which will be written to on success
+		@param type type of the event
 		@return HLVR_Ok on success
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_Create(HLVR_EventData** event);
-	/*! Destroy an HLVR_EventData object
-		@param event object to destroy
+
+	HLVR_RETURN(HLVR_Result) HLVR_Event_Create(HLVR_Event** event, HLVR_EventType type);
+	/*! Destroy an HLVR_Event object
+		@param event address of the target event pointer to destroy
 		@return void
 	*/
-	HLVR_RETURN(void)		 HLVR_EventData_Destroy(HLVR_EventData** event);
+	HLVR_RETURN(void)		 HLVR_Event_Destroy(HLVR_Event** event);
 
 	/*! Set a float with the given key 
 		@param event target
@@ -522,7 +528,7 @@ extern "C" {
 		@param value value
 		@return HLVR_Ok 
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetFloat(HLVR_EventData* event, HLVR_EventDataKey key, float value);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloat(HLVR_Event* event, HLVR_EventKey key, float value);
 	/*! Set an array of floats with the given key
 		@param event target
 		@param key key
@@ -530,14 +536,14 @@ extern "C" {
 		@param length length of @p values
 		@return HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetFloats(HLVR_EventData* event, HLVR_EventDataKey key, const float values[], unsigned int length);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloats(HLVR_Event* event, HLVR_EventKey key, const float* values, unsigned int length);
 	/*! Set an int with the given key
 		@param event target
 		@param key key
 		@param value value
 		@return HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetInt(HLVR_EventData* event, HLVR_EventDataKey key, int value);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_SetInt(HLVR_Event* event, HLVR_EventKey key, int value);
 	/*! Set an array of ints with the given key
 		@param event target
 		@param key key
@@ -545,14 +551,14 @@ extern "C" {
 		@param length length of @p values
 		@return HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetInts(HLVR_EventData* event, HLVR_EventDataKey key, const int values[], unsigned int length);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_SetInts(HLVR_Event* event, HLVR_EventKey key, const int* values, unsigned int length);
 	/*! Set an unsigned 32-bit int with the given key
 		@param event target
 		@param key key
 		@param value value
 		@return HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt32(HLVR_EventData* event, HLVR_EventDataKey key, uint32_t value);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32(HLVR_Event* event, HLVR_EventKey key, uint32_t value);
 	/*! Set an unsigned 32-bit int array with the given key
 		@param event target
 		@param key key
@@ -560,14 +566,14 @@ extern "C" {
 		@param length length of @p values
 		@return HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt32s(HLVR_EventData * event, HLVR_EventDataKey key, const uint32_t values[], unsigned int length);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32s(HLVR_Event * event, HLVR_EventKey key, const uint32_t* values, unsigned int length);
 	/*! Set an unsigned 64-bit int with the given key
 		@param event target
 		@param key key
 		@param value value
 		@return HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt64(HLVR_EventData * event, HLVR_EventDataKey key, uint64_t value);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64(HLVR_Event * event, HLVR_EventKey key, uint64_t value);
 	/*! Set an unsigned 64-bit int array with the given key
 		@param event target
 		@param key key
@@ -575,48 +581,51 @@ extern "C" {
 		@param length length of @p values
 		@return HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_SetUInt64s(HLVR_EventData * event, HLVR_EventDataKey key, const uint64_t values[], unsigned int length);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64s(HLVR_Event * event, HLVR_EventKey key, const uint64_t* values, unsigned int length);
+
+
+
+
 
 	/*! 
 		The error value associated with the parse result of a given key
 	*/
-	typedef enum HLVR_EventData_KeyParseError {
-		HLVR_EventData_KeyParseError_UNKNOWN,
-		HLVR_EventData_KeyParseError_KeyRequired,
-		HLVR_EventData_KeyParseError_InvalidValue,		/*!< the value did not satisfy constraints of the event, e.g. only non-negative numbers */
-		HLVR_EventData_KeyParseError_WrongValueType,	/*!< the value exists for the given key, yet it is of the wrong type */
-		HLVR_EventData_KeyParseError_MIN = hlvr_int32min,
-		HLVR_EventData_KeyParseError_MAX = hlvr_int32max
-	} HLVR_EventData_KeyParseError;
+	typedef enum HLVR_Event_KeyParseError {
+		HLVR_Event_KeyParseError_UNKNOWN,
+		HLVR_Event_KeyParseError_KeyRequired,
+		HLVR_Event_KeyParseError_InvalidValue,		/*!< the value did not satisfy constraints of the event, e.g. only non-negative numbers */
+		HLVR_Event_KeyParseError_WrongValueType,	/*!< the value exists for the given key, yet it is of the wrong type */
+		HLVR_Event_KeyParseError_MIN = hlvr_int32min,
+		HLVR_Event_KeyParseError_MAX = hlvr_int32max
+	} HLVR_Event_KeyParseError;
 
 
 	/*! Parse error for a particular key */
-	typedef struct HLVR_EventData_KeyParseResult {
-		HLVR_EventDataKey Key;
-		HLVR_EventData_KeyParseError Error;
-	} HLVR_EventData_KeyParseResult;
+	typedef struct HLVR_Event_KeyParseResult {
+		HLVR_EventKey Key;
+		HLVR_Event_KeyParseError Error;
+	} HLVR_Event_KeyParseResult;
 
 	/*! Set of validation errors generated by the system when parsing an event.
-		@see HLVR_EventData_Validate
-		@see HLVR_EventData
+		@see HLVR_Event_Validate
+		@see HLVR_Event
 	*/
-	typedef struct HLVR_EventData_ValidationResult {
+	typedef struct HLVR_Event_ValidationResult {
 		/*! How many errors */
 		int Count;
 		/*! Value of the errors */
-		HLVR_EventData_KeyParseResult Errors[32];
-	} HLVR_EventData_ValidationResult;
+		HLVR_Event_KeyParseResult Errors[32];
+	} HLVR_Event_ValidationResult;
 
 	/*! Validate @p event against the parser for the given event @p type.
 
 		Useful as a debugging tool when writing wrappers for other languages.
 
 		@param event the event to validate
-		@param type the type of the event to attempt parsing
 		@param outResult where to put validation results 
 		@return HLVR_Error_InvalidEventType if the given type is unknown, else HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_EventData_Validate(HLVR_EventData* event, HLVR_EventType type, HLVR_EventData_ValidationResult* outResult);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_Validate(HLVR_Event* event, HLVR_Event_ValidationResult* outResult);
 
 	
 	/*! Create a new timeline
@@ -632,11 +641,10 @@ extern "C" {
 	/*! Add an event with a given type and time offset to this timeline
 		@param timeline the timeline to operate on
 		@param timeOffsetSeconds the time offset of the event, in fractional seconds (e.g. 3.4f)
-		@param data the data to use when adding the event
-		@param dataType the type of data to attempt parsing
+		@param event the data to use when adding the event
 		@return HLVR_Error_InvalidTimeOffset if @p timeOffsetSeconds < 0, else HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline* timeline, double timeOffsetSeconds, HLVR_EventData* data, HLVR_EventType dataType);
+	HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline* timeline, double timeOffsetSeconds, HLVR_Event* event);
 	
 	/*! Create a new effect within the system, using a timeline as the source
 		@param timeline the source timeline

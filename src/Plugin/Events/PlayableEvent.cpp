@@ -12,19 +12,19 @@
 
 
 Validator make_xor_constraint(Validator lhs, Validator rhs) {
-	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_Event_KeyParseResult>* results) {
 		return lhs(event, results) ^ rhs(event, results);
 	};
 }
 
 Validator make_or_constraint(Validator lhs, Validator rhs) {
-	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_Event_KeyParseResult>* results) {
 		return lhs(event, results) || rhs(event, results);
 	};
 }
 
 Validator make_and_constraint(Validator lhs, Validator rhs) {
-	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_Event_KeyParseResult>* results) {
 		return lhs(event, results) && rhs(event, results);
 	};
 }
@@ -98,11 +98,11 @@ bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::uniq
 	return *lhs == *rhs;
 }
 
-void PlayableEvent::debug_parse(const ParameterizedEvent & event, HLVR_EventData_ValidationResult * result) const
+void PlayableEvent::debug_parse(const ParameterizedEvent & event, HLVR_Event_ValidationResult * result) const
 {
 	*result = { 0 };
 
-	std::vector<HLVR_EventData_KeyParseResult> results;
+	std::vector<HLVR_Event_KeyParseResult> results;
 	std::vector<Validator> validators = make_validators();
 
 	for (auto& validator : validators) {

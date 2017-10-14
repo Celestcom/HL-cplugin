@@ -23,8 +23,8 @@ typedef boost::variant<
 
 struct event_param {
 	event_param();
-	event_param(HLVR_EventDataKey key, EventValue);
-	HLVR_EventDataKey key;
+	event_param(HLVR_EventKey key, EventValue);
+	HLVR_EventKey key;
 	EventValue value;
 };
 
@@ -35,33 +35,33 @@ public:
 	explicit ParameterizedEvent();
 
 	template<class T>
-	bool Set(HLVR_EventDataKey key, T value);
+	bool Set(HLVR_EventKey key, T value);
 
 	template<typename ArrayType>
-	bool Set(HLVR_EventDataKey key, const ArrayType* values, unsigned int length);
+	bool Set(HLVR_EventKey key, const ArrayType* values, unsigned int length);
 	template<typename T>
-	T GetOr(HLVR_EventDataKey key, T defaultValue) const;
+	T GetOr(HLVR_EventKey key, T defaultValue) const;
 
 	template<typename T>
-	bool TryGet(HLVR_EventDataKey key, T* outVal) const;
+	bool TryGet(HLVR_EventKey key, T* outVal) const;
 	HLVR_EventType type() const;
 
-	bool HasKey(HLVR_EventDataKey key) const;
+	bool HasKey(HLVR_EventKey key) const;
 
 	void setType(HLVR_EventType type);
 private:
 	HLVR_EventType m_type;
 	std::vector<event_param> m_params;
 
-	event_param* findParam(HLVR_EventDataKey key);
-	const event_param* findParam(HLVR_EventDataKey key) const;
+	event_param* findParam(HLVR_EventKey key);
+	const event_param* findParam(HLVR_EventKey key) const;
 	
 	template<typename T>
-	void updateOrAdd(HLVR_EventDataKey key, T val);
+	void updateOrAdd(HLVR_EventKey key, T val);
 };
 
 template<class T>
-inline bool ParameterizedEvent::Set(HLVR_EventDataKey key, T value)
+inline bool ParameterizedEvent::Set(HLVR_EventKey key, T value)
 {
 //	std::lock_guard<std::mutex> guard(m_propLock);
 	updateOrAdd<T>(key, value);
@@ -69,7 +69,7 @@ inline bool ParameterizedEvent::Set(HLVR_EventDataKey key, T value)
 }
 
 template<typename ArrayType>
-inline bool ParameterizedEvent::Set(HLVR_EventDataKey key, const ArrayType * values, unsigned int length)
+inline bool ParameterizedEvent::Set(HLVR_EventKey key, const ArrayType * values, unsigned int length)
 {
 	std::vector<ArrayType> vec(values, values + length);
 	updateOrAdd<std::vector<ArrayType>>(key, std::move(vec));
@@ -78,7 +78,7 @@ inline bool ParameterizedEvent::Set(HLVR_EventDataKey key, const ArrayType * val
 
 
 template<typename T>
-inline T ParameterizedEvent::GetOr(HLVR_EventDataKey key, T defaultValue) const
+inline T ParameterizedEvent::GetOr(HLVR_EventKey key, T defaultValue) const
 {
 	try {
 		if (const event_param* prop = findParam(key)) {
@@ -94,7 +94,7 @@ inline T ParameterizedEvent::GetOr(HLVR_EventDataKey key, T defaultValue) const
 }
 
 template<typename T>
-bool ParameterizedEvent::TryGet(HLVR_EventDataKey key, T* outVal) const
+bool ParameterizedEvent::TryGet(HLVR_EventKey key, T* outVal) const
 {
 	try {
 		if (const event_param* prop = findParam(key)) {
@@ -113,7 +113,7 @@ bool ParameterizedEvent::TryGet(HLVR_EventDataKey key, T* outVal) const
 }
 
 template<typename T>
-inline void ParameterizedEvent::updateOrAdd(HLVR_EventDataKey key, T val)
+inline void ParameterizedEvent::updateOrAdd(HLVR_EventKey key, T val)
 {
 	if (event_param* existing = findParam(key)) {
 		existing->value = val;

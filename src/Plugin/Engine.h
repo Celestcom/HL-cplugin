@@ -86,6 +86,7 @@ public:
 	void DestroyIterator(HiddenIterator<HLVR_DeviceInfo>* device);
 	void DestroyIterator(HiddenIterator<HLVR_NodeInfo>* nodes);
 
+	int StreamEvent(const ParameterizedEvent& event);
 private:
 	IoService m_ioService;
 	HLVR_TrackingUpdate m_cachedTrackingUpdate;

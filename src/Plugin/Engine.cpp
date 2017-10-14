@@ -103,6 +103,19 @@ void Engine::DestroyIterator(HiddenIterator<HLVR_NodeInfo>* nodes)
 	);
 }
 
+int Engine::StreamEvent(const ParameterizedEvent& event)
+{
+	auto ev = PlayableEvent::make(event.type(), 0.0f);
+	if (!ev) {
+		return HLVR_Error_InvalidEventType;
+	}
+
+	NullSpaceIPC::HighLevelEvent hle;
+	ev->serialize(hle);
+	m_messenger.WriteEvent(hle);
+	return HLVR_Ok;
+}
+
 int Engine::DumpDeviceDiagnostics()
 {
 	NullSpaceIPC::DriverCommand command;
@@ -320,7 +333,7 @@ extractPlayables(const std::vector<TimeAndType>& events) {
 	std::vector<PlayablePtr> playables;
 	playables.reserve(events.size());
 	for (const auto& event : events) {
-		if (auto newPlayable = PlayableEvent::make(event.Type, event.TimeOffset)) {
+		if (auto newPlayable = PlayableEvent::make(event.Data.type(), event.TimeOffset)) {
 			if (newPlayable->parse(event.Data)) {
 				playables.push_back(std::move(newPlayable));
 			}

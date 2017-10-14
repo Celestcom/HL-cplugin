@@ -8,7 +8,7 @@
 typedef struct HLVR_System HLVR_System;
 typedef struct HLVR_Timeline HLVR_Timeline;
 typedef struct HLVR_Effect HLVR_Effect;
-typedef struct HLVR_EventData HLVR_EventData;
+typedef struct HLVR_Event HLVR_Event;
 
 typedef struct HLVR_Quaternion HLVR_Quaternion;
 typedef struct HLVR_TrackingUpdate HLVR_TrackingUpdate;
@@ -27,7 +27,7 @@ typedef struct HLVR_RuntimeInfo HLVR_RuntimeInfo;
 typedef struct HLVR_EffectInfo HLVR_EffectInfo;
 typedef enum HLVR_EffectInfo_State HLVR_EffectInfo_State;
 
-typedef enum HLVR_EventDataKey HLVR_EventDataKey;
+typedef enum HLVR_EventKey HLVR_EventKey;
 typedef enum HLVR_EventType HLVR_EventType;
 
 typedef enum HLVR_Region HLVR_Region;

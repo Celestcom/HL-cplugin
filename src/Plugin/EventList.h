@@ -7,7 +7,6 @@ class Engine;
 
 struct TimeAndType {
 	float TimeOffset;
-	HLVR_EventType Type;
 	ParameterizedEvent Data;
 };
 

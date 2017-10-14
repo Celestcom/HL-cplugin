@@ -76,9 +76,9 @@ std::vector<Phantom> wrap_type(const std::vector<Original>& original) {
 
 
 //template<typename Constraint>
-//void validate(const ParameterizedEvent& event, HLVR_EventDataKey key, Constraint&& c, std::vector<HLVR_EventData_KeyParseResult>* results) {
+//void validate(const ParameterizedEvent& event, HLVR_EventKey key, Constraint&& c, std::vector<HLVR_Event_KeyParseResult>* results) {
 //	if (auto error = validate(key, event, std::move(c))) {
-//		results->push_back(HLVR_EventData_KeyParseResult{ key, *error });
+//		results->push_back(HLVR_Event_KeyParseResult{ key, *error });
 //	}
 //}
 
@@ -91,12 +91,12 @@ std::vector<Validator> BasicHapticEvent::make_validators() const  {
 	
 	
 	return{
-		make_constraint<float>(HLVR_EventDataKey_SimpleHaptic_Strength_Float, [](float strength) { return strength >= 0.0f && strength <= 1.0f; }),
-		make_constraint<float>(HLVR_EventDataKey_SimpleHaptic_Duration_Float, [](float dur) { return dur >= 0.0f; }),
-		make_constraint<int>(HLVR_EventDataKey_SimpleHaptic_Effect_Int, [](int effect) { return effect > 0; }),
+		make_constraint<float>(HLVR_EventKey_SimpleHaptic_Strength_Float, [](float strength) { return strength >= 0.0f && strength <= 1.0f; }),
+		make_constraint<float>(HLVR_EventKey_SimpleHaptic_Duration_Float, [](float dur) { return dur >= 0.0f; }),
+		make_constraint<int>(HLVR_EventKey_SimpleHaptic_Effect_Int, [](int effect) { return effect > 0; }),
 		make_xor_constraint(
-			make_constraint<std::vector<uint32_t>>(HLVR_EventDataKey_SimpleHaptic_Where_Regions_UInt32s, [](auto& stuff) { return stuff.size() > 0; }),
-			make_constraint<std::vector<uint32_t>>(HLVR_EventDataKey_SimpleHaptic_Where_Nodes_UInt32s, [](auto& stuff) { return stuff.size() > 0; })
+			make_constraint<std::vector<uint32_t>>(HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s, [](auto& stuff) { return stuff.size() > 0; }),
+			make_constraint<std::vector<uint32_t>>(HLVR_EventKey_SimpleHaptic_Where_Nodes_UInt32s, [](auto& stuff) { return stuff.size() > 0; })
 		)
 	};
 	
@@ -106,15 +106,15 @@ std::vector<Validator> BasicHapticEvent::make_validators() const  {
 bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 {
 
-	m_strength = ev.GetOr<float>(HLVR_EventDataKey_SimpleHaptic_Strength_Float, 1.0f);
-	m_duration = ev.GetOr<float>(HLVR_EventDataKey_SimpleHaptic_Duration_Float, 0.0f);
+	m_strength = ev.GetOr<float>(HLVR_EventKey_SimpleHaptic_Strength_Float, 1.0f);
+	m_duration = ev.GetOr<float>(HLVR_EventKey_SimpleHaptic_Duration_Float, 0.0f);
 
 	std::vector<uint32_t> regions;
 	std::vector<uint32_t> nodes;
-	if (ev.TryGet(HLVR_EventDataKey_SimpleHaptic_Where_Regions_UInt32s, &regions)) {
+	if (ev.TryGet(HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s, &regions)) {
 		m_area = wrap_type<Loc<region>>(regions);
 	}
-	else if (ev.TryGet(HLVR_EventDataKey_SimpleHaptic_Where_Nodes_UInt32s, &nodes)) {
+	else if (ev.TryGet(HLVR_EventKey_SimpleHaptic_Where_Nodes_UInt32s, &nodes)) {
 		m_area = wrap_type<Loc<node>>(nodes);
 	}
 	else {
@@ -122,7 +122,7 @@ bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
 	}
 
 
-	m_requestedEffectFamily = ev.GetOr<int>(HLVR_EventDataKey_SimpleHaptic_Effect_Int, 3);
+	m_requestedEffectFamily = ev.GetOr<int>(HLVR_EventKey_SimpleHaptic_Effect_Int, 3);
 	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
 	m_parsedEffectFamily = effect;
 	

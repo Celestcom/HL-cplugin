@@ -141,6 +141,12 @@
     <ClInclude Include="..\src\Plugin\targetver.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Plugin\Events\SimpleHaptic.h">
+      <Filter>src\Plugin\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plugin\Events\PlayableEvent2.h">
+      <Filter>src\Plugin\Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">

@@ -403,6 +403,8 @@
     <ClInclude Include="..\src\Plugin\EventList.h" />
     <ClInclude Include="..\src\Plugin\Events\BasicHapticEvent.h" />
     <ClInclude Include="..\src\Plugin\Events\PlayableEvent.h" />
+    <ClInclude Include="..\src\Plugin\Events\PlayableEvent2.h" />
+    <ClInclude Include="..\src\Plugin\Events\SimpleHaptic.h" />
     <ClInclude Include="..\src\Plugin\ExceptionSafeCall.h" />
     <ClInclude Include="..\src\Plugin\HapticArgs.h" />
     <ClInclude Include="..\src\Plugin\HapticsPlayer.h" />

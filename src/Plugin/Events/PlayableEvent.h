@@ -9,13 +9,13 @@ namespace NullSpaceIPC {
 	class HighLevelEvent;
 }
 
-using Validator = std::function<bool(const ParameterizedEvent&, std::vector<HLVR_EventData_KeyParseResult>*)>;
+using Validator = std::function<bool(const ParameterizedEvent&, std::vector<HLVR_Event_KeyParseResult>*)>;
 
 template<typename T>
 using Predicate = std::function<bool(const T&)>;
 
 template<typename T>
-using Constraint = std::function<Validator(HLVR_EventDataKey, Predicate<T> c)>;
+using Constraint = std::function<Validator(HLVR_EventKey, Predicate<T> c)>;
 
 
 
@@ -24,15 +24,15 @@ static const key_req_t key_required;
 
 
 template<typename T, typename Constraint>
-boost::optional<HLVR_EventData_KeyParseError> validate_helper(HLVR_EventDataKey key, const ParameterizedEvent& event, Constraint&& constraint) {
+boost::optional<HLVR_Event_KeyParseError> validate_helper(HLVR_EventKey key, const ParameterizedEvent& event, Constraint&& constraint) {
 	T value;
 	if (event.TryGet(key, &value)) {
 		if (!constraint(value)) {
-			return HLVR_EventData_KeyParseError_InvalidValue;
+			return HLVR_Event_KeyParseError_InvalidValue;
 		}
 	}
 	else {
-		return HLVR_EventData_KeyParseError_WrongValueType;
+		return HLVR_Event_KeyParseError_WrongValueType;
 	}
 
 
@@ -42,17 +42,17 @@ boost::optional<HLVR_EventData_KeyParseError> validate_helper(HLVR_EventDataKey 
 
 
 template<typename T, typename Constraint>
-boost::optional<HLVR_EventData_KeyParseError> validate(HLVR_EventDataKey key, const ParameterizedEvent& event, Constraint&& constraint, key_req_t req) {
+boost::optional<HLVR_Event_KeyParseError> validate(HLVR_EventKey key, const ParameterizedEvent& event, Constraint&& constraint, key_req_t req) {
 
 	if (!event.HasKey(key)) {
-		return HLVR_EventData_KeyParseError_KeyRequired;
+		return HLVR_Event_KeyParseError_KeyRequired;
 	}
 
 	return validate_helper<T>(key, event, std::move(constraint));
 }
 
 template<typename T, typename Constraint>
-boost::optional<HLVR_EventData_KeyParseError> validate(HLVR_EventDataKey key, const ParameterizedEvent& event, Constraint&& constraint) {
+boost::optional<HLVR_Event_KeyParseError> validate(HLVR_EventKey key, const ParameterizedEvent& event, Constraint&& constraint) {
 
 	if (!event.HasKey(key)) {
 		return boost::none;
@@ -62,10 +62,10 @@ boost::optional<HLVR_EventData_KeyParseError> validate(HLVR_EventDataKey key, co
 
 
 template<typename T>
-Validator make_constraint(HLVR_EventDataKey key, Predicate<T> c) {
-	return[key, fn = std::move(c)](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+Validator make_constraint(HLVR_EventKey key, Predicate<T> c) {
+	return[key, fn = std::move(c)](const ParameterizedEvent& event, std::vector<HLVR_Event_KeyParseResult>* results) {
 		if (auto error = validate<T>(key, event, std::move(fn))) {
-			results->push_back(HLVR_EventData_KeyParseResult{ key, *error });
+			results->push_back(HLVR_Event_KeyParseResult{ key, *error });
 			return false;
 		}
 		return true;
@@ -73,10 +73,10 @@ Validator make_constraint(HLVR_EventDataKey key, Predicate<T> c) {
 }
 
 template<typename T>
-Validator make_required_constraint(HLVR_EventDataKey key, Predicate<T> c) {
-	return[key, fn = std::move(c)](const ParameterizedEvent& event, std::vector<HLVR_EventData_KeyParseResult>* results) {
+Validator make_required_constraint(HLVR_EventKey key, Predicate<T> c) {
+	return[key, fn = std::move(c)](const ParameterizedEvent& event, std::vector<HLVR_Event_KeyParseResult>* results) {
 		if (auto error = validate<T>(key, event, std::move(fn), key_required)) {
-			results->push_back(HLVR_EventData_KeyParseResult{ key, *error });
+			results->push_back(HLVR_Event_KeyParseResult{ key, *error });
 			return false;
 		}
 		return true;
@@ -95,7 +95,7 @@ class PlayableEvent {
 public:
 	PlayableEvent(float time):m_time(time) {};
 	virtual ~PlayableEvent() {};
-	void debug_parse(const ParameterizedEvent& event, HLVR_EventData_ValidationResult* result) const;
+	void debug_parse(const ParameterizedEvent& event, HLVR_Event_ValidationResult* result) const;
 	virtual std::vector<Validator> make_validators() const = 0;
 	float time() const { return m_time; }
 	virtual float duration() const = 0;

@@ -17,7 +17,7 @@ HLVR_EventType ParameterizedEvent::type() const
 	return m_type;
 }
 
-bool ParameterizedEvent::HasKey(HLVR_EventDataKey key) const
+bool ParameterizedEvent::HasKey(HLVR_EventKey key) const
 {
 	return findParam(key) != nullptr;
 }
@@ -27,14 +27,14 @@ void ParameterizedEvent::setType(HLVR_EventType type)
 	m_type = type;
 }
 
-event_param* ParameterizedEvent::findParam(HLVR_EventDataKey key)
+event_param* ParameterizedEvent::findParam(HLVR_EventKey key)
 {
 	return const_cast<event_param*>(
 		static_cast<const ParameterizedEvent*>(this)->findParam(key)
 	);
 }
 
-const event_param * ParameterizedEvent::findParam(HLVR_EventDataKey key) const
+const event_param * ParameterizedEvent::findParam(HLVR_EventKey key) const
 {
 	for (const auto& param : m_params) {
 		if (param.key == key) {
@@ -50,7 +50,7 @@ event_param::event_param():
 {
 }
 
-event_param::event_param(HLVR_EventDataKey key, EventValue val):
+event_param::event_param(HLVR_EventKey key, EventValue val):
 	key(key),
 	value(val)
 {
