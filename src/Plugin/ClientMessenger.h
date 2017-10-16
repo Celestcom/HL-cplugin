@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ReadableSharedQueue.h"
+#include "ReadableSharedMap.h"
 #include "ReadableSharedObject.h"
 #include "WritableSharedQueue.h"
 #include "ReadableSharedTracking.h"
@@ -22,7 +23,6 @@ class ClientMessenger
 {
 public:
 	ClientMessenger(boost::asio::io_service&);
-	~ClientMessenger();
 
 	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
 	std::vector<NullSpace::SharedMemory::DeviceInfo> ReadDevices();
@@ -57,7 +57,9 @@ private:
 	//Stream of commands to send to driver, such as ENABLE_TRACKING, DISABLE_TRACKING, etc.
 	std::unique_ptr<WritableSharedQueue> m_commandStream;
 
-	std::unique_ptr<ReadableSharedTracking> m_tracking;
+	std::unique_ptr<ReadableSharedMap<uint32_t, NullSpace::SharedMemory::Quaternion>> m_tracking;
+
+
 
 	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>> m_bodyView;
 	//We use a sentinel to see if the driver is responsive/exists

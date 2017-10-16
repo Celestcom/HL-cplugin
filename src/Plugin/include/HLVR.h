@@ -79,6 +79,7 @@ extern "C" {
 		hlvr_region_body = 1 * HLVR_SUBREGION_BLOCK,
 		hlvr_region_torso = 2 * HLVR_SUBREGION_BLOCK,
 		hlvr_region_torso_front = 3 * HLVR_SUBREGION_BLOCK,
+		hlvr_region_middle_sternum = 3 * HLVR_SUBREGION_BLOCK + 1,
 		hlvr_region_chest_left = 4 * HLVR_SUBREGION_BLOCK,
 		hlvr_region_chest_right = 5 * HLVR_SUBREGION_BLOCK,
 		hlvr_region_upper_ab_left = 6 * HLVR_SUBREGION_BLOCK,
@@ -108,6 +109,8 @@ extern "C" {
 		hlvr_region_MIN = hlvr_int32min,
 		hlvr_region_MAX = hlvr_int32max
 	} HLVR_Region;
+
+
 
 	
 	/*!

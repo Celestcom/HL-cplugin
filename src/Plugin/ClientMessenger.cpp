@@ -27,9 +27,7 @@ ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 }
 
 
-ClientMessenger::~ClientMessenger()
-{
-}
+
 
 boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 {
@@ -39,15 +37,27 @@ boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 	//return boost::optional<TrackingUpdate>();
 
 	if (m_tracking) {
-		TrackingUpdate t = { };
-		NullSpace::SharedMemory::Quaternion def = {0};
-		NullSpace::SharedMemory::Quaternion quat = m_tracking->TryRead("chest", def);
-		t.chest = quat;
-		return t;
+		if (m_tracking->Size() > 0) {
+			TrackingUpdate t = {};
+
+			if (m_tracking->Contains(hlvr_region_middle_sternum)) {
+				t.chest = m_tracking->Get(hlvr_region_middle_sternum);
+			}
+
+			if (m_tracking->Contains(hlvr_region_upper_arm_left)) {
+				t.left_upper_arm = m_tracking->Get(hlvr_region_upper_arm_left);
+			}
+
+			if (m_tracking->Contains(hlvr_region_upper_arm_right)) {
+				t.right_upper_arm = m_tracking->Get(hlvr_region_upper_arm_right);
+			}
+
+			return t;
+		}
 	}
-	else {
-		return boost::none;
-	}
+	
+	return boost::none;
+	
 
 
 }
@@ -208,7 +218,7 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
 		m_systems = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>>("ns-device-mem", "ns-device-data");
 		m_nodes = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::NodeInfo>>("ns-node-mem", "ns-node-data");
-	//	m_tracking = std::make_unique<ReadableSharedTracking>();
+		m_tracking = std::make_unique<ReadableSharedMap<uint32_t, NullSpace::SharedMemory::Quaternion>>("ns-tracking-2");
 		m_bodyView = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>>("ns-bodyview-mem", "ns-bodyview-vec");
 	}
 	catch (const boost::interprocess::interprocess_exception& e) {
