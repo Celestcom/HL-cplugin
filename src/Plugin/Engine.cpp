@@ -109,6 +109,7 @@ int Engine::StreamEvent(const ParameterizedEvent& event)
 	if (!ev) {
 		return HLVR_Error_InvalidEventType;
 	}
+	ev->parse(event);
 
 	NullSpaceIPC::HighLevelEvent hle;
 	ev->serialize(hle);
