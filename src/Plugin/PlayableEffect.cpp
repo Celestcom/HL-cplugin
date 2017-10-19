@@ -52,13 +52,13 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,boost::uuids::
 
 void PlayableEffect::sortByTime(std::vector<PlayablePtr>& playables)
 {
-	std::sort(playables.begin(), playables.end(), cmp_by_time);
+	std::sort(playables.begin(), playables.end(), [](const auto& lhs, const auto& rhs) { return lhs->time() < rhs->time(); });
 }
 
 
 void PlayableEffect::pruneDuplicates(std::vector<PlayablePtr>& playables) {
 	
-	auto last = std::unique(playables.begin(), playables.end(), cmp_by_duplicate);
+	auto last = std::unique(playables.begin(), playables.end(), [](const auto& lhs, const auto& rhs) { return *lhs == *rhs; });
 	playables.erase(last, playables.end());
 	playables.shrink_to_fit();
 }

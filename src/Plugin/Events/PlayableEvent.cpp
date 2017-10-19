@@ -107,11 +107,6 @@ bool PlayableEvent::operator==(const PlayableEvent& other) const
 
 
 
-bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs)
-{
-	return lhs->time() < rhs->time();
-}
-
 
 std::unordered_map<uint32_t, NullSpace::SharedMemory::nsvr_shared_region::_enumerated> regionMap =
 {
@@ -135,9 +130,6 @@ std::unordered_map<uint32_t, NullSpace::SharedMemory::nsvr_shared_region::_enume
 
 
 
-bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs) {
-	return *lhs == *rhs;
-}
 
 PlayableEvent::PlayableEvent(float time) : m_time(time) 
 {

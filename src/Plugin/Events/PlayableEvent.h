@@ -55,10 +55,6 @@ private:
 };
 
 
-
-bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);
-bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);
-
 //todo: actually use this factory
 class PlayableEventFactory {
 public:
