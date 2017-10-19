@@ -34,12 +34,12 @@ uint32_t DiscreteHapticEvent::effectFamily() const
 std::vector<Validator> DiscreteHapticEvent::makeValidators() const  {
 
 	return{
-		make_constraint<float>(HLVR_EventKey_DiscreteHaptic_Strength_Float, [](float strength) { return strength >= 0.0f && strength <= 1.0f; }),
-		make_constraint<float>(HLVR_EventKey_DiscreteHaptic_Duration_Float, [](float dur) { return dur >= 0.0f; }),
-		make_constraint<int>(HLVR_EventKey_DiscreteHaptic_Waveform_Int, [](int effect) { return effect > 0; }),
+		make_optional_constraint<float>(HLVR_EventKey_DiscreteHaptic_Strength_Float, [](float strength) { return strength >= 0.0f && strength <= 1.0f; }),
+		make_optional_constraint<float>(HLVR_EventKey_DiscreteHaptic_Duration_Float, [](float dur) { return dur >= 0.0f; }),
+		make_optional_constraint<int>(HLVR_EventKey_DiscreteHaptic_Waveform_Int, [](int effect) { return effect > 0; }),
 		make_xor_constraint(
-			make_constraint<std::vector<uint32_t>>(HLVR_EventKey_Target_Regions_UInt32s, [](auto& stuff) { return stuff.size() > 0; }),
-			make_constraint<std::vector<uint32_t>>(HLVR_EventKey_Target_Nodes_UInt32s, [](auto& stuff) { return stuff.size() > 0; })
+			make_optional_constraint<std::vector<uint32_t>>(HLVR_EventKey_Target_Regions_UInt32s, [](auto& stuff) { return stuff.size() > 0; }),
+			make_optional_constraint<std::vector<uint32_t>>(HLVR_EventKey_Target_Nodes_UInt32s, [](auto& stuff) { return stuff.size() > 0; })
 		)
 	};
 }

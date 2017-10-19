@@ -14,23 +14,7 @@
 
 
 
-Validator make_xor_constraint(Validator lhs, Validator rhs) {
-	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_Event_KeyParseResult>* results) {
-		return lhs(event, results) ^ rhs(event, results);
-	};
-}
 
-Validator make_or_constraint(Validator lhs, Validator rhs) {
-	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_Event_KeyParseResult>* results) {
-		return lhs(event, results) || rhs(event, results);
-	};
-}
-
-Validator make_and_constraint(Validator lhs, Validator rhs) {
-	return [lhs, rhs](const ParameterizedEvent& event, std::vector<HLVR_Event_KeyParseResult>* results) {
-		return lhs(event, results) && rhs(event, results);
-	};
-}
 
 class serialize_target_visitor : public boost::static_visitor<void> {
 
@@ -167,6 +151,7 @@ float PlayableEvent::time() const
 void PlayableEvent::debug_parse(const ParameterizedEvent & event, HLVR_Event_ValidationResult * result) const
 {
 	*result = { 0 };
+	//todo: make some validators for target?
 
 	std::vector<HLVR_Event_KeyParseResult> results;
 	std::vector<Validator> validators = makeValidators();
