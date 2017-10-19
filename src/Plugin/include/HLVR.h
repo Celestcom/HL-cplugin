@@ -57,11 +57,11 @@ extern "C" {
 		HLVR_EventKey_UNKNOWN = 0,
 
 		/* Event-Specific keys */
-		HLVR_EventKey_SimpleHaptic_Duration_Float = 1000,	/*!< defaults to 0.0 (natural waveform duration) */
-		HLVR_EventKey_SimpleHaptic_Strength_Float,			/*!< default to 1.0 */
-		HLVR_EventKey_SimpleHaptic_Effect_Int,				/*!< defaults to HLVR_Waveform_Click */
-		HLVR_EventKey_SimpleHaptic_Where_Regions_UInt32s,	/*!< defaults to hlvr_region_body */
-		HLVR_EventKey_SimpleHaptic_Where_Nodes_UInt32s,		/*!< defaults to using Where_Regions, see previous */
+		HLVR_EventKey_DiscreteHaptic_Duration_Float = 1000,	/*!< defaults to 0.0 (natural waveform duration) */
+		HLVR_EventKey_DiscreteHaptic_Strength_Float,			/*!< default to 1.0 */
+		HLVR_EventKey_DiscreteHaptic_Waveform_Int,				/*!< defaults to HLVR_Waveform_Click */
+		HLVR_EventKey_DiscreteHaptic_Where_Regions_UInt32s,	/*!< defaults to hlvr_region_body */
+		HLVR_EventKey_DiscreteHaptic_Where_Nodes_UInt32s,		/*!< defaults to using Where_Regions, see previous */
 
 		HLVR_EventKey_MIN = hlvr_int32min,
 		HLVR_EventKey_MAX = hlvr_int32max
@@ -252,7 +252,8 @@ extern "C" {
 	*/
 	typedef enum HLVR_EventType {
 		HLVR_EventType_UNKNOWN = 0,
-		HLVR_EventType_SimpleHaptic = 1,
+		HLVR_EventType_DiscreteHaptic = 1,
+		HLVR_EventType_ContinuousHaptic = 2,
 		HLVR_EventType_MIN = hlvr_int32min,
 		HLVR_EventType_MAX = hlvr_int32max
 	} HLVR_EventType;

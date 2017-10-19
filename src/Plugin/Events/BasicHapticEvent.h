@@ -31,7 +31,7 @@ public:
 	bool parse(const ParameterizedEvent&) override;
 	std::vector<Validator> make_validators() const override;
 	void serialize(NullSpaceIPC::HighLevelEvent& event) const override;
-	static constexpr HLVR_EventType descriptor = HLVR_EventType::HLVR_EventType_SimpleHaptic;
+	static constexpr HLVR_EventType descriptor = HLVR_EventType::HLVR_EventType_DiscreteHaptic;
 
 private:
 	float m_strength;
