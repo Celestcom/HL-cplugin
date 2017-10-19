@@ -54,25 +54,25 @@ private:
 	virtual bool isEqual(const PlayableEvent& other) const = 0;
 };
 
-
-//todo: actually use this factory
-class PlayableEventFactory {
-public:
-	template<typename Derived>
-	void registerType(HLVR_EventType type) {
-		static_assert(std::is_base_of<PlayableEvent, Derived>::value, "Derived must be derived from PlayableEvent!");
-		_createFuncs[name] = []() {
-			return std::make_unique<Derived>();
-		};
-	}
-	std::unique_ptr<PlayableEvent> create(HLVR_EventType type) {
-		auto it = _createFuncs.find(type);
-		if (it != _createFuncs.end()) {
-			return (it->second)();
-		}
-		return std::unique_ptr<PlayableEvent>{};
-	}
-private:
-	using CreateFunc = std::function<std::unique_ptr<PlayableEvent>(void)>;
-	std::unordered_map<HLVR_EventType, CreateFunc> _createFuncs;
-};
+ 
+//todo: actually use this factory..?
+//class PlayableEventFactory {
+//public:
+//	template<typename Derived>
+//	void registerType(HLVR_EventType type) {
+//		static_assert(std::is_base_of<PlayableEvent, Derived>::value, "Derived must be derived from PlayableEvent!");
+//		_createFuncs[name] = []() {
+//			return std::make_unique<Derived>();
+//		};
+//	}
+//	std::unique_ptr<PlayableEvent> create(HLVR_EventType type) {
+//		auto it = _createFuncs.find(type);
+//		if (it != _createFuncs.end()) {
+//			return (it->second)();
+//		}
+//		return std::unique_ptr<PlayableEvent>{};
+//	}
+//private:
+//	using CreateFunc = std::function<std::unique_ptr<PlayableEvent>(void)>;
+//	std::unordered_map<HLVR_EventType, CreateFunc> _createFuncs;
+//};

@@ -10,7 +10,7 @@ EventList::EventList():m_events(), m_eventLock()
 }
 
 //Precondition: event is not null
-int EventList::AddEvent(TimeAndType event)
+int EventList::AddEvent(TimeOffset<ParameterizedEvent> event)
 {	
 	std::lock_guard<std::mutex> guard(m_eventLock);
 	m_events.push_back(std::move(event));
@@ -22,7 +22,7 @@ int EventList::AddEvent(TimeAndType event)
 
 
 
-std::vector<TimeAndType> EventList::events()
+std::vector<TimeOffset<ParameterizedEvent>> EventList::events()
 {
 	std::lock_guard<std::mutex> guard(m_eventLock);
 
@@ -38,8 +38,8 @@ void EventList::Interleave(EventList* source, float offset)
 {
 	
 
-	for (TimeAndType event : source->m_events) {
-		event.TimeOffset += offset;
+	for (TimeOffset<ParameterizedEvent> event : source->m_events) {
+		event.Time += offset;
 		m_events.push_back(event);
 	}
 }
@@ -48,7 +48,7 @@ void EventList::Dupe(float offset)
 {
 	auto copy = m_events;
 	for (auto event : copy) {
-		event.TimeOffset += offset;
+		event.Time += offset;
 		m_events.push_back(event);
 
 	}

@@ -335,7 +335,12 @@ HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * timeline, double
 	//if we need the precision later we can have it
 	
 	return ExceptionGuard([&] {
-		return AS_TYPE(EventList, timeline)->AddEvent(TimeAndType{ static_cast<float>(timeOffsetSeconds), *AS_TYPE(ParameterizedEvent, event) });
+		return AS_TYPE(EventList, timeline)->AddEvent(
+			TimeOffset<ParameterizedEvent> {
+				static_cast<float>(timeOffsetSeconds),
+				*AS_TYPE(ParameterizedEvent, event)
+			}
+		);
 	});
 }
 

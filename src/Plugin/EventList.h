@@ -5,9 +5,12 @@
 #include "ParameterizedEvent.h"
 class Engine;
 
-struct TimeAndType {
-	float TimeOffset;
-	ParameterizedEvent Data;
+
+
+template<typename T>
+struct TimeOffset {
+	float Time;
+	T Data;
 };
 
 class EventList
@@ -15,11 +18,11 @@ class EventList
 public:
 	
 	EventList();
-	int AddEvent(TimeAndType data);
-	std::vector<TimeAndType> events();
+	int AddEvent(TimeOffset<ParameterizedEvent> data);
+	std::vector<TimeOffset<ParameterizedEvent>> events();
 	bool empty() const;
 private:
-	std::vector<TimeAndType> m_events;
+	std::vector<TimeOffset<ParameterizedEvent>> m_events;
 	std::mutex m_eventLock;
 public:
 	void Interleave(EventList* source, float offset);

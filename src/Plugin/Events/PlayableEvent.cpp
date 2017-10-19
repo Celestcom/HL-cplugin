@@ -77,16 +77,14 @@ void PlayableEvent::serialize(NullSpaceIPC::HighLevelEvent & event) const
 std::unique_ptr<PlayableEvent>
 PlayableEvent::make(HLVR_EventType type, float timeOffset)
 {
-	std::unique_ptr<PlayableEvent> possibleEvent;
 	switch (type) {
 	case HLVR_EventType::HLVR_EventType_DiscreteHaptic:
-		possibleEvent = std::make_unique<DiscreteHapticEvent>(timeOffset);
-		break;
+		return std::make_unique<DiscreteHapticEvent>(timeOffset);
 	default:
 		break;
 	}
 
-	return possibleEvent;
+	return std::unique_ptr<PlayableEvent>();
 
 
 }
