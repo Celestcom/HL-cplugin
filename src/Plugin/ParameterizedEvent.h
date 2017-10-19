@@ -93,6 +93,7 @@ inline T ParameterizedEvent::GetOr(HLVR_EventKey key, T defaultValue) const
 	}
 }
 
+//TryGet will not modify outVal if it fails to get the value
 template<typename T>
 bool ParameterizedEvent::TryGet(HLVR_EventKey key, T* outVal) const
 {
@@ -102,12 +103,10 @@ bool ParameterizedEvent::TryGet(HLVR_EventKey key, T* outVal) const
 			return true;
 		}
 		else {
-			*outVal = T();
 			return false;
 		}
 	}
 	catch (const boost::bad_get&) {
-		*outVal = T();
 		return false;
 	}
 }

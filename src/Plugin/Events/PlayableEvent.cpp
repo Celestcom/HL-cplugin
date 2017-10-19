@@ -7,7 +7,10 @@
 #include "Locator.h"
 #include <bitset>
 #include "SharedTypes.h"
-
+#pragma warning(push)
+#pragma warning(disable : 4267)
+#include "HighLevelEvent.pb.h"
+#pragma warning(pop)
 
 
 
@@ -29,12 +32,62 @@ Validator make_and_constraint(Validator lhs, Validator rhs) {
 	};
 }
 
+class serialize_target_visitor : public boost::static_visitor<void> {
+
+public:
+	serialize_target_visitor(NullSpaceIPC::Location* location) : m_location(location) {
+
+	}
+	void operator()(const TargetRegions& regions) {
+		auto mut_regions = m_location->mutable_regions();
+		for (auto region : regions.regions) {
+			mut_regions->add_regions(region);
+		}
+	}
+	void operator()(const TargetNodes& nodes) {
+		auto mut_nodes = m_location->mutable_nodes();
+		for (auto node : nodes.nodes) {
+			mut_nodes->add_nodes(node);
+		}
+	}
+	
+private:
+	NullSpaceIPC::Location* m_location;
+};
 
 
+
+bool PlayableEvent::parse(const ParameterizedEvent & e)
+{
+	TargetRegions regions;
+	TargetNodes nodes;
+
+
+	if (e.TryGet(HLVR_EventKey_Target_Regions_UInt32s, &regions.regions)) {
+		m_target = regions;
+	}
+	else if (e.TryGet(HLVR_EventKey_Target_Nodes_UInt32s, &nodes.nodes)) {
+		m_target = nodes;
+	}
+
+	m_target = TargetRegions{ {hlvr_region_body} };
+
+	return doParse(e); 
+}
 
 bool PlayableEvent::operator<(const PlayableEvent & rhs) const
 {
 	return this->time() < rhs.time();
+}
+
+void PlayableEvent::serialize(NullSpaceIPC::HighLevelEvent & event) const
+{
+	NullSpaceIPC::LocationalEvent* location = event.mutable_locational_event();
+
+	serialize_target_visitor extractor(location->mutable_location());
+	boost::apply_visitor(extractor, m_target);
+	
+	doSerialize(event);
 }
 
 std::unique_ptr<PlayableEvent>
@@ -56,7 +109,11 @@ PlayableEvent::make(HLVR_EventType type, float timeOffset)
 
 bool PlayableEvent::operator==(const PlayableEvent& other) const
 {
-	return typeid(*this) == typeid(other) && m_time == other.m_time &&  isEqual(other);
+	return 
+		typeid(*this) == typeid(other) 
+	 && m_time == other.m_time 
+	 && m_target == other.m_target
+	 && isEqual(other);
 }
 
 
@@ -98,12 +155,21 @@ bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::uniq
 	return *lhs == *rhs;
 }
 
+PlayableEvent::PlayableEvent(float time) : m_time(time) 
+{
+}
+
+float PlayableEvent::time() const
+{
+	return m_time; 
+}
+
 void PlayableEvent::debug_parse(const ParameterizedEvent & event, HLVR_Event_ValidationResult * result) const
 {
 	*result = { 0 };
 
 	std::vector<HLVR_Event_KeyParseResult> results;
-	std::vector<Validator> validators = make_validators();
+	std::vector<Validator> validators = makeValidators();
 
 	for (auto& validator : validators) {
 		validator(event, &results);

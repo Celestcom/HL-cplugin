@@ -9,43 +9,13 @@
 BasicHapticEvent::BasicHapticEvent(float time) 
 	: PlayableEvent(time),
 	m_strength(1),
-	m_duration(0),
-	m_area()
+	m_duration(0)
 {
 	m_parsedEffectFamily = "click";
 	m_requestedEffectFamily = Locator::getTranslator().ToEffectFamily(m_parsedEffectFamily);
 }
 
 
-
-class where_visitor : public boost::static_visitor<void> {
-
-public:
-	using e = BasicHapticEvent;
-	where_visitor(NullSpaceIPC::Location* location) : m_location(location) {
-
-	}
-	void operator()(const std::vector<e::Loc<e::region>>& regions) {
-		
-		auto mut_regions = m_location->mutable_regions();
-		for (auto region : regions) {
-			mut_regions->add_regions(region.value);
-		}
-	}
-	void operator()(const std::vector<e::Loc<e::node>>& nodes) {
-		auto mut_nodes = m_location->mutable_nodes();
-		for (auto node : nodes) {
-			mut_nodes->add_nodes(node.value);
-		}
-	}
-private:
-	NullSpaceIPC::Location* m_location;
-};
-
-//float BasicHapticEvent::time() const
-//{
-//	return m_time;
-//}
 
 float BasicHapticEvent::duration() const
 {
@@ -58,68 +28,25 @@ uint32_t BasicHapticEvent::effectFamily() const
 	return m_requestedEffectFamily;
 }
 
-template<typename Phantom, typename Original>
-std::vector<Phantom> wrap_type(const std::vector<Original>& original) {
-	std::vector<Phantom> desired;
-	desired.reserve(original.size());
-	for (const auto& item : original) {
-		desired.push_back(Phantom{item });
-	}
-	return desired;
-}
 
 
 
+std::vector<Validator> BasicHapticEvent::makeValidators() const  {
 
-
-
-
-
-//template<typename Constraint>
-//void validate(const ParameterizedEvent& event, HLVR_EventKey key, Constraint&& c, std::vector<HLVR_Event_KeyParseResult>* results) {
-//	if (auto error = validate(key, event, std::move(c))) {
-//		results->push_back(HLVR_Event_KeyParseResult{ key, *error });
-//	}
-//}
-
-
-
-std::vector<Validator> BasicHapticEvent::make_validators() const  {
-
-	
-
-	
-	
 	return{
 		make_constraint<float>(HLVR_EventKey_DiscreteHaptic_Strength_Float, [](float strength) { return strength >= 0.0f && strength <= 1.0f; }),
 		make_constraint<float>(HLVR_EventKey_DiscreteHaptic_Duration_Float, [](float dur) { return dur >= 0.0f; }),
 		make_constraint<int>(HLVR_EventKey_DiscreteHaptic_Waveform_Int, [](int effect) { return effect > 0; }),
 		make_xor_constraint(
-			make_constraint<std::vector<uint32_t>>(HLVR_EventKey_DiscreteHaptic_Where_Regions_UInt32s, [](auto& stuff) { return stuff.size() > 0; }),
-			make_constraint<std::vector<uint32_t>>(HLVR_EventKey_DiscreteHaptic_Where_Nodes_UInt32s, [](auto& stuff) { return stuff.size() > 0; })
+			make_constraint<std::vector<uint32_t>>(HLVR_EventKey_Target_Regions_UInt32s, [](auto& stuff) { return stuff.size() > 0; }),
+			make_constraint<std::vector<uint32_t>>(HLVR_EventKey_Target_Nodes_UInt32s, [](auto& stuff) { return stuff.size() > 0; })
 		)
 	};
-	
-	//return validators;
-	
 }
-bool BasicHapticEvent::parse(const ParameterizedEvent& ev)
+bool BasicHapticEvent::doParse(const ParameterizedEvent& ev)
 {
-
 	m_strength = ev.GetOr<float>(HLVR_EventKey_DiscreteHaptic_Strength_Float, 1.0f);
 	m_duration = ev.GetOr<float>(HLVR_EventKey_DiscreteHaptic_Duration_Float, 0.0f);
-
-	std::vector<uint32_t> regions;
-	std::vector<uint32_t> nodes;
-	if (ev.TryGet(HLVR_EventKey_DiscreteHaptic_Where_Regions_UInt32s, &regions)) {
-		m_area = wrap_type<Loc<region>>(regions);
-	}
-	else if (ev.TryGet(HLVR_EventKey_DiscreteHaptic_Where_Nodes_UInt32s, &nodes)) {
-		m_area = wrap_type<Loc<node>>(nodes);
-	}
-	else {
-		m_area = wrap_type<Loc<region>>(std::vector<uint32_t>{hlvr_region_body});
-	}
 
 
 	m_requestedEffectFamily = ev.GetOr<int>(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 3);
@@ -137,11 +64,10 @@ bool BasicHapticEvent::isEqual(const PlayableEvent& other) const
 		m_strength == ev.m_strength
 		&& m_requestedEffectFamily == ev.m_requestedEffectFamily
 		&& m_parsedEffectFamily == ev.m_parsedEffectFamily
-		&& m_area == ev.m_area
 		&& m_duration == ev.m_duration;
 }
 
-void BasicHapticEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
+void BasicHapticEvent::doSerialize(NullSpaceIPC::HighLevelEvent& event) const
 {
 	using namespace NullSpaceIPC;
 	LocationalEvent* location = event.mutable_locational_event();
@@ -150,8 +76,6 @@ void BasicHapticEvent::serialize(NullSpaceIPC::HighLevelEvent& event) const
 	simple->set_effect(m_requestedEffectFamily);
 	simple->set_strength(m_strength);
 
-	where_visitor where(location->mutable_location());
-	boost::apply_visitor(where, m_area);
 	
 }
 
@@ -161,8 +85,8 @@ float BasicHapticEvent::strength() const
 }
 
 
-
-HLVR_EventType BasicHapticEvent::type() const
-{
-	return descriptor;
-}
+//
+//HLVR_EventType BasicHapticEvent::type() const
+//{
+//	return descriptor;
+//}

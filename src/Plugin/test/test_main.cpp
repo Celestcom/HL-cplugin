@@ -48,7 +48,7 @@ std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 	BasicHapticEvent a(0.0f);
 	ParameterizedEvent e;
 	std::vector<uint32_t> region = { hlvr_region_upper_ab_left };
-	e.Set(HLVR_EventKey_DiscreteHaptic_Where_Regions_UInt32s, region.data(), region.size());
+	e.Set(HLVR_EventKey_Target_Regions_UInt32s, region.data(), region.size());
 	
 	a.parse(e);
 	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
@@ -239,7 +239,7 @@ TEST_CASE("The events system works", "[EventSystem]") {
 		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Duration_Float, 999) == 999);
 		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 999.0f) == 999.0f);
 		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Strength_Float, std::vector<float>({ 999.0f })).at(0) == Approx(999.0f));
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Where_Regions_UInt32s, std::vector<int>({ 999 })).at(0) == 999);
+		REQUIRE(event.GetOr(HLVR_EventKey_Target_Regions_UInt32s, std::vector<int>({ 999 })).at(0) == 999);
 	}
 
 	SECTION("TryGet will return false if the key is not found") {
@@ -247,10 +247,10 @@ TEST_CASE("The events system works", "[EventSystem]") {
 		REQUIRE(!event.TryGet(HLVR_EventKey_DiscreteHaptic_Waveform_Int, &x));
 	}
 
-	SECTION("TryGet will return default value if the key is not found") {
+	SECTION("TryGet will not modify the given value if the key is not found") {
 		int x = 152;
 		event.TryGet(HLVR_EventKey_DiscreteHaptic_Waveform_Int, &x);
-		REQUIRE(x == 0);
+		REQUIRE(x == 152);
 	}
 
 	SECTION("TryGet will return the value if found") {

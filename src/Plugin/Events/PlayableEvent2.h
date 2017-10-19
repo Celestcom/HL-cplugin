@@ -7,6 +7,6 @@ public:
 	bool validate() {}
 	virtual ~PlayableEvent2() = default;
 private:
-//	virtual void make_validators() const = 0;
+//	virtual void makeValidators() const = 0;
 
 };

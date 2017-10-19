@@ -9,34 +9,21 @@ class BasicHapticEvent : public PlayableEvent {
 public:	
 	BasicHapticEvent(float time);
 	
-	template<typename T>
-	struct Loc {
-		uint32_t value;
-		explicit Loc(uint32_t val) : value(val) {}
-		Loc() : value(0) {}
-	
-	};
 
-	
-	struct node {};
-	struct region {};
 
-	using Where = boost::variant<std::vector<Loc<node>>, std::vector<Loc<region>>>;
 	float strength() const;
 	uint32_t effectFamily() const;
 
 	/* PlayableEvent impl */
 	float duration() const override;
-	HLVR_EventType type() const override;
-	bool parse(const ParameterizedEvent&) override;
-	std::vector<Validator> make_validators() const override;
-	void serialize(NullSpaceIPC::HighLevelEvent& event) const override;
+	bool doParse(const ParameterizedEvent&) override;
+	std::vector<Validator> makeValidators() const override;
+	void doSerialize(NullSpaceIPC::HighLevelEvent& event) const override;
 	static constexpr HLVR_EventType descriptor = HLVR_EventType::HLVR_EventType_DiscreteHaptic;
 
 private:
 	float m_strength;
 	float m_duration;
-	Where m_area;
 	std::string m_parsedEffectFamily;
 	uint32_t m_requestedEffectFamily;
 
@@ -46,7 +33,4 @@ private:
 
 
 };
-template<typename T>
-bool operator==(const BasicHapticEvent::Loc<T>& lhs, const BasicHapticEvent::Loc<T>& rhs) { return lhs.value == rhs.value; }
 
-typedef boost::variant<BasicHapticEvent> SuitEvent;

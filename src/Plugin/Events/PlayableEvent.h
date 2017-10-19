@@ -89,37 +89,73 @@ Validator make_or_constraint(Validator lhs, Validator rhs);
 
 Validator make_and_constraint(Validator lhs, Validator rhs);
 
+struct TargetRegions {
+	std::vector<uint32_t> regions;
+};
 
+inline bool operator==(const TargetRegions& lhs, const TargetRegions& rhs) {
+	return lhs.regions == rhs.regions;
+}
+
+struct TargetNodes {
+	std::vector<uint32_t> nodes;
+};
+
+inline bool operator==(const TargetNodes& lhs, const TargetNodes& rhs) {
+	return lhs.nodes == rhs.nodes;
+}
+
+
+
+
+using Target = boost::variant<TargetRegions, TargetNodes>;
 
 class PlayableEvent {
 public:
-	PlayableEvent(float time):m_time(time) {};
-	virtual ~PlayableEvent() {};
+	PlayableEvent(float time);
+	virtual ~PlayableEvent() = default;
+
+	//Return time offset of the event in fractional seconds
+	float time() const;
+
+	//Perform a parse of the given ParameterizedEvent, but don't actually create a real event - just throw results in 'result'
 	void debug_parse(const ParameterizedEvent& event, HLVR_Event_ValidationResult* result) const;
-	virtual std::vector<Validator> make_validators() const = 0;
-	float time() const { return m_time; }
-	virtual float duration() const = 0;
-	virtual HLVR_EventType type() const = 0;
-	virtual bool parse(const ParameterizedEvent&) = 0;
-	virtual void serialize(NullSpaceIPC::HighLevelEvent& event) const = 0;
+
+	//Perform a true parse of the ParameterizedEvent
+	bool parse(const ParameterizedEvent& e);
+
+	//Serialize the event into our transport protocol message
+	void serialize(NullSpaceIPC::HighLevelEvent& event) const;
+	
+	//Compare events based on time offset
 	bool operator<(const PlayableEvent& rhs) const;
+
+	//Compare event for equality (same time, same type, and derived == other derived)
+	bool operator==(const PlayableEvent& other) const;
+
+	//Return total duration of the event in fractional seconds. Can be an estimate. 
+	virtual float duration() const = 0;
+
 
 	static std::unique_ptr<PlayableEvent> make(HLVR_EventType type, float timeOffset);
 
-	bool operator==(const PlayableEvent& other) const;
 
 
 private:
-	virtual bool isEqual(const PlayableEvent& other) const = 0;
 	float m_time;
+	Target m_target;
+	virtual std::vector<Validator> makeValidators() const = 0;
+	virtual void doSerialize(NullSpaceIPC::HighLevelEvent& event) const = 0;
+	virtual bool doParse(const ParameterizedEvent&) = 0;
+	virtual bool isEqual(const PlayableEvent& other) const = 0;
 };
 
 
-std::vector<uint32_t> extractRegions(const PlayableEvent& event);
 
 bool cmp_by_duplicate(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);
 bool cmp_by_time(const std::unique_ptr<PlayableEvent>& lhs, const std::unique_ptr<PlayableEvent>& rhs);
 
+//todo: actually use this factory
 class PlayableEventFactory {
 public:
 	template<typename Derived>

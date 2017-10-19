@@ -55,13 +55,22 @@ extern "C" {
 	*/
 	typedef enum HLVR_EventKey {
 		HLVR_EventKey_UNKNOWN = 0,
+		/* Common Keys */
+		HLVR_EventKey_Target_Regions_UInt32s,
+		HLVR_EventKey_Target_Nodes_UInt32s,
 
 		/* Event-Specific keys */
 		HLVR_EventKey_DiscreteHaptic_Duration_Float = 1000,	/*!< defaults to 0.0 (natural waveform duration) */
 		HLVR_EventKey_DiscreteHaptic_Strength_Float,			/*!< default to 1.0 */
 		HLVR_EventKey_DiscreteHaptic_Waveform_Int,				/*!< defaults to HLVR_Waveform_Click */
-		HLVR_EventKey_DiscreteHaptic_Where_Regions_UInt32s,	/*!< defaults to hlvr_region_body */
-		HLVR_EventKey_DiscreteHaptic_Where_Nodes_UInt32s,		/*!< defaults to using Where_Regions, see previous */
+
+		HLVR_EventKey_ContinuousHaptic_Strength_Float = 2000,
+
+
+	
+		HLVR_EventKey_BufferedHaptic_Samples_Floats = 3000,
+		HLVR_EventKey_BufferedHaptic_Frequency_Float,
+
 
 		HLVR_EventKey_MIN = hlvr_int32min,
 		HLVR_EventKey_MAX = hlvr_int32max
@@ -254,6 +263,7 @@ extern "C" {
 		HLVR_EventType_UNKNOWN = 0,
 		HLVR_EventType_DiscreteHaptic = 1,
 		HLVR_EventType_ContinuousHaptic = 2,
+		HLVR_EventType_BufferedHaptic = 3,
 		HLVR_EventType_MIN = hlvr_int32min,
 		HLVR_EventType_MAX = hlvr_int32max
 	} HLVR_EventType;
@@ -586,6 +596,9 @@ extern "C" {
 		@return HLVR_Ok
 	*/
 	HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64s(HLVR_Event * event, HLVR_EventKey key, const uint64_t* values, unsigned int length);
+
+
+
 
 
 
