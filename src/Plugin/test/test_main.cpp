@@ -45,17 +45,17 @@ bool isContCommand(const NullSpaceIPC::EffectCommand& command) {
 
 std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 	std::vector<std::unique_ptr<PlayableEvent>> events;
-	BasicHapticEvent a(0.0f);
+	DiscreteHapticEvent a(0.0f);
 	ParameterizedEvent e;
 	std::vector<uint32_t> region = { hlvr_region_upper_ab_left };
 	e.Set(HLVR_EventKey_Target_Regions_UInt32s, region.data(), region.size());
 	
 	a.parse(e);
-	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(a)));
+	events.push_back(std::unique_ptr<PlayableEvent>(new DiscreteHapticEvent(a)));
 
-	BasicHapticEvent b(1.0f);
+	DiscreteHapticEvent b(1.0f);
 	b.parse(e);
-	events.push_back(std::unique_ptr<PlayableEvent>(new BasicHapticEvent(b)));
+	events.push_back(std::unique_ptr<PlayableEvent>(new DiscreteHapticEvent(b)));
 	return events;
 }
 TEST_CASE("The haptics player works", "[HapticsPlayer]") {
@@ -323,7 +323,7 @@ TEST_CASE("Higher level event validation should work") {
 		REQUIRE(result.Count == 0);
 	}
 
-	SECTION("A BasicHapticEvent should generate the correct errors.. [smoketest]") {
+	SECTION("A DiscreteHapticEvent should generate the correct errors.. [smoketest]") {
 		ParameterizedEvent data;
 		data.Set(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 0); //invalid value
 		data.Set(HLVR_EventKey_DiscreteHaptic_Duration_Float, 2); //invalid type

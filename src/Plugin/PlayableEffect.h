@@ -20,7 +20,7 @@ class RegionVisitor : public boost::static_visitor<std::vector<std::string>> {
 private:
 public:
 	RegionVisitor();
-	std::vector<std::string> operator()(const BasicHapticEvent& event) const;
+	std::vector<std::string> operator()(const DiscreteHapticEvent& event) const;
 };
 using PlayablePtr = std::unique_ptr<PlayableEvent>;
 

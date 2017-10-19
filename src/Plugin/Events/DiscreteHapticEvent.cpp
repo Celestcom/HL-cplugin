@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "BasicHapticEvent.h"
+#include "DiscreteHapticEvent.h"
 #include "Locator.h"
 #pragma warning(push)
 #pragma warning(disable : 4267)
