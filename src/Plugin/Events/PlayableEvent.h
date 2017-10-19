@@ -40,7 +40,7 @@ public:
 	//Return total duration of the event in fractional seconds. Can be an estimate. 
 	virtual float duration() const = 0;
 
-
+	//Our super-simple basic factory that allows you to forget to add types, etc.
 	static std::unique_ptr<PlayableEvent> make(HLVR_EventType type, float timeOffset);
 
 
@@ -55,7 +55,7 @@ private:
 };
 
  
-//todo: actually use this factory..?
+//todo: actually use this factory..? Or not.
 //class PlayableEventFactory {
 //public:
 //	template<typename Derived>

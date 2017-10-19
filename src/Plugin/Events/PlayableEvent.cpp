@@ -53,8 +53,9 @@ bool PlayableEvent::parse(const ParameterizedEvent & e)
 	else if (e.TryGet(HLVR_EventKey_Target_Nodes_UInt32s, &nodes.nodes)) {
 		m_target = nodes;
 	}
-
-	m_target = TargetRegions{ {hlvr_region_body} };
+	else {
+		m_target = TargetRegions{ {hlvr_region_body} };
+	}
 
 	return doParse(e); 
 }
