@@ -2,11 +2,13 @@
 #include "PlayableEvent.h"
 #include "ParameterizedEvent.h"
 #include "HLVR.h"
-#include "BasicHapticEvent.h"
 #include <typeinfo>
 #include "Locator.h"
 #include <bitset>
 #include "SharedTypes.h"
+
+#include "DiscreteHapticEvent.h"
+#include "ContinuousHaptic.h"
 #pragma warning(push)
 #pragma warning(disable : 4267)
 #include "HighLevelEvent.pb.h"
@@ -81,6 +83,8 @@ PlayableEvent::make(HLVR_EventType type, float timeOffset)
 	switch (type) {
 	case HLVR_EventType::HLVR_EventType_DiscreteHaptic:
 		return std::make_unique<DiscreteHapticEvent>(timeOffset);
+	case HLVR_EventType::HLVR_EventType_ContinuousHaptic:
+		return std::make_unique<ContinuousHaptic>(timeOffset);
 	default:
 		break;
 	}

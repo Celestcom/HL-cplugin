@@ -163,6 +163,7 @@ extern "C" {
 		HLVR_DeviceConcept_Headwear,
 		HLVR_DeviceConcept_Gun,
 		HLVR_DeviceConcept_Sword,
+		HLVR_DeviceConcept_Gauntlet,
 		HLVR_DeviceConcept_MIN = hlvr_int32min,
 		HLVR_DeviceConcept_MAX = hlvr_int32max
 	} HLVR_DeviceConcept;

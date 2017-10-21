@@ -18,7 +18,11 @@ class PlayableEvent {
 public:
 	PlayableEvent(float time);
 	virtual ~PlayableEvent() = default;
-
+	
+	//Return total duration of the event in fractional seconds. Can be an estimate. 
+	virtual float duration() const = 0;
+	
+	
 	//Return time offset of the event in fractional seconds
 	float time() const;
 
@@ -37,8 +41,7 @@ public:
 	//Compare event for equality (same time, same type, and derived == other derived)
 	bool operator==(const PlayableEvent& other) const;
 
-	//Return total duration of the event in fractional seconds. Can be an estimate. 
-	virtual float duration() const = 0;
+	
 
 	//Our super-simple basic factory that allows you to forget to add types, etc.
 	static std::unique_ptr<PlayableEvent> make(HLVR_EventType type, float timeOffset);
@@ -48,6 +51,7 @@ public:
 private:
 	float m_time;
 	Target m_target;
+	
 	virtual std::vector<Validator> makeValidators() const = 0;
 	virtual void doSerialize(NullSpaceIPC::HighLevelEvent& event) const = 0;
 	virtual bool doParse(const ParameterizedEvent&) = 0;

@@ -147,6 +147,9 @@
     <ClInclude Include="..\src\Plugin\Events\target.h">
       <Filter>src\Plugin\Events</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Plugin\Events\ContinuousHaptic.h">
+      <Filter>src\Plugin\Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -237,5 +240,6 @@
       <Filter>src\Plugin\test</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\Events\validators.cpp" />
+    <ClCompile Include="..\src\Plugin\Events\ContinuousHaptic.cpp" />
   </ItemGroup>
 </Project>
