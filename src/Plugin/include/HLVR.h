@@ -48,34 +48,7 @@ extern "C" {
 	*/
 	const uint32_t hlvr_allnodes = 0;
 
-	/*! Properties that can be set on an HLVR_Event. 
-		
-		When a key has a common prefix, such as Where_Regions and Where_Nodes for SimpleHaptic, it means that only one of keys
-		should be specified. For example, a SimpleHaptic can target a particular set of device nodes, or a particular set of regions, but not both.
-	*/
-	typedef enum HLVR_EventKey {
-		HLVR_EventKey_UNKNOWN = 0,
-		/* Common Keys */
-		HLVR_EventKey_Target_Regions_UInt32s,
-		HLVR_EventKey_Target_Nodes_UInt32s,
-
-		/* Event-Specific keys */
-		HLVR_EventKey_DiscreteHaptic_Duration_Float = 1000,	/*!< defaults to 0.0 (natural waveform duration) */
-		HLVR_EventKey_DiscreteHaptic_Strength_Float,			/*!< default to 1.0 */
-		HLVR_EventKey_DiscreteHaptic_Waveform_Int,				/*!< defaults to HLVR_Waveform_Click */
-
-		HLVR_EventKey_ContinuousHaptic_Strength_Float = 2000,
-
-
 	
-		HLVR_EventKey_BufferedHaptic_Samples_Floats = 3000,
-		HLVR_EventKey_BufferedHaptic_Frequency_Float,
-
-
-		HLVR_EventKey_MIN = hlvr_int32min,
-		HLVR_EventKey_MAX = hlvr_int32max
-
-	} HLVR_EventKey;
 	
 	/*! Reserves space between regions */
 	const int32_t HLVR_SUBREGION_BLOCK = 1000000;
@@ -265,11 +238,44 @@ extern "C" {
 		HLVR_EventType_DiscreteHaptic = 1,
 		HLVR_EventType_ContinuousHaptic = 2,
 		HLVR_EventType_BufferedHaptic = 3,
+		HLVR_EventType_BeginAnalogAudio = 4,
+		HLVR_EventType_EndAnalogAudio = 5,
 		HLVR_EventType_MIN = hlvr_int32min,
 		HLVR_EventType_MAX = hlvr_int32max
 	} HLVR_EventType;
 
 	
+	/*! Properties that can be set on an HLVR_Event.
+
+	When a key has a common prefix, such as Where_Regions and Where_Nodes for SimpleHaptic, it means that only one of keys
+	should be specified. For example, a SimpleHaptic can target a particular set of device nodes, or a particular set of regions, but not both.
+	*/
+	typedef enum HLVR_EventKey {
+		HLVR_EventKey_UNKNOWN = 0,
+		/* Common Keys */
+		HLVR_EventKey_Target_Regions_UInt32s,
+		HLVR_EventKey_Target_Nodes_UInt32s,
+
+		/* Event-Specific keys */
+		HLVR_EventKey_DiscreteHaptic_Duration_Float = 1000,
+		HLVR_EventKey_DiscreteHaptic_Strength_Float,
+		HLVR_EventKey_DiscreteHaptic_Waveform_Int,
+
+		HLVR_EventKey_ContinuousHaptic_Strength_Float = 2000,
+
+
+
+		HLVR_EventKey_BufferedHaptic_Samples_Floats = 3000,
+		HLVR_EventKey_BufferedHaptic_Frequency_Float,
+
+		HLVR_EventKey_BeginAnalogAudio_Reserved = 4000,
+		HLVR_EventKey_EndAnalogAudio_Reserved = 5000,
+
+		HLVR_EventKey_MIN = hlvr_int32min,
+		HLVR_EventKey_MAX = hlvr_int32max
+
+	} HLVR_EventKey;
+
 
 	/*! 
 		Used to enumerate all devices recognized by the system at a point in time.

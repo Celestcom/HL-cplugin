@@ -401,6 +401,7 @@
     <ClInclude Include="..\src\Plugin\EnumTranslator.h" />
     <ClInclude Include="..\src\Plugin\Enums.h" />
     <ClInclude Include="..\src\Plugin\EventList.h" />
+    <ClInclude Include="..\src\Plugin\Events\AnalogAudio.h" />
     <ClInclude Include="..\src\Plugin\Events\ContinuousHaptic.h" />
     <ClInclude Include="..\src\Plugin\Events\DiscreteHapticEvent.h" />
     <ClInclude Include="..\src\Plugin\Events\PlayableEvent.h" />
@@ -505,6 +506,7 @@
     <ClCompile Include="..\src\Plugin\Engine.cpp" />
     <ClCompile Include="..\src\Plugin\EnumTranslator.cpp" />
     <ClCompile Include="..\src\Plugin\EventList.cpp" />
+    <ClCompile Include="..\src\Plugin\Events\AnalogAudio.cpp" />
     <ClCompile Include="..\src\Plugin\Events\ContinuousHaptic.cpp" />
     <ClCompile Include="..\src\Plugin\Events\DiscreteHapticEvent.cpp" />
     <ClCompile Include="..\src\Plugin\Events\PlayableEvent.cpp" />

@@ -6,7 +6,7 @@
 #include "Locator.h"
 #include <bitset>
 #include "SharedTypes.h"
-
+#include "AnalogAudio.h"
 #include "DiscreteHapticEvent.h"
 #include "ContinuousHaptic.h"
 #pragma warning(push)
@@ -85,6 +85,10 @@ PlayableEvent::make(HLVR_EventType type, float timeOffset)
 		return std::make_unique<DiscreteHapticEvent>(timeOffset);
 	case HLVR_EventType::HLVR_EventType_ContinuousHaptic:
 		return std::make_unique<ContinuousHaptic>(timeOffset);
+	case HLVR_EventType::HLVR_EventType_BeginAnalogAudio:
+		return std::make_unique<BeginAnalogAudio>(timeOffset);
+	case HLVR_EventType::HLVR_EventType_EndAnalogAudio:
+		return std::make_unique<EndAnalogAudio>(timeOffset);
 	default:
 		break;
 	}

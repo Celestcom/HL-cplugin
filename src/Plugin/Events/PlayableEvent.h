@@ -52,7 +52,7 @@ private:
 	float m_time;
 	Target m_target;
 	
-	virtual std::vector<Validator> makeValidators() const = 0;
+	virtual std::vector<Validator> makeValidators() const { return std::vector<Validator>{}; }
 	virtual void doSerialize(NullSpaceIPC::HighLevelEvent& event) const = 0;
 	virtual bool doParse(const ParameterizedEvent&) = 0;
 	virtual bool isEqual(const PlayableEvent& other) const = 0;
