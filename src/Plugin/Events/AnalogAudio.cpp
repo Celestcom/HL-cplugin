@@ -16,9 +16,8 @@ void BeginAnalogAudio::doSerialize(NullSpaceIPC::HighLevelEvent & event) const
 	auto beginAnalog = locational->mutable_begin_analog_audio();
 }
 
-bool BeginAnalogAudio::doParse(const ParameterizedEvent & event)
+void BeginAnalogAudio::doParse(const ParameterizedEvent & event)
 {
-	return true;
 }
 
 EndAnalogAudio::EndAnalogAudio(float time) : PlayableEvent(time)
@@ -31,7 +30,6 @@ void EndAnalogAudio::doSerialize(NullSpaceIPC::HighLevelEvent & event) const
 	auto end = locational->mutable_end_analog_audio();
 }
 
-bool EndAnalogAudio::doParse(const ParameterizedEvent &)
+void EndAnalogAudio::doParse(const ParameterizedEvent &)
 {
-	return true;
 }

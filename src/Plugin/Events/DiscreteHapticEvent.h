@@ -16,15 +16,16 @@ public:
 
 	/* PlayableEvent impl */
 	float duration() const override;
-	bool doParse(const ParameterizedEvent&) override;
-	std::vector<Validator> makeValidators() const override;
-	void doSerialize(NullSpaceIPC::HighLevelEvent& event) const override;
 
 private:
+	void doParse(const ParameterizedEvent&) override;
+	void doSerialize(NullSpaceIPC::HighLevelEvent& event) const override;
+	std::vector<Validator> makeValidators() const override;
+
 	static constexpr HLVR_EventType descriptor = HLVR_EventType::HLVR_EventType_DiscreteHaptic;
 
 	float m_strength;
-	float m_duration;
+	uint32_t m_duration;
 	std::string m_parsedEffectFamily;
 	uint32_t m_requestedEffectFamily;
 

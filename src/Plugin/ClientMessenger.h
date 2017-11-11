@@ -41,8 +41,6 @@ private:
 	//Write haptics to the suit using this shared queue
 	std::unique_ptr<WritableSharedQueue> m_hapticsStream;
 
-	//Read the most up-to-date tracking data from this object
-	std::unique_ptr<ReadableSharedObject<NullSpace::SharedMemory::TrackingUpdate>> m_trackingData;
 
 	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::NodeInfo>> m_nodes;
 	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>> m_systems;
@@ -57,7 +55,7 @@ private:
 	//Stream of commands to send to driver, such as ENABLE_TRACKING, DISABLE_TRACKING, etc.
 	std::unique_ptr<WritableSharedQueue> m_commandStream;
 
-	std::unique_ptr<ReadableSharedMap<uint32_t, NullSpace::SharedMemory::Quaternion>> m_tracking;
+	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::TaggedQuaternion>> m_tracking;
 
 
 

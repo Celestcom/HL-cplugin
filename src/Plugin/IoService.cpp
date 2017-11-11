@@ -46,6 +46,8 @@ void IoService::Shutdown()
 {
 	
 	_shouldQuit.store(true);
+	_work.reset();
+
 	_io.stop();
 
 	if (_ioLoop.joinable()) {

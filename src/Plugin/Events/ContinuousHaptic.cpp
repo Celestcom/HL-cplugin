@@ -4,7 +4,7 @@
 #pragma warning(disable : 4267)
 #include "HighLevelEvent.pb.h"
 #pragma warning(pop)
-ContinuousHaptic::ContinuousHaptic(float time) : PlayableEvent(time)
+ContinuousHaptic::ContinuousHaptic(float time) : PlayableEvent(time), m_strength(1.0)
 {
 }
 float ContinuousHaptic::duration() const
@@ -26,10 +26,9 @@ void ContinuousHaptic::doSerialize(NullSpaceIPC::HighLevelEvent & event) const
 	cont->set_strength(m_strength);
 }
 
-bool ContinuousHaptic::doParse(const ParameterizedEvent &ev)
+void ContinuousHaptic::doParse(const ParameterizedEvent &ev)
 {
 	m_strength = ev.GetOr(HLVR_EventKey_ContinuousHaptic_Strength_Float, 1.0f);
-	return true;
 }
 
 bool ContinuousHaptic::isEqual(const PlayableEvent & other) const

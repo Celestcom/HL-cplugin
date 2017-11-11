@@ -257,7 +257,7 @@ extern "C" {
 		HLVR_EventKey_Target_Nodes_UInt32s,
 
 		/* Event-Specific keys */
-		HLVR_EventKey_DiscreteHaptic_Duration_Float = 1000,
+		HLVR_EventKey_DiscreteHaptic_Repetitions_UInt32 = 1000,
 		HLVR_EventKey_DiscreteHaptic_Strength_Float,
 		HLVR_EventKey_DiscreteHaptic_Waveform_Int,
 

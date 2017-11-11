@@ -8,7 +8,7 @@ public:
 	float duration() const override { return 0.0f; }
 private:
 	void doSerialize(NullSpaceIPC::HighLevelEvent& event) const override;
-	bool doParse(const ParameterizedEvent& event) override;
+	void doParse(const ParameterizedEvent& event) override;
 	bool isEqual(const PlayableEvent& other) const override { return true; }
 };
 
@@ -19,7 +19,7 @@ public:
 	float duration() const override { return 0.0f; }
 private:
 	void doSerialize(NullSpaceIPC::HighLevelEvent& event) const override;
-	bool doParse(const ParameterizedEvent&) override;
+	void doParse(const ParameterizedEvent&) override;
 	bool isEqual(const PlayableEvent& other) const override { return true; }
 
 };

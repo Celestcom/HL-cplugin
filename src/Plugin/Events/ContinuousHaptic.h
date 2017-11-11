@@ -16,7 +16,7 @@ private:
 
 	virtual void doSerialize(NullSpaceIPC::HighLevelEvent& event) const override;
 
-	virtual bool doParse(const ParameterizedEvent&) override;
+	virtual void doParse(const ParameterizedEvent&) override;
 
 
 	virtual bool isEqual(const PlayableEvent& other) const override;

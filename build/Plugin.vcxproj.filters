@@ -153,6 +153,13 @@
     <ClInclude Include="..\src\Plugin\Events\AnalogAudio.h">
       <Filter>src\Plugin\Events</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="BufferedHaptic.h">
+      <Filter>src\Plugin\Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plugin\Events\BufferedHaptic.h">
+      <Filter>src\Plugin\Events</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -245,5 +252,9 @@
     <ClCompile Include="..\src\Plugin\Events\validators.cpp" />
     <ClCompile Include="..\src\Plugin\Events\ContinuousHaptic.cpp" />
     <ClCompile Include="..\src\Plugin\Events\AnalogAudio.cpp" />
+    <ClCompile Include="..\src\Plugin\Events\BufferedHaptic.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Plugin.rc" />
   </ItemGroup>
 </Project>

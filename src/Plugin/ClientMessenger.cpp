@@ -18,7 +18,13 @@ ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 	m_sentinelTimer(io),
 	m_sentinelInterval(500),
 	m_sentinalTimeout(2000),
-	m_connectedToService(false)
+	m_connectedToService(false),
+	m_hapticsStream(),
+	m_commandStream(),
+	m_systems(),
+	m_nodes(),
+	m_tracking(),
+	m_bodyView()
 {
 	//First time we attempt to establish connection, do it with zero delay
 	m_sentinelTimer.expires_from_now(boost::posix_time::millisec(0));
@@ -40,16 +46,14 @@ boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 		if (m_tracking->Size() > 0) {
 			TrackingUpdate t = {};
 
-			if (m_tracking->Contains(hlvr_region_middle_sternum)) {
-				t.chest = m_tracking->Get(hlvr_region_middle_sternum);
+			if (auto index = m_tracking->Find([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_middle_sternum; })) {
+				t.chest = m_tracking->Get(*index).quat;
 			}
-
-			if (m_tracking->Contains(hlvr_region_upper_arm_left)) {
-				t.left_upper_arm = m_tracking->Get(hlvr_region_upper_arm_left);
+			if (auto index = m_tracking->Find([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_left; })) {
+				t.left_upper_arm = m_tracking->Get(*index).quat;
 			}
-
-			if (m_tracking->Contains(hlvr_region_upper_arm_right)) {
-				t.right_upper_arm = m_tracking->Get(hlvr_region_upper_arm_right);
+			if (auto index = m_tracking->Find([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_right; })) {
+				t.right_upper_arm = m_tracking->Get(*index).quat;
 			}
 
 			return t;
@@ -66,7 +70,7 @@ std::vector<NullSpace::SharedMemory::DeviceInfo> ClientMessenger::ReadDevices()
 {
 	std::vector<NullSpace::SharedMemory::DeviceInfo> info;
 	if (m_systems) {
-		for (std::size_t i = 0; i < m_systems->size(); i++) {
+		for (std::size_t i = 0; i < m_systems->Size(); i++) {
 			info.push_back(m_systems->Get(i));
 		}
 		
@@ -79,7 +83,7 @@ std::vector<NullSpace::SharedMemory::NodeInfo> ClientMessenger::ReadNodes()
 {
 	std::vector<NullSpace::SharedMemory::NodeInfo> info;
 	if (m_nodes) {
-		for (std::size_t i = 0; i < m_nodes->size(); i++) {
+		for (std::size_t i = 0; i < m_nodes->Size(); i++) {
 			info.push_back(m_nodes->Get(i));
 		}
 
@@ -162,7 +166,7 @@ std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
 	std::vector<NullSpace::SharedMemory::RegionPair> pairs;
 	
 	if (m_bodyView) {
-		std::size_t eles = m_bodyView->size();
+		std::size_t eles = m_bodyView->Size();
 		pairs.reserve(eles);
 		for (std::size_t i = 0; i < eles; i++) {
 			pairs.push_back(m_bodyView->Get(i));
@@ -211,20 +215,18 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 
 	//Once the sentinel has connected, we want to setup the other shared objects
 	try {
-		//Locator::Logger().Log("ClientMessenger", "Attempting to create all the other shared objects");
+		static_assert(sizeof(char) == 1, "set char size to 1");
 
 		m_hapticsStream = std::make_unique<WritableSharedQueue>("ns-haptics-data");
-	//	m_trackingData = std::make_unique<ReadableSharedObject<TrackingUpdate>>("ns-tracking-data");
 		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
 		m_systems = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>>("ns-device-mem", "ns-device-data");
 		m_nodes = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::NodeInfo>>("ns-node-mem", "ns-node-data");
-		m_tracking = std::make_unique<ReadableSharedMap<uint32_t, NullSpace::SharedMemory::Quaternion>>("ns-tracking-2");
-		m_bodyView = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>>("ns-bodyview-mem", "ns-bodyview-vec");
+		m_tracking = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::TaggedQuaternion>>("ns-tracking-mem", "ns-tracking-data");
+		m_bodyView = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>>("ns-bodyview-mem", "ns-bodyview-data");
 	}
 	catch (const boost::interprocess::interprocess_exception& e) {
 		BOOST_LOG_TRIVIAL(error) << "Failed to make shared objects: " << e.what();
-		//Locator::Logger().Log("ClientMessenger", "Failed to create all the other shared objects", LogLevel::Error);
-
+	
 		//somehow failed to make these shared objects.
 		//for now, until we know what types of errors these are, try again
 		startAttemptEstablishConnection();

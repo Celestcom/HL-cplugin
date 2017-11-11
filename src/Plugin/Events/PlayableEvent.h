@@ -30,7 +30,7 @@ public:
 	void debug_parse(const ParameterizedEvent& event, HLVR_Event_ValidationResult* result) const;
 
 	//Perform a true parse of the ParameterizedEvent
-	bool parse(const ParameterizedEvent& e);
+	void parse(const ParameterizedEvent& e);
 
 	//Serialize the event into our transport protocol message
 	void serialize(NullSpaceIPC::HighLevelEvent& event) const;
@@ -54,7 +54,7 @@ private:
 	
 	virtual std::vector<Validator> makeValidators() const { return std::vector<Validator>{}; }
 	virtual void doSerialize(NullSpaceIPC::HighLevelEvent& event) const = 0;
-	virtual bool doParse(const ParameterizedEvent&) = 0;
+	virtual void doParse(const ParameterizedEvent&) = 0;
 	virtual bool isEqual(const PlayableEvent& other) const = 0;
 };
 

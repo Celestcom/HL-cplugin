@@ -196,84 +196,89 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	
 
 }
-
+HLVR_EventKey key_float = static_cast<HLVR_EventKey>(1);
+HLVR_EventKey key_uint = static_cast<HLVR_EventKey>(2);
+HLVR_EventKey key_int = static_cast<HLVR_EventKey>(3);
+auto key_vecint = static_cast<HLVR_EventKey>(4);
+auto key_vecfloat = static_cast<HLVR_EventKey>(5);
 
 TEST_CASE("The events system works", "[EventSystem]") {
 
 	ParameterizedEvent event;
+	
 
 	SECTION("You should be able to get out what you put in") {
-		event.Set(HLVR_EventKey_DiscreteHaptic_Duration_Float, 1.0f);
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Duration_Float, 999.0f) == Approx(1.0f));
+		event.Set(key_float, 1.0f);
+		REQUIRE(event.GetOr(key_float, 999.0f) == Approx(1.0f));
 
-		event.Set(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 1);
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 999) == 1);
+		event.Set(key_int, 1);
+		REQUIRE(event.GetOr(key_int, 999) == 1);
 
-		event.Set(static_cast<HLVR_EventKey>(10001), std::vector<int>({ 1 }));
-		REQUIRE(event.GetOr(static_cast<HLVR_EventKey>(10001), std::vector<int>({ 999 })).at(0) == 1);
+		event.Set(key_vecint, std::vector<int>({ 1 }));
+		REQUIRE(event.GetOr(key_vecint, std::vector<int>({ 999 })).at(0) == 1);
 	}
 
 	SECTION("You should get a default value if you supply a wrong key") {
-		event.Set(HLVR_EventKey_DiscreteHaptic_Duration_Float, 1.0f);
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 999) == 999);
+		event.Set(key_float, 1.0f);
+		REQUIRE(event.GetOr(key_int, 999) == 999);
 	}
 
 	SECTION("You should get a default value if you supply the wrong type") {
-		event.Set(HLVR_EventKey_DiscreteHaptic_Duration_Float, 1.0f);
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Duration_Float, 999) == 999);
+		event.Set(key_float, 1.0f);
+		REQUIRE(event.GetOr(key_float, 999) == 999);
 	}
 
 	SECTION("If you overwrite a key with a different value, you should get the new value out") {
-		event.Set(HLVR_EventKey_DiscreteHaptic_Duration_Float, 1.0f);
-		event.Set(HLVR_EventKey_DiscreteHaptic_Duration_Float, 2.0f);
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Duration_Float, 999.0f) == Approx(2.0f));
+		event.Set(key_float, 1.0f);
+		event.Set(key_float, 2.0f);
+		REQUIRE(event.GetOr(key_float, 999.0f) == Approx(2.0f));
 	}
 
 	SECTION("If you overwrite a key with a different type, you should get the new type out") {
-		event.Set(HLVR_EventKey_DiscreteHaptic_Duration_Float, 1.0f);
-		event.Set(HLVR_EventKey_DiscreteHaptic_Duration_Float, 2);
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Duration_Float, 999) == 2);
+		event.Set(key_float, 1.0f);
+		event.Set(key_float, 2);
+		REQUIRE(event.GetOr(key_float, 999) == 2);
 	}
 
 	SECTION("If you request a key that isn't present, you should get the default value") {
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Duration_Float, 999) == 999);
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 999.0f) == 999.0f);
-		REQUIRE(event.GetOr(HLVR_EventKey_DiscreteHaptic_Strength_Float, std::vector<float>({ 999.0f })).at(0) == Approx(999.0f));
-		REQUIRE(event.GetOr(HLVR_EventKey_Target_Regions_UInt32s, std::vector<int>({ 999 })).at(0) == 999);
+		REQUIRE(event.GetOr(key_float, 999) == 999);
+		REQUIRE(event.GetOr(key_int, 999.0f) == 999.0f);
+		REQUIRE(event.GetOr(key_vecfloat, std::vector<float>({ 999.0f })).at(0) == Approx(999.0f));
+		REQUIRE(event.GetOr(key_vecint, std::vector<int>({ 999 })).at(0) == 999);
 	}
 
 	SECTION("TryGet will return false if the key is not found") {
 		int x;
-		REQUIRE(!event.TryGet(HLVR_EventKey_DiscreteHaptic_Waveform_Int, &x));
+		REQUIRE(!event.TryGet(key_int, &x));
 	}
 
 	SECTION("TryGet will not modify the given value if the key is not found") {
 		int x = 152;
-		event.TryGet(HLVR_EventKey_DiscreteHaptic_Waveform_Int, &x);
+		event.TryGet(key_int, &x);
 		REQUIRE(x == 152);
 	}
 
 	SECTION("TryGet will return the value if found") {
 		int x;
-		event.Set(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 152);
-		REQUIRE(event.TryGet(HLVR_EventKey_DiscreteHaptic_Waveform_Int, &x));
+		event.Set(key_int, 152);
+		REQUIRE(event.TryGet(key_int, &x));
 		REQUIRE(x == 152);
 	}
 
 	SECTION("HasKey will return true if the key is present") {
-		event.Set(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 122);
-		REQUIRE(event.HasKey(HLVR_EventKey_DiscreteHaptic_Waveform_Int));
+		event.Set(key_int, 122);
+		REQUIRE(event.HasKey(key_int));
 	}
 
 	SECTION("HasKey will return false if the key is not present") {
-		REQUIRE(!event.HasKey(HLVR_EventKey_DiscreteHaptic_Waveform_Int));
+		REQUIRE(!event.HasKey(key_int));
 	}
 }
 
 TEST_CASE("Validation machinery should work") {
 	SECTION("If a key is not present, it isn't an error (using validate, because we support optional)") {
 		ParameterizedEvent data;
-		auto result = validate<int>(HLVR_EventKey_DiscreteHaptic_Waveform_Int, data, [](int effect) { return true; });
+		auto result = validate<int>(key_int, data, [](int effect) { return true; });
 		REQUIRE(!result);
 
 	}
@@ -325,27 +330,27 @@ TEST_CASE("Higher level event validation should work") {
 
 	SECTION("A DiscreteHapticEvent should generate the correct errors.. [smoketest]") {
 		ParameterizedEvent data;
-		data.Set(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 0); //invalid value
-		data.Set(HLVR_EventKey_DiscreteHaptic_Duration_Float, 2); //invalid type
-		data.Set(HLVR_EventKey_DiscreteHaptic_Strength_Float, 1.0f); //valid
+		data.Set(key_int, 0); //invalid value
+		data.Set(key_float, 2); //invalid type
+		data.Set(static_cast<HLVR_EventKey>(10), 1.0f); //valid
 
 		playable->debug_parse(data, &result);
 		REQUIRE(result.Count == 2);
 		
 		auto foundEffectErr = std::find_if(std::begin(result.Errors), std::end(result.Errors), 
-			[](const HLVR_Event_KeyParseResult& result) { return result.Key == HLVR_EventKey_DiscreteHaptic_Waveform_Int; });
+			[](const HLVR_Event_KeyParseResult& result) { return result.Key == key_int; });
 
 		REQUIRE(foundEffectErr != std::end(result.Errors));
 		REQUIRE(foundEffectErr->Error == HLVR_Event_KeyParseError_InvalidValue);
 
 		auto foundDurationErr = std::find_if(std::begin(result.Errors), std::end(result.Errors),
-			[](const HLVR_Event_KeyParseResult& result) { return result.Key == HLVR_EventKey_DiscreteHaptic_Duration_Float; });
+			[](const HLVR_Event_KeyParseResult& result) { return result.Key == key_float; });
 
 		REQUIRE(foundDurationErr != std::end(result.Errors));
 		REQUIRE(foundDurationErr->Error == HLVR_Event_KeyParseError_WrongValueType);
 
 		auto foundStrengthErr = std::find_if(std::begin(result.Errors), std::end(result.Errors),
-				[](const HLVR_Event_KeyParseResult& result) { return result.Key == HLVR_EventKey_DiscreteHaptic_Strength_Float; });
+				[](const HLVR_Event_KeyParseResult& result) { return result.Key == 10; });
 		REQUIRE(foundStrengthErr == std::end(result.Errors));
 
 

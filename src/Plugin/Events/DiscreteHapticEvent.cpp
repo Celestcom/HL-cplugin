@@ -35,21 +35,19 @@ std::vector<Validator> DiscreteHapticEvent::makeValidators() const  {
 
 	return{
 		make_optional_constraint<float>(HLVR_EventKey_DiscreteHaptic_Strength_Float, [](float strength) { return strength >= 0.0f && strength <= 1.0f; }),
-		make_optional_constraint<float>(HLVR_EventKey_DiscreteHaptic_Duration_Float, [](float dur) { return dur >= 0.0f; }),
+		make_optional_constraint<uint32_t>(HLVR_EventKey_DiscreteHaptic_Repetitions_UInt32, [](uint32_t dur) { return dur > 0; /* well, it's unsigned... */}),
 		make_optional_constraint<int>(HLVR_EventKey_DiscreteHaptic_Waveform_Int, [](int effect) { return effect > 0; })
 	};
 }
-bool DiscreteHapticEvent::doParse(const ParameterizedEvent& ev)
+void DiscreteHapticEvent::doParse(const ParameterizedEvent& ev)
 {
 	m_strength = ev.GetOr<float>(HLVR_EventKey_DiscreteHaptic_Strength_Float, 1.0f);
-	m_duration = ev.GetOr<float>(HLVR_EventKey_DiscreteHaptic_Duration_Float, 0.0f);
+	m_duration = ev.GetOr<uint32_t>(HLVR_EventKey_DiscreteHaptic_Repetitions_UInt32, 0);
 
 
 	m_requestedEffectFamily = ev.GetOr<int>(HLVR_EventKey_DiscreteHaptic_Waveform_Int, 3);
 	std::string effect = Locator::getTranslator().ToEffectFamilyString(m_requestedEffectFamily);
 	m_parsedEffectFamily = effect;
-	
-	return true;
 
 }
 
@@ -68,7 +66,7 @@ void DiscreteHapticEvent::doSerialize(NullSpaceIPC::HighLevelEvent& event) const
 	using namespace NullSpaceIPC;
 	LocationalEvent* location = event.mutable_locational_event();
 	SimpleHaptic* simple = location->mutable_simple_haptic();
-	simple->set_duration(m_duration);
+	simple->set_repetitions(m_duration);
 	simple->set_effect(m_requestedEffectFamily);
 	simple->set_strength(m_strength);
 

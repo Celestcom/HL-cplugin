@@ -9,6 +9,7 @@
 #include "AnalogAudio.h"
 #include "DiscreteHapticEvent.h"
 #include "ContinuousHaptic.h"
+#include "BufferedHaptic.h"
 #pragma warning(push)
 #pragma warning(disable : 4267)
 #include "HighLevelEvent.pb.h"
@@ -43,7 +44,7 @@ private:
 
 
 
-bool PlayableEvent::parse(const ParameterizedEvent & e)
+void PlayableEvent::parse(const ParameterizedEvent & e)
 {
 	TargetRegions regions;
 	TargetNodes nodes;
@@ -59,7 +60,7 @@ bool PlayableEvent::parse(const ParameterizedEvent & e)
 		m_target = TargetRegions{ {hlvr_region_body} };
 	}
 
-	return doParse(e); 
+	doParse(e); 
 }
 
 bool PlayableEvent::operator<(const PlayableEvent & rhs) const
@@ -89,6 +90,8 @@ PlayableEvent::make(HLVR_EventType type, float timeOffset)
 		return std::make_unique<BeginAnalogAudio>(timeOffset);
 	case HLVR_EventType::HLVR_EventType_EndAnalogAudio:
 		return std::make_unique<EndAnalogAudio>(timeOffset);
+	case HLVR_EventType::HLVR_EventType_BufferedHaptic:
+		return std::make_unique<BufferedHaptic>(timeOffset);
 	default:
 		break;
 	}

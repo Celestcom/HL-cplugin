@@ -335,9 +335,8 @@ extractPlayables(const std::vector<TimeOffset<ParameterizedEvent>>& events) {
 	playables.reserve(events.size());
 	for (const auto& event : events) {
 		if (auto newPlayable = PlayableEvent::make(event.Data.type(), event.Time)) {
-			if (newPlayable->parse(event.Data)) {
-				playables.push_back(std::move(newPlayable));
-			}
+			newPlayable->parse(event.Data); 
+			playables.push_back(std::move(newPlayable));
 		}
 	}
 

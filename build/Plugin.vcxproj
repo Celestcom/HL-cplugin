@@ -402,6 +402,7 @@
     <ClInclude Include="..\src\Plugin\Enums.h" />
     <ClInclude Include="..\src\Plugin\EventList.h" />
     <ClInclude Include="..\src\Plugin\Events\AnalogAudio.h" />
+    <ClInclude Include="..\src\Plugin\Events\BufferedHaptic.h" />
     <ClInclude Include="..\src\Plugin\Events\ContinuousHaptic.h" />
     <ClInclude Include="..\src\Plugin\Events\DiscreteHapticEvent.h" />
     <ClInclude Include="..\src\Plugin\Events\PlayableEvent.h" />
@@ -429,6 +430,8 @@
     <ClInclude Include="..\src\Plugin\json\json.h" />
     <ClInclude Include="..\src\Plugin\stdafx.h" />
     <ClInclude Include="..\src\Plugin\targetver.h" />
+    <ClInclude Include="BufferedHaptic.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -507,6 +510,7 @@
     <ClCompile Include="..\src\Plugin\EnumTranslator.cpp" />
     <ClCompile Include="..\src\Plugin\EventList.cpp" />
     <ClCompile Include="..\src\Plugin\Events\AnalogAudio.cpp" />
+    <ClCompile Include="..\src\Plugin\Events\BufferedHaptic.cpp" />
     <ClCompile Include="..\src\Plugin\Events\ContinuousHaptic.cpp" />
     <ClCompile Include="..\src\Plugin\Events\DiscreteHapticEvent.cpp" />
     <ClCompile Include="..\src\Plugin\Events\PlayableEvent.cpp" />
@@ -544,6 +548,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Plugin.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
