@@ -36,9 +36,6 @@ HapticsPlayer::HapticsPlayer( ClientMessenger& messenger):
 {	
 }
 
-HapticsPlayer::~HapticsPlayer()
-{
-}
 
 int HapticsPlayer::Play(HapticHandle hh)
 {

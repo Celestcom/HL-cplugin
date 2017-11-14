@@ -21,7 +21,6 @@ class HapticsPlayer
 public:
 
 	HapticsPlayer(ClientMessenger& messenger);
-	~HapticsPlayer();
 
 	void Update(float dt);
 
