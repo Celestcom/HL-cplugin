@@ -328,33 +328,6 @@ TEST_CASE("Higher level event validation should work") {
 		REQUIRE(result.Count == 0);
 	}
 
-	SECTION("A DiscreteHapticEvent should generate the correct errors.. [smoketest]") {
-		ParameterizedEvent data;
-		data.Set(key_int, 0); //invalid value
-		data.Set(key_float, 2); //invalid type
-		data.Set(static_cast<HLVR_EventKey>(10), 1.0f); //valid
-
-		playable->debug_parse(data, &result);
-		REQUIRE(result.Count == 2);
-		
-		auto foundEffectErr = std::find_if(std::begin(result.Errors), std::end(result.Errors), 
-			[](const HLVR_Event_KeyParseResult& result) { return result.Key == key_int; });
-
-		REQUIRE(foundEffectErr != std::end(result.Errors));
-		REQUIRE(foundEffectErr->Error == HLVR_Event_KeyParseError_InvalidValue);
-
-		auto foundDurationErr = std::find_if(std::begin(result.Errors), std::end(result.Errors),
-			[](const HLVR_Event_KeyParseResult& result) { return result.Key == key_float; });
-
-		REQUIRE(foundDurationErr != std::end(result.Errors));
-		REQUIRE(foundDurationErr->Error == HLVR_Event_KeyParseError_WrongValueType);
-
-		auto foundStrengthErr = std::find_if(std::begin(result.Errors), std::end(result.Errors),
-				[](const HLVR_Event_KeyParseResult& result) { return result.Key == 10; });
-		REQUIRE(foundStrengthErr == std::end(result.Errors));
-
-
-	}
 
 }
 

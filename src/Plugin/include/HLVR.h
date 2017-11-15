@@ -236,7 +236,6 @@ extern "C" {
 	typedef enum HLVR_EventType {
 		HLVR_EventType_UNKNOWN = 0,
 		HLVR_EventType_DiscreteHaptic = 1,
-		HLVR_EventType_ContinuousHaptic = 2,
 		HLVR_EventType_BufferedHaptic = 3,
 		HLVR_EventType_BeginAnalogAudio = 4,
 		HLVR_EventType_EndAnalogAudio = 5,
@@ -260,9 +259,6 @@ extern "C" {
 		HLVR_EventKey_DiscreteHaptic_Repetitions_UInt32 = 1000,
 		HLVR_EventKey_DiscreteHaptic_Strength_Float,
 		HLVR_EventKey_DiscreteHaptic_Waveform_Int,
-
-		HLVR_EventKey_ContinuousHaptic_Strength_Float = 2000,
-
 
 
 		HLVR_EventKey_BufferedHaptic_Samples_Floats = 3000,

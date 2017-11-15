@@ -84,8 +84,6 @@ PlayableEvent::make(HLVR_EventType type, float timeOffset)
 	switch (type) {
 	case HLVR_EventType::HLVR_EventType_DiscreteHaptic:
 		return std::make_unique<DiscreteHapticEvent>(timeOffset);
-	case HLVR_EventType::HLVR_EventType_ContinuousHaptic:
-		return std::make_unique<ContinuousHaptic>(timeOffset);
 	case HLVR_EventType::HLVR_EventType_BeginAnalogAudio:
 		return std::make_unique<BeginAnalogAudio>(timeOffset);
 	case HLVR_EventType::HLVR_EventType_EndAnalogAudio:
