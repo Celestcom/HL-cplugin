@@ -2,7 +2,6 @@
 #include "PlayableEffect.h"
 #include "Locator.h"
 #include <iostream>
-#include "BasicHapticEvent.h"
 #include "HLVR.h"
 #include <memory>
 #include <iterator>
@@ -275,14 +274,6 @@ void PlayableEffect::pause()
 void PlayableEffect::resume() {
 	m_messenger.WriteEvent(makePlaybackEvent(m_id, NullSpaceIPC::PlaybackEvent_Command_UNPAUSE));
 }
-
-
-
-RegionVisitor::RegionVisitor()
-{
-}
-
-
 
 
 

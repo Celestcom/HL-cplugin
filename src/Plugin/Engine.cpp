@@ -117,6 +117,29 @@ int Engine::StreamEvent(const ParameterizedEvent& event)
 	return HLVR_Ok;
 }
 
+int Engine::EnableTracking(uint32_t device_id)
+{
+	NullSpaceIPC::HighLevelEvent hle;
+	auto device_event = hle.mutable_device_event();
+	device_event->set_device(device_id);
+	auto tracking_enable = device_event->mutable_enable_tracking();
+
+	m_messenger.WriteEvent(hle);
+	return 1;
+}
+
+int Engine::DisableTracking(uint32_t device_id)
+{
+	NullSpaceIPC::HighLevelEvent hle;
+	auto device_event = hle.mutable_device_event();
+	device_event->set_device(device_id);
+	auto tracking_enable = device_event->mutable_disable_tracking();
+
+	m_messenger.WriteEvent(hle);
+
+	return 1;
+}
+
 int Engine::DumpDeviceDiagnostics()
 {
 	NullSpaceIPC::DriverCommand command;
@@ -275,20 +298,6 @@ bool Engine::DoEngineCommand(::EngineCommand command)
 		break;
 	case EngineCommand::DestroyAll:
 		m_player.ClearAll();
-		break;
-	case EngineCommand::EnableTracking:
-		{
-		NullSpaceIPC::DriverCommand command;
-		command.set_command(NullSpaceIPC::DriverCommand_Command_ENABLE_TRACKING);
-		m_messenger.WriteCommand(command);
-		}
-		break;
-	case EngineCommand::DisableTracking:
-		{
-		NullSpaceIPC::DriverCommand command;
-		command.set_command(NullSpaceIPC::DriverCommand_Command_DISABLE_TRACKING);
-		m_messenger.WriteCommand(command);
-		}
 		break;
 	default:
 		break;

@@ -31,8 +31,6 @@ extern "C" {
 	typedef struct HLVR_BodyView HLVR_BodyView;
 
 
-	HLVR_RETURN_EXP(HLVR_Result) HLVR_Immediate_Set(HLVR_System* systemPtr, uint32_t* regions, double* amplitudes, uint32_t length);
-
 	/*! thing*/
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_Create(HLVR_BodyView** body);
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_Release(HLVR_BodyView** body);
@@ -62,8 +60,8 @@ extern "C" {
 
 
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_PollTracking(HLVR_System* ptr, HLVR_TrackingUpdate* updatePtr);
-	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_EnableTracking(HLVR_System* ptr);
-	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_DisableTracking(HLVR_System* ptr);
+	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_EnableTracking(HLVR_System* ptr, uint32_t device_id);
+	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_DisableTracking(HLVR_System* ptr, uint32_t device_id);
 
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_StreamEvent(HLVR_System* system, HLVR_Event* data);
 

@@ -13,6 +13,7 @@
 #include "../SharedCommunication/readablesharedvector.h"
 #include "../SharedCommunication/SharedTypes.h"
 #include "HLVR_Experimental.h"
+#include "DiscreteHapticEvent.h"
 template<typename T>
 T time(std::function<void()> fn) {
 	auto then = std::chrono::high_resolution_clock::now();

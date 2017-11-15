@@ -1,9 +1,8 @@
 #pragma once
 #include "IPlayable.h"
-#include "BasicHapticEvent.h"
 #include <set>
 #include <boost\uuid\random_generator.hpp>
-
+#include "PlayableEvent.h"
 template<typename T>
 struct weak_ptr_less_than {
 	bool operator() (const std::weak_ptr<T>& lhs, const std::weak_ptr<T>& rhs) const {
@@ -16,12 +15,7 @@ std::vector<std::string> extractRegions(const std::unique_ptr<PlayableEvent> & e
 
 
 
-class RegionVisitor : public boost::static_visitor<std::vector<std::string>> {
-private:
-public:
-	RegionVisitor();
-	std::vector<std::string> operator()(const DiscreteHapticEvent& event) const;
-};
+
 using PlayablePtr = std::unique_ptr<PlayableEvent>;
 
 class ClientMessenger;

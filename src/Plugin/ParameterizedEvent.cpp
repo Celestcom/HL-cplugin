@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "ParameterizedEvent.h"
 #include "HLVR.h"
-#include "BasicHapticEvent.h"
 
 ParameterizedEvent::ParameterizedEvent(): 
 	m_type(HLVR_EventType_UNKNOWN),

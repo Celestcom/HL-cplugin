@@ -4,7 +4,6 @@
 #include <boost\functional\hash.hpp>
 #include <boost\optional.hpp>
 #include "PlayableEffect.h"
-#include "BasicHapticEvent.h"
 #include <mutex>
 #include <atomic>
 typedef uint32_t HapticHandle;

@@ -197,21 +197,21 @@ HLVR_RETURN(HLVR_Result) HLVR_System_PollTracking(HLVR_System * ptr, HLVR_Tracki
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_System_EnableTracking(HLVR_System * ptr)
+HLVR_RETURN(HLVR_Result) HLVR_System_EnableTracking(HLVR_System * ptr, uint32_t device_id)
  {
 	 RETURN_IF_NULL(ptr);
 
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->DoEngineCommand(EngineCommand::EnableTracking);
+		 return AS_TYPE(Engine, ptr)->EnableTracking(device_id);
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_System_DisableTracking(HLVR_System * ptr)
+HLVR_RETURN(HLVR_Result) HLVR_System_DisableTracking(HLVR_System * ptr, uint32_t device_id)
  {
 	 RETURN_IF_NULL(ptr);
 
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->DoEngineCommand(EngineCommand::DisableTracking);
+		 return AS_TYPE(Engine, ptr)->DisableTracking(device_id);
 	 });
  }
 

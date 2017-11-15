@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "DiscreteHapticEvent.h"
 #include "Locator.h"
+
+#include "validators.h"
 #pragma warning(push)
 #pragma warning(disable : 4267)
 #include "HighLevelEvent.pb.h"
