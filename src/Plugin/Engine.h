@@ -71,7 +71,6 @@ public:
 	int Sample(uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount);
 
 	int DumpDeviceDiagnostics();
-	int SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length);
 	int GetHandleInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr);
 
 	int GetNumDevices(uint32_t* outAmount);

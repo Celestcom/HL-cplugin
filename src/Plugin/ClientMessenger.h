@@ -27,9 +27,7 @@ public:
 	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
 	std::vector<NullSpace::SharedMemory::DeviceInfo> ReadDevices();
 	std::vector<NullSpace::SharedMemory::NodeInfo> ReadNodes();
-	void WriteCommand(const NullSpaceIPC::DriverCommand& d);
 	void WriteEvent(const NullSpaceIPC::HighLevelEvent& e);
-	void WriteHaptics(const NullSpaceIPC::EffectCommand& e);
 	boost::optional<std::string> ReadLog();
 
 	std::vector<NullSpace::SharedMemory::RegionPair> ReadBodyView();

@@ -25,21 +25,6 @@
 
 
 
-HLVR_RETURN_EXP(HLVR_Result) HLVR_Immediate_Set(HLVR_System * systemPtr, uint32_t * regions, double * amplitudes, uint32_t length)
-{
-	RETURN_IF_NULL(systemPtr);
-	RETURN_IF_NULL(regions);
-	RETURN_IF_NULL(amplitudes);
-
-	if (length < 0) {
-		return HLVR_Error_InvalidArgument;
-	}
-
-	return ExceptionGuard([&] {
-		return AS_TYPE(Engine, systemPtr)->SetStrengths(regions, amplitudes, length);
-	});
-}
-
 HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_Create(HLVR_BodyView** body)
 {
 	return ExceptionGuard([&] {

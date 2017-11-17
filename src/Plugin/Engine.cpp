@@ -140,31 +140,7 @@ int Engine::DisableTracking(uint32_t device_id)
 	return 1;
 }
 
-int Engine::DumpDeviceDiagnostics()
-{
-	NullSpaceIPC::DriverCommand command;
-	command.set_command(NullSpaceIPC::DriverCommand_Command_DUMP_DEVICE_DIAGNOSTICS);
-	m_messenger.WriteCommand(command);
-	return HLVR_Ok;
-}
 
-int Engine::SetStrengths(uint32_t* regions, double* amplitudes, uint32_t length)
-{
-	throw std::runtime_error("reimplement");
-	/*auto& translator = Locator::getTranslator();
-
-	using namespace NullSpaceIPC;
-	HighLevelEvent event;
-	auto realtime = event.mutable_realtime_haptic();
-	for (unsigned int i = 0; i < length; i++) {
-		auto magnitude = realtime->add_magnitudes();
-		magnitude->set_region(regions[i]);
-		magnitude->set_strength(amplitudes[i]);	
-	}
-	m_messenger.WriteEvent(event);
-*/
-	return HLVR_Ok;
-}
 
 Engine::Engine() :
 

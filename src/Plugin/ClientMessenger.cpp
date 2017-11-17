@@ -21,7 +21,6 @@ ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 	m_sentinalTimeout(2000),
 	m_connectedToService(false),
 	m_hapticsStream(),
-	m_commandStream(),
 	m_systems(),
 	m_nodes(),
 	m_tracking(),
@@ -93,20 +92,6 @@ std::vector<NullSpace::SharedMemory::NodeInfo> ClientMessenger::ReadNodes()
 }
 
 
-void ClientMessenger::WriteCommand(const NullSpaceIPC::DriverCommand & d)
-{
-	std::string binaryData;
-	d.SerializeToString(&binaryData);
-	if (m_commandStream) {
-		try {
-			m_commandStream->Push(binaryData.data(), d.ByteSize());
-		}
-		catch (const boost::interprocess::interprocess_exception&) {
-			//probably full queue
-			//should log
-		}
-	}
-}
 
 void ClientMessenger::WriteEvent(const NullSpaceIPC::HighLevelEvent & e)
 {
@@ -122,21 +107,7 @@ void ClientMessenger::WriteEvent(const NullSpaceIPC::HighLevelEvent & e)
 	}
 }
 
-void ClientMessenger::WriteHaptics(const NullSpaceIPC::EffectCommand& e)
-{
-	std::string binaryData;
-	e.SerializeToString(&binaryData);
-	if (m_hapticsStream) {
-		try {
-			m_hapticsStream->Push(binaryData.data(), e.ByteSize());
-		}
-		catch (const boost::interprocess::interprocess_exception&) {
-			//probably full queue, which means the server isn't reading fast enough!
-			//should log
-		}
-	}
-	
-}
+
 
 boost::optional<std::string> ClientMessenger::ReadLog()
 {
@@ -219,7 +190,6 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		static_assert(sizeof(char) == 1, "set char size to 1");
 
 		m_hapticsStream = std::make_unique<WritableSharedQueue>("ns-haptics-data");
-		m_commandStream = std::make_unique<WritableSharedQueue>("ns-command-data");
 		m_systems = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>>("ns-device-mem", "ns-device-data");
 		m_nodes = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::NodeInfo>>("ns-node-mem", "ns-node-data");
 		m_tracking = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::TaggedQuaternion>>("ns-tracking-mem", "ns-tracking-data");
