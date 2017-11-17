@@ -256,8 +256,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\src\Plugin\version.rc2">
-      <Filter>src</Filter>
-    </None>
+    <ResourceCompile Include="..\src\Plugin\version.rc2" />
   </ItemGroup>
 </Project>

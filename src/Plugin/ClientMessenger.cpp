@@ -12,6 +12,7 @@
 
 #include "HLVR.h"
 
+#include "BoostIPCSharedMemoryDirectory.h"
 using namespace NullSpace::SharedMemory;
 ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 

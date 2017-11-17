@@ -211,8 +211,8 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>HLVR_EXPORTS;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_INTERPROCESS_SHARED_DIR_FUNC;HLVR_EXPORTS;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_65_1;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -223,7 +223,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Debug;D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Debug;D:\Libraries\boost\boost_1_65_1\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>bin\Debug\Win32\Hardlight.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
@@ -233,8 +233,8 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>HLVR_EXPORTS;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_INTERPROCESS_SHARED_DIR_FUNC;HLVR_EXPORTS;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_65_1;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -245,7 +245,7 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Debug;D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Libraries\boost\boost_1_65_1\stage\win64\lib;D:\protobuf-3.0.0\cmake\build\solution64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>bin\Debug\Win64\Hardlight.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
@@ -255,8 +255,8 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>HLVR_EXPORTS;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_INTERPROCESS_SHARED_DIR_FUNC;HLVR_EXPORTS;WIN32;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_65_1;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -267,7 +267,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Debug;D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Debug;D:\Libraries\boost\boost_1_65_1\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -277,8 +277,8 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>HLVR_EXPORTS;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_INTERPROCESS_SHARED_DIR_FUNC;HLVR_EXPORTS;DEBUG;_DEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_65_1;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <MinimalRebuild>false</MinimalRebuild>
@@ -289,7 +289,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Debug;D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Debug;D:\Libraries\boost\boost_1_65_1\stage\win64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -299,8 +299,8 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>HLVR_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_INTERPROCESS_SHARED_DIR_FUNC;HLVR_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_65_1;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -313,7 +313,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Release;D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Release;D:\Libraries\boost\boost_1_65_1\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>bin\Release\Win32\Hardlight.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
@@ -323,8 +323,8 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>HLVR_EXPORTS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_INTERPROCESS_SHARED_DIR_FUNC;HLVR_EXPORTS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_65_1;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -337,7 +337,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Release;D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Release;D:\Libraries\boost\boost_1_65_1\stage\win64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ImportLibrary>bin\Release\Win64\Hardlight.lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
@@ -347,8 +347,8 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>HLVR_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_INTERPROCESS_SHARED_DIR_FUNC;HLVR_EXPORTS;WIN32;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_65_1;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -361,7 +361,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Release;D:\Libraries\boost\boost_1_61_0\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution\Release;D:\Libraries\boost\boost_1_65_1\stage\win32\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -371,8 +371,8 @@
       <PrecompiledHeaderFile>stdafx.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <DisableSpecificWarnings>4800;%(DisableSpecificWarnings)</DisableSpecificWarnings>
-      <PreprocessorDefinitions>HLVR_EXPORTS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_61_0;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BOOST_INTERPROCESS_SHARED_DIR_FUNC;HLVR_EXPORTS;NDEBUG;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>D:\protobuf-3.0.0\cmake\build\solution\include;..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication;D:\Libraries\boost\boost_1_65_1;..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs;..\src\Plugin;..\src\Plugin\test;..\src\Plugin\devices;..\src\Plugin\events;..\src\Plugin\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -385,7 +385,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Release;D:\Libraries\boost\boost_1_61_0\stage\x64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\protobuf-3.0.0\cmake\build\solution64\Release;D:\Libraries\boost\boost_1_65_1\stage\win64\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
