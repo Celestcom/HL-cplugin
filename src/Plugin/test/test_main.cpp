@@ -65,7 +65,7 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	//Messenger should probably be an interface, else we need it to test HapticsPlayer
 	boost::asio::io_service io;
 	ClientMessenger m(io);
-	HapticsPlayer player( m);
+	HapticsPlayer player(io, m);
 
 	REQUIRE(player.GetNumLiveEffects() == 0);
 	REQUIRE(player.GetNumReleasedEffects() == 0);

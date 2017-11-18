@@ -23,7 +23,7 @@ T time(std::function<void()> fn) {
 using namespace std;
 
 
-HapticsPlayer::HapticsPlayer( ClientMessenger& messenger):
+HapticsPlayer::HapticsPlayer(boost::asio::io_service& io, ClientMessenger& messenger):
 	m_playerPaused(false),
 	m_effectsLock(),
 	m_hasher(),
@@ -32,10 +32,30 @@ HapticsPlayer::HapticsPlayer( ClientMessenger& messenger):
 	m_outsideToInternal(),
 	m_uuidGenerator(),
 	m_currentHandleId(0),
-	m_messenger(messenger)
+	m_messenger(messenger),
+	m_updateHapticsInterval(boost::posix_time::millisec(5)),
+	m_updateHaptics(io)
 {	
 }
 
+void HapticsPlayer::start() {
+	scheduleTimestep();
+}
+
+
+void HapticsPlayer::stop()
+{
+	m_updateHaptics.cancel();
+}
+
+void HapticsPlayer::scheduleTimestep() {
+	m_updateHaptics.expires_from_now(m_updateHapticsInterval);
+	m_updateHaptics.async_wait([&](auto ec) { 
+		if (ec) { return; } 
+		Update(m_updateHapticsInterval.total_milliseconds() / 1000.f );
+		scheduleTimestep();
+	});
+}
 
 int HapticsPlayer::Play(HapticHandle hh)
 {

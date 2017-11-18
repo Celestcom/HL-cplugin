@@ -149,8 +149,6 @@ HLVR_RETURN(void) HLVR_System_Destroy(HLVR_System** ptr)
 {	
 	ExceptionGuard([&] {
 		delete AS_TYPE(Engine, *ptr);
-		*ptr = nullptr;
-
 		return HLVR_Ok;
 	});
 }
@@ -243,7 +241,6 @@ HLVR_RETURN(void) HLVR_Event_Destroy(HLVR_Event ** eventPtr)
  {
 	ExceptionGuard([&] {
 		delete AS_TYPE(ParameterizedEvent, *eventPtr);
-		*eventPtr = nullptr;
 		return HLVR_Ok;
 
 	});
@@ -362,7 +359,6 @@ HLVR_RETURN(void) HLVR_Timeline_Destroy(HLVR_Timeline ** listPtr)
 	ExceptionGuard([&] {
 
 		delete AS_TYPE(EventList, *listPtr);
-		*listPtr = nullptr;
 		return HLVR_Ok;
 
 	});
@@ -443,7 +439,6 @@ HLVR_RETURN(void) HLVR_Effect_Destroy(HLVR_Effect** handlePtr)
  {
 	ExceptionGuard([&] {
 		delete AS_TYPE(PlaybackHandle, *handlePtr);
-		*handlePtr = nullptr;
 		return HLVR_Ok;
 	});
  }
