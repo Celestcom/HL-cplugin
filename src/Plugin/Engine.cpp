@@ -159,10 +159,9 @@ Engine::Engine() :
 
 	
 
-	setupUserFacingLogSink();
-	setupFileLogSink(); //not implementing this yet
+//	setupUserFacingLogSink();
+	//setupFileLogSink(); //not implementing this yet
 
-	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
 	boost::log::core::get()->set_logging_enabled(false);
 
