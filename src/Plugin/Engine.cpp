@@ -147,7 +147,7 @@ Engine::Engine() :
 	m_isHapticsSystemPlaying(true),
 	m_ioService(),
 	m_messenger(m_ioService.GetIOService()),
-	m_player( m_messenger),
+	m_player(m_ioService.GetIOService(), m_messenger),
 	m_currentHandleId(0),
 	m_hapticsExecutionInterval(boost::posix_time::milliseconds(5)),
 	m_hapticsTimestep(m_ioService.GetIOService(), m_hapticsExecutionInterval),
@@ -159,27 +159,15 @@ Engine::Engine() :
 
 	
 
-	setupUserFacingLogSink();
-	setupFileLogSink(); //not implementing this yet
+//	setupUserFacingLogSink();
+	//setupFileLogSink(); //not implementing this yet
 
-	BOOST_LOG_TRIVIAL(info) << "[PluginMain] Plugin initialized";
 
 	boost::log::core::get()->set_logging_enabled(false);
 
-	
-	m_hapticsTimestep.SetEvent([this]() {
-		try {
-			auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - m_lastHapticsTimestep);
+	m_player.start();
 
-			executeTimestep(elapsed);
-			m_lastHapticsTimestep = std::chrono::high_resolution_clock::now();
-		}
-		catch (const std::exception& e) {
-			BOOST_LOG_TRIVIAL(error) << "[PluginMain] Fatal error executing timestep: " << e.what();
 
-		}
-	});
-	m_hapticsTimestep.Start();
 }
 
 
@@ -194,7 +182,7 @@ void Engine::setupFileLogSink()
 	);
 
 
-	typedef sinks::synchronous_sink<sinks::text_file_backend> sink_t;
+	using sink_t = sinks::synchronous_sink<sinks::text_file_backend>;
 	boost::shared_ptr<sink_t> sink(new sink_t(backend));
 
 	boost::log::core::get()->add_sink(sink);
@@ -217,7 +205,7 @@ void Engine::setupUserFacingLogSink()
 	m_log = boost::make_shared<MyTestLog>();
 	m_log->Provide(&m_messenger, m_ioService.GetIOService());
 	
-	typedef sinks::synchronous_sink<MyTestLog> sink_t;
+	using sink_t = sinks::synchronous_sink<MyTestLog>;
 	boost::shared_ptr<sink_t> sink(new sink_t(m_log));
 	core::get()->add_sink(sink);
 	
@@ -230,8 +218,8 @@ Engine::~Engine()
 
 	try {
 		m_player.ClearAll();
+		m_player.stop();
 		std::this_thread::sleep_for(std::chrono::milliseconds(25));
-		m_hapticsTimestep.Stop();
 		m_ioService.Shutdown();
 	}
 	catch (const std::exception&) {

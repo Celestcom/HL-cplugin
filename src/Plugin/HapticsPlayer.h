@@ -6,7 +6,11 @@
 #include "PlayableEffect.h"
 #include <mutex>
 #include <atomic>
-typedef uint32_t HapticHandle;
+#include <boost/asio/io_service.hpp>
+#include <boost/asio/deadline_timer.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+
+using HapticHandle = uint32_t;
 
 //todo: evaluate if this needs a name change.
 //ideas: EventPlayer
@@ -19,13 +23,15 @@ class HapticsPlayer
 {
 public:
 
-	HapticsPlayer(ClientMessenger& messenger);
+	HapticsPlayer(boost::asio::io_service& io, ClientMessenger& messenger);
 
-	void Update(float dt);
 
 	HapticHandle Create(std::vector<std::unique_ptr<PlayableEvent>> events);
 	void Release(HapticHandle h);
 
+	void start();
+	void stop();
+	void Update(float dt);
 	int Play(HapticHandle h);
 	int Pause(HapticHandle h);
 	int Stop(HapticHandle h);
@@ -58,6 +64,12 @@ private:
 	void addNewEffect(const boost::uuids::uuid&, std::vector<std::unique_ptr<PlayableEvent>>&& events);
 	HapticHandle nextHandle();
 
+	void scheduleTimestep();
+
 	ClientMessenger& m_messenger;
+
+	boost::posix_time::millisec m_updateHapticsInterval;
+	boost::asio::deadline_timer m_updateHaptics;
+
 };
 
