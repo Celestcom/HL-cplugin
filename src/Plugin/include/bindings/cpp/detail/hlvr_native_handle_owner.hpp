@@ -2,6 +2,7 @@
 
 #include "HLVR.h"
 #include <memory>
+#include <cassert>
 namespace hlvr 
 {
 namespace detail {
