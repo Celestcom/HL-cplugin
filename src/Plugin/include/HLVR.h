@@ -378,7 +378,7 @@ extern "C" {
 		@return HLVR_Ok if the context was created successfully
 		
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_System_Create(HLVR_System** system, HLVR_SystemConfiguration* config);
+	HLVR_RETURN(HLVR_Result) HLVR_System_Create(HLVR_System** system);
 
 	/*! Destroy the context, shutting down communication between this application and the Hardlight runtime service.
 		@param system address of the target system pointer

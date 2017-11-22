@@ -124,7 +124,7 @@ HLVR_RETURN(int) HLVR_NodeIterator_Next(HLVR_NodeIterator * iter, uint32_t devic
 }
 
 
-HLVR_RETURN(HLVR_Result) HLVR_System_Create(HLVR_System** systemPtr, HLVR_SystemConfiguration* config)
+HLVR_RETURN(HLVR_Result) HLVR_System_Create(HLVR_System** systemPtr)
 {
 	//todo: return an error if the service version is incompatible. Check registry key? Something?
 	return ExceptionGuard([&] { *systemPtr = AS_TYPE(HLVR_System, new Engine()); return HLVR_Ok; });

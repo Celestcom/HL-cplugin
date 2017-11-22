@@ -15,6 +15,42 @@ struct regions_t {};
 const static nodes_t nodes{};
 const static regions_t regions{};
 
+template<typename T, typename Creator, typename Deleter>
+class native_handle_owner {
+public:
+	explicit native_handle_owner(Creator c, Deleter d)
+		: m_handle{ nullptr, d }
+		, m_lastError{ 0 }
+	{
+		T* tempHandle = nullptr;
+		m_lastError = c(&tempHandle);
+
+		if (HLVR_OK(m_lastError)) {
+			m_handle.reset(tempHandle);
+		}
+	}
+
+	const T* native_handle() const {
+		return m_handle.get();
+	}
+
+	T* native_handle() {
+		return m_handle.get();
+	}
+
+	explicit operator bool() const noexcept {
+		return (bool)m_handle;
+	}
+
+	HLVR_Result last_error() const noexcept {
+		return m_lastError;
+	}
+protected:
+	std::unique_ptr<T, Deleter> m_handle;
+	HLVR_Result m_lastError;
+};
+
+
 const char* error_c_str(HLVR_Result result) {
 		switch (result) {
 		case HLVR_Error_UNKNOWN:
@@ -44,69 +80,39 @@ const char* error_c_str(HLVR_Result result) {
 		}
 	
 }
-class system {
+
+using system_handle = native_handle_owner<HLVR_System, decltype(&HLVR_System_Create), decltype(&HLVR_System_Destroy)>;
+class system : public system_handle {
 public:
-	system() : m_system{ nullptr }, m_lastError(0) {
-
-		m_lastError = HLVR_System_Create(&m_system, nullptr);
-		if (HLVR_FAIL(m_lastError)) {
-			m_system = nullptr;
-		}
-	}
-	~system() {
-		shutdown();
-	}
-	system(const system&) = delete;
-	system& operator=(const system&) = delete;
-
-	explicit operator bool() const noexcept {
-		return m_system != nullptr;
-	}
-
-	HLVR_Result last_error() const {
-		return m_lastError;
-	}
-
+	system() : system_handle { &HLVR_System_Create, &HLVR_System_Destroy } {}
 	
 
-	void provide_native_handle(owner<HLVR_System*> handle) {
-		m_system = handle;
-	}
-
 	void shutdown() {
-		if (m_system != nullptr) {
-			HLVR_System_Destroy(&m_system);
-			m_system = nullptr;
-		}
+		m_handle.reset(nullptr);
 	}
 
 	bool get_runtime_info(HLVR_RuntimeInfo* info) {
-		assert(m_system != nullptr);
+		assert(m_handle);
 		assert(info != nullptr);
-		m_lastError = HLVR_System_GetRuntimeInfo(m_system, info);
+		m_lastError = HLVR_System_GetRuntimeInfo(m_handle.get(), info);
 		return HLVR_OK(m_lastError);
 	}
 
 	bool poll_tracking(HLVR_TrackingUpdate* update) {
-		assert(m_system != nullptr);
+		assert(m_handle);
 		assert(update != nullptr);
-		m_lastError = HLVR_System_PollTracking(m_system, update);
+		m_lastError = HLVR_System_PollTracking(m_handle.get(), update);
 		return HLVR_OK(m_lastError);
 	}
 
 	bool push_event(HLVR_Event* event) {
-		assert(m_system != nullptr);
+		assert(m_handle);
 		assert(event != nullptr);
-		m_lastError = HLVR_System_StreamEvent(m_system, event);
+		m_lastError = HLVR_System_StreamEvent(m_handle.get(), event);
 		return HLVR_OK(m_lastError);
 	}
 
-	//returns a non-owning handle
-	HLVR_System* native_handle() { return m_system; }
-
-private:
-	owner<HLVR_System*> m_system;
-	HLVR_Result m_lastError;
+	
 };
 
 
@@ -121,14 +127,14 @@ public:
 	}
 
 	~event() {
-		HLVR_Event_Destroy(&m_event);
+		HLVR_Event_Destroy(m_event);
 	}
 
 	event(event&& other) : m_event{ other.m_event }, m_lastError{ other.m_lastError } {
 		other.m_event = nullptr;
 	}
 	event& operator=(event&& other) {
-		HLVR_Event_Destroy(&m_event);
+		HLVR_Event_Destroy(m_event);
 		m_event = other.m_event;
 		other.m_event = nullptr;
 		return *this;
@@ -185,78 +191,78 @@ private:
 	HLVR_Result m_lastError;
 };
 
+
+
 class timeline {
 public:
-	timeline() : m_timeline{ nullptr }, m_lastError{ 0 } {
-		m_lastError = HLVR_Timeline_Create(&m_timeline);
-		if (HLVR_FAIL(m_lastError)) {
-			m_timeline = nullptr;
+	timeline() 
+		: m_timeline{ nullptr, [](HLVR_Timeline* t) { HLVR_Timeline_Destroy(t); } }
+		, m_lastError{ 0 } 
+	{
+		HLVR_Timeline* tempHandle = nullptr;
+		m_lastError = HLVR_Timeline_Create(&tempHandle);
+
+		if (HLVR_OK(m_lastError)) {
+			m_timeline.reset(tempHandle);
 		}
 	}
-	~timeline() {
-		HLVR_Timeline_Destroy(&m_timeline);
-	}
-
-	timeline(const timeline&) = delete;
-	timeline& operator=(const timeline&) = delete;
+	
 	HLVR_Result last_error() const {
 		return m_lastError;
 	}
 
 	
 	explicit operator bool() const noexcept {
-		return m_timeline != nullptr;
+		return (bool) m_timeline;
 	}
 
 	bool add_event(hlvr::event& ev, double timeOffsetFractionalSeconds) {
 		assert(m_timeline != nullptr);
-		m_lastError = HLVR_Timeline_AddEvent(m_timeline, timeOffsetFractionalSeconds, ev.native_handle());
+		m_lastError = HLVR_Timeline_AddEvent(m_timeline.get(), timeOffsetFractionalSeconds, ev.native_handle());
 		return HLVR_OK(m_lastError);
 	}
 
 	HLVR_Timeline* native_handle() {
-		return m_timeline;
+		return m_timeline.get();
 	}
 
 	const HLVR_Timeline* native_handle() const {
-		return m_timeline;
+		return m_timeline.get();
 	}
 private:
-	owner<HLVR_Timeline*> m_timeline;
+	std::unique_ptr<HLVR_Timeline, decltype(&HLVR_Timeline_Destroy)> m_timeline;
 	HLVR_Result m_lastError;
 };
 
 
-class effect {
+
+
+
+using effect_handle = native_handle_owner<HLVR_Effect, decltype(&HLVR_Effect_Create), decltype(&HLVR_Effect_Destroy)>;
+
+class effect : public effect_handle {
 public:
-	effect() : m_effect{ nullptr }, m_lastError{ 0 } {
-		m_lastError = HLVR_Effect_Create(&m_effect);
-		if (HLVR_FAIL(m_lastError)) {
-			m_effect = nullptr;
-		}
-	}
-
-	~effect() {
-		HLVR_Effect_Destroy(&m_effect);
-	}
-
-	HLVR_Effect* native_handle() {
-		return m_effect;
-	}
-
-	effect(const effect&) = delete;
-	effect& operator=(const effect&) = delete;
+	effect() : effect_handle{ &HLVR_Effect_Create, &HLVR_Effect_Destroy } {}
 
 
 	bool play() {
-		assert(m_effect != nullptr);
-		m_lastError = HLVR_Effect_Play(m_effect);
+		assert(m_handle);
+		m_lastError = HLVR_Effect_Play(m_handle.get());
 		return HLVR_OK(m_lastError);
 	}
 
-private:
-	std::unique_ptr<HLVR_Effect> m_effect;
-	HLVR_Result  m_lastError;
+	bool pause() {
+		assert(m_handle);
+		m_lastError = HLVR_Effect_Pause(m_handle.get());
+		return HLVR_OK(m_lastError);
+	}
+
+	bool reset() {
+		assert(m_handle);
+		m_lastError = HLVR_Effect_Reset(m_handle.get());
+		return HLVR_OK(m_lastError);
+	}
+
 };
 
 
