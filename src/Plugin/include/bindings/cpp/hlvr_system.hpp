@@ -1,7 +1,7 @@
 #pragma once
 
 #include "HLVR.h"
-
+#include <memory>
 namespace hlvr 
 {
 
@@ -255,7 +255,7 @@ public:
 	}
 
 private:
-	owner<HLVR_Effect*> m_effect;
+	std::unique_ptr<HLVR_Effect> m_effect;
 	HLVR_Result  m_lastError;
 };
 

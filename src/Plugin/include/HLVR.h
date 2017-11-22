@@ -18,8 +18,8 @@
 #endif
 
 #define HLVR_API_VERSION_MAJOR 0
-#define HLVR_API_VERSION_MINOR 5
-#define HLVR_API_VERSION_PATCH 1
+#define HLVR_API_VERSION_MINOR 6
+#define HLVR_API_VERSION_PATCH 0
 #define HLVR_API_VERSION ((HLVR_API_VERSION_MAJOR << 24) | (HLVR_API_VERSION_MINOR << 16) | HLVR_API_VERSION_PATCH)
 
 #if !defined(HLVR_TOSTRING)
@@ -384,7 +384,7 @@ extern "C" {
 		@param system address of the target system pointer
 		@return void
 	*/
-	HLVR_RETURN(void) HLVR_System_Destroy(HLVR_System** system);
+	HLVR_RETURN(void) HLVR_System_Destroy(HLVR_System* system);
 
 	/*! Checks if this version of the API has a particular feature.
 		@param feature name of feature
@@ -537,7 +537,7 @@ extern "C" {
 		@param event address of the target event pointer to destroy
 		@return void
 	*/
-	HLVR_RETURN(void)		 HLVR_Event_Destroy(HLVR_Event** event);
+	HLVR_RETURN(void)		 HLVR_Event_Destroy(HLVR_Event* event);
 
 	/*! Set a float with the given key 
 		@param event target
@@ -656,7 +656,7 @@ extern "C" {
 	/*! Destroy the given timeline
 		@return void
 	*/
-	HLVR_RETURN(void)		 HLVR_Timeline_Destroy(HLVR_Timeline** timeline);
+	HLVR_RETURN(void)		 HLVR_Timeline_Destroy(HLVR_Timeline* timeline);
 	
 	/*! Add an event with a given type and time offset to this timeline
 		@param timeline the timeline to operate on
@@ -682,7 +682,7 @@ extern "C" {
 		The effect will still play out until completion.
 		@return HLVR_Ok on success
 	*/
-	HLVR_RETURN(void)		 HLVR_Effect_Destroy(HLVR_Effect** handlePtr);
+	HLVR_RETURN(void)		 HLVR_Effect_Destroy(HLVR_Effect* handlePtr);
 	/*! Cause the effect to play, or resume playback from a paused state.
 		@return HLVR_Ok on success, HLVR_Error_NoSuchHandle if the effect was destroyed or not yet bound
 	*/

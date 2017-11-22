@@ -38,8 +38,8 @@ namespace NGitVersion.Model
         public string Culture        { get { return ""; } }
 
         public string Major          { get { return "0"; } } // TODO
-        public string Minor          { get { return "5"; } } // TODO
-        public string Build          { get { return "1"; } } // TODO
+        public string Minor          { get { return "6"; } } // TODO
+        public string Build          { get { return "0"; } } // TODO
 
         public string Revision       { get { return mRevision.Value; } }
         public string ShortHash      { get { return mShortHash.Value; } }

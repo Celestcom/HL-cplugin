@@ -145,10 +145,10 @@ HLVR_RETURN(int) HLVR_Version_HasFeature(const char * feature)
 	return features.find(feature) != features.end();
 }
 
-HLVR_RETURN(void) HLVR_System_Destroy(HLVR_System** ptr)
+HLVR_RETURN(void) HLVR_System_Destroy(HLVR_System* ptr)
 {	
 	ExceptionGuard([&] {
-		delete AS_TYPE(Engine, *ptr);
+		delete AS_TYPE(Engine, ptr);
 		return HLVR_Ok;
 	});
 }
@@ -237,10 +237,10 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_Create(HLVR_Event** eventPtr, HLVR_EventType
 	 });
  }
 
-HLVR_RETURN(void) HLVR_Event_Destroy(HLVR_Event ** eventPtr)
+HLVR_RETURN(void) HLVR_Event_Destroy(HLVR_Event * eventPtr)
  {
 	ExceptionGuard([&] {
-		delete AS_TYPE(ParameterizedEvent, *eventPtr);
+		delete AS_TYPE(ParameterizedEvent, eventPtr);
 		return HLVR_Ok;
 
 	});
@@ -354,11 +354,11 @@ HLVR_RETURN(HLVR_Result) HLVR_Timeline_Create(HLVR_Timeline** timelinePtr)
 
  
 
-HLVR_RETURN(void) HLVR_Timeline_Destroy(HLVR_Timeline ** listPtr)
+HLVR_RETURN(void) HLVR_Timeline_Destroy(HLVR_Timeline * listPtr)
  {
 	ExceptionGuard([&] {
 
-		delete AS_TYPE(EventList, *listPtr);
+		delete AS_TYPE(EventList, listPtr);
 		return HLVR_Ok;
 
 	});
@@ -435,10 +435,10 @@ HLVR_RETURN(HLVR_Result) HLVR_Effect_Play(HLVR_Effect* effect) {
 
 
 
-HLVR_RETURN(void) HLVR_Effect_Destroy(HLVR_Effect** handlePtr)
+HLVR_RETURN(void) HLVR_Effect_Destroy(HLVR_Effect* handlePtr)
  {
 	ExceptionGuard([&] {
-		delete AS_TYPE(PlaybackHandle, *handlePtr);
+		delete AS_TYPE(PlaybackHandle, handlePtr);
 		return HLVR_Ok;
 	});
  }
