@@ -33,6 +33,7 @@ public:
 	}
 
 	std::vector<HLVR_DeviceInfo> get_known_devices() {
+		assert(m_handle);
 
 		std::vector<HLVR_DeviceInfo> devices;
 
@@ -47,6 +48,8 @@ public:
 	}
 
 	std::vector<HLVR_NodeInfo> get_nodes(uint32_t device_id) {
+		assert(m_handle);
+
 		std::vector<HLVR_NodeInfo> nodes;
 
 		HLVR_NodeIterator iter;

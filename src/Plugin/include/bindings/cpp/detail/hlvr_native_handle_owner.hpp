@@ -3,10 +3,8 @@
 #include "HLVR.h"
 #include <memory>
 #include <cassert>
-namespace hlvr 
-{
+namespace hlvr {
 namespace detail {
-
 
 template<typename T, typename Creator, typename Deleter>
 class native_handle_owner {
@@ -23,11 +21,11 @@ public:
 		}
 	}
 
-	const T* native_handle() const {
+	const T* native_handle() const noexcept{
 		return m_handle.get();
 	}
 
-	T* native_handle() {
+	T* native_handle() noexcept {
 		return m_handle.get();
 	}
 
