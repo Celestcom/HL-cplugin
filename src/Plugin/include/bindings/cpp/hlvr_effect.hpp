@@ -1,38 +1,32 @@
 #pragma once
 
-#include "HLVR.h"
 #include "detail/hlvr_native_handle_owner.hpp"
+#include "hlvr_error.hpp"
+#include "HLVR.h"
+#include <cassert>
 
-namespace hlvr 
-{
+namespace hlvr {
+namespace detail {
+using effect_handle = native_handle_owner<HLVR_Effect, decltype(&HLVR_Effect_Create), decltype(&HLVR_Effect_Destroy)>;
+}
 
-
-using effect_handle = detail::native_handle_owner<HLVR_Effect, decltype(&HLVR_Effect_Create), decltype(&HLVR_Effect_Destroy)>;
-
-class effect : public effect_handle {
+class effect : public detail::effect_handle {
 public:
-	effect() : effect_handle{ &HLVR_Effect_Create, &HLVR_Effect_Destroy } {}
+	effect() : detail::effect_handle{ &HLVR_Effect_Create, &HLVR_Effect_Destroy } {}
 
-
-	bool play() {
+	status_code play() {
 		assert(m_handle);
-		m_lastError = HLVR_Effect_Play(m_handle.get());
-		return HLVR_OK(m_lastError);
+		return status_code(HLVR_Effect_Play(m_handle.get()));
 	}
 
-	bool pause() {
+	status_code pause() {
 		assert(m_handle);
-		m_lastError = HLVR_Effect_Pause(m_handle.get());
-		return HLVR_OK(m_lastError);
+		return status_code(HLVR_Effect_Pause(m_handle.get()));
 	}
 
-	bool reset() {
+	status_code reset() {
 		assert(m_handle);
-		m_lastError = HLVR_Effect_Reset(m_handle.get());
-		return HLVR_OK(m_lastError);
+		return status_code(HLVR_Effect_Reset(m_handle.get()));
 	}
-
 };
-
-
 }

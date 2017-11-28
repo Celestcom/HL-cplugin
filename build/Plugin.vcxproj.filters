@@ -34,6 +34,9 @@
     <Filter Include="src\Plugin\test">
       <UniqueIdentifier>{9A5EDC46-06EA-490B-0FFB-CCFF7B05A60B}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\Plugin\include\cpp">
+      <UniqueIdentifier>{088362de-9698-4a4d-a489-6ba7048db5fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Plugin\AreaFlags.h">
@@ -155,6 +158,21 @@
     </ClInclude>
     <ClInclude Include="..\src\Plugin\targetver.h">
       <Filter>src\Plugin</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_effect.hpp">
+      <Filter>src\Plugin\include\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_error.hpp">
+      <Filter>src\Plugin\include\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_event.hpp">
+      <Filter>src\Plugin\include\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_system.hpp">
+      <Filter>src\Plugin\include\cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_timeline.hpp">
+      <Filter>src\Plugin\include\cpp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

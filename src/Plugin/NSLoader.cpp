@@ -319,7 +319,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64s(HLVR_Event * event, HLVR_EventKey
 
 
 
-HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * timeline, double timeOffsetSeconds, HLVR_Event * event)
+HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * timeline, double timeOffsetSeconds, const HLVR_Event * event)
 {
 	RETURN_IF_NULL(timeline);
 	RETURN_IF_NULL(event);
@@ -335,7 +335,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * timeline, double
 		return AS_TYPE(EventList, timeline)->AddEvent(
 			TimeOffset<ParameterizedEvent> {
 				static_cast<float>(timeOffsetSeconds),
-				*AS_TYPE(ParameterizedEvent, event)
+				*AS_TYPE(const ParameterizedEvent, event)
 			}
 		);
 	});

@@ -148,7 +148,7 @@ std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
 	return pairs;
 }
 
-bool ClientMessenger::ConnectedToService(HLVR_RuntimeInfo* info)
+bool ClientMessenger::ConnectedToService(HLVR_RuntimeInfo* info) const
 {
 
 	if (m_connectedToService) {

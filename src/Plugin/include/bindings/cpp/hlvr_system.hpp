@@ -5,9 +5,16 @@
 #include "HLVR_Experimental.h"
 #include "detail/hlvr_native_handle_owner.hpp"
 #include "hlvr_event.hpp"
+#include "hlvr_error.hpp"
 
-namespace hlvr 
-{
+#include "detail/expected.hpp"
+#include <cassert>
+
+namespace hlvr {
+
+namespace detail {
+using system_handle = native_handle_owner<HLVR_System, decltype(&HLVR_System_Create), decltype(&HLVR_System_Destroy)>;
+}
 
 struct nodes_t {};
 struct regions_t {};
@@ -15,21 +22,37 @@ struct regions_t {};
 const static nodes_t nodes{};
 const static regions_t regions{};
 
-using system_handle = detail::native_handle_owner<HLVR_System, decltype(&HLVR_System_Create), decltype(&HLVR_System_Destroy)>;
-class system : public system_handle {
+
+//tl::expected<system, status_code> make_system() {
+//	HLVR_System* handle = nullptr;
+//	HLVR_Result ec = HLVR_System_Create(&handle);
+//	if (HLVR_FAIL(ec)) {
+//		return tl::make_unexpected(status_code(ec));
+//	}
+//	else {
+//		return 
+//	}
+//}
+struct test {
+
+};
+system make_test() {
+	HLVR_System* sys;
+	return system(sys);
+}
+class system : public detail::system_handle {
 public:
-	system() : system_handle { &HLVR_System_Create, &HLVR_System_Destroy } {}
-	
+	system() : detail::system_handle { &HLVR_System_Create, &HLVR_System_Destroy } {}
+	system(HLVR_System* raw) {}
 
 	void shutdown() {
 		m_handle.reset(nullptr);
 	}
 
-	bool get_runtime_info(HLVR_RuntimeInfo* info) {
+	status_code get_runtime_info(HLVR_RuntimeInfo* info) const {
 		assert(m_handle);
-		assert(info != nullptr);
-		m_lastError = HLVR_System_GetRuntimeInfo(m_handle.get(), info);
-		return HLVR_OK(m_lastError);
+		assert(info);
+		return status_code(HLVR_System_GetRuntimeInfo(m_handle.get(), info));
 	}
 
 	std::vector<HLVR_DeviceInfo> get_known_devices() {
@@ -66,32 +89,31 @@ public:
 		return get_nodes(hlvr_allnodes);
 	}
 
-	bool push_event(hlvr::event& event) {
+	status_code push_event(hlvr::event& event) {
 		assert(m_handle);
-		assert((bool)event);
-		m_lastError = HLVR_System_StreamEvent(m_handle.get(), event.native_handle());
-		return HLVR_OK(m_lastError);
+		assert(event);
+		return status_code(HLVR_System_StreamEvent(m_handle.get(), event.native_handle()));
 	}
 
 
-	bool poll_tracking(HLVR_TrackingUpdate* update) {
+	status_code poll_tracking(HLVR_TrackingUpdate* update) {
 		assert(m_handle);
-		assert(update != nullptr);
-		m_lastError = HLVR_System_PollTracking(m_handle.get(), update);
-		return HLVR_OK(m_lastError);
+		assert(update);
+		return status_code(HLVR_System_PollTracking(m_handle.get(), update));
+
 	}
 
-	bool enable_tracking(uint32_t device_id) {
+	status_code enable_tracking(uint32_t device_id) {
 		assert(m_handle);
-		m_lastError = HLVR_System_EnableTracking(m_handle.get(), device_id);
-		return HLVR_OK(m_lastError);
+		return status_code(HLVR_System_EnableTracking(m_handle.get(), device_id));
 	}
 
-	bool disable_tracking(uint32_t device_id) {
+	status_code disable_tracking(uint32_t device_id) {
 		assert(m_handle);
-		m_lastError = HLVR_System_DisableTracking(m_handle.get(), device_id);
-		return HLVR_OK(m_lastError);
+		return status_code(HLVR_System_DisableTracking(m_handle.get(), device_id));
 	}
+
+	friend system make_test();
 };
 
 }

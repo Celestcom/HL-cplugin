@@ -410,7 +410,7 @@ extern "C" {
 		@param[out] info struct to be populated
 		@return HLVR_Ok if able to retrieve information, else HLVR_Error_NotConnected if not connected to Service.
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_System_GetRuntimeInfo(HLVR_System* system, HLVR_RuntimeInfo* info);
+	HLVR_RETURN(HLVR_Result) HLVR_System_GetRuntimeInfo(const HLVR_System* system, HLVR_RuntimeInfo* info);
 
 
 	/*! Suspend execution of the effects engine.
@@ -645,7 +645,7 @@ extern "C" {
 		@param outResult where to put validation results 
 		@return HLVR_Error_InvalidEventType if the given type is unknown, else HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_Event_Validate(HLVR_Event* event, HLVR_Event_ValidationResult* outResult);
+	HLVR_RETURN(HLVR_Result) HLVR_Event_Validate(const HLVR_Event* event, HLVR_Event_ValidationResult* outResult);
 
 	
 	/*! Create a new timeline
@@ -664,7 +664,7 @@ extern "C" {
 		@param event the data to use when adding the event
 		@return HLVR_Error_InvalidTimeOffset if @p timeOffsetSeconds < 0, else HLVR_Ok
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline* timeline, double timeOffsetSeconds, HLVR_Event* event);
+	HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline* timeline, double timeOffsetSeconds, const HLVR_Event* event);
 	
 	/*! Create a new effect within the system, using a timeline as the source
 		@param timeline the source timeline
@@ -672,7 +672,7 @@ extern "C" {
 		@param effect target HLVR_Effect 
 		@return HLVR_Error_EmptyTimeline if timeline contains no events, else HLVR_Ok 
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(HLVR_Timeline* timeline, HLVR_System* system, HLVR_Effect* effect);
+	HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(const HLVR_Timeline* timeline, HLVR_System* system, HLVR_Effect* effect);
 
 	/*! Create a new HLVR_Effect
 		@return HLVR_Ok on success
@@ -698,7 +698,7 @@ extern "C" {
 	/*! Return information associated with this effect.
 		@return HLVR_Ok on success, else HLVR_Error_NoSuchHandle if the effect was destroyed or not yet bound
 	*/
-	HLVR_RETURN(HLVR_Result) HLVR_Effect_GetInfo(HLVR_Effect* effect, HLVR_EffectInfo* info);
+	HLVR_RETURN(HLVR_Result) HLVR_Effect_GetInfo(const HLVR_Effect* effect, HLVR_EffectInfo* info);
 
 
 

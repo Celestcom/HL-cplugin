@@ -11,12 +11,11 @@ class native_handle_owner {
 public:
 	explicit native_handle_owner(Creator c, Deleter d)
 		: m_handle{ nullptr, d }
-		, m_lastError{ 0 }
 	{
 		T* tempHandle = nullptr;
-		m_lastError = c(&tempHandle);
+		HLVR_Result ec = c(&tempHandle);
 
-		if (HLVR_OK(m_lastError)) {
+		if (HLVR_OK(ec)) {
 			m_handle.reset(tempHandle);
 		}
 	}
@@ -30,15 +29,12 @@ public:
 	}
 
 	explicit operator bool() const noexcept {
-		return (bool)m_handle;
+		return (bool) m_handle;
 	}
 
-	HLVR_Result last_error() const noexcept {
-		return m_lastError;
-	}
+
 protected:
 	std::unique_ptr<T, Deleter> m_handle;
-	HLVR_Result m_lastError;
 };
 
 }

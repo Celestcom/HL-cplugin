@@ -22,7 +22,7 @@ int EventList::AddEvent(TimeOffset<ParameterizedEvent> event)
 
 
 
-std::vector<TimeOffset<ParameterizedEvent>> EventList::events()
+std::vector<TimeOffset<ParameterizedEvent>> EventList::events() const
 {
 	std::lock_guard<std::mutex> guard(m_eventLock);
 

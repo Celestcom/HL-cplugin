@@ -19,11 +19,11 @@ public:
 	
 	EventList();
 	int AddEvent(TimeOffset<ParameterizedEvent> data);
-	std::vector<TimeOffset<ParameterizedEvent>> events();
+	std::vector<TimeOffset<ParameterizedEvent>> events() const;
 	bool empty() const;
 private:
 	std::vector<TimeOffset<ParameterizedEvent>> m_events;
-	std::mutex m_eventLock;
+	mutable std::mutex m_eventLock;
 public:
 	void Interleave(EventList* source, float offset);
 	void Dupe(float offset);

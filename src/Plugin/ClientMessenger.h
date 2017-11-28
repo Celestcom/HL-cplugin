@@ -4,7 +4,6 @@
 #include "ReadableSharedMap.h"
 #include "ReadableSharedObject.h"
 #include "WritableSharedQueue.h"
-#include "ReadableSharedTracking.h"
 #include "ReadableSharedVector.h"
 #include "SharedTypes.h"
 #include <boost\optional.hpp>
@@ -31,7 +30,7 @@ public:
 	boost::optional<std::string> ReadLog();
 
 	std::vector<NullSpace::SharedMemory::RegionPair> ReadBodyView();
-	bool ConnectedToService(HLVR_RuntimeInfo* info);
+	bool ConnectedToService(HLVR_RuntimeInfo* info) const;
 
 	
 private:

@@ -227,7 +227,7 @@ Engine::~Engine()
 	}
 }
 
-int Engine::PollStatus(HLVR_RuntimeInfo* info)
+int Engine::PollStatus(HLVR_RuntimeInfo* info) const 
 {
 	if (m_messenger.ConnectedToService(info)) {
 	
@@ -317,7 +317,7 @@ extractPlayables(const std::vector<TimeOffset<ParameterizedEvent>>& events) {
 }
 
 //Only modifies handle if the effect is created successfully
-int Engine::CreateEffect(EventList * list, HapticHandle* handle)
+int Engine::CreateEffect(const EventList * list, HapticHandle* handle)
 {
 	if (list == nullptr) {
 		return HLVR_Error_NullArgument;

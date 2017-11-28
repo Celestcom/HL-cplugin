@@ -5,7 +5,9 @@
 namespace hlvr 
 {
 
-const char* error_c_str(HLVR_Result result) {
+
+
+inline const char* error_c_str(HLVR_Result result) {
 	switch (result) {
 	case HLVR_Error_UNKNOWN:
 		return "Unknown";
@@ -33,5 +35,22 @@ const char* error_c_str(HLVR_Result result) {
 		return "Unknown";
 	}
 }
+
+class status_code {
+public:
+	explicit status_code(HLVR_Result result) : m_code{ result } {}
+	const char* what() const {
+		return error_c_str(m_code);
+	}
+	const HLVR_Result value() const {
+		return m_code;
+	}
+	explicit operator bool() const noexcept{
+		return HLVR_OK(m_code);
+	}
+private:
+	HLVR_Result m_code;
+};
+
 
 }
