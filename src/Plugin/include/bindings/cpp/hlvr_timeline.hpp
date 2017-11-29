@@ -14,13 +14,16 @@
 namespace hlvr {
 
 namespace detail {
-using timeline_handle = native_handle_owner<HLVR_Timeline, decltype(&HLVR_Timeline_Create), decltype(&HLVR_Timeline_Destroy)>;
+	using timeline_traits = native_traits<HLVR_Timeline, decltype(&HLVR_Timeline_Create), decltype(&HLVR_Timeline_Destroy)>;
 }
 
-class timeline : public detail::timeline_handle {
+class timeline : public detail::native_handle_owner<timeline, detail::timeline_traits> {
 public:
-	timeline() : detail::timeline_handle{ &HLVR_Timeline_Create, &HLVR_Timeline_Destroy } {}
+	using timeline_handle = detail::native_handle_owner<timeline, detail::timeline_traits>;
+	timeline() : timeline_handle { &HLVR_Timeline_Destroy } {}
 
+
+	
 
 	status_code add_event(const hlvr::event& ev, double timeOffsetFractionalSeconds) {
 		assert(m_handle);
@@ -32,8 +35,39 @@ public:
 		assert(system);
 		assert(effect);
 
-		return status_code(HLVR_Timeline_Transmit(m_handle.get(), system.native_handle(), effect.native_handle()));
+		auto sc = HLVR_Timeline_Transmit(m_handle.get(), system.native_handle(), effect.native_handle());
+		return status_code(sc);
 	}
+
+	tl::expected<hlvr::effect, status_code> transmit(hlvr::system& system) const {
+		assert(m_handle);
+		assert(system);
+
+	
+		auto potentialEffect = hlvr::effect::make();
+		if (!potentialEffect) {
+			return potentialEffect;
+		}
+
+		hlvr::status_code sc = transmit(system, *potentialEffect);
+		if (sc) { 
+			return potentialEffect;
+		}
+		else {
+			return tl::unexpected<status_code>(sc);
+		}
+		
+		
+
+	}
+
+	static tl::expected<timeline, status_code> make() {
+		return make_helper(&HLVR_Timeline_Create);
+	}
+
+private:
+	friend timeline_handle;
+	timeline(HLVR_Timeline* rawPtr) : timeline_handle(rawPtr, &HLVR_Timeline_Destroy) {}
 
 };
 

@@ -13,7 +13,9 @@
 namespace hlvr {
 
 namespace detail {
-using system_handle = native_handle_owner<HLVR_System, decltype(&HLVR_System_Create), decltype(&HLVR_System_Destroy)>;
+
+	using system_traits = native_traits<HLVR_System, decltype(&HLVR_System_Create), decltype(&HLVR_System_Destroy)>;
+
 }
 
 struct nodes_t {};
@@ -23,36 +25,26 @@ const static nodes_t nodes{};
 const static regions_t regions{};
 
 
-//tl::expected<system, status_code> make_system() {
-//	HLVR_System* handle = nullptr;
-//	HLVR_Result ec = HLVR_System_Create(&handle);
-//	if (HLVR_FAIL(ec)) {
-//		return tl::make_unexpected(status_code(ec));
-//	}
-//	else {
-//		return 
-//	}
-//}
-struct test {
 
-};
-system make_test() {
-	HLVR_System* sys;
-	return system(sys);
-}
-class system : public detail::system_handle {
+class system : public detail::native_handle_owner<system, detail::system_traits> {
 public:
-	system() : detail::system_handle { &HLVR_System_Create, &HLVR_System_Destroy } {}
-	system(HLVR_System* raw) {}
+	using system_handle = detail::native_handle_owner<system, detail::system_traits>;
 
+	system() : system_handle(&HLVR_System_Destroy) {}
 	void shutdown() {
 		m_handle.reset(nullptr);
 	}
 
-	status_code get_runtime_info(HLVR_RuntimeInfo* info) const {
+	tl::expected<HLVR_RuntimeInfo, status_code> get_runtime_info() const {
 		assert(m_handle);
-		assert(info);
-		return status_code(HLVR_System_GetRuntimeInfo(m_handle.get(), info));
+		HLVR_RuntimeInfo info = { 0 };
+		auto ec = HLVR_System_GetRuntimeInfo(m_handle.get(), &info);
+		if (HLVR_OK(ec)) {
+			return info;
+		}
+		else {
+			return tl::make_unexpected(status_code(ec));
+		}
 	}
 
 	std::vector<HLVR_DeviceInfo> get_known_devices() {
@@ -96,11 +88,15 @@ public:
 	}
 
 
-	status_code poll_tracking(HLVR_TrackingUpdate* update) {
+	tl::expected<HLVR_TrackingUpdate, status_code> poll_tracking() {
 		assert(m_handle);
-		assert(update);
-		return status_code(HLVR_System_PollTracking(m_handle.get(), update));
-
+		HLVR_TrackingUpdate update = { 0 };
+		auto ec = HLVR_System_PollTracking(m_handle.get(), &update);
+		if (HLVR_OK(ec)) { 
+			return update; 
+		} else { 
+			return tl::make_unexpected(status_code(ec));
+		}
 	}
 
 	status_code enable_tracking(uint32_t device_id) {
@@ -113,7 +109,16 @@ public:
 		return status_code(HLVR_System_DisableTracking(m_handle.get(), device_id));
 	}
 
-	friend system make_test();
+	
+	static tl::expected<system, status_code> make() {
+		return make_helper(&HLVR_System_Create);
+	}
+
+
+private:
+	friend class system_handle;
+	explicit system(HLVR_System* handle) : system_handle( handle, &HLVR_System_Destroy ) {}
 };
+
 
 }

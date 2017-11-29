@@ -1,19 +1,26 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
-#include <iostream>
+
 #include "../AreaFlags.h"
-#include <boost/uuid/random_generator.hpp>
-#include <boost/uuid/uuid.hpp>
 #include "../HapticsPlayer.h"
 #include "../ParameterizedEvent.h"
-#include <boost/asio/io_service.hpp>
 #include "../ClientMessenger.h"
-#include <functional>
-#include <chrono>
 #include "../SharedCommunication/readablesharedvector.h"
 #include "../SharedCommunication/SharedTypes.h"
 #include "HLVR_Experimental.h"
 #include "DiscreteHapticEvent.h"
+#include "../include/bindings/cpp/hlvr_system.hpp"
+#include "../include/bindings/cpp/hlvr_event.hpp"
+#include "../include/bindings/cpp/hlvr_timeline.hpp"
+
+#include <iostream>
+#include <type_traits>
+#include <boost/uuid/random_generator.hpp>
+#include <boost/uuid/uuid.hpp>
+#include <boost/asio/io_service.hpp>
+#include <functional>
+#include <chrono>
+
 template<typename T>
 T time(std::function<void()> fn) {
 	auto then = std::chrono::high_resolution_clock::now();
@@ -367,6 +374,80 @@ TEST_CASE("BodyView should work") {
 	SECTION("The shared memory should instantiate") {
 		auto r = m.ReadBodyView();
 	}
+}
+
+TEST_CASE("Bindings should at least compile ;)") {
+
+	hlvr::system system;
+	
+	SECTION("An uninitialized system should assert false") {
+		REQUIRE(!system);
+	}
+
+	SECTION("An uninitialized system should have nullptr native handle") {
+		REQUIRE(system.native_handle() == nullptr);
+	}
+
+	SECTION("Instantiating system successfully should result in a non-null native_handle and bool operator() should return true") {
+		auto potentialSystem = hlvr::system::make();
+		if (potentialSystem) {
+			INFO("System instantiated");
+			REQUIRE(potentialSystem->native_handle() != nullptr);
+			REQUIRE(*potentialSystem);
+		}
+		else {
+			INFO("Warning! System was not instantiated - this is not expected, but we still need to test it")
+			REQUIRE(!potentialSystem);
+			INFO(potentialSystem.error().what());
+		}
+	}
+
+	SECTION("Moving should work") {
+		auto potentialSystem = hlvr::system::make();
+
+		
+
+
+		if (potentialSystem) {
+			system = std::move(*potentialSystem);
+			REQUIRE(system);
+			REQUIRE(system.native_handle() != nullptr);
+		}
+		else {
+			REQUIRE(1 == 2);
+			INFO("Can't test moving if I can't instantiate the plugin..");
+		}
+	}
+
+
+	SECTION("Events") {
+		hlvr::event event;
+		REQUIRE(!event);
+		REQUIRE(event.native_handle() == nullptr);
+		if (auto realEvent = hlvr::event::make(HLVR_EventType_EndAnalogAudio)) {
+			REQUIRE(realEvent->native_handle() != nullptr);
+			event = std::move(*realEvent);
+			REQUIRE(event);
+		}
+
+	}
+
+	SECTION("Timelines") {
+		hlvr::timeline timeline;
+		REQUIRE(!timeline);
+		REQUIRE(timeline.native_handle() == nullptr);
+
+		if (auto realTimeline = hlvr::timeline::make()) {
+			REQUIRE(realTimeline->native_handle() != nullptr);
+			timeline = std::move(*realTimeline);
+			REQUIRE(timeline);
+		}
+
+	}
+
+	
+
+
 }
 int main(int argc, char* argv[]) {
 	int result = Catch::Session().run(argc, argv);

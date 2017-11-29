@@ -14,14 +14,18 @@ struct event_create {
 		return HLVR_Event_Create(event, m_type);
 	}
 	HLVR_EventType m_type;
+
 };
-	
-using event_handle = native_handle_owner<HLVR_Event, detail::event_create, decltype(&HLVR_Event_Destroy)>;
+	using event_traits = native_traits<HLVR_Event, event_create, decltype(&HLVR_Event_Destroy)>;
+
 }
 
-class event : public detail::event_handle {
+class event : public detail::native_handle_owner<event, detail::event_traits> {
 public:
-	explicit event(HLVR_EventType type) : detail::event_handle{ detail::event_create(type), &HLVR_Event_Destroy } {}
+	// detail::event_create(type), 
+
+	using event_handle = detail::native_handle_owner<event, detail::event_traits>;
+	event() : event_handle{ &HLVR_Event_Destroy } {}
 
 
 
@@ -50,9 +54,26 @@ public:
 		return status_code(HLVR_Event_SetInt(m_handle.get(), key, val));
 	}
 
+	static tl::expected<event, status_code> make(HLVR_EventType type) {
+		return make_helper(detail::event_create(type));
+	}
+private:
+	friend event_handle;
+	explicit event(HLVR_Event* rawPtr) : event_handle(rawPtr, &HLVR_Event_Destroy) {}
 
 };
 
+
+inline tl::expected<HLVR_Event_ValidationResult, status_code> validate_event(const event& ev) {
+	HLVR_Event_ValidationResult result;
+	auto sc = HLVR_Event_Validate(ev.native_handle(), &result);
+	if (HLVR_OK(sc)) {
+		return result;
+	}
+	else {
+		return tl::make_unexpected(status_code(sc));
+	}
+}
 
 
 }
