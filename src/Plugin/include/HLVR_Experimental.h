@@ -49,6 +49,11 @@ extern "C" {
 		float z;
 	} HLVR_Quaternion;
 
+	typedef struct HLVR_Vector3f {
+		float x;
+		float y;
+		float z;
+	} HLVR_Vector3f;
 
 	typedef struct HLVR_TrackingUpdate {
 		HLVR_Quaternion chest;
@@ -56,9 +61,24 @@ extern "C" {
 		HLVR_Quaternion left_forearm;
 		HLVR_Quaternion right_upper_arm;
 		HLVR_Quaternion right_forearm;
+
+		HLVR_Vector3f chest_gravity;
+		HLVR_Vector3f chest_compass;
+
+		HLVR_Vector3f left_upper_arm_gravity;
+		HLVR_Vector3f left_upper_arm_compass;
+
+		HLVR_Vector3f left_forearm_gravity;
+		HLVR_Vector3f left_forearm_compass;
+
+		HLVR_Vector3f right_upper_arm_gravity;
+		HLVR_Vector3f right_upper_arm_compass;
+
+		HLVR_Vector3f right_forearm_gravity;
+		HLVR_Vector3f right_forearm_compass;
 	} HLVR_TrackingUpdate;
 
-
+	
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_PollTracking(HLVR_System* ptr, HLVR_TrackingUpdate* updatePtr);
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_EnableTracking(HLVR_System* ptr, uint32_t device_id);
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_DisableTracking(HLVR_System* ptr, uint32_t device_id);

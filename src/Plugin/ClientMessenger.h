@@ -52,7 +52,7 @@ private:
 	//Stream of commands to send to driver, such as ENABLE_TRACKING, DISABLE_TRACKING, etc.
 	std::unique_ptr<WritableSharedQueue> m_commandStream;
 
-	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::TaggedQuaternion>> m_tracking;
+	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::TrackingData>> m_tracking;
 
 
 

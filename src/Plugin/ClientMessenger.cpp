@@ -47,13 +47,22 @@ boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 			TrackingUpdate t = {};
 
 			if (auto index = m_tracking->Find([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_middle_sternum; })) {
-				t.chest = m_tracking->Get(*index).quat;
+				const auto val = m_tracking->Get(*index);
+				t.chest = val.quat;
+				t.chest_compass = val.compass;
+				t.chest_gravity = val.gravity;
 			}
 			if (auto index = m_tracking->Find([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_left; })) {
-				t.left_upper_arm = m_tracking->Get(*index).quat;
+				const auto val = m_tracking->Get(*index);
+				t.left_upper_arm = val.quat;
+				t.left_upper_arm_compass = val.compass;
+				t.left_upper_arm_gravity = val.gravity;
 			}
 			if (auto index = m_tracking->Find([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_right; })) {
-				t.right_upper_arm = m_tracking->Get(*index).quat;
+				const auto val = m_tracking->Get(*index);
+				t.right_upper_arm = val.quat;
+				t.right_upper_arm_compass = val.compass;
+				t.right_upper_arm_gravity = val.gravity;
 			}
 
 			return t;
@@ -192,7 +201,7 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		m_hapticsStream = std::make_unique<WritableSharedQueue>("ns-haptics-data");
 		m_systems = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>>("ns-device-mem", "ns-device-data");
 		m_nodes = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::NodeInfo>>("ns-node-mem", "ns-node-data");
-		m_tracking = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::TaggedQuaternion>>("ns-tracking-mem", "ns-tracking-data");
+		m_tracking = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::TrackingData>>("ns-tracking-mem", "ns-tracking-data");
 		m_bodyView = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>>("ns-bodyview-mem", "ns-bodyview-data");
 	}
 	catch (const boost::interprocess::interprocess_exception& e) {

@@ -42,12 +42,12 @@ HLVR_RETURN(int) HLVR_Version_IsCompatibleDLL(void)
 	return major == HLVR_API_VERSION_MAJOR;
 }
 
-HLVR_RETURN(HLVR_Result) HLVR_System_GetRuntimeInfo(HLVR_System * systemPtr, HLVR_RuntimeInfo * infoPtr)
+HLVR_RETURN(HLVR_Result) HLVR_System_GetRuntimeInfo(const HLVR_System * systemPtr, HLVR_RuntimeInfo * infoPtr)
 {
 	RETURN_IF_NULL(systemPtr);
 
 	return ExceptionGuard([&] {
-		return AS_TYPE(Engine, systemPtr)->PollStatus(infoPtr);
+		return AS_TYPE(const Engine, systemPtr)->PollStatus(infoPtr);
 	});
 
 }
@@ -364,17 +364,17 @@ HLVR_RETURN(void) HLVR_Timeline_Destroy(HLVR_Timeline * listPtr)
 	});
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_Event_Validate(HLVR_Event * event, HLVR_Event_ValidationResult * outResult)
+HLVR_RETURN(HLVR_Result) HLVR_Event_Validate(const HLVR_Event * event, HLVR_Event_ValidationResult * outResult)
 {
 	RETURN_IF_NULL(event);
 	RETURN_IF_NULL(outResult);
 
 	return ExceptionGuard([&] {
-		auto p = PlayableEvent::make(AS_TYPE(ParameterizedEvent, event)->type(), 0.0f);
+		auto p = PlayableEvent::make(AS_TYPE(const ParameterizedEvent, event)->type(), 0.0f);
 		if (!p) {
 			RETURN(HLVR_Error_InvalidEventType);
 		}
-		p->debug_parse(*AS_TYPE(ParameterizedEvent, event), outResult);
+		p->debug_parse(*AS_TYPE(const ParameterizedEvent, event), outResult);
 		
 		RETURN(HLVR_Ok);
 	});
@@ -382,7 +382,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_Validate(HLVR_Event * event, HLVR_Event_Vali
 
 
 
-HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(HLVR_Timeline * timelinePtr, HLVR_System* systemPtr, HLVR_Effect * handlePtr)
+HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(const HLVR_Timeline * timelinePtr, HLVR_System* systemPtr, HLVR_Effect * handlePtr)
  {
 	 RETURN_IF_NULL(systemPtr);
 	 RETURN_IF_NULL(timelinePtr);
@@ -391,7 +391,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(HLVR_Timeline * timelinePtr, HLV
 	 return ExceptionGuard([&] {
 
 		 auto engine = AS_TYPE(Engine, systemPtr);
-		 auto timeline = AS_TYPE(EventList, timelinePtr);
+		 auto timeline = AS_TYPE(const EventList, timelinePtr);
 		 auto handle = AS_TYPE(PlaybackHandle, handlePtr);
 
 		

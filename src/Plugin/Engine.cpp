@@ -338,17 +338,29 @@ int Engine::CreateEffect(const EventList * list, HapticHandle* handle)
 }
 
 
-void copyQuaternion(HLVR_Quaternion& lhs, const NullSpace::SharedMemory::Quaternion& rhs) {
+inline void copyQuaternion(HLVR_Quaternion& lhs, const NullSpace::SharedMemory::Quaternion& rhs) {
 	lhs.w = rhs.w;
 	lhs.x = rhs.x;
 	lhs.y = rhs.y;
 	lhs.z = rhs.z;
 }
 
+inline void copyVector3f(HLVR_Vector3f& lhs, const NullSpace::SharedMemory::Vector3& rhs) {
+	lhs.x = rhs.x;
+	lhs.y = rhs.y;
+	lhs.z = rhs.z;
+}
 void copyTracking(HLVR_TrackingUpdate& lhs, const NullSpace::SharedMemory::TrackingUpdate& rhs) {
 	copyQuaternion(lhs.chest, rhs.chest);
 	copyQuaternion(lhs.left_upper_arm, rhs.left_upper_arm);
 	copyQuaternion(lhs.right_upper_arm, rhs.right_upper_arm);
+
+	copyVector3f(lhs.chest_compass, rhs.chest_compass);
+	copyVector3f(lhs.chest_gravity, rhs.chest_gravity);
+	copyVector3f(lhs.left_upper_arm_compass, rhs.left_upper_arm_compass);
+	copyVector3f(lhs.left_upper_arm_gravity, rhs.left_upper_arm_gravity);
+	copyVector3f(lhs.right_upper_arm_compass, rhs.right_upper_arm_compass);
+	copyVector3f(lhs.right_upper_arm_gravity, rhs.right_upper_arm_gravity);
 }
 
 int Engine::PollTracking(HLVR_TrackingUpdate* q)
