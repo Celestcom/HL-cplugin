@@ -138,7 +138,7 @@ void HapticsPlayer::addNewEffect(const boost::uuids::uuid& id, std::vector<std::
 }
 
 
-boost::optional<PlayableInfo> HapticsPlayer::GetHandleInfo(HapticHandle h) 
+boost::optional<PlayableInfo> HapticsPlayer::GetHandleInfo(HapticHandle h) const
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 
@@ -230,7 +230,7 @@ void HapticsPlayer::ClearAll()
 
 
 
-boost::optional<boost::uuids::uuid> HapticsPlayer::findInternalHandle(HapticHandle h)
+boost::optional<boost::uuids::uuid> HapticsPlayer::findInternalHandle(HapticHandle h) const
 {
 	if (m_outsideToInternal.find(h) != m_outsideToInternal.end()) {
 		return m_outsideToInternal.at(h);
@@ -240,17 +240,21 @@ boost::optional<boost::uuids::uuid> HapticsPlayer::findInternalHandle(HapticHand
 }
 
 
-boost::optional<PlayableEffect&> HapticsPlayer::findExistingPlayable(HapticHandle h)
+const PlayableEffect* HapticsPlayer::findExistingPlayable(HapticHandle h) const 
 {
 	if (auto internalHandle = findInternalHandle(h)) {
 
 		auto intKey = m_hasher(*internalHandle);
 		if (m_effects.find(intKey) != m_effects.end()) {
-			return m_effects.at(intKey);
+			return &m_effects.at(intKey);
 		}
 	
 	}
 
-	return boost::none;
+	return nullptr;
 }
 
+PlayableEffect* HapticsPlayer::findExistingPlayable(HapticHandle h) {
+
+	return const_cast<PlayableEffect*>(static_cast<const HapticsPlayer*>(this)->findExistingPlayable(h));
+}

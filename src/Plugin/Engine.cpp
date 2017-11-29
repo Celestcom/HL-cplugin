@@ -26,7 +26,7 @@ void Engine::executeTimestep(std::chrono::milliseconds dt)
 
 }
 
-int Engine::GetHandleInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) 
+int Engine::GetHandleInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) const
 {
 	if (auto info = m_player.GetHandleInfo(HapticHandle(m_handle))) {
 		infoPtr->Duration = info->Duration();
@@ -376,55 +376,3 @@ int Engine::PollTracking(HLVR_TrackingUpdate* q)
 }
 
 
-//int Engine::PollLogs(NSVR_LogEntry * entry)
-//{
-//	if (auto logEntry = m_log->Poll()) {
-//		auto str = *logEntry;
-//		entry->Length = static_cast<uint32_t>(str.length());
-//		strncpy_s(entry->Message, 512, str.c_str(), 512);
-//		entry->Message[511] = '\0';
-//		return NSVR_Success_Unqualified;
-//	}
-//	else {
-//		return NSVR_Success_NoDataAvailable;
-//	}
-//}
-
-//int Engine::EnableAudio(NSVR_AudioOptions* optionsPtr)
-//{
-//	NullSpaceIPC::DriverCommand command;
-//	command.set_command(NullSpaceIPC::DriverCommand_Command_ENABLE_AUDIO);
-//	if (optionsPtr == nullptr) {
-//		(*command.mutable_params())["audio_min"] = 0x04;
-//		(*command.mutable_params())["audio_max"] = 0x22;
-//		(*command.mutable_params())["peak_time"] = 0x01;
-//		(*command.mutable_params())["filter"] = 0x01;
-//	}
-//	else
-//	{
-//		(*command.mutable_params())["audio_min"] = std::min(std::max<int>(0, optionsPtr->AudioMin), 255);
-//		(*command.mutable_params())["audio_max"] = std::min(std::max<int>(0, optionsPtr->AudioMax), 255);
-//		(*command.mutable_params())["peak_time"] = std::min(std::max<int>(0, optionsPtr->PeakTime), 3);
-//		(*command.mutable_params())["filter"] = std::min(std::max<int>(0, optionsPtr->Filter), 3);
-//	}
-//	m_messenger.WriteCommand(command);
-//	return NSVR_Success_Unqualified;
-//}
-//
-//int Engine::DisableAudio()
-//{
-//	NullSpaceIPC::DriverCommand command;
-//	command.set_command(NullSpaceIPC::DriverCommand_Command_DISABLE_AUDIO);
-//	m_messenger.WriteCommand(command);
-//	return NSVR_Success_Unqualified;
-//}
-//
-//int Engine::SubmitRawCommand(uint8_t * buffer, int length)
-//{
-//	NullSpaceIPC::DriverCommand command;
-//	command.set_command(NullSpaceIPC::DriverCommand_Command_RAW_COMMAND);
-//	command.set_raw_command(buffer, length);
-//	m_messenger.WriteCommand(command);
-//	return NSVR_Success_Unqualified;
-//}
-//

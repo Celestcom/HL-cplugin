@@ -445,13 +445,13 @@ HLVR_RETURN(void) HLVR_Effect_Destroy(HLVR_Effect* handlePtr)
 
 
 
-HLVR_RETURN(HLVR_Result) HLVR_Effect_GetInfo(HLVR_Effect* effect, HLVR_EffectInfo* info)
+HLVR_RETURN(HLVR_Result) HLVR_Effect_GetInfo(const HLVR_Effect* effect, HLVR_EffectInfo* info)
 {
 	RETURN_IF_NULL(effect);
 	RETURN_IF_NULL(info);
 
 	return ExceptionGuard([&] {
-		return AS_TYPE(PlaybackHandle, effect)->GetHandleInfo(info);
+		return AS_TYPE(const PlaybackHandle, effect)->GetHandleInfo(info);
 	});
 }
 

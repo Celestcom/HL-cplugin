@@ -40,7 +40,7 @@ public:
 	void PauseAll();
 	void ClearAll();
 
-	boost::optional<PlayableInfo> GetHandleInfo(HapticHandle h);
+	boost::optional<PlayableInfo> GetHandleInfo(HapticHandle h) const;
 
 	std::size_t GetNumLiveEffects();
 	std::size_t GetNumReleasedEffects();
@@ -50,7 +50,7 @@ private:
 	boost::hash<boost::uuids::uuid> m_hasher;
 	boost::uuids::random_generator m_uuidGenerator;
 
-	std::mutex m_effectsLock;
+	mutable std::mutex m_effectsLock;
 
 	std::unordered_map<std::size_t, PlayableEffect> m_effects;
 	std::vector<std::size_t> m_frozenEffects;
@@ -59,8 +59,9 @@ private:
 
 	std::atomic<uint32_t> m_currentHandleId;
 
-	boost::optional<boost::uuids::uuid> findInternalHandle(HapticHandle h); 
-	boost::optional<PlayableEffect&> findExistingPlayable(HapticHandle h);
+	boost::optional<boost::uuids::uuid> findInternalHandle(HapticHandle h) const; 
+	const PlayableEffect* findExistingPlayable(HapticHandle h) const;
+	PlayableEffect* findExistingPlayable(HapticHandle h);
 	void addNewEffect(const boost::uuids::uuid&, std::vector<std::unique_ptr<PlayableEvent>>&& events);
 	HapticHandle nextHandle();
 

@@ -14,7 +14,7 @@ public:
 	int Pause();
 	int Play();
 	int Reset();
-	int GetHandleInfo(HLVR_EffectInfo* infoPtr);
+	int GetHandleInfo(HLVR_EffectInfo* infoPtr) const;
 
 	uint32_t handle;
 	Engine* engine;
