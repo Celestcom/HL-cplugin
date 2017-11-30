@@ -5,99 +5,12 @@
 #include <boost/assign/list_inserter.hpp>
 
 
-#include <functional>
-#include <chrono>
-
-template<typename T>
-T time(std::function<void()> fn) {
-	auto then = std::chrono::high_resolution_clock::now();
-	fn();
-	auto now = std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - then);
-	return now;
-}
-
-
-template<typename T> struct map_init_helper
-{
-	T& data;
-	map_init_helper(T& d) : data(d) {}
-	map_init_helper& operator() (typename T::key_type const& key, typename T::mapped_type const& value)
-	{
-		data[key] = value;
-		return *this;
-	}
-};
-
-template<typename T> map_init_helper<T> map_init(T& item)
-{
-	return map_init_helper<T>(item);
-};
-
 std::string EnumTranslator::ToString(Location loc) const
 {
 	return _locationMap.left.at(loc);
 
 }
 
-std::string EnumTranslator::ToString(Effect effect) const
-{
-	return _effectMap.left.at(effect);
-
-
-}
-
-std::string EnumTranslator::ToString(Side side) const
-{
-	return _sideMap.left.at(side);
-}
-
-Effect EnumTranslator::ToEffect(std::string effect, Effect defaultEffect)
-{
-	
-	if (_effectMap.right.find(effect) != _effectMap.right.end())
-	{
-		return _effectMap.right.at(effect);
-	}
-	return defaultEffect;
-}
-
-Effect EnumTranslator::ToEffect(std::string effect) const
-{
-	return _effectMap.right.at(effect);
-}
-
-Side EnumTranslator::ToSide(std::string side) const
-{
-	return _sideMap.right.at(side);
-}
-
-Side EnumTranslator::ToSide(std::string side, Side defaultSide)
-{
-	if (_sideMap.right.find(side) != _sideMap.right.end())
-	{
-		return _sideMap.right.at(side);
-	}
-	return defaultSide;
-}
-
-std::string EnumTranslator::ToString(JsonLocation jsonLoc) const
-{
-	return _jsonLocationMap.left.at(jsonLoc);
-}
-
-JsonLocation EnumTranslator::ToJsonLocation(std::string jsonLoc) const
-{
-	return _jsonLocationMap.right.at(jsonLoc);
-}
-
-JsonLocation EnumTranslator::ToJsonLocation(std::string jsonLoc, JsonLocation defaultLocation)
-{
-	if (_jsonLocationMap.right.find(jsonLoc) != _jsonLocationMap.right.end())
-	{
-		return _jsonLocationMap.right.at(jsonLoc);
-	} 
-	return defaultLocation;
-}
 
 Location EnumTranslator::ToLocation(std::string location, Location defaultLocation) 
 {
@@ -116,30 +29,7 @@ Location EnumTranslator::ToLocation(std::string location) const
 EnumTranslator::EnumTranslator() {
 	init_locations();
 	init_effects();
-	init_sides();
-	init_json_locations();
-	init_areas();
 	init_familymap();
-	init_locarea_map();
-	init_regions();
-}
-
-AreaFlag EnumTranslator::ToArea(std::string area, AreaFlag defaultArea) const
-{
-	if (_areaMap.right.find(area) != _areaMap.right.end()) {
-		return _areaMap.right.at(area);
-	}
-	return defaultArea;
-}
-
-AreaFlag EnumTranslator::ToArea(std::string area) const
-{
-	return _areaMap.right.at(area);
-}
-
-std::string EnumTranslator::ToString(AreaFlag area) const
-{
-	return _areaMap.left.at(area);
 }
 
 uint32_t EnumTranslator::ToEffectFamily(std::string effectFamily) const
@@ -152,53 +42,6 @@ std::string EnumTranslator::ToEffectFamilyString(uint32_t effectFamily) const
 	return _effectFamilyMap.right.at(effectFamily);
 }
 
-AreaFlag EnumTranslator::ToArea(Location loc) const
-{
-	return _locationAreaMap.left.at(loc);
-}
-
-std::string EnumTranslator::ToRegionString(AreaFlag f) const
-{
-	return _regionMap.left.at(f);
-}
-
-EnumTranslator::~EnumTranslator()
-{
-}
-
-void EnumTranslator::init_areas()
-{
-	boost::assign::insert(_areaMap)
-		(AreaFlag::None, "None")
-		(AreaFlag::Forearm_Left, "Forearm_Left")
-		(AreaFlag::Upper_Arm_Left, "Upper_Arm_Left")
-		(AreaFlag::Shoulder_Left, "Shoulder_Left")
-		(AreaFlag::Back_Left, "Back_Left")
-		(AreaFlag::Chest_Left, "Chest_Left")
-		(AreaFlag::Upper_Ab_Left, "Upper_Ab_Left")
-		(AreaFlag::Mid_Ab_Left, "Mid_Ab_Left")
-		(AreaFlag::Lower_Ab_Left, "Lower_Ab_Left")
-		(AreaFlag::Forearm_Right, "Forearm_Right")
-		(AreaFlag::Upper_Arm_Right, "Upper_Arm_Right")
-		(AreaFlag::Shoulder_Right, "Shoulder_Right")
-		(AreaFlag::Back_Right, "Back_Right")
-		(AreaFlag::Chest_Right, "Chest_Right")
-		(AreaFlag::Upper_Ab_Right, "Upper_Ab_Right")
-		(AreaFlag::Mid_Ab_Right, "Mid_Ab_Right")
-		(AreaFlag::Lower_Ab_Right, "Lower_Ab_Right")
-		(AreaFlag::Left_All, "Left_All")
-		(AreaFlag::Right_All, "Right_All")
-		(AreaFlag::All_Areas, "All_Areas")
-		(AreaFlag::Forearm_Both, "Forearm_Both")
-		(AreaFlag::Upper_Arm_Both, "Upper_Arm_Both")
-		(AreaFlag::Shoulder_Both, "Shoulder_Both")
-		(AreaFlag::Back_Both, "Back_Both")
-		(AreaFlag::Chest_Both, "Chest_Both")
-		(AreaFlag::Upper_Ab_Both, "Upper_Ab_Both")
-		(AreaFlag::Mid_Ab_Both, "Mid_Ab_Both")
-		(AreaFlag::Lower_Ab_Both, "Lower_Ab_Both");
-
-}
 void EnumTranslator::init_familymap()
 {
 	boost::assign::insert(_effectFamilyMap)
@@ -219,49 +62,6 @@ void EnumTranslator::init_familymap()
 		("transition_hum", 15)
 		("triple_click", 16)
 		("doom_buzz", 666);
-}
-
-void EnumTranslator::init_locarea_map()
-{
-	boost::assign::insert(_locationAreaMap)
-		(Location::Forearm_Left, AreaFlag::Forearm_Left)
-		(Location::Upper_Arm_Left, AreaFlag::Upper_Arm_Left)
-		(Location::Shoulder_Left, AreaFlag::Shoulder_Left)
-		(Location::Upper_Back_Left, AreaFlag::Back_Left)
-		(Location::Chest_Left, AreaFlag::Chest_Left)
-		(Location::Upper_Ab_Left, AreaFlag::Upper_Ab_Left)
-		(Location::Mid_Ab_Left, AreaFlag::Mid_Ab_Left)
-		(Location::Lower_Ab_Left, AreaFlag::Lower_Ab_Left)
-		(Location::Forearm_Right, AreaFlag::Forearm_Right)
-		(Location::Upper_Arm_Right, AreaFlag::Upper_Arm_Right)
-		(Location::Shoulder_Right, AreaFlag::Shoulder_Right)
-		(Location::Upper_Back_Right, AreaFlag::Back_Right)
-		(Location::Chest_Right, AreaFlag::Chest_Right)
-		(Location::Upper_Ab_Right, AreaFlag::Upper_Ab_Right)
-		(Location::Mid_Ab_Right, AreaFlag::Mid_Ab_Right)
-		(Location::Lower_Ab_Right, AreaFlag::Lower_Ab_Right);
-}
-
-void EnumTranslator::init_regions()
-{
-	boost::assign::insert(_regionMap)
-		(AreaFlag::Back_Left, "left_back")
-		(AreaFlag::Back_Right, "right_back")
-		(AreaFlag::Shoulder_Left, "left_shoulder")
-		(AreaFlag::Shoulder_Right, "right_shoulder")
-		(AreaFlag::Upper_Arm_Left, "left_upper_arm")
-		(AreaFlag::Upper_Arm_Right, "right_upper_arm")
-		(AreaFlag::Forearm_Left, "left_forearm")
-		(AreaFlag::Forearm_Right, "right_forearm")
-		(AreaFlag::Chest_Left, "left_upper_chest")
-		(AreaFlag::Chest_Right, "right_upper_chest")
-		(AreaFlag::Upper_Ab_Left, "left_upper_ab")
-		(AreaFlag::Upper_Ab_Right, "right_upper_ab")
-		(AreaFlag::Mid_Ab_Left, "left_mid_ab")
-		(AreaFlag::Mid_Ab_Right, "right_mid_ab")
-		(AreaFlag::Lower_Ab_Left, "left_lower_ab")
-		(AreaFlag::Lower_Ab_Right, "right_lower_ab");
-
 }
 
 
@@ -346,29 +146,7 @@ void EnumTranslator::init_effects() {
 
 }
 
-void EnumTranslator::init_sides()
-{
-	boost::assign::insert(_sideMap)
-		(Side::Inherit, "inherit")
-		(Side::Left, "left")
-		(Side::Right, "right")
-		(Side::Mirror, "mirror")
-		(Side::NotSpecified, "not_specified");
-}
 
-void EnumTranslator::init_json_locations()
-{
-	boost::assign::insert(_jsonLocationMap)
-		(JsonLocation::Chest, "chest")
-		(JsonLocation::Forearm, "forearm")
-		(JsonLocation::Lower_Ab, "lower_ab")
-		(JsonLocation::Mid_Ab, "mid_ab")
-		(JsonLocation::Shoulder, "shoulder")
-		(JsonLocation::Upper_Ab, "upper_ab")
-		(JsonLocation::Upper_Arm, "upper_arm")
-		(JsonLocation::Upper_Back, "upper_back")
-		;
-}
 
 void EnumTranslator::init_locations() {
 	boost::assign::insert(_locationMap)

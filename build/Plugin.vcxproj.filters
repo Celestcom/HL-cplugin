@@ -39,9 +39,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Plugin\AreaFlags.h">
-      <Filter>src\Plugin</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Plugin\BodyView.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
@@ -58,9 +55,6 @@
       <Filter>src\Plugin</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Plugin\EngineIsAlive.h">
-      <Filter>src\Plugin</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Plugin\EnumTranslator.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Plugin\Enums.h">
@@ -173,6 +167,7 @@
     <ClInclude Include="..\src\Plugin\EffectPlayer.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Plugin\EnumTranslator.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -197,9 +192,6 @@
       <Filter>src\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\Engine.cpp">
-      <Filter>src\Plugin</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Plugin\EnumTranslator.cpp">
       <Filter>src\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\EventList.cpp">
@@ -268,6 +260,7 @@
     <ClCompile Include="..\src\Plugin\EffectPlayer.cpp">
       <Filter>src\Plugin</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Plugin\EnumTranslator.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\Plugin\version.rc2" />
