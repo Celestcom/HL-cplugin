@@ -93,9 +93,6 @@
     <ClInclude Include="..\src\Plugin\IRetainedEvent.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Plugin\ITimeOffset.h">
-      <Filter>src\Plugin</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Plugin\IoService.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
