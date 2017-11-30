@@ -63,7 +63,6 @@ private:
 template<class T>
 inline bool ParameterizedEvent::Set(HLVR_EventKey key, T value)
 {
-//	std::lock_guard<std::mutex> guard(m_propLock);
 	updateOrAdd<T>(key, value);
 	return true;
 }

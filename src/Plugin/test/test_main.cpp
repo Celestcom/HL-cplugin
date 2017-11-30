@@ -1,7 +1,6 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
-#include "../AreaFlags.h"
 #include "../EffectPlayer.h"
 #include "../ParameterizedEvent.h"
 #include "../ClientMessenger.h"
@@ -30,27 +29,15 @@ T time(std::function<void()> fn) {
 }
 
 boost::uuids::random_generator idGenerator;
+
 const float DELTA_TIME = 0.05f;
 
 
 
-bool isIdleCommand(const NullSpaceIPC::EffectCommand& command) {
-
-	return command.command() == NullSpaceIPC::EffectCommand_Command_HALT;
-}
-bool isOneshotCommand(const NullSpaceIPC::EffectCommand& command) {
-	return command.command() == NullSpaceIPC::EffectCommand_Command_PLAY;
-}
-
-bool isContCommand(const NullSpaceIPC::EffectCommand& command) {
-	return command.command() == NullSpaceIPC::EffectCommand_Command_PLAY_CONTINUOUS;
-}
 
 
 
-
-
-
+//Creates two playables for testing purposes, first at 0.0 seconds, next at 1.0 seconds.
 std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 	std::vector<std::unique_ptr<PlayableEvent>> events;
 	DiscreteHapticEvent a(0.0f);
@@ -66,6 +53,8 @@ std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 	events.push_back(std::unique_ptr<PlayableEvent>(new DiscreteHapticEvent(b)));
 	return events;
 }
+
+
 TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 
 	//Now I see why we shouldn't have classes take hard references to resources.
