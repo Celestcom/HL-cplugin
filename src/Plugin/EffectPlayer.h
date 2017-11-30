@@ -46,6 +46,11 @@ public:
 	void start();
 	void stop();
 private:
+	struct EffectId {
+		EffectHandle external_handle;
+		boost::uuids::uuid internal_uuid;
+		std::size_t internal_hashed_uuid;
+	};
 	ClientMessenger& m_messenger;
 
 	boost::posix_time::millisec m_updateHapticsInterval;
@@ -53,8 +58,8 @@ private:
 
 	bool m_playerPaused;
 
-	boost::hash<boost::uuids::uuid> m_hasher;
-	boost::uuids::random_generator m_uuidGenerator;
+	boost::hash<boost::uuids::uuid> m_uuidHasher;
+	boost::uuids::random_generator m_generateUuid;
 
 	mutable std::mutex m_effectsLock;
 
@@ -63,19 +68,21 @@ private:
 
 	std::unordered_map<EffectHandle, boost::uuids::uuid> m_outsideToInternal;
 
-	std::atomic<uint32_t> m_currentHandleId;
+	uint32_t m_currentHandleId;
 
 	boost::optional<boost::uuids::uuid> toInternal(EffectHandle h) const; 
-	const PlayableEffect* find(EffectHandle h) const;
-	PlayableEffect* find(EffectHandle h);
+	const PlayableEffect* find_unsynchronized(EffectHandle h) const;
+	PlayableEffect* find_unsynchronized(EffectHandle h);
 	
-	void addNewEffect(const boost::uuids::uuid&, std::vector<std::unique_ptr<PlayableEvent>>&& events);
-	EffectHandle nextHandle();
+	EffectId nextEffectId_unsynchronized();
 
 	void scheduleTimestep();
 
-	int synchronizedHandleCommand(EffectHandle handle, std::function<void(PlayableEffect*)>);
+	int handleCommand_synchronized(EffectHandle handle, std::function<void(PlayableEffect*)>);
 
+	std::size_t getNumReleased_unsynchronized() const;
+
+	void eraseHandle_unsynchronized(EffectHandle handle);
 
 	
 
