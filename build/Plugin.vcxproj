@@ -432,7 +432,6 @@
     <ClInclude Include="..\src\Plugin\Events\target.h" />
     <ClInclude Include="..\src\Plugin\Events\validators.h" />
     <ClInclude Include="..\src\Plugin\ExceptionSafeCall.h" />
-    <ClInclude Include="..\src\Plugin\HapticArgs.h" />
     <ClInclude Include="..\src\Plugin\EffectPlayer.h" />
     <ClInclude Include="..\src\Plugin\HapticsPlayerEvents.h" />
     <ClInclude Include="..\src\Plugin\HapticsPlayerExecutor.h" />
@@ -532,7 +531,6 @@
     <ClCompile Include="..\src\Plugin\Events\DiscreteHapticEvent.cpp" />
     <ClCompile Include="..\src\Plugin\Events\PlayableEvent.cpp" />
     <ClCompile Include="..\src\Plugin\Events\validators.cpp" />
-    <ClCompile Include="..\src\Plugin\HapticArgs.cpp" />
     <ClCompile Include="..\src\Plugin\EffectPlayer.cpp" />
     <ClCompile Include="..\src\Plugin\HexUtils.cpp" />
     <ClCompile Include="..\src\Plugin\IoService.cpp" />

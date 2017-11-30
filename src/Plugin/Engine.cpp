@@ -370,9 +370,9 @@ int Engine::PollTracking(HLVR_TrackingUpdate* q)
 		copyTracking(*q, *trackingUpdate);
 		return HLVR_Ok;
 	}
-	else {
-		return HLVR_Ok_NoDataAvailable;
-	}
+	
+	return HLVR_Ok_NoDataAvailable;
+	
 }
 
 
