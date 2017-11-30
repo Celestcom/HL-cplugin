@@ -56,10 +56,6 @@ void IoService::Shutdown()
 
 }
 
-IoService::~IoService()
-{
-	
-}
 
 boost::asio::io_service& IoService::GetIOService()
 {

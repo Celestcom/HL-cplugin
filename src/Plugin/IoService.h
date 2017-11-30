@@ -9,7 +9,6 @@ class IoService
 public:
 	//Constructs and Start's a new IoService
 	IoService();
-	~IoService();
 
 	//Return the underlying io_service object
 	boost::asio::io_service& GetIOService();

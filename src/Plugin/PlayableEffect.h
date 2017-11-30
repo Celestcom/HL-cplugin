@@ -1,5 +1,4 @@
 #pragma once
-#include "IPlayable.h"
 #include <set>
 #include <boost\uuid\random_generator.hpp>
 #include "PlayableEvent.h"
@@ -10,7 +9,11 @@ struct weak_ptr_less_than {
 	}
 };
 
-
+struct EffectInfo {
+	float Duration;
+	float CurrentTime;
+	int State;
+};
 std::vector<std::string> extractRegions(const std::unique_ptr<PlayableEvent> & event);
 
 

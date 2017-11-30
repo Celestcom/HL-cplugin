@@ -12,6 +12,9 @@
 
 #include <mutex>
 #include <atomic>
+#include <unordered_map>
+
+
 
 
 using EffectHandle = uint32_t;
