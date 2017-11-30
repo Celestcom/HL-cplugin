@@ -28,10 +28,10 @@ T time(std::function<void()> fn) {
 }
 
 
-PlayableEffect::PlayableEffect(std::vector<PlayablePtr>&& effects,boost::uuids::random_generator& uuid, ClientMessenger& messenger) :
+PlayableEffect::PlayableEffect(std::vector<PlayablePtr> effects,boost::uuids::uuid uuid, ClientMessenger& messenger) :
 	m_effects(std::move(effects)),
 	m_state(PlaybackState::IDLE),
-	m_id(uuid()),
+	m_id(std::move(uuid)),
 	m_time(0),
 	m_released(false),
 	m_messenger(messenger)

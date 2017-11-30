@@ -147,6 +147,7 @@
       <Filter>src\Plugin</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Plugin\EnumTranslator.h" />
+    <ClInclude Include="..\src\Plugin\EffectContainer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -234,6 +235,7 @@
       <Filter>src\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\EnumTranslator.cpp" />
+    <ClCompile Include="..\src\Plugin\EffectContainer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\src\Plugin\version.rc2" />

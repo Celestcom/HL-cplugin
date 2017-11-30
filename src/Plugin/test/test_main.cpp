@@ -189,9 +189,12 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 			REQUIRE(player.GetNumLiveEffects() == 0);
 		}
 
-
-		
-
+		SECTION("You shouldn't be able to interact with a released effect") {
+			player.Release(h);
+			REQUIRE(player.Play(h) == HLVR_Error_NoSuchHandle);
+			REQUIRE(player.Pause(h) == HLVR_Error_NoSuchHandle);
+			REQUIRE(player.Stop(h) == HLVR_Error_NoSuchHandle);
+		}
 	}
 
 

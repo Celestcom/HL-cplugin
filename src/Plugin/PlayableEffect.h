@@ -28,8 +28,8 @@ class PlayableEffect
 public:
 
 
-	//Precondition: the vector is not empty
-	PlayableEffect(std::vector<PlayablePtr>&& effects, boost::uuids::random_generator& gen, ClientMessenger& messenger);
+	//Precondition: the effects is not empty
+	PlayableEffect(std::vector<PlayablePtr> effects, boost::uuids::uuid id, ClientMessenger& messenger);
 	PlayableEffect(const PlayableEffect&) = delete;
 	PlayableEffect(PlayableEffect&&);
 	~PlayableEffect();
