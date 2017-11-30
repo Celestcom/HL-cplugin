@@ -24,8 +24,6 @@ public:
 private:
 	std::vector<TimeOffset<ParameterizedEvent>> m_events;
 	mutable std::mutex m_eventLock;
-public:
-	void Interleave(EventList* source, float offset);
-	void Dupe(float offset);
+
 };
 

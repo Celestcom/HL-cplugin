@@ -30,23 +30,3 @@ bool EventList::empty() const
 	return m_events.empty();
 }
 
-void EventList::Interleave(EventList* source, float offset)
-{
-	std::lock_guard<std::mutex> guard(m_eventLock);
-	for (TimeOffset<ParameterizedEvent> event : source->m_events) {
-		event.Time += offset;
-		m_events.push_back(event);
-	}
-}
-
-void EventList::Dupe(float offset)
-{
-	std::lock_guard<std::mutex> guard(m_eventLock);
-
-	auto copy = m_events;
-	for (auto event : copy) {
-		event.Time += offset;
-		m_events.push_back(event);
-
-	}
-}
