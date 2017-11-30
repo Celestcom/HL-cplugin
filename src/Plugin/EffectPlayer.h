@@ -72,14 +72,15 @@ private:
 	std::unordered_map<EffectHandle, boost::uuids::uuid> m_outsideToInternal;
 
 	uint32_t m_currentHandleId;
+	
+	
+	void scheduleTimestep();
 
-	boost::optional<boost::uuids::uuid> toInternal(EffectHandle h) const; 
+	boost::optional<boost::uuids::uuid> toInternal_unsynchronized(EffectHandle h) const; 
 	const PlayableEffect* find_unsynchronized(EffectHandle h) const;
 	PlayableEffect* find_unsynchronized(EffectHandle h);
 	
 	EffectId nextEffectId_unsynchronized();
-
-	void scheduleTimestep();
 
 	int handleCommand_synchronized(EffectHandle handle, std::function<void(PlayableEffect*)>);
 
@@ -87,7 +88,6 @@ private:
 
 	void eraseHandle_unsynchronized(EffectHandle handle);
 
-	
 
 };
 

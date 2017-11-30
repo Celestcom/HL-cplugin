@@ -224,7 +224,7 @@ void EffectPlayer::ClearAll()
 
 const PlayableEffect* EffectPlayer::find_unsynchronized(EffectHandle h) const 
 {
-	if (auto internalHandle = toInternal(h)) {
+	if (auto internalHandle = toInternal_unsynchronized(h)) {
 		auto intKey = m_uuidHasher(*internalHandle);
 		if (m_effects.find(intKey) != m_effects.end()) {
 			return &m_effects.at(intKey);
@@ -238,7 +238,7 @@ PlayableEffect* EffectPlayer::find_unsynchronized(EffectHandle h)
 	return const_cast<PlayableEffect*>(static_cast<const EffectPlayer*>(this)->find_unsynchronized(h));
 }
 
-boost::optional<boost::uuids::uuid> EffectPlayer::toInternal(EffectHandle h) const
+boost::optional<boost::uuids::uuid> EffectPlayer::toInternal_unsynchronized(EffectHandle h) const
 {
 	if (m_outsideToInternal.find(h) != m_outsideToInternal.end()) {
 		return m_outsideToInternal.at(h);
