@@ -441,7 +441,6 @@
     <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_system.hpp" />
     <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_timeline.hpp" />
     <ClInclude Include="..\src\Plugin\IPlayable.h" />
-    <ClInclude Include="..\src\Plugin\IRetainedEvent.h" />
     <ClInclude Include="..\src\Plugin\IoService.h" />
     <ClInclude Include="..\src\Plugin\JsonSerializer.h" />
     <ClInclude Include="..\src\Plugin\Locator.h" />
