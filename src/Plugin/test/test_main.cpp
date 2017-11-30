@@ -2,7 +2,7 @@
 #include "catch.hpp"
 
 #include "../AreaFlags.h"
-#include "../HapticsPlayer.h"
+#include "../EffectPlayer.h"
 #include "../ParameterizedEvent.h"
 #include "../ClientMessenger.h"
 #include "../SharedCommunication/readablesharedvector.h"
@@ -69,67 +69,67 @@ std::vector<std::unique_ptr<PlayableEvent>> makePlayables() {
 TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 
 	//Now I see why we shouldn't have classes take hard references to resources.
-	//Messenger should probably be an interface, else we need it to test HapticsPlayer
+	//Messenger should probably be an interface, else we need it to test EffectPlayer
 	boost::asio::io_service io;
 	ClientMessenger m(io);
-	HapticsPlayer player(io, m);
+	EffectPlayer player(io, m);
 
 	REQUIRE(player.GetNumLiveEffects() == 0);
 	REQUIRE(player.GetNumReleasedEffects() == 0);
 
 
 	SECTION("Retrieving a nonexistent handle shouldn't crash") {
-		HapticHandle randomlyChosen = 1245;
+		EffectHandle randomlyChosen = 1245;
 		REQUIRE_NOTHROW([&]() {
-			auto handle = player.GetHandleInfo(randomlyChosen);
+			auto handle = player.GetInfo(randomlyChosen);
 			REQUIRE(!handle);
 		});
 		
 	}
 
 	SECTION("Creating an effect should work, and the effect should be not be playing by default") {
-		HapticHandle h = player.Create(makePlayables());
+		EffectHandle h = player.Create(makePlayables());
 		
 		REQUIRE(player.GetNumLiveEffects() == 1);
 
-		auto info = player.GetHandleInfo(h);
-		REQUIRE(info->State() != 0); //this enum should be exposed. 0 = playing
-		REQUIRE(info->CurrentTime() == Approx(0.0f));
+		auto info = player.GetInfo(h);
+		REQUIRE(info->State != 0); //this enum should be exposed. 0 = playing
+		REQUIRE(info->CurrentTime == Approx(0.0f));
 	}
 
 	SECTION("Pausing an effect should work") {
-		HapticHandle h = player.Create(makePlayables());
+		EffectHandle h = player.Create(makePlayables());
 		
-		auto info = player.GetHandleInfo(h);
-		REQUIRE(info->Duration() > DELTA_TIME);
+		auto info = player.GetInfo(h);
+		REQUIRE(info->Duration > DELTA_TIME);
 
 		player.Play(h);
 		player.Update(DELTA_TIME);
 		player.Pause(h);
 
-		info = player.GetHandleInfo(h);
-		REQUIRE(info->State() != HLVR_EffectInfo_State_Playing);
-		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME));
+		info = player.GetInfo(h);
+		REQUIRE(info->State != HLVR_EffectInfo_State_Playing);
+		REQUIRE(info->CurrentTime == Approx(DELTA_TIME));
 	}
 
 	SECTION("Stopping an effect should work") {
-		HapticHandle h = player.Create(makePlayables());
-		auto info = player.GetHandleInfo(h);
-		REQUIRE(info->Duration() > DELTA_TIME);
+		EffectHandle h = player.Create(makePlayables());
+		auto info = player.GetInfo(h);
+		REQUIRE(info->Duration > DELTA_TIME);
 
 		player.Play(h);
 		player.Update(DELTA_TIME);
 		player.Stop(h);
 
-		info = player.GetHandleInfo(h);
-		REQUIRE(info->State() != HLVR_EffectInfo_State_Playing);
-		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME));
+		info = player.GetInfo(h);
+		REQUIRE(info->State != HLVR_EffectInfo_State_Playing);
+		REQUIRE(info->CurrentTime == Approx(DELTA_TIME));
 	}
 
 	SECTION("Resuming an effect should work") {
-		HapticHandle h = player.Create(makePlayables());
-		auto info = player.GetHandleInfo(h);
-		REQUIRE(info->Duration() > DELTA_TIME);
+		EffectHandle h = player.Create(makePlayables());
+		auto info = player.GetInfo(h);
+		REQUIRE(info->Duration > DELTA_TIME);
 
 		player.Play(h);
 		player.Update(DELTA_TIME);
@@ -138,27 +138,27 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 		player.Play(h);
 		player.Update(DELTA_TIME);
 
-		info = player.GetHandleInfo(h);
-		REQUIRE(info->State() == HLVR_EffectInfo_State_Playing);
-		REQUIRE(info->CurrentTime() == Approx(DELTA_TIME * 2));
+		info = player.GetInfo(h);
+		REQUIRE(info->State == HLVR_EffectInfo_State_Playing);
+		REQUIRE(info->CurrentTime == Approx(DELTA_TIME * 2));
 	}
 
 	SECTION("An effect should stop after reaching its duration") {
-		HapticHandle h = player.Create(makePlayables());
+		EffectHandle h = player.Create(makePlayables());
 
-		auto info = player.GetHandleInfo(h);
-		REQUIRE(info->Duration() > DELTA_TIME);
+		auto info = player.GetInfo(h);
+		REQUIRE(info->Duration > DELTA_TIME);
 
 
 		player.Play(h);
-		player.Update(info->Duration() + DELTA_TIME);
-		info = player.GetHandleInfo(h);
-		REQUIRE(info->State() != HLVR_EffectInfo_State_Playing);
-		REQUIRE(info->CurrentTime() == Approx(info->Duration() + DELTA_TIME));
+		player.Update(info->Duration + DELTA_TIME);
+		info = player.GetInfo(h);
+		REQUIRE(info->State != HLVR_EffectInfo_State_Playing);
+		REQUIRE(info->CurrentTime == Approx(info->Duration + DELTA_TIME));
 	}
 
 	SECTION("Releasing an effect should work") {
-		HapticHandle h = player.Create(makePlayables());
+		EffectHandle h = player.Create(makePlayables());
 		player.Release(h);
 		REQUIRE(player.GetNumLiveEffects() == 0);
 		REQUIRE(player.GetNumReleasedEffects() == 1);
@@ -166,11 +166,11 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 	}
 
 	SECTION("A released effect should be cleaned up properly") {
-		HapticHandle h = player.Create(makePlayables());
+		EffectHandle h = player.Create(makePlayables());
 
 		SECTION("If it was playing at the time of release, it should not be deleted until it is done playing") {
 			player.Play(h);
-			auto duration = player.GetHandleInfo(h)->Duration();
+			auto duration = player.GetInfo(h)->Duration;
 			player.Release(h);
 			player.Update(DELTA_TIME);
 			REQUIRE(player.GetNumReleasedEffects() == 1);

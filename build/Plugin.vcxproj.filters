@@ -99,9 +99,6 @@
     <ClInclude Include="..\src\Plugin\HapticArgs.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Plugin\HapticsPlayer.h">
-      <Filter>src\Plugin</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Plugin\HexUtils.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
@@ -174,6 +171,11 @@
     <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_timeline.hpp">
       <Filter>src\Plugin\include\cpp</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\Plugin\HapticsPlayerEvents.h" />
+    <ClInclude Include="..\src\Plugin\HapticsPlayerExecutor.h" />
+    <ClInclude Include="..\src\Plugin\EffectPlayer.h">
+      <Filter>src\Plugin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
@@ -230,9 +232,6 @@
     <ClCompile Include="..\src\Plugin\HapticArgs.cpp">
       <Filter>src\Plugin</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\Plugin\HapticsPlayer.cpp">
-      <Filter>src\Plugin</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\Plugin\HexUtils.cpp">
       <Filter>src\Plugin</Filter>
     </ClCompile>
@@ -271,6 +270,9 @@
     </ClCompile>
     <ClCompile Include="..\src\Plugin\test\test_main.cpp">
       <Filter>src\Plugin\test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Plugin\EffectPlayer.cpp">
+      <Filter>src\Plugin</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

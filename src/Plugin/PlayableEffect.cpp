@@ -227,9 +227,9 @@ bool PlayableEffect::IsReleased() const
 	return m_released;
 }
 
-PlayableInfo PlayableEffect::GetInfo() const
+EffectInfo PlayableEffect::GetInfo() const
 {
-	return PlayableInfo(GetTotalDuration(), m_time, (int)m_state);
+	return EffectInfo{ GetTotalDuration(), m_time, (int)m_state };
 }
 
 void PlayableEffect::Release()

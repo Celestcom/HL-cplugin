@@ -2,25 +2,10 @@
 #include <unordered_map>
 #include "boost\uuid\uuid.hpp"
 
-struct PlayableInfo {
-private:
-	float _totalPlaytime;
-	float _currentTime;
-	int _state;
-public:
-	float Duration() const {
-		return _totalPlaytime;
-	}
-	float CurrentTime() const {
-		return _currentTime;
-	}
-	int State() const {
-		return _state;
-	}
-	PlayableInfo(float duration, float currentTime, int playing) :
-		_totalPlaytime(duration),
-		_currentTime(currentTime),
-		_state(playing) {}
+struct EffectInfo {
+	float Duration;
+	float CurrentTime;
+	int State;
 };
 
 
@@ -36,7 +21,7 @@ public:
 	//Shall only have an effect when playing, which is to pause playback
 	virtual void Pause() = 0;
 
-	//Cleanup resources associated with the effect, pending removal by the HapticsPlayer
+	//Cleanup resources associated with the effect, pending removal by the EffectPlayer
 	virtual void Release() = 0;
 
 
@@ -47,7 +32,7 @@ public:
 	virtual bool IsReleased() const = 0;
 
 	//Return info about the playable
-	virtual PlayableInfo GetInfo() const = 0;
+	virtual EffectInfo GetInfo() const = 0;
 
 	//Return the total length of the effect in fractional seconds
 	virtual float GetTotalDuration() const = 0;

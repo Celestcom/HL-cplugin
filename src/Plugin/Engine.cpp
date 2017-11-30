@@ -26,12 +26,12 @@ void Engine::executeTimestep(std::chrono::milliseconds dt)
 
 }
 
-int Engine::GetHandleInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) const
+int Engine::GetInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) const
 {
-	if (auto info = m_player.GetHandleInfo(HapticHandle(m_handle))) {
-		infoPtr->Duration = info->Duration();
-		infoPtr->Elapsed = info->CurrentTime();
-		infoPtr->PlaybackState = static_cast<HLVR_EffectInfo_State>(info->State());
+	if (auto info = m_player.GetInfo(EffectHandle(m_handle))) {
+		infoPtr->Duration = info->Duration;
+		infoPtr->Elapsed = info->CurrentTime;
+		infoPtr->PlaybackState = static_cast<HLVR_EffectInfo_State>(info->State);
 		return HLVR_Ok;
 	}
 	else {
@@ -317,7 +317,7 @@ extractPlayables(const std::vector<TimeOffset<ParameterizedEvent>>& events) {
 }
 
 //Only modifies handle if the effect is created successfully
-int Engine::CreateEffect(const EventList * list, HapticHandle* handle)
+int Engine::CreateEffect(const EventList * list, EffectHandle* handle)
 {
 	if (list == nullptr) {
 		return HLVR_Error_NullArgument;
@@ -327,7 +327,7 @@ int Engine::CreateEffect(const EventList * list, HapticHandle* handle)
 		return HLVR_Error_EmptyTimeline;
 	}
 	else {
-		HapticHandle h = m_player.Create(extractPlayables(list->events()));
+		EffectHandle h = m_player.Create(extractPlayables(list->events()));
 		*handle = h;
 		return HLVR_Ok;
 	}

@@ -5,7 +5,7 @@
 #include "IoService.h"
 #include "ClientMessenger.h"
 #include <boost\asio\deadline_timer.hpp>
-#include "HapticsPlayer.h"
+#include "EffectPlayer.h"
 #include "ScheduledEvent.h"
 #include "EventList.h"
 #include "HLVR.h"
@@ -60,7 +60,7 @@ public:
 	int HandlePlay(uint32_t handle);
 	int HandleReset(uint32_t handle);
 	void ReleaseHandle(uint32_t handle);
-	int CreateEffect(const EventList * list, HapticHandle * handle);
+	int CreateEffect(const EventList * list, EffectHandle * handle);
 	int  PollTracking(HLVR_TrackingUpdate* q);
 
 
@@ -71,7 +71,7 @@ public:
 	int Sample(uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount);
 
 	int DumpDeviceDiagnostics();
-	int GetHandleInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) const;
+	int GetInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) const;
 
 	int GetNumDevices(uint32_t* outAmount);
 
@@ -95,7 +95,7 @@ private:
 	bool m_isHapticsSystemPlaying;
 	ClientMessenger m_messenger;
 
-	HapticsPlayer m_player;
+	EffectPlayer m_player;
 
 	boost::posix_time::milliseconds m_hapticsExecutionInterval;
 	void executeTimestep(std::chrono::milliseconds dt);

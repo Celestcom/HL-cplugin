@@ -451,7 +451,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Effect_GetInfo(const HLVR_Effect* effect, HLVR_Eff
 	RETURN_IF_NULL(info);
 
 	return ExceptionGuard([&] {
-		return AS_TYPE(const PlaybackHandle, effect)->GetHandleInfo(info);
+		return AS_TYPE(const PlaybackHandle, effect)->GetInfo(info);
 	});
 }
 

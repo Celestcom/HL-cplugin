@@ -38,7 +38,7 @@ public:
 	float CurrentTime() const;
 	bool IsPlaying() const;
 	bool IsReleased() const;
-	PlayableInfo GetInfo() const;
+	EffectInfo GetInfo() const;
 	void Release();
 
 	

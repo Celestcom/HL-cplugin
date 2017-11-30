@@ -38,10 +38,10 @@ int PlaybackHandle::Reset()
 }
 
 
-int PlaybackHandle::GetHandleInfo(HLVR_EffectInfo* infoPtr) const
+int PlaybackHandle::GetInfo(HLVR_EffectInfo* infoPtr) const
 {
 	if (engine != nullptr) {
-		return engine->GetHandleInfo(handle, infoPtr);
+		return engine->GetInfo(handle, infoPtr);
 	}
 	return HLVR_Error_Unspecified;
 }
