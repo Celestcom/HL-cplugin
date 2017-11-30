@@ -18,26 +18,21 @@ int EventList::AddEvent(TimeOffset<ParameterizedEvent> event)
 	return HLVR_Ok;
 }
 
-
-
-
-
 std::vector<TimeOffset<ParameterizedEvent>> EventList::events() const
 {
 	std::lock_guard<std::mutex> guard(m_eventLock);
-
 	return m_events;
 }
 
 bool EventList::empty() const
 {
+	std::lock_guard<std::mutex> guard(m_eventLock);
 	return m_events.empty();
 }
 
 void EventList::Interleave(EventList* source, float offset)
 {
-	
-
+	std::lock_guard<std::mutex> guard(m_eventLock);
 	for (TimeOffset<ParameterizedEvent> event : source->m_events) {
 		event.Time += offset;
 		m_events.push_back(event);
@@ -46,6 +41,8 @@ void EventList::Interleave(EventList* source, float offset)
 
 void EventList::Dupe(float offset)
 {
+	std::lock_guard<std::mutex> guard(m_eventLock);
+
 	auto copy = m_events;
 	for (auto event : copy) {
 		event.Time += offset;
