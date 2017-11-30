@@ -42,9 +42,6 @@
     <ClInclude Include="..\src\Plugin\AreaFlags.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Plugin\AreaParser.h">
-      <Filter>src\Plugin</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Plugin\BodyView.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
@@ -195,9 +192,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\HighLevelEvent.pb.cc">
       <Filter>NS_Unreal_SDK\src\Driver\protobuff_defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Plugin\AreaParser.cpp">
-      <Filter>src\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\ClientMessenger.cpp">
       <Filter>src\Plugin</Filter>

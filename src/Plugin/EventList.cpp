@@ -3,7 +3,7 @@
 
 #include "ParameterizedEvent.h"
 #include "HLVR_Errors.h"
-#include "HLVR.h"
+
 EventList::EventList():m_events(), m_eventLock()
 {
 	m_events.reserve(1);

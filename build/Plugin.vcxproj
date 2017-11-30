@@ -416,7 +416,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\src\Plugin\AreaFlags.h" />
-    <ClInclude Include="..\src\Plugin\AreaParser.h" />
     <ClInclude Include="..\src\Plugin\BodyView.h" />
     <ClInclude Include="..\src\Plugin\ClientMessenger.h" />
     <ClInclude Include="..\src\Plugin\Encoder.h" />
@@ -524,7 +523,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin32|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release UnitTestWin64|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\src\Plugin\AreaParser.cpp" />
     <ClCompile Include="..\src\Plugin\ClientMessenger.cpp" />
     <ClCompile Include="..\src\Plugin\Engine.cpp" />
     <ClCompile Include="..\src\Plugin\EnumTranslator.cpp" />

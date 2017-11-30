@@ -1,8 +1,9 @@
 #pragma once
 
-#include <memory>
-#include <mutex>
 #include "ParameterizedEvent.h"
+
+#include <mutex>
+
 class Engine;
 
 
