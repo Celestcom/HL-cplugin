@@ -435,7 +435,6 @@
     <ClInclude Include="..\src\Plugin\EffectPlayer.h" />
     <ClInclude Include="..\src\Plugin\HapticsPlayerEvents.h" />
     <ClInclude Include="..\src\Plugin\HapticsPlayerExecutor.h" />
-    <ClInclude Include="..\src\Plugin\HexUtils.h" />
     <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_effect.hpp" />
     <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_error.hpp" />
     <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_event.hpp" />
@@ -532,7 +531,6 @@
     <ClCompile Include="..\src\Plugin\Events\PlayableEvent.cpp" />
     <ClCompile Include="..\src\Plugin\Events\validators.cpp" />
     <ClCompile Include="..\src\Plugin\EffectPlayer.cpp" />
-    <ClCompile Include="..\src\Plugin\HexUtils.cpp" />
     <ClCompile Include="..\src\Plugin\IoService.cpp" />
     <ClCompile Include="..\src\Plugin\Locator.cpp" />
     <ClCompile Include="..\src\Plugin\MyTestLog.cpp" />
