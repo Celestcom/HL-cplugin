@@ -45,16 +45,10 @@
     <ClInclude Include="..\src\Plugin\ClientMessenger.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Plugin\Encoder.h">
-      <Filter>src\Plugin</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Plugin\Engine.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Plugin\EngineCommand.h">
-      <Filter>src\Plugin</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Plugin\EngineIsAlive.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Plugin\Enums.h">

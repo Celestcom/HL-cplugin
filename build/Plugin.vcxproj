@@ -417,10 +417,8 @@
   <ItemGroup>
     <ClInclude Include="..\src\Plugin\BodyView.h" />
     <ClInclude Include="..\src\Plugin\ClientMessenger.h" />
-    <ClInclude Include="..\src\Plugin\Encoder.h" />
     <ClInclude Include="..\src\Plugin\Engine.h" />
     <ClInclude Include="..\src\Plugin\EngineCommand.h" />
-    <ClInclude Include="..\src\Plugin\EngineIsAlive.h" />
     <ClInclude Include="..\src\Plugin\Enums.h" />
     <ClInclude Include="..\src\Plugin\EnumTranslator.h" />
     <ClInclude Include="..\src\Plugin\EventList.h" />
