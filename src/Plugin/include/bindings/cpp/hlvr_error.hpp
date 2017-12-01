@@ -39,6 +39,7 @@ inline const char* error_c_str(HLVR_Result result) {
 class status_code {
 public:
 	explicit status_code(HLVR_Result result) : m_code{ result } {}
+	status_code() = default;
 	const char* what() const {
 		return error_c_str(m_code);
 	}

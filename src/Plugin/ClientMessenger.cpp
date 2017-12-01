@@ -46,23 +46,20 @@ boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 		if (m_tracking->Size() > 0) {
 			TrackingUpdate t = {};
 
-			if (auto index = m_tracking->Find([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_middle_sternum; })) {
-				const auto val = m_tracking->Get(*index);
-				t.chest = val.quat;
-				t.chest_compass = val.compass;
-				t.chest_gravity = val.gravity;
+			if (auto val = m_tracking->Get([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_middle_sternum; })) {
+				t.chest = val->quat;
+				t.chest_compass = val->compass;
+				t.chest_gravity = val->gravity;
 			}
-			if (auto index = m_tracking->Find([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_left; })) {
-				const auto val = m_tracking->Get(*index);
-				t.left_upper_arm = val.quat;
-				t.left_upper_arm_compass = val.compass;
-				t.left_upper_arm_gravity = val.gravity;
+			if (auto val = m_tracking->Get([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_left; })) {
+				t.left_upper_arm = val->quat;
+				t.left_upper_arm_compass = val->compass;
+				t.left_upper_arm_gravity = val->gravity;
 			}
-			if (auto index = m_tracking->Find([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_right; })) {
-				const auto val = m_tracking->Get(*index);
-				t.right_upper_arm = val.quat;
-				t.right_upper_arm_compass = val.compass;
-				t.right_upper_arm_gravity = val.gravity;
+			if (auto val = m_tracking->Get([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_right; })) {
+				t.right_upper_arm = val->quat;
+				t.right_upper_arm_compass = val->compass;
+				t.right_upper_arm_gravity = val->gravity;
 			}
 
 			return t;
@@ -79,10 +76,7 @@ std::vector<NullSpace::SharedMemory::DeviceInfo> ClientMessenger::ReadDevices()
 {
 	std::vector<NullSpace::SharedMemory::DeviceInfo> info;
 	if (m_systems) {
-		for (std::size_t i = 0; i < m_systems->Size(); i++) {
-			info.push_back(m_systems->Get(i));
-		}
-		
+		info = m_systems->ToVector();
 	}
 	return info;
 
@@ -92,10 +86,7 @@ std::vector<NullSpace::SharedMemory::NodeInfo> ClientMessenger::ReadNodes()
 {
 	std::vector<NullSpace::SharedMemory::NodeInfo> info;
 	if (m_nodes) {
-		for (std::size_t i = 0; i < m_nodes->Size(); i++) {
-			info.push_back(m_nodes->Get(i));
-		}
-
+		info = m_nodes->ToVector();
 	}
 	return info;
 }
@@ -136,22 +127,11 @@ boost::optional<std::string> ClientMessenger::ReadLog()
 
 std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
 {
-	//Todo: make a safer scheme for accessing these objects. If you forget to check for nullptr,
-	//then we'll have a read access violation if the shared mem didn't initialize. 
-	//Perhaps we make a wrapper for these.
-	// Api could be like boost::optional value_or
-	// return bodyView.try([](BodyView* view) {
-	//       //do whatever needs to be done
-	// }); 
 
 	std::vector<NullSpace::SharedMemory::RegionPair> pairs;
 	
 	if (m_bodyView) {
-		std::size_t eles = m_bodyView->Size();
-		pairs.reserve(eles);
-		for (std::size_t i = 0; i < eles; i++) {
-			pairs.push_back(m_bodyView->Get(i));
-		}
+		pairs = m_bodyView->ToVector();
 	}
 	
 	return pairs;

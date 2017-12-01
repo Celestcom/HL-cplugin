@@ -54,7 +54,7 @@ public:
 		return status_code(HLVR_Event_SetInt(m_handle.get(), key, val));
 	}
 
-	static tl::expected<event, status_code> make(HLVR_EventType type) {
+	static expected<event, status_code> make(HLVR_EventType type) {
 		return make_helper(detail::event_create(type));
 	}
 private:
@@ -64,14 +64,14 @@ private:
 };
 
 
-inline tl::expected<HLVR_Event_ValidationResult, status_code> validate_event(const event& ev) {
+inline expected<HLVR_Event_ValidationResult, status_code> validate_event(const event& ev) {
 	HLVR_Event_ValidationResult result;
 	auto sc = HLVR_Event_Validate(ev.native_handle(), &result);
 	if (HLVR_OK(sc)) {
 		return result;
 	}
 	else {
-		return tl::make_unexpected(status_code(sc));
+		return make_unexpected(status_code(sc));
 	}
 }
 

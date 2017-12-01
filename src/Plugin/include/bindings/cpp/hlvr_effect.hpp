@@ -32,7 +32,7 @@ public:
 		return status_code(HLVR_Effect_Reset(m_handle.get()));
 	}
 
-	tl::expected<HLVR_EffectInfo, status_code> get_info() {
+	expected<HLVR_EffectInfo, status_code> get_info() {
 		assert(m_handle);
 		HLVR_EffectInfo info = { 0 };
 		auto ec = HLVR_Effect_GetInfo(m_handle.get(), &info);
@@ -40,11 +40,11 @@ public:
 			return info;
 		}
 		else {
-			return tl::make_unexpected(status_code(ec));
+			return make_unexpected(status_code(ec));
 		}
 	}
 
-	static tl::expected<effect, status_code> make() {
+	static expected<effect, status_code> make() {
 		return make_helper(&HLVR_Effect_Create);
 	}
 

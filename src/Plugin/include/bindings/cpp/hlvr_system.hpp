@@ -7,7 +7,6 @@
 #include "hlvr_event.hpp"
 #include "hlvr_error.hpp"
 
-#include "detail/expected.hpp"
 #include <cassert>
 
 namespace hlvr {
@@ -35,7 +34,7 @@ public:
 		m_handle.reset(nullptr);
 	}
 
-	tl::expected<HLVR_RuntimeInfo, status_code> get_runtime_info() const {
+	expected<HLVR_RuntimeInfo, status_code> get_runtime_info() const {
 		assert(m_handle);
 		HLVR_RuntimeInfo info = { 0 };
 		auto ec = HLVR_System_GetRuntimeInfo(m_handle.get(), &info);
@@ -43,7 +42,7 @@ public:
 			return info;
 		}
 		else {
-			return tl::make_unexpected(status_code(ec));
+			return make_unexpected(status_code(ec));
 		}
 	}
 
@@ -88,14 +87,14 @@ public:
 	}
 
 
-	tl::expected<HLVR_TrackingUpdate, status_code> poll_tracking() {
+	expected<HLVR_TrackingUpdate, status_code> poll_tracking() {
 		assert(m_handle);
 		HLVR_TrackingUpdate update = { 0 };
 		auto ec = HLVR_System_PollTracking(m_handle.get(), &update);
 		if (HLVR_OK(ec)) { 
 			return update; 
 		} else { 
-			return tl::make_unexpected(status_code(ec));
+			return make_unexpected(status_code(ec));
 		}
 	}
 
@@ -110,10 +109,24 @@ public:
 	}
 
 	
-	static tl::expected<system, status_code> make() {
+	static expected<system, status_code> make() {
 		return make_helper(&HLVR_System_Create);
 	}
 
+	status_code suspend_all_haptics() {
+		assert(m_handle);
+		return status_code( HLVR_System_SuspendEffects(m_handle.get()));
+	}
+
+	status_code resume_all_haptics() {
+		assert(m_handle);
+		return status_code(HLVR_System_ResumeEffects(m_handle.get()));
+	}
+
+	status_code cancel_all_haptics() {
+		assert(m_handle);
+		return status_code(HLVR_System_CancelEffects(m_handle.get()));
+	}
 
 private:
 	friend class system_handle;

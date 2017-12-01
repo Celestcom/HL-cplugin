@@ -39,7 +39,7 @@ public:
 		return status_code(sc);
 	}
 
-	tl::expected<hlvr::effect, status_code> transmit(hlvr::system& system) const {
+	expected<hlvr::effect, status_code> transmit(hlvr::system& system) const {
 		assert(m_handle);
 		assert(system);
 
@@ -54,14 +54,14 @@ public:
 			return potentialEffect;
 		}
 		else {
-			return tl::unexpected<status_code>(sc);
+			return unexpected<status_code>(sc);
 		}
 		
 		
 
 	}
 
-	static tl::expected<timeline, status_code> make() {
+	static expected<timeline, status_code> make() {
 		return make_helper(&HLVR_Timeline_Create);
 	}
 
