@@ -4,21 +4,21 @@
 #include "ParameterizedEvent.h"
 #include "HLVR_Errors.h"
 
-EventList::EventList():m_events(), m_eventLock()
+EventList::EventList()
+	: m_events()
+	, m_eventLock()
 {
 	m_events.reserve(1);
 }
 
-//Precondition: event is not null
-int EventList::AddEvent(TimeOffset<ParameterizedEvent> event)
+int EventList::AddEvent(TimeOffset<TypedEvent> event)
 {	
 	std::lock_guard<std::mutex> guard(m_eventLock);
 	m_events.push_back(std::move(event));
-	
 	return HLVR_Ok;
 }
 
-std::vector<TimeOffset<ParameterizedEvent>> EventList::events() const
+std::vector<TimeOffset<TypedEvent>> EventList::events() const
 {
 	std::lock_guard<std::mutex> guard(m_eventLock);
 	return m_events;

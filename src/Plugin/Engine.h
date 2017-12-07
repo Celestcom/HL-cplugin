@@ -84,7 +84,7 @@ public:
 	void DestroyIterator(HiddenIterator<HLVR_DeviceInfo>* device);
 	void DestroyIterator(HiddenIterator<HLVR_NodeInfo>* nodes);
 
-	int StreamEvent(const ParameterizedEvent& event);
+	int StreamEvent(const TypedEvent& event);
 	int EnableTracking(uint32_t device_id);
 	int DisableTracking(uint32_t device_id);
 private:

@@ -2,29 +2,25 @@
 #include "ParameterizedEvent.h"
 #include "HLVR.h"
 
-ParameterizedEvent::ParameterizedEvent(): 
-	m_type(HLVR_EventType_UNKNOWN),
-	m_params()
+
+TypedEvent::TypedEvent(HLVR_EventType type) 
+	: Type(type)
+	, Params() {}
+
+ParameterizedEvent::ParameterizedEvent()
+	: m_params()
 {
-	//average event key count is 5, so preemptively reserve that much
-	//change if proves unnecessary
+	//Trying to avoid a resize
 	m_params.reserve(5);
 }
 
-HLVR_EventType ParameterizedEvent::type() const
-{
-	return m_type;
-}
+
 
 bool ParameterizedEvent::HasKey(HLVR_EventKey key) const
 {
 	return findParam(key) != nullptr;
 }
 
-void ParameterizedEvent::setType(HLVR_EventType type)
-{
-	m_type = type;
-}
 
 event_param* ParameterizedEvent::findParam(HLVR_EventKey key)
 {
@@ -43,14 +39,10 @@ const event_param * ParameterizedEvent::findParam(HLVR_EventKey key) const
 	return nullptr;
 }
 
-event_param::event_param(): 
-	key(), 
-	value()
-{
-}
 
-event_param::event_param(HLVR_EventKey key, EventValue val):
-	key(key),
-	value(val)
+
+event_param::event_param(HLVR_EventKey key, EventValue val)
+	: key(key)
+	, value(val)
 {
 }

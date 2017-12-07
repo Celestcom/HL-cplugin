@@ -218,7 +218,7 @@ HLVR_RETURN_EXP(HLVR_Result) HLVR_System_StreamEvent(HLVR_System* system, HLVR_E
 	RETURN_IF_NULL(system);
 	RETURN_IF_NULL(data);
 
-	return ExceptionGuard([&] { return AS_TYPE(Engine, system)->StreamEvent(*AS_TYPE(ParameterizedEvent, data)); });
+	return ExceptionGuard([&] { return AS_TYPE(Engine, system)->StreamEvent(*AS_TYPE(TypedEvent, data)); });
 }
 
 
@@ -228,10 +228,8 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_Create(HLVR_Event** eventPtr, HLVR_EventType
  {
 	
 	return ExceptionGuard([&] {
-		ParameterizedEvent* p = new ParameterizedEvent();
-		p->setType(type);
-	
-		*eventPtr = AS_TYPE(HLVR_Event, p);
+		TypedEvent* e = new TypedEvent(type);
+		*eventPtr = AS_TYPE(HLVR_Event, e);
 
 		 RETURN(HLVR_Ok);
 	 });
@@ -240,7 +238,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_Create(HLVR_Event** eventPtr, HLVR_EventType
 HLVR_RETURN(void) HLVR_Event_Destroy(HLVR_Event * eventPtr)
  {
 	ExceptionGuard([&] {
-		delete AS_TYPE(ParameterizedEvent, eventPtr);
+		delete AS_TYPE(TypedEvent, eventPtr);
 		return HLVR_Ok;
 
 	});
@@ -251,7 +249,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloat(HLVR_Event * event, HLVR_EventKey k
 	 RETURN_IF_NULL(event);
 
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(ParameterizedEvent, event)->Set<float>(key, value);
+		 return AS_TYPE(TypedEvent, event)->Params.Set<float>(key, value);
 	 });
  }
 
@@ -261,7 +259,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetFloats(HLVR_Event * event, HLVR_EventKey 
 
 	return ExceptionGuard([&] {
 		
-		return AS_TYPE(ParameterizedEvent, event)->Set(key, values, length);
+		return AS_TYPE(TypedEvent, event)->Params.Set(key, values, length);
 	});
 }
 
@@ -270,7 +268,7 @@ HLVR_RETURN(HLVR_Result)HLVR_Event_SetInt(HLVR_Event * event, HLVR_EventKey key,
 	 RETURN_IF_NULL(event);
 
 	 return ExceptionGuard([&] {
-		 return AS_TYPE(ParameterizedEvent, event)->Set<int>(key, value);
+		 return AS_TYPE(TypedEvent, event)->Params.Set<int>(key, value);
 	 });
  }
 
@@ -278,7 +276,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetInts(HLVR_Event * event, HLVR_EventKey ke
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
-		return AS_TYPE(ParameterizedEvent, event)->Set(key, array, length);
+		return AS_TYPE(TypedEvent, event)->Params.Set(key, array, length);
 	});
 }
 
@@ -286,7 +284,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32(HLVR_Event * event, HLVR_EventKey 
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
-		return AS_TYPE(ParameterizedEvent, event)->Set(key, value);
+		return AS_TYPE(TypedEvent, event)->Params.Set(key, value);
 	});
 }
 
@@ -294,7 +292,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt32s(HLVR_Event * event, HLVR_EventKey
 {
 	RETURN_IF_NULL(event);
 	return ExceptionGuard([&] {
-		return AS_TYPE(ParameterizedEvent, event)->Set(key, array, length);
+		return AS_TYPE(TypedEvent, event)->Params.Set(key, array, length);
 	});
 }
 
@@ -303,7 +301,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64(HLVR_Event * event, HLVR_EventKey 
 	RETURN_IF_NULL(event);
 
 	return ExceptionGuard([&] {
-		return AS_TYPE(ParameterizedEvent, event)->Set(key, value);
+		return AS_TYPE(TypedEvent, event)->Params.Set(key, value);
 	});
 }
 
@@ -312,7 +310,7 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_SetUInt64s(HLVR_Event * event, HLVR_EventKey
 	RETURN_IF_NULL(event);
 
 	return ExceptionGuard([&] {
-		return AS_TYPE(ParameterizedEvent, event)->Set(key, array, length);
+		return AS_TYPE(TypedEvent, event)->Params.Set(key, array, length);
 	});
 }
 
@@ -333,9 +331,9 @@ HLVR_RETURN(HLVR_Result) HLVR_Timeline_AddEvent(HLVR_Timeline * timeline, double
 	
 	return ExceptionGuard([&] {
 		return AS_TYPE(EventList, timeline)->AddEvent(
-			TimeOffset<ParameterizedEvent> {
+			TimeOffset<TypedEvent> {
 				static_cast<float>(timeOffsetSeconds),
-				*AS_TYPE(const ParameterizedEvent, event)
+				*AS_TYPE(const TypedEvent, event)
 			}
 		);
 	});
@@ -370,11 +368,11 @@ HLVR_RETURN(HLVR_Result) HLVR_Event_Validate(const HLVR_Event * event, HLVR_Even
 	RETURN_IF_NULL(outResult);
 
 	return ExceptionGuard([&] {
-		auto p = PlayableEvent::make(AS_TYPE(const ParameterizedEvent, event)->type(), 0.0f);
+		auto p = PlayableEvent::make(AS_TYPE(const TypedEvent, event)->Type, 0.0f);
 		if (!p) {
 			RETURN(HLVR_Error_InvalidEventType);
 		}
-		p->debug_parse(*AS_TYPE(const ParameterizedEvent, event), outResult);
+		p->debug_parse(AS_TYPE(const TypedEvent, event)->Params, outResult);
 		
 		RETURN(HLVR_Ok);
 	});

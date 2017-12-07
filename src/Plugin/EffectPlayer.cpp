@@ -38,6 +38,8 @@ void EffectPlayer::start()
 void EffectPlayer::stop()
 {
 	m_updateHaptics.cancel();
+
+
 }
 
 void EffectPlayer::scheduleTimestep() {
@@ -101,7 +103,9 @@ EffectHandle EffectPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>> ev
 }
 
 
-
+bool test() {
+	return bool(boost::optional<int>{2});
+}
 boost::optional<EffectInfo> EffectPlayer::GetInfo(EffectHandle h) const
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
@@ -110,6 +114,8 @@ boost::optional<EffectInfo> EffectPlayer::GetInfo(EffectHandle h) const
 		return effect->GetInfo();
 	}
 	
+
+
 	return boost::none;
 }
 

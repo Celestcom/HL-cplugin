@@ -103,13 +103,13 @@ void Engine::DestroyIterator(HiddenIterator<HLVR_NodeInfo>* nodes)
 	);
 }
 
-int Engine::StreamEvent(const ParameterizedEvent& event)
+int Engine::StreamEvent(const TypedEvent& event)
 {
-	auto ev = PlayableEvent::make(event.type(), 0.0f);
+	auto ev = PlayableEvent::make(event.Type, 0.0f);
 	if (!ev) {
 		return HLVR_Error_InvalidEventType;
 	}
-	ev->parse(event);
+	ev->parse(event.Params);
 
 	NullSpaceIPC::HighLevelEvent hle;
 	ev->serialize(hle);
@@ -301,14 +301,14 @@ int Engine::HandleReset(uint32_t handle)
 
 
 std::vector<std::unique_ptr<PlayableEvent>> 
-extractPlayables(const std::vector<TimeOffset<ParameterizedEvent>>& events) {
+extractPlayables(const std::vector<TimeOffset<TypedEvent>>& events) {
 	
 	using PlayablePtr = std::unique_ptr<PlayableEvent>;
 	std::vector<PlayablePtr> playables;
 	playables.reserve(events.size());
 	for (const auto& event : events) {
-		if (auto newPlayable = PlayableEvent::make(event.Data.type(), event.Time)) {
-			newPlayable->parse(event.Data); 
+		if (auto newPlayable = PlayableEvent::make(event.Data.Type, event.Time)) {
+			newPlayable->parse(event.Data.Params); 
 			playables.push_back(std::move(newPlayable));
 		}
 	}

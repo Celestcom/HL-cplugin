@@ -79,17 +79,7 @@ namespace hlvr {
 			using creator_type = Creator;
 			using deleter_type = Deleter;
 		};
-		/*template<typename Wrapped, typename Traits>
-		static tl::expected<Wrapped, status_code> make_helper(typename Traits::creator_type c) {
-			Traits::native_handle_type* handle = nullptr;
-			HLVR_Result sc = c(&handle);
-			if (HLVR_OK(sc)) {
-				return Wrapped(handle);
-			}
-			else {
-				return tl::make_unexpected(status_code(sc));
-			}
-		}*/
+	
 
 		template<typename T, class Traits>
 		class native_handle_owner {
