@@ -9,13 +9,14 @@ public:
 	EffectContainer();
 	using EffectHandle = uint32_t;
 	EffectHandle CreateEffect(PlayableEffect effect);
+
 	void Clear();
 	void FreezeEffects();
 	void ThawEffects();
 	
 	void Update(float dt);
 
-	bool Mutate(EffectHandle handle, std::function<void(PlayableEffect*)>);
+	bool Mutate(EffectHandle handle, std::function<void(PlayableEffect&)>);
 	const PlayableEffect* Get(EffectHandle handle) const;
 
 	std::size_t GetNumReleased() const;
@@ -30,3 +31,5 @@ private:
 	void garbageCollect();
 
 };
+
+

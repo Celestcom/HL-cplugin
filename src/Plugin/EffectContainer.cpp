@@ -62,11 +62,11 @@ void EffectContainer::Update(float dt)
 	garbageCollect();
 }
 
-bool EffectContainer::Mutate(EffectHandle handle, std::function<void(PlayableEffect*)> mutator)
+bool EffectContainer::Mutate(EffectHandle handle, std::function<void(PlayableEffect&)> mutator)
 {
 	if (PlayableEffect* ptr = find(handle)) {
 		if (!ptr->IsReleased()) {
-			mutator(ptr);
+			mutator(*ptr);
 			return true;
 		}
 	}

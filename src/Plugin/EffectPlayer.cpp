@@ -3,6 +3,7 @@
 #include "EffectPlayer.h"
 #include "PlayableEffect.h"
 #include "ClientMessenger.h"
+#include "PlayableEffect.h"
 
 #include <boost/range/algorithm.hpp>
 #include <boost/range/adaptors.hpp>
@@ -17,15 +18,14 @@
 
 
 
-EffectPlayer::EffectPlayer(boost::asio::io_service& io, ClientMessenger& messenger):
-	m_messenger(messenger),
-	m_container(),
-	m_updateHapticsInterval(boost::posix_time::millisec(5)),
-	m_updateHaptics(io),
-	m_playerPaused(false),
-	m_generateUuid(),
-	m_effectsLock()
-
+EffectPlayer::EffectPlayer(boost::asio::io_service& io, ClientMessenger& messenger)
+	: m_messenger(messenger)
+	, m_container()
+	, m_updateHapticsInterval(boost::posix_time::millisec(5))
+	, m_updateHaptics(io)
+	, m_playerPaused(false)
+	, m_generateUuid()
+	, m_effectsLock()
 {	
 }
 
@@ -64,25 +64,25 @@ void EffectPlayer::Update(float dt)
 
 int EffectPlayer::Play(EffectHandle handle)
 {
-	return do_synchronized(handle, [](PlayableEffect* effect) { effect->Play(); });
+	return synchronized_effect_action(handle, [](PlayableEffect& effect) { effect.Play(); });
 }
 
 int EffectPlayer::Pause(EffectHandle handle)
 {
-	return do_synchronized(handle, [](PlayableEffect* effect) { effect->Pause(); });
+	return synchronized_effect_action(handle, [](PlayableEffect& effect) { effect.Pause(); });
 }
 
 int EffectPlayer::Stop(EffectHandle handle)
 {
-	return do_synchronized(handle, [](PlayableEffect* effect) { effect->Stop(); });
+	return synchronized_effect_action(handle, [](PlayableEffect& effect) { effect.Stop(); });
 }
 
 void EffectPlayer::Release(EffectHandle handle)
 {
-	do_synchronized(handle, [&](PlayableEffect* effect) { effect->Release(); });
+	synchronized_effect_action(handle, [](PlayableEffect& effect) { effect.Release(); });
 }
 
-int EffectPlayer::do_synchronized(EffectHandle handle, std::function<void(PlayableEffect*)> fn)
+HLVR_Result EffectPlayer::synchronized_effect_action(EffectHandle handle, std::function<void(PlayableEffect&)> fn)
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
 	if (m_container.Mutate(handle, fn)) {
@@ -108,7 +108,6 @@ boost::optional<EffectInfo> EffectPlayer::GetInfo(EffectHandle h) const
 
 	if (const PlayableEffect* effect = m_container.Get(h)) {
 		return effect->GetInfo();
-
 	}
 	
 	return boost::none;

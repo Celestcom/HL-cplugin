@@ -1,8 +1,6 @@
 #pragma once
 
-#include "PlayableEffect.h"
 #include "EffectContainer.h"
-#include <boost/uuid/uuid.hpp> 
 #include <boost/uuid/random_generator.hpp> 
 #include <boost/functional/hash.hpp>
 #include <boost/optional.hpp>
@@ -18,9 +16,8 @@
 
 using EffectHandle = uint32_t;
 
-
+class PlayableEffect;
 class ClientMessenger;
-class EventRegistry;
 class EffectPlayer
 {
 public:
@@ -62,7 +59,7 @@ private:
 	boost::uuids::random_generator m_generateUuid;
 
 	mutable std::mutex m_effectsLock;
-	int do_synchronized(EffectHandle handle, std::function<void(PlayableEffect*)> fn);
+	HLVR_Result synchronized_effect_action(EffectHandle handle, std::function<void(PlayableEffect&)> fn);
 
 
 
