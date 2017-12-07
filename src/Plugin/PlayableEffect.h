@@ -23,8 +23,6 @@ public:
 
 	//Precondition: effects.size() > 0
 	PlayableEffect(std::vector<PlayablePtr> effects, boost::uuids::uuid id, ClientMessenger& messenger);
-	PlayableEffect(const PlayableEffect&) = delete;
-	PlayableEffect(PlayableEffect&&);
 
 	void Play();
 	void Pause();
@@ -57,6 +55,7 @@ private:
 
 	void pruneDuplicates(std::vector<PlayablePtr>& playables);
 	void sortByTime(std::vector<PlayablePtr>& playables);
+
 
 	void scrubToBegin();
 	void reset();

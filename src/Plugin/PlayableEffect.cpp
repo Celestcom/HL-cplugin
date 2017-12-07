@@ -42,17 +42,17 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr> effects, boost::uuids::u
 //Todo: find out why we can't use the default move constructor.
 //I believe it would behave correctly - although we are stealing an iterator from the other object, it would point into the 
 //stolen effects vector so all would be good. 
-PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
-	m_effects(std::move(rhs.m_effects)),
-	m_state(rhs.m_state),
-	m_id(rhs.m_id),
-	m_time(rhs.m_time),
-	m_isReleased(rhs.m_isReleased),
-	m_lastExecutedEffect(m_effects.begin()),
-	m_messenger(rhs.m_messenger)
-{
-
-}
+//PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
+//	m_effects(std::move(rhs.m_effects)),
+//	m_state(rhs.m_state),
+//	m_id(rhs.m_id),
+//	m_time(rhs.m_time),
+//	m_isReleased(rhs.m_isReleased),
+//	m_lastExecutedEffect(m_effects.begin()),
+//	m_messenger(rhs.m_messenger)
+//{
+//
+//}
 
 void PlayableEffect::sortByTime(std::vector<PlayablePtr>& playables)
 {
