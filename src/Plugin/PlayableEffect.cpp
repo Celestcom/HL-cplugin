@@ -1,40 +1,29 @@
 #include "stdafx.h"
+
 #include "PlayableEffect.h"
 #include "Locator.h"
-#include <iostream>
-#include "HLVR.h"
-#include <memory>
-#include <iterator>
-#include <numeric>
-#include <bitset>
-#include <array>
-
-#include <functional>
-#include <chrono>
-
-
 #include "ClientMessenger.h"
+
 #pragma warning(push)
 #pragma warning(disable : 4267)
 #include "HighLevelEvent.pb.h"
 #pragma warning(pop)
 
-template<typename T>
-T time(std::function<void()> fn) {
-	auto then = std::chrono::high_resolution_clock::now();
-	fn();
-	auto now = std::chrono::duration_cast<T>(std::chrono::high_resolution_clock::now() - then);
-	return now;
-}
+#include "HLVR.h"
+#include <numeric> //std::accumulate
 
 
-PlayableEffect::PlayableEffect(std::vector<PlayablePtr> effects,boost::uuids::uuid uuid, ClientMessenger& messenger) :
-	m_effects(std::move(effects)),
-	m_state(PlaybackState::IDLE),
-	m_id(std::move(uuid)),
-	m_time(0),
-	m_released(false),
-	m_messenger(messenger)
+
+
+
+
+PlayableEffect::PlayableEffect(std::vector<PlayablePtr> effects, boost::uuids::uuid uuid, ClientMessenger& messenger) 
+	: m_state(PlaybackState::IDLE)
+	, m_time(0.f) //fractional seconds, e.g. 1.5 is one and one half of a second. We should make this a type.
+	, m_effects(std::move(effects))
+	, m_id(std::move(uuid))
+	, m_messenger(messenger)
+	, m_isReleased(false)
 {
 	assert(!m_effects.empty());
 
@@ -49,37 +38,42 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr> effects,boost::uuids::uu
 	scrubToBegin();
 }
 
-void PlayableEffect::sortByTime(std::vector<PlayablePtr>& playables)
-{
-	std::sort(playables.begin(), playables.end(), [](const auto& lhs, const auto& rhs) { return lhs->time() < rhs->time(); });
-}
-
-
-void PlayableEffect::pruneDuplicates(std::vector<PlayablePtr>& playables) {
-	
-	auto last = std::unique(playables.begin(), playables.end(), [](const auto& lhs, const auto& rhs) { return *lhs == *rhs; });
-	playables.erase(last, playables.end());
-	playables.shrink_to_fit();
-}
-
-
-
+//Not sure why the move constructor is deleted, but here is a replacement.
+//Todo: find out why we can't use the default move constructor.
+//I believe it would behave correctly - although we are stealing an iterator from the other object, it would point into the 
+//stolen effects vector so all would be good. 
 PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
 	m_effects(std::move(rhs.m_effects)),
 	m_state(rhs.m_state),
 	m_id(rhs.m_id),
 	m_time(rhs.m_time),
-	m_released(rhs.m_released),
+	m_isReleased(rhs.m_isReleased),
 	m_lastExecutedEffect(m_effects.begin()),
 	m_messenger(rhs.m_messenger)
 {
-	
+
 }
 
-PlayableEffect::~PlayableEffect()
+void PlayableEffect::sortByTime(std::vector<PlayablePtr>& playables)
 {
-	
+	auto by_time = [](const auto& lhs, const auto& rhs) { 
+		return lhs->time() < rhs->time(); 
+	};
+	std::sort(playables.begin(), playables.end(), by_time);
 }
+
+
+void PlayableEffect::pruneDuplicates(std::vector<PlayablePtr>& playables) {
+	
+	auto value_equality = [](const auto& lhs, const auto& rhs) {
+		return *lhs == *rhs;
+	};
+
+ 	auto last = std::unique(playables.begin(), playables.end(), value_equality);
+	playables.erase(last, playables.end());
+	playables.shrink_to_fit();
+}
+
 
 void PlayableEffect::Play()
 {
@@ -98,12 +92,10 @@ void PlayableEffect::Play()
 	default:
 		break;
 	}
-	
 }
 
 void PlayableEffect::Stop()
 {
-
 	switch (m_state) {
 		case PlaybackState::IDLE:
 			//remain in idle state
@@ -141,24 +133,26 @@ void PlayableEffect::Pause()
 	
 }
 
+//Right now, we are using UUID. We shouldn't be truncating a UUID like I am below.
+//Todo: generate our own random IDs, say, from 0 to 2^64 - 1.
+//The other option which I have tried is to send over a byte array representing the full
+//UUID. I think this is overkill, and it means we need to pass it on the hardware plugins as well.
+uint64_t truncatedUuid(const boost::uuids::uuid& uuid) {
+	uint64_t truncatedId = 0;
+	memcpy_s(&truncatedId, sizeof(truncatedId), uuid.data, sizeof uint64_t);
+	return truncatedId;
+}
+
 NullSpaceIPC::HighLevelEvent makeEvent(const boost::uuids::uuid& parentId, const PlayablePtr& event) {
 	
-
-
 	using namespace NullSpaceIPC;
 	HighLevelEvent abstract_event;
 
-	//Right now, we are using UUID. We shouldn't be truncating a UUID like I am below.
-	//Todo: generate our own random IDs, say, from 0 to 2^64 - 1.
-	//The other option which I have tried is to send over a byte array representing the full
-	//UUID. I think this is overkill, and it means we need to pass it on the hardware plugins as well.
-	uint64_t truncatedId;
-	memcpy_s(&truncatedId, sizeof(truncatedId), parentId.data, sizeof uint64_t);
-	
-	abstract_event.set_parent_id(truncatedId);
+	abstract_event.set_parent_id(truncatedUuid(parentId));
 	event->serialize(abstract_event);
 	return abstract_event;
 }
+
 void PlayableEffect::Update(float dt)
 {
 	if (m_state == PlaybackState::IDLE || m_state == PlaybackState::PAUSED) {
@@ -176,31 +170,25 @@ void PlayableEffect::Update(float dt)
 	
 	while (current != m_effects.end()) {
 		if (isTimeExpired(*current)) {
-			
-			using namespace NullSpaceIPC;
-			
-			HighLevelEvent event = makeEvent(m_id, *current);			
-		
+			NullSpaceIPC::HighLevelEvent event = makeEvent(m_id, *current);			
 			m_messenger.WriteEvent(event);
-				
-				
 			std::advance(current, 1);
 		}
 		else {
-			//precondition: this requires that the effects vector was sorted by time.
-			//Given that, we can stop here because if it wasn't expired, then the next won't be either
+			//Precondition: effects vector must be sorted by time (which we do in the constructor)
+			//Given that, we can stop here because if this effect wasn't expired, then the next won't be either
 			break;
 		}
 	}
 
 	m_lastExecutedEffect = current;
 
+	//Automatically stop when we exceed the total duration of the effect
 	if (m_time >= GetTotalDuration()) {
 		Stop();
 	}
 
 } 
-
 
 
 float PlayableEffect::GetTotalDuration() const
@@ -209,7 +197,6 @@ float PlayableEffect::GetTotalDuration() const
 		float thisEffectEndTime = std::max(0.0f, effect->duration() + effect->time());
 		return std::max(currentDuration, thisEffectEndTime);
 	});
-
 }
 
 float PlayableEffect::CurrentTime() const
@@ -224,7 +211,7 @@ bool PlayableEffect::IsPlaying() const
 
 bool PlayableEffect::IsReleased() const
 {
-	return m_released;
+	return m_isReleased;
 }
 
 EffectInfo PlayableEffect::GetInfo() const
@@ -234,9 +221,7 @@ EffectInfo PlayableEffect::GetInfo() const
 
 void PlayableEffect::Release()
 {
-	m_released = true;
-
-	
+	m_isReleased = true;	
 }
 
 
@@ -244,10 +229,7 @@ NullSpaceIPC::HighLevelEvent makePlaybackEvent(const boost::uuids::uuid& parentI
 	using namespace NullSpaceIPC;
 	HighLevelEvent event;
 
-	uint64_t truncatedId;
-	memcpy_s(&truncatedId, sizeof(truncatedId), parentId.data, sizeof uint64_t);
-
-	event.set_parent_id(truncatedId);
+	event.set_parent_id(truncatedUuid(parentId));
 
 	PlaybackEvent* playback_event = event.mutable_playback_event();
 	playback_event->set_command(command);
