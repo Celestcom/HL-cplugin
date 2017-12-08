@@ -16,6 +16,13 @@
 #include "Locator.h"
 #include "BodyView.h"
 #include <chrono>
+
+
+void copyQuaternion(HLVR_Quaternion& lhs, const NullSpace::SharedMemory::Quaternion& rhs);
+
+void copyVector3f(HLVR_Vector3f& lhs, const NullSpace::SharedMemory::Vector3& rhs);
+
+
 void Engine::executeTimestep(std::chrono::milliseconds dt)
 {
 	
@@ -377,14 +384,14 @@ int Engine::CreateEffect(const EventList * list, EffectHandle* handle)
 }
 
 
-inline void copyQuaternion(HLVR_Quaternion& lhs, const NullSpace::SharedMemory::Quaternion& rhs) {
+ void copyQuaternion(HLVR_Quaternion& lhs, const NullSpace::SharedMemory::Quaternion& rhs) {
 	lhs.w = rhs.w;
 	lhs.x = rhs.x;
 	lhs.y = rhs.y;
 	lhs.z = rhs.z;
 }
 
-inline void copyVector3f(HLVR_Vector3f& lhs, const NullSpace::SharedMemory::Vector3& rhs) {
+ void copyVector3f(HLVR_Vector3f& lhs, const NullSpace::SharedMemory::Vector3& rhs) {
 	lhs.x = rhs.x;
 	lhs.y = rhs.y;
 	lhs.z = rhs.z;

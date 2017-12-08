@@ -83,7 +83,7 @@ public:
 	status_code push_event(hlvr::event& event) {
 		assert(m_handle);
 		assert(event);
-		return status_code(HLVR_System_StreamEvent(m_handle.get(), event.native_handle()));
+		return status_code(HLVR_System_PushEvent(m_handle.get(), event.native_handle()));
 	}
 
 
@@ -100,12 +100,12 @@ public:
 
 	status_code enable_tracking(uint32_t device_id) {
 		assert(m_handle);
-		return status_code(HLVR_System_EnableTracking(m_handle.get(), device_id));
+		return status_code(HLVR_System_Tracking_Enable(m_handle.get(), device_id));
 	}
 
 	status_code disable_tracking(uint32_t device_id) {
 		assert(m_handle);
-		return status_code(HLVR_System_DisableTracking(m_handle.get(), device_id));
+		return status_code(HLVR_System_Tracking_Disable(m_handle.get(), device_id));
 	}
 
 	
