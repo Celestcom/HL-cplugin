@@ -69,6 +69,7 @@ typedef enum HLVR_ErrorTypes {
 
 	HLVR_Error_InvalidTimeOffset = -8000,	/*!< The time argument was < 0.0 */
 	HLVR_Error_EmptyTimeline = -8001,		/*!< The HLVR_Timeline that was transmitted had no events */
+	HLVR_Error_TrackedRegionNotFound = -9001,
 	HLVR_Error_MIN = hlvr_int32min,
 	HLVR_Error_MAX = hlvr_int32max
 

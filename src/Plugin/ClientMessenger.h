@@ -22,6 +22,9 @@ public:
 	ClientMessenger(boost::asio::io_service&);
 
 	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
+
+	boost::optional<NullSpace::SharedMemory::TrackingData> ClientMessenger::ReadTrackingData(uint32_t region);
+
 	std::vector<NullSpace::SharedMemory::DeviceInfo> ReadDevices();
 	std::vector<NullSpace::SharedMemory::NodeInfo> ReadNodes();
 	void WriteEvent(const NullSpaceIPC::HighLevelEvent& e);

@@ -69,7 +69,6 @@ public:
 
 	int Sample(uint16_t* strengths, uint32_t* areas, uint32_t* families, int length, unsigned int* resultCount);
 
-	int DumpDeviceDiagnostics();
 	int GetInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) const;
 
 	int GetNumDevices(uint32_t* outAmount);
@@ -87,6 +86,10 @@ public:
 	int StreamEvent(const TypedEvent& event);
 	int EnableTracking(uint32_t device_id);
 	int DisableTracking(uint32_t device_id);
+
+	int GetOrientation(uint32_t region, HLVR_Quaternion* outOrientation);
+	int GetCompass(uint32_t region, HLVR_Vector3f* outCompass);
+	int GetGravity(uint32_t region, HLVR_Vector3f* outGravity);
 private:
 	IoService m_ioService;
 	HLVR_TrackingUpdate m_cachedTrackingUpdate;

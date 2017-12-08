@@ -195,25 +195,55 @@ HLVR_RETURN(HLVR_Result) HLVR_System_PollTracking(HLVR_System * ptr, HLVR_Tracki
 	 });
  }
 
-HLVR_RETURN(HLVR_Result) HLVR_System_EnableTracking(HLVR_System * ptr, uint32_t device_id)
- {
-	 RETURN_IF_NULL(ptr);
+HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_GetOrientation(HLVR_System * ptr, uint32_t region, HLVR_Quaternion * outOrientation)
+{
+	RETURN_IF_NULL(ptr);
+	RETURN_IF_NULL(outOrientation);
 
-	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->EnableTracking(device_id);
-	 });
- }
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, ptr)->GetOrientation(region, outOrientation);
+	});
+}
 
-HLVR_RETURN(HLVR_Result) HLVR_System_DisableTracking(HLVR_System * ptr, uint32_t device_id)
- {
-	 RETURN_IF_NULL(ptr);
+HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_GetCompass(HLVR_System * ptr, uint32_t region, HLVR_Vector3f * outCompass)
+{
+	RETURN_IF_NULL(ptr);
+	RETURN_IF_NULL(outCompass);
 
-	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->DisableTracking(device_id);
-	 });
- }
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, ptr)->GetCompass(region, outCompass);
+	});
+}
 
-HLVR_RETURN_EXP(HLVR_Result) HLVR_System_StreamEvent(HLVR_System* system, HLVR_Event * data)
+HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_GetGravity(HLVR_System * ptr, uint32_t region, HLVR_Vector3f * outGravity)
+{
+	RETURN_IF_NULL(ptr);
+	RETURN_IF_NULL(outGravity);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, ptr)->GetGravity(region, outGravity);
+	});
+}
+
+HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_Enable(HLVR_System * ptr, uint32_t device_id)
+{
+	RETURN_IF_NULL(ptr);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, ptr)->EnableTracking(device_id);
+	});
+}
+
+HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_Disable(HLVR_System * ptr, uint32_t device_id)
+{
+	RETURN_IF_NULL(ptr);
+
+	return ExceptionGuard([&] {
+		return AS_TYPE(Engine, ptr)->DisableTracking(device_id);
+	});
+}
+
+HLVR_RETURN_EXP(HLVR_Result) HLVR_System_PushEvent(HLVR_System* system, HLVR_Event * data)
 {
 	RETURN_IF_NULL(system);
 	RETURN_IF_NULL(data);

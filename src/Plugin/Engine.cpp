@@ -140,6 +140,45 @@ int Engine::DisableTracking(uint32_t device_id)
 	return 1;
 }
 
+//precondition: outOrientation != nullptr
+int Engine::GetOrientation(uint32_t region, HLVR_Quaternion * outOrientation)
+{
+	assert(outOrientation != nullptr);
+
+	if (auto data = m_messenger.ReadTrackingData(region)) {
+		copyQuaternion(*outOrientation, data->quat);
+		return HLVR_Ok;
+	}
+
+	return HLVR_Error_TrackedRegionNotFound;
+}
+
+//precondition: outCompass != nullptr
+int Engine::GetCompass(uint32_t region, HLVR_Vector3f * outCompass)
+{
+	assert(outCompass != nullptr);
+
+	if (auto data = m_messenger.ReadTrackingData(region)) {
+		copyVector3f(*outCompass, data->compass);
+		return HLVR_Ok;
+	}
+
+	return HLVR_Error_TrackedRegionNotFound;
+}
+
+//precondition: outGravity != nullptr
+int Engine::GetGravity(uint32_t region, HLVR_Vector3f * outGravity)
+{
+	assert(outGravity != nullptr);
+
+	if (auto data = m_messenger.ReadTrackingData(region)) {
+		copyVector3f(*outGravity, data->gravity);
+		return HLVR_Ok;
+	}
+
+	return HLVR_Error_TrackedRegionNotFound;
+}
+
 
 
 Engine::Engine() :

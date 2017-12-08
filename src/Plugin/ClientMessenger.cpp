@@ -33,7 +33,15 @@ ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 
 
 
+boost::optional<NullSpace::SharedMemory::TrackingData> ClientMessenger::ReadTrackingData(uint32_t region) {
+	if (m_tracking && m_tracking->Size() > 0) {
+		if (auto val = m_tracking->Get([region](const auto& taggedQuat) { return taggedQuat.region == region; })) {
+			return *val;
+		}
+	}
 
+	return boost::none;
+}
 boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 {
 	//if (m_trackingData) {

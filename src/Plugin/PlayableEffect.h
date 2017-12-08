@@ -24,6 +24,12 @@ public:
 	//Precondition: effects.size() > 0
 	PlayableEffect(std::vector<PlayablePtr> effects, boost::uuids::uuid id, ClientMessenger& messenger);
 
+	//Can't be copied - that would break out internal iterator 
+	PlayableEffect(const PlayableEffect&) = delete;
+
+	//But can be moved - will not break internal iterator
+	PlayableEffect(PlayableEffect&&) = default;
+
 	void Play();
 	void Pause();
 	void Stop();
