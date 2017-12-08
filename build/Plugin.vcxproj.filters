@@ -150,18 +150,6 @@
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">
       <Filter>NS_Unreal_SDK\src\Driver\SharedCommunication</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\DriverCommand.pb.cc">
-      <Filter>NS_Unreal_SDK\src\Driver\protobuff_defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\EffectCommand.pb.cc">
-      <Filter>NS_Unreal_SDK\src\Driver\protobuff_defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\ExecutionCommand.pb.cc">
-      <Filter>NS_Unreal_SDK\src\Driver\protobuff_defs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\HapticEffect.pb.cc">
-      <Filter>NS_Unreal_SDK\src\Driver\protobuff_defs</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\protobuff_defs\HighLevelEvent.pb.cc">
       <Filter>NS_Unreal_SDK\src\Driver\protobuff_defs</Filter>
     </ClCompile>

@@ -12,8 +12,6 @@
 
 #pragma warning(push)
 #pragma warning(disable : 4267)
-#include "EffectCommand.pb.h"
-#include "DriverCommand.pb.h"
 #include "HighLevelEvent.pb.h"
 #pragma warning(pop)
 
