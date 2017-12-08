@@ -14,7 +14,7 @@
 #include "BoostIPCSharedMemoryDirectory.h"
 using namespace NullSpace::SharedMemory;
 ClientMessenger::ClientMessenger(boost::asio::io_service& io):
-
+	m_serviceVersion(),
 	m_sentinelTimer(io),
 	m_sentinelInterval(500),
 	m_sentinalTimeout(2000),
