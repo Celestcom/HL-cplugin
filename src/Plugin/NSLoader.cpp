@@ -418,17 +418,25 @@ HLVR_RETURN(HLVR_Result) HLVR_Timeline_Transmit(const HLVR_Timeline * timelinePt
 
 	 return ExceptionGuard([&] {
 
-		 auto engine = AS_TYPE(Engine, systemPtr);
-		 auto timeline = AS_TYPE(const EventList, timelinePtr);
-		 auto handle = AS_TYPE(PlaybackHandle, handlePtr);
+		//Doing a lot of reinterpret_casts here, so I get it out of the way first.
+		auto engine = AS_TYPE(Engine, systemPtr);
+		auto timeline = AS_TYPE(const EventList, timelinePtr);
+		auto handle = AS_TYPE(PlaybackHandle, handlePtr);
 
+
+		//If this effect was already attached to something playing, we want to release that previously playing thing
+		//so that it can eventually be cleaned up. Else it will dangle. 
+		if (handle->IsBound()) {
+			engine->ReleaseHandle(handle->handle);
+		}
 		
-		 if (handle->handle != 0) {
-			 engine->ReleaseHandle(handle->handle);
-		 }
-		
-		 handle->engine = engine;
-		 return engine->CreateEffect(timeline, &handle->handle);
+		EffectHandle newHandle = 0;
+		auto retCode = engine->CreateEffect(timeline, &newHandle);
+		if (HLVR_OK(retCode)) {
+			//Only modify the state of the handle if the engine was able to successfully create the effect
+			handle->bind(newHandle, engine);
+		}
+		return retCode;
 		 
 	 });
  }

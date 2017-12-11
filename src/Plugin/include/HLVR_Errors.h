@@ -62,8 +62,8 @@ typedef enum HLVR_ErrorTypes {
 
 	HLVR_Error_NotConnected = -4000,	/*!< Not connected to the Hardlight runtime service */
 
-	HLVR_Error_NoSuchHandle = -5000,	/*!< The HLVR_Effect was destroyed or was not bound to any effect */
-
+	HLVR_Error_NoSuchHandle = -5000,	/*!< The HLVR_Effect was already released and cannot be used anymore */
+	HLVR_Error_EmptyHandle = -5001, /*!< The HLVR_Effect was never initialized with a timeline */
 	HLVR_Error_NoMoreDevices = -6000,	/*!< There are no more devices to enumerate */
 	HLVR_Error_NoMoreNodes = -7000,		/*!< There are no more nodes to enumerate, or the device specified in HLVR_NodeIterator_Next does not exist */
 

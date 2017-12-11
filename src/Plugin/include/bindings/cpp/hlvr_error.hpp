@@ -23,6 +23,8 @@ inline const char* error_c_str(HLVR_Result result) {
 		return "NotConnected";
 	case HLVR_Error_NoSuchHandle:
 		return "NoSuchHandle";
+	case HLVR_Error_EmptyHandle:
+		return "EmptyHandle";
 	case HLVR_Error_NoMoreDevices:
 		return "NoMoreDevices";
 	case HLVR_Error_NoMoreNodes:
