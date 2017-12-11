@@ -28,9 +28,6 @@
     <Filter Include="src\Plugin\include">
       <UniqueIdentifier>{9EF55522-8AD9-1678-F339-11CBDF3C01FA}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Plugin\json">
-      <UniqueIdentifier>{D41DD746-40A9-440B-49BA-C7FFB5C4A00B}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\Plugin\test">
       <UniqueIdentifier>{9A5EDC46-06EA-490B-0FFB-CCFF7B05A60B}</UniqueIdentifier>
     </Filter>
@@ -110,12 +107,6 @@
     </ClInclude>
     <ClInclude Include="..\src\Plugin\include\HLVR_Forwards.h">
       <Filter>src\Plugin\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Plugin\json\json-forwards.h">
-      <Filter>src\Plugin\json</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Plugin\json\json.h">
-      <Filter>src\Plugin\json</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Plugin\stdafx.h">
       <Filter>src\Plugin</Filter>
@@ -205,9 +196,6 @@
       <Filter>src\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\dllmain.cpp">
-      <Filter>src\Plugin</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Plugin\jsoncpp.cpp">
       <Filter>src\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\stdafx.cpp">

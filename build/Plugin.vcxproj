@@ -449,8 +449,6 @@
     <ClInclude Include="..\src\Plugin\include\HLVR_Errors.h" />
     <ClInclude Include="..\src\Plugin\include\HLVR_Experimental.h" />
     <ClInclude Include="..\src\Plugin\include\HLVR_Forwards.h" />
-    <ClInclude Include="..\src\Plugin\json\json-forwards.h" />
-    <ClInclude Include="..\src\Plugin\json\json.h" />
     <ClInclude Include="..\src\Plugin\stdafx.h" />
     <ClInclude Include="..\src\Plugin\targetver.h" />
   </ItemGroup>
@@ -496,7 +494,6 @@
     <ClCompile Include="..\src\Plugin\PlayableEffect.cpp" />
     <ClCompile Include="..\src\Plugin\PlaybackHandle.cpp" />
     <ClCompile Include="..\src\Plugin\dllmain.cpp" />
-    <ClCompile Include="..\src\Plugin\jsoncpp.cpp" />
     <ClCompile Include="..\src\Plugin\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Win64|x64'">Create</PrecompiledHeader>
