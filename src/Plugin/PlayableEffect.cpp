@@ -28,7 +28,7 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr> effects, boost::uuids::u
 	assert(!m_effects.empty());
 
 	sortByTime(&m_effects);
-	pruneDuplicates(&m_effects);
+	removeDuplicates(&m_effects);
 
 	scrubToBegin();
 }
@@ -43,7 +43,7 @@ void sortByTime(std::vector<PlayablePtr>* playables)
 }
 
 
-void pruneDuplicates(std::vector<PlayablePtr>* playables) {
+void removeDuplicates(std::vector<PlayablePtr>* playables) {
 	
 	auto value_equality = [](const auto& lhs, const auto& rhs) {
 		return *lhs == *rhs;
@@ -113,8 +113,7 @@ void PlayableEffect::Pause()
 	
 }
 
-//Right now, we are using UUID. We shouldn't be truncating a UUID like I am below.
-//Todo: generate our own random IDs, say, from 0 to 2^64 - 1.
+//Right now, we are using UUID to uniquely identify each event. We probably (?) shouldn't be truncating a UUID like I am below.
 //The other option which I have tried is to send over a byte array representing the full
 //UUID. I think this is overkill, and it means we need to pass it on the hardware plugins as well.
 uint64_t truncatedUuid(const boost::uuids::uuid& uuid) {
@@ -123,13 +122,13 @@ uint64_t truncatedUuid(const boost::uuids::uuid& uuid) {
 	return truncatedId;
 }
 
-NullSpaceIPC::HighLevelEvent makeEvent(const boost::uuids::uuid& parentId, const PlayablePtr& event) {
+NullSpaceIPC::HighLevelEvent makeEvent(const boost::uuids::uuid& parentId, const PlayableEvent& event) {
 	
 	using namespace NullSpaceIPC;
 	HighLevelEvent abstract_event;
 
 	abstract_event.set_parent_id(truncatedUuid(parentId));
-	event->serialize(abstract_event);
+	event.serialize(abstract_event);
 	return abstract_event;
 }
 
@@ -143,14 +142,14 @@ void PlayableEffect::Update(float dt)
 	
 	auto current(m_lastExecutedEffect);
 
-	auto isTimeExpired = [this](const PlayablePtr& event) {
-		return event->time() <= m_time;
+	auto isTimeExpired = [this](const PlayableEvent& event) {
+		return event.time() <= m_time;
 	};
 
 	
 	while (current != m_effects.end()) {
-		if (isTimeExpired(*current)) {
-			NullSpaceIPC::HighLevelEvent event = makeEvent(m_id, *current);			
+		if (isTimeExpired(*current->get())) {
+			NullSpaceIPC::HighLevelEvent event = makeEvent(m_id, *current->get());			
 			m_messenger.WriteEvent(event);
 			std::advance(current, 1);
 		}

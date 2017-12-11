@@ -5,6 +5,11 @@
 #include <vector>
 #include <memory>
 
+
+//The purpose of this class is to hold a bunch of events together in a timeline - an Effect. 
+//This is the actual object that a user of the Hardlight SDK is interacting with when they make haptic effects.
+//It contains facilities for controlling playback of an effect, as well as releasing it when they are done. 
+
 //Used to group together some common info about an effect, for use at higher levels of the SDK
 struct EffectInfo {
 	float Duration;
@@ -12,10 +17,11 @@ struct EffectInfo {
 	int State;
 };
 
+
 using PlayablePtr = std::unique_ptr<PlayableEvent>;
 
 void sortByTime(std::vector<PlayablePtr>* playables);
-void pruneDuplicates(std::vector<PlayablePtr>* playables);
+void removeDuplicates(std::vector<PlayablePtr>* playables);
 
 
 class ClientMessenger;
