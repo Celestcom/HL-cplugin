@@ -12,8 +12,11 @@ struct EffectInfo {
 	int State;
 };
 
-
 using PlayablePtr = std::unique_ptr<PlayableEvent>;
+
+void sortByTime(std::vector<PlayablePtr>* playables);
+void pruneDuplicates(std::vector<PlayablePtr>* playables);
+
 
 class ClientMessenger;
 
@@ -24,10 +27,10 @@ public:
 	//Precondition: effects.size() > 0
 	PlayableEffect(std::vector<PlayablePtr> effects, boost::uuids::uuid id, ClientMessenger& messenger);
 
-	//Can't be copied - that would break out internal iterator 
+	//Can't be copied - that would break the internal effect iterator 
 	PlayableEffect(const PlayableEffect&) = delete;
 
-	//But can be moved - will not break internal iterator
+	//But can be moved - will not break internal effect iterator
 	PlayableEffect(PlayableEffect&&) = default;
 
 	void Play();
@@ -59,8 +62,6 @@ private:
 	ClientMessenger& m_messenger;
 	bool m_isReleased;
 
-	void pruneDuplicates(std::vector<PlayablePtr>& playables);
-	void sortByTime(std::vector<PlayablePtr>& playables);
 
 
 	void scrubToBegin();

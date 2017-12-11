@@ -59,7 +59,7 @@ private:
 	boost::uuids::random_generator m_generateUuid;
 
 	mutable std::mutex m_effectsLock;
-	HLVR_Result synchronized_effect_action(EffectHandle handle, std::function<void(PlayableEffect&)> fn);
+	HLVR_Result do_effect_action(std::mutex& mutex, EffectHandle handle, std::function<void(PlayableEffect&)> fn);
 
 
 

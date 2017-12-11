@@ -27,51 +27,31 @@ PlayableEffect::PlayableEffect(std::vector<PlayablePtr> effects, boost::uuids::u
 {
 	assert(!m_effects.empty());
 
-	sortByTime(m_effects);
-
-	//It is unclear if this de-duplication should happen at all, or if it should
-	//happen at a higher level. It feels wrong to iterate over thousands of duplicates when
-	//the lower level will be forced to wipe them out. 
-
-	pruneDuplicates(m_effects);
+	sortByTime(&m_effects);
+	pruneDuplicates(&m_effects);
 
 	scrubToBegin();
 }
 
-//Not sure why the move constructor is deleted, but here is a replacement.
-//Todo: find out why we can't use the default move constructor.
-//I believe it would behave correctly - although we are stealing an iterator from the other object, it would point into the 
-//stolen effects vector so all would be good. 
-//PlayableEffect::PlayableEffect(PlayableEffect && rhs) :
-//	m_effects(std::move(rhs.m_effects)),
-//	m_state(rhs.m_state),
-//	m_id(rhs.m_id),
-//	m_time(rhs.m_time),
-//	m_isReleased(rhs.m_isReleased),
-//	m_lastExecutedEffect(m_effects.begin()),
-//	m_messenger(rhs.m_messenger)
-//{
-//
-//}
 
-void PlayableEffect::sortByTime(std::vector<PlayablePtr>& playables)
+void sortByTime(std::vector<PlayablePtr>* playables)
 {
 	auto by_time = [](const auto& lhs, const auto& rhs) { 
 		return lhs->time() < rhs->time(); 
 	};
-	std::sort(playables.begin(), playables.end(), by_time);
+	std::sort(playables->begin(), playables->end(), by_time);
 }
 
 
-void PlayableEffect::pruneDuplicates(std::vector<PlayablePtr>& playables) {
+void pruneDuplicates(std::vector<PlayablePtr>* playables) {
 	
 	auto value_equality = [](const auto& lhs, const auto& rhs) {
 		return *lhs == *rhs;
 	};
 
- 	auto last = std::unique(playables.begin(), playables.end(), value_equality);
-	playables.erase(last, playables.end());
-	playables.shrink_to_fit();
+ 	auto last = std::unique(playables->begin(), playables->end(), value_equality);
+	playables->erase(last, playables->end());
+	playables->shrink_to_fit();
 }
 
 

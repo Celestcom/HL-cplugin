@@ -16,8 +16,6 @@
 
 
 
-
-
 EffectPlayer::EffectPlayer(boost::asio::io_service& io, ClientMessenger& messenger)
 	: m_messenger(messenger)
 	, m_container()
@@ -38,8 +36,6 @@ void EffectPlayer::start()
 void EffectPlayer::stop()
 {
 	m_updateHaptics.cancel();
-
-
 }
 
 void EffectPlayer::scheduleTimestep() {
@@ -66,27 +62,27 @@ void EffectPlayer::Update(float dt)
 
 int EffectPlayer::Play(EffectHandle handle)
 {
-	return synchronized_effect_action(handle, [](PlayableEffect& effect) { effect.Play(); });
+	return do_effect_action(m_effectsLock, handle, [](PlayableEffect& effect) { effect.Play(); });
 }
 
 int EffectPlayer::Pause(EffectHandle handle)
 {
-	return synchronized_effect_action(handle, [](PlayableEffect& effect) { effect.Pause(); });
+	return do_effect_action(m_effectsLock, handle, [](PlayableEffect& effect) { effect.Pause(); });
 }
 
 int EffectPlayer::Stop(EffectHandle handle)
 {
-	return synchronized_effect_action(handle, [](PlayableEffect& effect) { effect.Stop(); });
+	return do_effect_action(m_effectsLock, handle, [](PlayableEffect& effect) { effect.Stop(); });
 }
 
 void EffectPlayer::Release(EffectHandle handle)
 {
-	synchronized_effect_action(handle, [](PlayableEffect& effect) { effect.Release(); });
+	do_effect_action(m_effectsLock, handle, [](PlayableEffect& effect) { effect.Release(); });
 }
 
-HLVR_Result EffectPlayer::synchronized_effect_action(EffectHandle handle, std::function<void(PlayableEffect&)> fn)
+HLVR_Result EffectPlayer::do_effect_action(std::mutex& mutex, EffectHandle handle, std::function<void(PlayableEffect&)> fn)
 {
-	std::lock_guard<std::mutex> guard(m_effectsLock);
+	std::lock_guard<std::mutex> guard(mutex);
 	if (m_container.Mutate(handle, fn)) {
 		return HLVR_Ok;
 	}
@@ -102,10 +98,6 @@ EffectHandle EffectPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>> ev
 	return m_container.CreateEffect(std::move(effect));
 }
 
-
-bool test() {
-	return bool(boost::optional<int>{2});
-}
 boost::optional<EffectInfo> EffectPlayer::GetInfo(EffectHandle h) const
 {
 	std::lock_guard<std::mutex> guard(m_effectsLock);
@@ -113,8 +105,6 @@ boost::optional<EffectInfo> EffectPlayer::GetInfo(EffectHandle h) const
 	if (const PlayableEffect* effect = m_container.Get(h)) {
 		return effect->GetInfo();
 	}
-	
-
 
 	return boost::none;
 }

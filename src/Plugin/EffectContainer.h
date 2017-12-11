@@ -4,6 +4,7 @@
 
 #include <unordered_map>
 
+//This class is not thread safe; synchronization must happen at a higher level
 class EffectContainer {
 public:
 	EffectContainer();

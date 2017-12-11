@@ -58,7 +58,8 @@ void EffectContainer::Update(float dt)
 	for (auto& effect : m_effects) {
 		effect.second.Update(dt);
 	}
-
+	
+	//For simplicity, we remove old effects every update. If this is ever an issue we can make it smarter.
 	garbageCollect();
 }
 
