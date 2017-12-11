@@ -84,9 +84,6 @@
     <ClInclude Include="..\src\Plugin\Locator.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Plugin\MyTestLog.h">
-      <Filter>src\Plugin</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Plugin\ParameterizedEvent.h">
       <Filter>src\Plugin</Filter>
     </ClInclude>
@@ -175,9 +172,6 @@
       <Filter>src\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\Locator.cpp">
-      <Filter>src\Plugin</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\Plugin\MyTestLog.cpp">
       <Filter>src\Plugin</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Plugin\NSLoader.cpp">

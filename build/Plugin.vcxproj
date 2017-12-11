@@ -441,7 +441,6 @@
     <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_timeline.hpp" />
     <ClInclude Include="..\src\Plugin\IoService.h" />
     <ClInclude Include="..\src\Plugin\Locator.h" />
-    <ClInclude Include="..\src\Plugin\MyTestLog.h" />
     <ClInclude Include="..\src\Plugin\ParameterizedEvent.h" />
     <ClInclude Include="..\src\Plugin\PlayableEffect.h" />
     <ClInclude Include="..\src\Plugin\PlaybackHandle.h" />
@@ -487,7 +486,6 @@
     <ClCompile Include="..\src\Plugin\EffectPlayer.cpp" />
     <ClCompile Include="..\src\Plugin\IoService.cpp" />
     <ClCompile Include="..\src\Plugin\Locator.cpp" />
-    <ClCompile Include="..\src\Plugin\MyTestLog.cpp" />
     <ClCompile Include="..\src\Plugin\NSLoader.cpp" />
     <ClCompile Include="..\src\Plugin\NSLoader_Internal.cpp" />
     <ClCompile Include="..\src\Plugin\ParameterizedEvent.cpp" />

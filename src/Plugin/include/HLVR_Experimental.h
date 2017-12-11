@@ -31,7 +31,6 @@ extern "C" {
 	typedef struct HLVR_BodyView HLVR_BodyView;
 
 
-	/*! thing*/
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_Create(HLVR_BodyView** body);
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_Release(HLVR_BodyView** body);
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_Poll(HLVR_BodyView* body, HLVR_System* system);
@@ -40,7 +39,7 @@ extern "C" {
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_GetNodeRegion(HLVR_BodyView * body, uint32_t nodeIndex, uint32_t* outRegion);
 
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_GetIntensity(HLVR_BodyView * body, uint32_t nodeIndex, float* outIntensity);
-
+	HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_GetWaveform(HLVR_BodyView* body, uint32_t nodeIndex, int32_t* outWaveform);
 	
 	typedef struct HLVR_Quaternion {
 		float w;

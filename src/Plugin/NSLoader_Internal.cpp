@@ -59,7 +59,7 @@ HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_GetNodeCount(HLVR_BodyView * body, ui
 
 	return ExceptionGuard([&] {
 		//todo: be defensive about overflow?
-		*outNodeCount = static_cast<uint32_t>(AS_TYPE(BodyView, body)->pairs.size());
+		*outNodeCount = static_cast<uint32_t>(AS_TYPE(const BodyView, body)->pairs.size());
 		return HLVR_Ok;
 	});
 }
@@ -69,7 +69,7 @@ HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_GetNodeType(HLVR_BodyView * body, uin
 	RETURN_IF_NULL(body);
 	RETURN_IF_NULL(outType);
 	return ExceptionGuard([&] {
-		return AS_TYPE(BodyView, body)->getNodeType(nodeIndex, outType);
+		return AS_TYPE(const BodyView, body)->getNodeType(nodeIndex, outType);
 	});
 }
 
@@ -79,7 +79,7 @@ HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_GetNodeRegion(HLVR_BodyView * body, u
 	RETURN_IF_NULL(body);
 	RETURN_IF_NULL(outRegion);
 	return ExceptionGuard([&] {
-		return AS_TYPE(BodyView, body)->getNodeRegion(nodeIndex, outRegion);
+		return AS_TYPE(const BodyView, body)->getNodeRegion(nodeIndex, outRegion);
 	});
 }
 
@@ -90,7 +90,16 @@ HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_GetIntensity(HLVR_BodyView * body, ui
 	RETURN_IF_NULL(outIntensity);
 
 	return ExceptionGuard([&] {
-		return AS_TYPE(BodyView, body)->getIntensity(nodeIndex, outIntensity);
+		return AS_TYPE(const BodyView, body)->getIntensity(nodeIndex, outIntensity);
+	});
+}
+
+HLVR_RETURN_EXP(HLVR_Result) HLVR_BodyView_GetWaveform(HLVR_BodyView * body, uint32_t nodeIndex, int32_t* outWaveform)
+{
+	RETURN_IF_NULL(body);
+	RETURN_IF_NULL(outWaveform);
+	return ExceptionGuard([&] {
+		return AS_TYPE(const BodyView, body)->getWaveform(nodeIndex, outWaveform);
 	});
 }
 

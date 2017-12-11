@@ -12,7 +12,6 @@
 #include <boost/log/sinks/text_file_backend.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/core/null_deleter.hpp>
-#include "MyTestLog.h"
 #include "Locator.h"
 #include "BodyView.h"
 #include <chrono>
@@ -244,18 +243,7 @@ int Engine::UpdateView(BodyView* view)
 }
 
 
-void Engine::setupUserFacingLogSink()
-{
-	
-	using namespace boost::log;
-	m_log = boost::make_shared<MyTestLog>();
-	m_log->Provide(&m_messenger, m_ioService.GetIOService());
-	
-	using sink_t = sinks::synchronous_sink<MyTestLog>;
-	boost::shared_ptr<sink_t> sink(new sink_t(m_log));
-	core::get()->add_sink(sink);
-	
-}
+
 
 Engine::~Engine()
 {

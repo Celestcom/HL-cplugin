@@ -16,11 +16,12 @@ using namespace NullSpace::SharedMemory;
 ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 	m_serviceVersion(),
 	m_sentinelTimer(io),
-	m_sentinelInterval(500),
+	m_sentinelCheckInterval(500),
 	m_sentinalTimeout(2000),
 	m_connectedToService(false),
-	m_hapticsStream(),
-	m_systems(),
+	m_events(),
+	m_eventsLock(),
+	m_devices(),
 	m_nodes(),
 	m_tracking(),
 	m_bodyView()
@@ -82,8 +83,8 @@ boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 std::vector<NullSpace::SharedMemory::DeviceInfo> ClientMessenger::ReadDevices()
 {
 	std::vector<NullSpace::SharedMemory::DeviceInfo> info;
-	if (m_systems) {
-		info = m_systems->ToVector();
+	if (m_devices) {
+		info = m_devices->ToVector();
 	}
 	return info;
 
@@ -104,9 +105,10 @@ void ClientMessenger::WriteEvent(const NullSpaceIPC::HighLevelEvent & e)
 {
 	std::string binaryData;
 	e.SerializeToString(&binaryData);
-	if (m_hapticsStream) {
+	if (m_events) {
 		try {
-			m_hapticsStream->Push(binaryData.data(), e.ByteSize());
+			std::lock_guard<std::mutex> guard{ m_eventsLock };
+			m_events->Push(binaryData.data(), e.ByteSize());
 		}
 		catch (const boost::interprocess::interprocess_exception& e) {
 			BOOST_LOG_TRIVIAL(warning) << "[ClientMessenger] Unable to push to haptics stream! " << e.what();
@@ -115,22 +117,6 @@ void ClientMessenger::WriteEvent(const NullSpaceIPC::HighLevelEvent & e)
 }
 
 
-
-boost::optional<std::string> ClientMessenger::ReadLog()
-{
-	if (m_logStream) {
-		std::vector<unsigned char> chars = m_logStream->Pop();
-		if (chars.empty()) {
-			return boost::optional<std::string>();
-		}
-		std::string resultString(chars.begin(), chars.end());
-		
-		return resultString;
-	}
-
-	return boost::optional<std::string>();
-
-}
 
 std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
 {
@@ -163,7 +149,7 @@ bool ClientMessenger::ConnectedToService(HLVR_RuntimeInfo* info) const
 
 void ClientMessenger::startAttemptEstablishConnection()
 {
-	m_sentinelTimer.expires_from_now(m_sentinelInterval);
+	m_sentinelTimer.expires_from_now(m_sentinelCheckInterval);
 	m_sentinelTimer.async_wait(boost::bind(&ClientMessenger::attemptEstablishConnection, this, boost::asio::placeholders::error));
 }
 
@@ -185,8 +171,8 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 	try {
 		static_assert(sizeof(char) == 1, "set char size to 1");
 
-		m_hapticsStream = std::make_unique<WritableSharedQueue>("ns-haptics-data");
-		m_systems = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>>("ns-device-mem", "ns-device-data");
+		m_events = std::make_unique<WritableSharedQueue>("ns-haptics-data");
+		m_devices = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>>("ns-device-mem", "ns-device-data");
 		m_nodes = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::NodeInfo>>("ns-node-mem", "ns-node-data");
 		m_tracking = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::TrackingData>>("ns-tracking-mem", "ns-tracking-data");
 		m_bodyView = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>>("ns-bodyview-mem", "ns-bodyview-data");
@@ -199,21 +185,7 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 		startAttemptEstablishConnection();
 		return;
 	}
-	try {
-		m_logStream = std::make_unique<ReadableSharedQueue>("ns-logging-data");
-
 	
-		
-	}
-	catch (const boost::interprocess::interprocess_exception& e) {
-		BOOST_LOG_TRIVIAL(error) << "Failed to make shared objects: " << e.what();
-		//Locator::Logger().Log("ClientMessenger", "Failed to create all the other shared objects", LogLevel::Error);
-
-		//somehow failed to make these shared objects.
-		//for now, until we know what types of errors these are, try again
-		startAttemptEstablishConnection();
-		return;
-	}
 
 	//Everything setup successfully? Monitor the connection!
 	startMonitorConnection();
@@ -223,7 +195,7 @@ void ClientMessenger::attemptEstablishConnection(const boost::system::error_code
 
 void ClientMessenger::startMonitorConnection()
 {
-	m_sentinelTimer.expires_from_now(m_sentinelInterval);
+	m_sentinelTimer.expires_from_now(m_sentinelCheckInterval);
 	m_sentinelTimer.async_wait([&](auto error) { monitorConnection(error); });
 }
 

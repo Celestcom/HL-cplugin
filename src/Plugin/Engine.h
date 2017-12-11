@@ -111,8 +111,6 @@ private:
 	std::vector<std::unique_ptr<HiddenIterator<HLVR_DeviceInfo>>> m_deviceSnapshots;
 	std::vector<std::unique_ptr<HiddenIterator<HLVR_NodeInfo>>> m_nodeSnapshots;
 
-	void setupUserFacingLogSink();
-
 	void setupFileLogSink();
 
 	
@@ -122,10 +120,5 @@ template<typename T>
 bool Engine::IsFinishedIterating(HiddenIterator<T>* param1) const
 {
 	return param1->currentItem == param1->items.end();
-//	auto it =std::find_if(m_snapshots.begin(), m_snapshots.end(), [snapshot](const auto& snapshotPtr) { return snapshotPtr.get() == snapshot; });
-	//	if (it != m_snapshots.end()) {
-	//		return (*it)->currentItem == (*it)->systems.end();
-	//	}
-	//	return true;
 }
 

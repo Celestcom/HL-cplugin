@@ -9,6 +9,7 @@
 #include <boost\optional.hpp>
 #include <boost\asio.hpp>
 #include <boost\chrono.hpp>
+#include <mutex>
 
 #pragma warning(push)
 #pragma warning(disable : 4267)
@@ -27,8 +28,9 @@ public:
 
 	std::vector<NullSpace::SharedMemory::DeviceInfo> ReadDevices();
 	std::vector<NullSpace::SharedMemory::NodeInfo> ReadNodes();
+
+	//possible-thread-safe
 	void WriteEvent(const NullSpaceIPC::HighLevelEvent& e);
-	boost::optional<std::string> ReadLog();
 
 	std::vector<NullSpace::SharedMemory::RegionPair> ReadBodyView();
 	bool ConnectedToService(HLVR_RuntimeInfo* info) const;
@@ -36,38 +38,24 @@ public:
 	
 private:
 	NullSpace::SharedMemory::ServiceInfo m_serviceVersion;
-	//Write haptics to the suit using this shared queue
-	std::unique_ptr<WritableSharedQueue> m_hapticsStream;
-
+	std::unique_ptr<WritableSharedQueue> m_events;
+	std::mutex m_eventsLock;
 
 	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::NodeInfo>> m_nodes;
-	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>> m_systems;
-	//Read the most up-to-date suit connection information from this object
-	// 
-	//Get logging info from engine. Note: only one consumer can reliably get the debug info
-	std::unique_ptr<ReadableSharedQueue> m_logStream;
+	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>> m_devices;
 
 	//Sentinel to see if the driver is running
 	std::unique_ptr<ReadableSharedObject<NullSpace::SharedMemory::SentinelObject>> m_sentinel;
 
-	//Stream of commands to send to driver, such as ENABLE_TRACKING, DISABLE_TRACKING, etc.
-	std::unique_ptr<WritableSharedQueue> m_commandStream;
-
 	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::TrackingData>> m_tracking;
 
-
-
 	std::unique_ptr<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>> m_bodyView;
-	//We use a sentinel to see if the driver is responsive/exists
-	boost::asio::deadline_timer m_sentinelTimer;
 
-	//How often we read the sentinel
-	boost::posix_time::milliseconds m_sentinelInterval;
+	boost::asio::deadline_timer m_sentinelTimer;
+	boost::posix_time::milliseconds m_sentinelCheckInterval;
 
 	//If currentTime - sentinalTime > m_sentinalTimeout, we say that we are disconnected
 	boost::chrono::milliseconds m_sentinalTimeout;
-
-
 
 	void startAttemptEstablishConnection();
 
@@ -75,8 +63,6 @@ private:
 
 	void startMonitorConnection();
 	void monitorConnection(const boost::system::error_code& ec);
-
-//	Encoder m_encoder;
 
 	bool m_connectedToService;
 };
