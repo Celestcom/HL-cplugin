@@ -3,7 +3,8 @@
 	\copyright Copyright 2017 NullSpace VR, Inc All Rights reserved.
 */
 
-#pragma once
+#ifndef __HLVR_INCLUDE_HLVR_ERRORS_H__
+#define __HLVR_INCLUDE_HLVR_ERRORS_H__
 
 
 #include <stdint.h>
@@ -11,8 +12,11 @@
 
 
 typedef int32_t HLVR_Result;
+
+#define HLVR_INT32_MIN 0x80000000
+#define HLVR_INT32_MAX 0x7FFFFFFF
 static const int32_t hlvr_int32max = 0x7FFFFFFF;
-static const int32_t hlvr_int32min = -hlvr_int32max - 1;
+static const int32_t hlvr_int32min = 0x80000000;
 
 /*!
 	Check if an HLVR_Result indicates success.
@@ -39,8 +43,8 @@ static const int32_t hlvr_int32min = -hlvr_int32max - 1;
 typedef enum HLVR_SuccessTypes {
 	HLVR_Ok = 0,
 	
-	HLVR_Ok_MIN = hlvr_int32min,
-	HLVR_Ok_MAX = hlvr_int32max
+	HLVR_Ok_MIN = HLVR_INT32_MIN,
+	HLVR_Ok_MAX = HLVR_INT32_MAX
 
 	
 } HLVR_SuccessTypes;
@@ -79,9 +83,10 @@ typedef enum HLVR_ErrorTypes {
 	/* Tracking */
 	HLVR_Error_TrackedRegionNotFound= -9001,
 
-	HLVR_Error_MIN = hlvr_int32min,
-	HLVR_Error_MAX = hlvr_int32max
+	HLVR_Error_MIN = HLVR_INT32_MIN,
+	HLVR_Error_MAX = HLVR_INT32_MAX
 
 
 } HLVR_ErrorTypes;
 
+#endif //__HLVR_INCLUDE_HLVR_ERRORS_H__

@@ -2,7 +2,8 @@
 	\brief Experimental and unstable features
 	\copyright Copyright 2017 NullSpace VR, Inc All Rights reserved.
 */
-#pragma once
+#ifndef __HLVR_INCLUDE_HLVR_EXPERIMENTAL_H__
+#define __HLVR_INCLUDE_HLVR_EXPERIMENTAL_H__
 
 
 #include <stdint.h>
@@ -95,3 +96,4 @@ extern "C" {
 }
 #endif
 
+#endif // __HLVR_INCLUDE_HLVR_EXPERIMENTAL_H_
