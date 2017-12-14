@@ -14,7 +14,6 @@
 #define AS_CTYPE(Type, Obj) reinterpret_cast<const Type *>(Obj)
 
 
-//comment this line if you want to disable argument null checking. Profile really hard before doing this.
 #define NULL_ARGUMENT_CHECKS
 
 #define RETURN(HLVR_Result_Value) return static_cast<HLVR_Result>(HLVR_Result_Value);
@@ -36,11 +35,16 @@ HLVR_RETURN(uint32_t) HLVR_Version_Get(void)
 	return HLVR_API_VERSION;
 }
 
-HLVR_RETURN(int) HLVR_Version_IsCompatibleDLL(void)
+const char * HLVR_Version_GetString()
 {
-	unsigned int major = HLVR_Version_Get() >> 24;
-	return major == HLVR_API_VERSION_MAJOR;
+	return HLVR_VERSION_STRING;
 }
+
+//HLVR_RETURN(int) HLVR_Version_IsCompatibleDLL(void)
+//{
+//	unsigned int major = HLVR_Version_Get() >> 24;
+//	return major == HLVR_API_VERSION_MAJOR;
+//}
 
 HLVR_RETURN(HLVR_Result) HLVR_System_GetRuntimeInfo(const HLVR_System * systemPtr, HLVR_RuntimeInfo * infoPtr)
 {
@@ -184,16 +188,7 @@ HLVR_RETURN(HLVR_Result) HLVR_System_CancelEffects(HLVR_System* ptr)
 
 
 
-HLVR_RETURN(HLVR_Result) HLVR_System_PollTracking(HLVR_System * ptr, HLVR_TrackingUpdate * updatePtr)
- {
-	 RETURN_IF_NULL(ptr);
-	 RETURN_IF_NULL(updatePtr);
 
-	 return ExceptionGuard([&] {
-		 return AS_TYPE(Engine, ptr)->PollTracking(updatePtr);
-
-	 });
- }
 
 HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_GetOrientation(HLVR_System * ptr, uint32_t region, HLVR_Quaternion * outOrientation)
 {
@@ -243,16 +238,51 @@ HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_Disable(HLVR_System * ptr, uin
 	});
 }
 
-HLVR_RETURN_EXP(HLVR_Result) HLVR_System_PushEvent(HLVR_System* system, HLVR_Event * data)
+HLVR_RETURN_EXP(HLVR_Result) HLVR_System_PushEvent(HLVR_System* system, const HLVR_Event * data)
 {
 	RETURN_IF_NULL(system);
 	RETURN_IF_NULL(data);
 
-	return ExceptionGuard([&] { return AS_TYPE(Engine, system)->StreamEvent(*AS_TYPE(TypedEvent, data)); });
+	return ExceptionGuard([&] { return AS_TYPE(Engine, system)->StreamEvent(*AS_TYPE(const TypedEvent, data)); });
 }
 
 
-
+const char* HLVR_ErrorString(HLVR_Result result) {
+	switch (result) {
+	case HLVR_Error_UNKNOWN:
+		return "Unknown";
+	case HLVR_Error_Unspecified:
+		return "Unspecified";
+	case HLVR_Error_NullArgument:
+		return "NullArgument";
+	case HLVR_Error_InvalidArgument:
+		return "InvalidArgument";
+	case HLVR_Error_BadAlloc:
+		return "BadAlloc";
+	case HLVR_Error_InvalidEventType:
+		return "InvalidEventType";
+	case HLVR_Error_ServiceNotConnected:
+		return "NotConnected";
+	case HLVR_Error_ServiceIncompatible:
+		return "ServiceIncompatible";
+	case HLVR_Error_NoSuchEffect:
+		return "NoSuchHandle";
+	case HLVR_Error_UninitializedEffect:
+		return "EmptyHandle";
+	case HLVR_Error_NoMoreDevices:
+		return "NoMoreDevices";
+	case HLVR_Error_NoMoreNodes:
+		return "NoMoreNodes";
+	case HLVR_Error_InvalidTimeOffset:
+		return "InvalidTimeOffset";
+	case HLVR_Error_EmptyTimeline:
+		return "EmptyTimeline";
+	case HLVR_Error_TrackedRegionNotFound:
+		return "TrackedRegionNotFound";
+	default:
+		return "Unknown";
+	}
+}
 
 HLVR_RETURN(HLVR_Result) HLVR_Event_Create(HLVR_Event** eventPtr, HLVR_EventType type)
  {

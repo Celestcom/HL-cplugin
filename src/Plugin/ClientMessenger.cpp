@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ClientMessenger.h"
 //#include "Locator.h"
+#include "HLVR.h"
 #include <boost\bind.hpp>
 #include <boost/log/trivial.hpp>
 
@@ -13,12 +14,15 @@
 
 #include "BoostIPCSharedMemoryDirectory.h"
 using namespace NullSpace::SharedMemory;
+
+constexpr int MIN_COMPATIBLE_SERVICE_VERSION_MAJOR = 1;
+constexpr int MIN_COMPATIBLE_SERVICE_VERSION_MINOR = 0;
 ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 	m_serviceVersion(),
 	m_sentinelTimer(io),
 	m_sentinelCheckInterval(500),
 	m_sentinalTimeout(2000),
-	m_connectedToService(false),
+	m_connectedToService(),
 	m_events(),
 	m_eventsLock(),
 	m_devices(),
@@ -33,16 +37,18 @@ ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 }
 
 
-
-boost::optional<NullSpace::SharedMemory::TrackingData> ClientMessenger::ReadTrackingData(uint32_t region) {
-	if (m_tracking && m_tracking->Size() > 0) {
+tl::expected<NullSpace::SharedMemory::TrackingData, HLVR_Result> ClientMessenger::ReadTrackingData(uint32_t region) {
+	if (!m_tracking) {
+		return tl::make_unexpected(HLVR_Error_ServiceNotConnected);
+	}
+	if (m_tracking->Size() > 0) {
 		if (auto val = m_tracking->Get([region](const auto& taggedQuat) { return taggedQuat.region == region; })) {
 			return *val;
 		}
-	}
-
-	return boost::none;
+	} 
+	return tl::make_unexpected(HLVR_Error_TrackedRegionNotFound);
 }
+
 boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
 {
 	//if (m_trackingData) {
@@ -130,20 +136,24 @@ std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
 	return pairs;
 }
 
-bool ClientMessenger::ConnectedToService(HLVR_RuntimeInfo* info) const
+int ClientMessenger::ConnectedToService(HLVR_RuntimeInfo* info) const
 {
 
 	if (m_connectedToService) {
-		if (info != nullptr) {
-			info->MajorVersion = m_serviceVersion.MajorVersion;
-			info->MinorVersion = m_serviceVersion.MinorVersion;
+		//okay, compatible service
+		if (*m_connectedToService) {
+			//okay, actually connected
+			if (info != nullptr) {
+				info->MajorVersion = m_serviceVersion.MajorVersion;
+				info->MinorVersion = m_serviceVersion.MinorVersion;
+			}
+			return HLVR_Ok;
 		}
-		return true;
+	
+		return HLVR_Error_ServiceNotConnected;	
 	}
 	
-	
-	return false;
-	
+	return HLVR_Error_ServiceIncompatible;	
 }
 
 
@@ -155,27 +165,43 @@ void ClientMessenger::startAttemptEstablishConnection()
 
 void ClientMessenger::attemptEstablishConnection(const boost::system::error_code &)
 {
+	//Step 1: read the sentinel object. This object should ideally never be changed, so that all services and all clients
+	//can always read from it. 
 	try {
 		m_sentinel = std::make_unique<ReadableSharedObject<NullSpace::SharedMemory::SentinelObject>>("ns-sentinel");
-
+		m_serviceVersion = m_sentinel->Read().Info;
+		if (compatibleService()) {
+			m_connectedToService = false;
+		}
+		else {
+			m_connectedToService = boost::none;
+		}
 	}
 	catch (const boost::interprocess::interprocess_exception&) {
+		startAttemptEstablishConnection();
+		return;
+	}
 
-		//the shared memory object doesn't exist yet? Try again
+	//Step 2: read the events queue. This may be changed, but it should remain compatible for at least a while. 
+	//If we can open it, we identify ourselves to the service.
+	try {
+		m_events = std::make_unique<WritableSharedQueue>("ns-haptics-data");
+		identifyClient();
+		//here is the service's chance to throw up a "Old/newer client was connected" message
+	}
+	catch (const boost::interprocess::interprocess_exception&) {
 		startAttemptEstablishConnection();
 		return;
 	}
 
 
-	//Once the sentinel has connected, we want to setup the other shared objects
 	try {
 		static_assert(sizeof(char) == 1, "set char size to 1");
-
-		m_events = std::make_unique<WritableSharedQueue>("ns-haptics-data");
 		m_devices = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::DeviceInfo>>("ns-device-mem", "ns-device-data");
 		m_nodes = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::NodeInfo>>("ns-node-mem", "ns-node-data");
 		m_tracking = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::TrackingData>>("ns-tracking-mem", "ns-tracking-data");
 		m_bodyView = std::make_unique<ReadableSharedVector<NullSpace::SharedMemory::RegionPair>>("ns-bodyview-mem", "ns-bodyview-data");
+
 	}
 	catch (const boost::interprocess::interprocess_exception& e) {
 		BOOST_LOG_TRIVIAL(error) << "Failed to make shared objects: " << e.what();
@@ -205,6 +231,7 @@ void ClientMessenger::monitorConnection(const boost::system::error_code & ec)
 	//	Locator::Logger().Log("ClientMessenger", "Reading the sentinal..");
 		auto info = m_sentinel->Read();
 		std::time_t lastDriverTimestamp = info.TimeStamp;
+	
 		//assumes that the current time is >= the read time
 		auto time = boost::chrono::duration_cast<boost::chrono::milliseconds>(
 			boost::chrono::seconds(std::time(nullptr) - lastDriverTimestamp)
@@ -227,6 +254,27 @@ void ClientMessenger::monitorConnection(const boost::system::error_code & ec)
 		//Locator::Logger().Log("ClientMessenger", "Monitor connection was cancelled");
 	}
 
+}
+
+
+bool ClientMessenger::compatibleService()
+{
+	if (m_serviceVersion.MajorVersion < MIN_COMPATIBLE_SERVICE_VERSION_MAJOR) { return false; }
+	if (m_serviceVersion.MajorVersion > MIN_COMPATIBLE_SERVICE_VERSION_MAJOR) { return true; }
+	if (m_serviceVersion.MinorVersion < MIN_COMPATIBLE_SERVICE_VERSION_MINOR) { return false; }
+	if (m_serviceVersion.MinorVersion > MIN_COMPATIBLE_SERVICE_VERSION_MINOR) { return true; }
+	
+	return true;
+}
+
+void ClientMessenger::identifyClient()
+{
+	NullSpaceIPC::HighLevelEvent event;
+	auto client_id_event = event.mutable_client_id_event();
+	client_id_event->set_dll_major(HLVR_API_VERSION_MAJOR);
+	client_id_event->set_dll_minor(HLVR_API_VERSION_MINOR);
+	client_id_event->set_dll_patch(HLVR_API_VERSION_PATCH);
+	WriteEvent(event);
 }
 
 

@@ -432,6 +432,7 @@
     <ClInclude Include="..\src\Plugin\Events\validators.h" />
     <ClInclude Include="..\src\Plugin\ExceptionSafeCall.h" />
     <ClInclude Include="..\src\Plugin\EffectPlayer.h" />
+    <ClInclude Include="..\src\Plugin\expected.hpp" />
     <ClInclude Include="..\src\Plugin\HapticsPlayerEvents.h" />
     <ClInclude Include="..\src\Plugin\HapticsPlayerExecutor.h" />
     <ClInclude Include="..\src\Plugin\include\bindings\cpp\hlvr_effect.hpp" />

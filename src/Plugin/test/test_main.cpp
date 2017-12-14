@@ -180,9 +180,9 @@ TEST_CASE("The haptics player works", "[HapticsPlayer]") {
 
 		SECTION("You shouldn't be able to interact with a released effect") {
 			player.Release(h);
-			REQUIRE(player.Play(h) == HLVR_Error_NoSuchHandle);
-			REQUIRE(player.Pause(h) == HLVR_Error_NoSuchHandle);
-			REQUIRE(player.Stop(h) == HLVR_Error_NoSuchHandle);
+			REQUIRE(player.Play(h) == HLVR_Error_NoSuchEffect);
+			REQUIRE(player.Pause(h) == HLVR_Error_NoSuchEffect);
+			REQUIRE(player.Stop(h) == HLVR_Error_NoSuchEffect);
 		}
 	}
 
@@ -437,6 +437,15 @@ TEST_CASE("Bindings should at least compile ;)") {
 
 	}
 
+
+	SECTION("Error to string") {
+		HLVR_Result r = HLVR_ErrorTypes::HLVR_Error_BadAlloc;
+		REQUIRE(strcmp(HLVR_ErrorString(r), "BadAlloc") == 0);
+
+		r = HLVR_ErrorTypes::HLVR_Error_InvalidTimeOffset;
+		REQUIRE(strcmp(HLVR_ErrorString(r), "InvalidTimeOffset") == 0);
+	
+	}
 	
 
 

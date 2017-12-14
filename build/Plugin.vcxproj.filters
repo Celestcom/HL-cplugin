@@ -133,6 +133,9 @@
     </ClInclude>
     <ClInclude Include="..\src\Plugin\EnumTranslator.h" />
     <ClInclude Include="..\src\Plugin\EffectContainer.h" />
+    <ClInclude Include="..\src\Plugin\expected.hpp">
+      <Filter>src\Plugin</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\NS_Unreal_SDK\src\Driver\SharedCommunication\ScheduledEvent.cpp">

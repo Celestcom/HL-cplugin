@@ -60,7 +60,6 @@ public:
 	int HandleReset(uint32_t handle);
 	void ReleaseHandle(uint32_t handle);
 	int CreateEffect(const EventList * list, EffectHandle * handle);
-	int  PollTracking(HLVR_TrackingUpdate* q);
 
 
 	int DisableAudio();

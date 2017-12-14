@@ -6,9 +6,11 @@
 #include "WritableSharedQueue.h"
 #include "ReadableSharedVector.h"
 #include "SharedTypes.h"
+#include "HLVR_Errors.h"
 #include <boost\optional.hpp>
 #include <boost\asio.hpp>
 #include <boost\chrono.hpp>
+#include "expected.hpp"
 #include <mutex>
 
 #pragma warning(push)
@@ -17,6 +19,8 @@
 #pragma warning(pop)
 
 typedef struct HLVR_RuntimeInfo HLVR_RuntimeInfo;
+
+
 class ClientMessenger
 {
 public:
@@ -24,16 +28,16 @@ public:
 
 	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
 
-	boost::optional<NullSpace::SharedMemory::TrackingData> ClientMessenger::ReadTrackingData(uint32_t region);
+	//todo: switch to using expected because it is amazing
+	tl::expected<NullSpace::SharedMemory::TrackingData, HLVR_Result> ClientMessenger::ReadTrackingData(uint32_t region);
 
 	std::vector<NullSpace::SharedMemory::DeviceInfo> ReadDevices();
 	std::vector<NullSpace::SharedMemory::NodeInfo> ReadNodes();
 
-	//possible-thread-safe
 	void WriteEvent(const NullSpaceIPC::HighLevelEvent& e);
 
 	std::vector<NullSpace::SharedMemory::RegionPair> ReadBodyView();
-	bool ConnectedToService(HLVR_RuntimeInfo* info) const;
+	int ConnectedToService(HLVR_RuntimeInfo* info) const;
 
 	
 private:
@@ -64,6 +68,9 @@ private:
 	void startMonitorConnection();
 	void monitorConnection(const boost::system::error_code& ec);
 
-	bool m_connectedToService;
+	bool compatibleService();
+	void identifyClient();
+	
+	boost::optional<bool> m_connectedToService;
 };
 

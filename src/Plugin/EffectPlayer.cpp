@@ -86,7 +86,7 @@ HLVR_Result EffectPlayer::do_effect_action(std::mutex& mutex, EffectHandle handl
 	if (m_container.Mutate(handle, fn)) {
 		return HLVR_Ok;
 	}
-	return HLVR_Error_NoSuchHandle;
+	return HLVR_Error_NoSuchEffect;
 }
 
 EffectHandle EffectPlayer::Create(std::vector<std::unique_ptr<PlayableEvent>> events)

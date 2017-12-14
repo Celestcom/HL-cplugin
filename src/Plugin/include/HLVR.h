@@ -19,7 +19,7 @@
 
 #define HLVR_API_VERSION_MAJOR 0
 #define HLVR_API_VERSION_MINOR 8
-#define HLVR_API_VERSION_PATCH 1
+#define HLVR_API_VERSION_PATCH 2
 #define HLVR_API_VERSION ((HLVR_API_VERSION_MAJOR << 24) | (HLVR_API_VERSION_MINOR << 16) | HLVR_API_VERSION_PATCH)
 
 #if !defined(HLVR_TOSTRING)
@@ -88,43 +88,6 @@ extern "C" {
 	const uint32_t hlvr_region_head = 27 * HLVR_SUBREGION_BLOCK;
 	const uint32_t hlvr_region_palm_left = 28 * HLVR_SUBREGION_BLOCK;
 	const uint32_t hlvr_region_palm_right = 29 * HLVR_SUBREGION_BLOCK;
-	/*typedef enum HLVR_Region {
-		hlvr_region_UNKNOWN = 0,
-		hlvr_region_body = 1 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_torso = 2 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_torso_front = 3 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_middle_sternum = 3 * HLVR_SUBREGION_BLOCK + 1,
-		hlvr_region_chest_left = 4 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_chest_right = 5 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_upper_ab_left = 6 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_middle_ab_left = 7 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_lower_ab_left = 8 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_upper_ab_right = 9 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_middle_ab_right = 10 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_lower_ab_right = 11 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_torso_back = 12 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_torso_left = 13 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_torso_right = 14 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_upper_back_left = 15 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_upper_back_right = 16 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_upper_arm_left = 17 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_lower_arm_left = 18 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_upper_arm_right = 19 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_lower_arm_right = 20 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_shoulder_left = 21 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_shoulder_right = 22 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_upper_leg_left = 23 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_lower_leg_left = 24 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_upper_leg_right = 25 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_lower_leg_right = 26 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_head = 27 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_palm_left = 28 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_palm_right = 29 * HLVR_SUBREGION_BLOCK,
-		hlvr_region_MIN = hlvr_int32min,
-		hlvr_region_MAX = hlvr_int32max
-	} HLVR_Region;*/
-
-
 
 	
 	/*!
@@ -429,18 +392,23 @@ extern "C" {
 	*/
 	HLVR_RETURN(uint32_t) HLVR_Version_Get(void);
 	
+	HLVR_RETURN(const char*) HLVR_Version_GetString();
+
 	/*! Checks if this header file is compatible with the supplied library.
 
 		Useful as a sanity check; intended use is to call this before any other call. 
 		@return 1 if compatible, else 0
 	*/
-	HLVR_RETURN(int) HLVR_Version_IsCompatibleDLL(void);
-
+	inline HLVR_RETURN(int) HLVR_Version_IsCompatibleDLL(void)
+	{
+		unsigned int major = HLVR_Version_Get() >> 24;
+		return major == HLVR_API_VERSION_MAJOR;
+	}
 
 	/*! Retrieves information about the current connection to the runtime service.
 		@param system current context
 		@param[out] info struct to be populated
-		@return HLVR_Ok if able to retrieve information, else HLVR_Error_NotConnected if not connected to Service.
+		@return HLVR_Ok if able to retrieve information, HLVR_Error_ServiceIncompatible if incompatible service version, HLVR_Error_ServiceNotConnected if not connected to Service.
 	*/
 	HLVR_RETURN(HLVR_Result) HLVR_System_GetRuntimeInfo(const HLVR_System* system, HLVR_RuntimeInfo* info);
 
@@ -716,24 +684,24 @@ extern "C" {
 	*/
 	HLVR_RETURN(void)		 HLVR_Effect_Destroy(HLVR_Effect* handlePtr);
 	/*! Cause the effect to play, or resume playback from a paused state.
-		@return HLVR_Ok on success, HLVR_Error_NoSuchHandle if the effect was destroyed or not yet bound
+		@return HLVR_Ok on success, HLVR_Error_NoSuchEffect if the effect was destroyed or not yet bound
 	*/
 	HLVR_RETURN(HLVR_Result) HLVR_Effect_Play(HLVR_Effect* handle);
 	/*! Cause the effect to pause.
-		@return HLVR_Ok on success, HLVR_Error_NoSuchHandle if the effect was destroyed or not yet bound
+		@return HLVR_Ok on success, HLVR_Error_NoSuchEffect if the effect was destroyed or not yet bound
 	*/
 	HLVR_RETURN(HLVR_Result) HLVR_Effect_Pause(HLVR_Effect* handle);
 	/*! Cause the effect to scrub back to beginning, placing the effect into the idle state.
-		@return HLVR_Ok on success, HLVR_Error_NoSuchHandle if the effect was destroyed or not yet bound
+		@return HLVR_Ok on success, HLVR_Error_NoSuchEffect if the effect was destroyed or not yet bound
 	*/
 	HLVR_RETURN(HLVR_Result) HLVR_Effect_Reset(HLVR_Effect* handle);
 	/*! Return information associated with this effect.
-		@return HLVR_Ok on success, else HLVR_Error_NoSuchHandle if the effect was destroyed or not yet bound
+		@return HLVR_Ok on success, else HLVR_Error_NoSuchEffect if the effect was destroyed or not yet bound
 	*/
 	HLVR_RETURN(HLVR_Result) HLVR_Effect_GetInfo(const HLVR_Effect* effect, HLVR_EffectInfo* info);
 
 
-
+	HLVR_RETURN(const char*) HLVR_ErrorString(HLVR_Result result);
 
 
 

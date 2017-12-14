@@ -78,7 +78,6 @@ extern "C" {
 	} HLVR_TrackingUpdate;
 
 	
-	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_PollTracking(HLVR_System* ptr, HLVR_TrackingUpdate* updatePtr);
 
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_GetOrientation(HLVR_System* ptr, uint32_t region, HLVR_Quaternion* outOrientation);
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_GetCompass(HLVR_System* ptr, uint32_t region, HLVR_Vector3f* outCompass);
@@ -88,7 +87,7 @@ extern "C" {
 	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_Tracking_Disable(HLVR_System* ptr, uint32_t device_id);
 
 
-	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_PushEvent(HLVR_System* system, HLVR_Event* data);
+	HLVR_RETURN_EXP(HLVR_Result) HLVR_System_PushEvent(HLVR_System* system, const HLVR_Event* data);
 
 	
 

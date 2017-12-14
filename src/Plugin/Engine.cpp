@@ -41,7 +41,7 @@ int Engine::GetInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) const
 		return HLVR_Ok;
 	}
 	else {
-		return HLVR_Error_NoSuchHandle;
+		return HLVR_Error_NoSuchEffect;
 	}
 }
 
@@ -151,12 +151,14 @@ int Engine::GetOrientation(uint32_t region, HLVR_Quaternion * outOrientation)
 {
 	assert(outOrientation != nullptr);
 
-	if (auto data = m_messenger.ReadTrackingData(region)) {
-		copyQuaternion(*outOrientation, data->quat);
+	auto expectedData = m_messenger.ReadTrackingData(region);
+	if (expectedData) {
+		copyQuaternion(*outOrientation, expectedData->quat);
 		return HLVR_Ok;
 	}
-
-	return HLVR_Error_TrackedRegionNotFound;
+	else {
+		return expectedData.error();
+	}
 }
 
 //precondition: outCompass != nullptr
@@ -263,15 +265,7 @@ Engine::~Engine()
 
 int Engine::PollStatus(HLVR_RuntimeInfo* info) const 
 {
-	if (m_messenger.ConnectedToService(info)) {
-	
-			return HLVR_Ok;
-		
-	}
-
-	return HLVR_Error_NotConnected;
-
-	
+	return m_messenger.ConnectedToService(info);
 }
 
 uint32_t Engine::GenerateHandle()
@@ -396,17 +390,4 @@ void copyTracking(HLVR_TrackingUpdate& lhs, const NullSpace::SharedMemory::Track
 	copyVector3f(lhs.right_upper_arm_compass, rhs.right_upper_arm_compass);
 	copyVector3f(lhs.right_upper_arm_gravity, rhs.right_upper_arm_gravity);
 }
-
-int Engine::PollTracking(HLVR_TrackingUpdate* q)
-{
-	
-	if (auto trackingUpdate = m_messenger.ReadTracking()) {
-		copyTracking(*q, *trackingUpdate);
-		return HLVR_Ok;
-	}
-	
-	return HLVR_Ok_NoDataAvailable;
-	
-}
-
 
