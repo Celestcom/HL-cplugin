@@ -18,9 +18,9 @@
 #define HLVR_API __declspec(dllimport) 
 #endif
 
-#define HLVR_API_VERSION_MAJOR 0
-#define HLVR_API_VERSION_MINOR 8
-#define HLVR_API_VERSION_PATCH 2
+#define HLVR_API_VERSION_MAJOR 1
+#define HLVR_API_VERSION_MINOR 0
+#define HLVR_API_VERSION_PATCH 0
 #define HLVR_API_VERSION ((HLVR_API_VERSION_MAJOR << 24) | (HLVR_API_VERSION_MINOR << 16) | HLVR_API_VERSION_PATCH)
 
 #if !defined(HLVR_TOSTRING)
@@ -52,7 +52,7 @@ extern "C" {
 	
 	
 	/*! Reserves space between regions */
-	#define HLVR_SUBREGION_BLOCK 1000000;
+	#define HLVR_SUBREGION_BLOCK 1000000
 	
 	/*!
 		A set of one or more HLVR_Regions are used to specify where particular events should take place. 
@@ -62,7 +62,7 @@ extern "C" {
 	const uint32_t hlvr_region_body = 1 * HLVR_SUBREGION_BLOCK;
 	const uint32_t hlvr_region_torso = 2 * HLVR_SUBREGION_BLOCK;
 	const uint32_t hlvr_region_torso_front = 3 * HLVR_SUBREGION_BLOCK;
-	const uint32_t hlvr_region_middle_sternum =  1 + 3 * HLVR_SUBREGION_BLOCK;
+	const uint32_t hlvr_region_middle_sternum =  3 * HLVR_SUBREGION_BLOCK + 1;
 	const uint32_t hlvr_region_chest_left = 4 * HLVR_SUBREGION_BLOCK;
 	const uint32_t hlvr_region_chest_right = 5 * HLVR_SUBREGION_BLOCK;
 	const uint32_t hlvr_region_upper_ab_left = 6 * HLVR_SUBREGION_BLOCK;
@@ -343,8 +343,9 @@ extern "C" {
 		@see HLVR_System_GetRuntimeInfo
 	*/
 	typedef struct HLVR_RuntimeInfo {
-		uint32_t MajorVersion;
-		uint32_t MinorVersion;
+		int32_t MajorVersion;
+		int32_t MinorVersion;
+		int32_t PatchVersion;
 	} HLVR_RuntimeInfo;
 
 	/*! Unused configuration object for the system.

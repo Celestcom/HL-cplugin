@@ -331,32 +331,6 @@ TEST_CASE("Higher level event validation should work") {
 
 }
 
-TEST_CASE("Retrieving the service version should work") {
-	boost::asio::io_service io;
-
-	ClientMessenger m(io);
-	io.run_one();
-	io.run_one();
-	io.run_one();
-	io.run_one();
-	io.run_one();
-
-	//This is a weird case setup,  I just want to see if it works
-	SECTION("So does it?") {
-		HLVR_RuntimeInfo info = { 0 };
-		auto v = m.ConnectedToService(&info);
-		if (v) {
-			if (info.MajorVersion == 0) {
-				REQUIRE(info.MinorVersion > 0);
-			}
-			else {
-				REQUIRE(info.MinorVersion >= 0);
-				REQUIRE(info.MajorVersion >= 1);
-			}
-		}
-		
-	}
-}
 TEST_CASE("BodyView should work") {
 	boost::asio::io_service io;
 	

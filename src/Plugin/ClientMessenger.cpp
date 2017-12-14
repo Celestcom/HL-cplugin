@@ -17,6 +17,7 @@ using namespace NullSpace::SharedMemory;
 
 constexpr int MIN_COMPATIBLE_SERVICE_VERSION_MAJOR = 1;
 constexpr int MIN_COMPATIBLE_SERVICE_VERSION_MINOR = 0;
+constexpr int MIN_COMPATIBLE_SERVICE_VERSION_PATCH = 5;
 ClientMessenger::ClientMessenger(boost::asio::io_service& io):
 	m_serviceVersion(),
 	m_sentinelTimer(io),
@@ -146,6 +147,7 @@ int ClientMessenger::ConnectedToService(HLVR_RuntimeInfo* info) const
 			if (info != nullptr) {
 				info->MajorVersion = m_serviceVersion.MajorVersion;
 				info->MinorVersion = m_serviceVersion.MinorVersion;
+				info->PatchVersion = m_serviceVersion.PatchVersion;
 			}
 			return HLVR_Ok;
 		}
@@ -263,7 +265,7 @@ bool ClientMessenger::compatibleService()
 	if (m_serviceVersion.MajorVersion > MIN_COMPATIBLE_SERVICE_VERSION_MAJOR) { return true; }
 	if (m_serviceVersion.MinorVersion < MIN_COMPATIBLE_SERVICE_VERSION_MINOR) { return false; }
 	if (m_serviceVersion.MinorVersion > MIN_COMPATIBLE_SERVICE_VERSION_MINOR) { return true; }
-	
+	if (m_serviceVersion.PatchVersion < MIN_COMPATIBLE_SERVICE_VERSION_PATCH) { return false; }
 	return true;
 }
 
