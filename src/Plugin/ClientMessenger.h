@@ -1,5 +1,9 @@
 #pragma once
 
+// ClientMessenger's purpose is to communicate with the runtime. Internally
+// it uses a shared memory bridge, essentially a bunch of objects/queues/vectors.
+// Note that it is much less error-prone to use simple structures when possible
+
 #include "ReadableSharedQueue.h"
 #include "ReadableSharedMap.h"
 #include "ReadableSharedObject.h"
@@ -24,19 +28,17 @@ typedef struct HLVR_RuntimeInfo HLVR_RuntimeInfo;
 class ClientMessenger
 {
 public:
+	//The io_service reference must remain valid for as long as ClientMessenger lives
 	ClientMessenger(boost::asio::io_service&);
 
-	boost::optional<NullSpace::SharedMemory::TrackingUpdate> ReadTracking();
-
-	//todo: switch to using expected because it is amazing
 	tl::expected<NullSpace::SharedMemory::TrackingData, HLVR_Result> ClientMessenger::ReadTrackingData(uint32_t region);
 
-	std::vector<NullSpace::SharedMemory::DeviceInfo> ReadDevices();
-	std::vector<NullSpace::SharedMemory::NodeInfo> ReadNodes();
+	tl::expected<std::vector<NullSpace::SharedMemory::DeviceInfo>, HLVR_Result> ReadDevices() const;
+	tl::expected<std::vector<NullSpace::SharedMemory::NodeInfo>, HLVR_Result> ReadNodes() const;
 
 	void WriteEvent(const NullSpaceIPC::HighLevelEvent& e);
 
-	std::vector<NullSpace::SharedMemory::RegionPair> ReadBodyView();
+	tl::expected<std::vector<NullSpace::SharedMemory::RegionPair>, HLVR_Result> ReadBodyView() const;
 	int ConnectedToService(HLVR_RuntimeInfo* info) const;
 
 	

@@ -49,13 +49,13 @@ int Engine::GetInfo(uint32_t m_handle, HLVR_EffectInfo* infoPtr) const
 
 int Engine::GetNumDevices(uint32_t * outAmount)
 {
-	*outAmount = m_messenger.ReadDevices().size();
+	*outAmount = (*m_messenger.ReadDevices()).size();
 	return 1;
 }
 
 HiddenIterator<HLVR_DeviceInfo>* Engine::TakeDeviceSnapshot()
 {
-	auto systems = m_messenger.ReadDevices();
+	auto systems = *m_messenger.ReadDevices();
 
 	std::vector<HLVR_DeviceInfo> devices;
 	for (const auto& system : systems) {
@@ -74,7 +74,7 @@ HiddenIterator<HLVR_DeviceInfo>* Engine::TakeDeviceSnapshot()
 
 HiddenIterator<HLVR_NodeInfo>* Engine::TakeNodeSnapshot(uint32_t device_id)
 {
-	auto nodes_raw = m_messenger.ReadNodes();
+	auto nodes_raw = *m_messenger.ReadNodes();
 	std::vector<HLVR_NodeInfo> nodes;
 	for (const auto& node : nodes_raw) {
 		//special case: they want ALL nodes, regardless of device, then specify device_id 0
@@ -240,7 +240,7 @@ void Engine::setupFileLogSink()
 
 int Engine::UpdateView(BodyView* view)
 {
-	view->pairs = m_messenger.ReadBodyView();
+	view->pairs = *m_messenger.ReadBodyView();
 	return HLVR_Ok;
 }
 

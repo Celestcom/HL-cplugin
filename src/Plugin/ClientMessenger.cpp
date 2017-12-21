@@ -50,54 +50,29 @@ tl::expected<NullSpace::SharedMemory::TrackingData, HLVR_Result> ClientMessenger
 	return tl::make_unexpected(HLVR_Error_TrackedRegionNotFound);
 }
 
-boost::optional<TrackingUpdate> ClientMessenger::ReadTracking()
+template<typename T>
+tl::expected<T*, HLVR_Result> checkValid(const std::unique_ptr<T>& ptr) {
+	if (ptr) {
+		return ptr.get();
+	}
+	else {
+		return tl::make_unexpected(HLVR_Error_ServiceNotConnected);
+	}
+}
+
+tl::expected<std::vector<NullSpace::SharedMemory::DeviceInfo>, HLVR_Result> ClientMessenger::ReadDevices() const
 {
-	//if (m_trackingData) {
-	//	return m_trackingData->Read();
+	return checkValid(m_devices).map([](auto devices) { return std::vector<NullSpace::SharedMemory::DeviceInfo>{}; });
+
+	///std::vector<NullSpace::SharedMemory::DeviceInfo> info;
+	//if (m_devices) {
+	//	info = m_devices->ToVector();
 	//}
-	//return boost::optional<TrackingUpdate>();
-
-	if (m_tracking) {
-		if (m_tracking->Size() > 0) {
-			TrackingUpdate t = {};
-
-			if (auto val = m_tracking->Get([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_middle_sternum; })) {
-				t.chest = val->quat;
-				t.chest_compass = val->compass;
-				t.chest_gravity = val->gravity;
-			}
-			if (auto val = m_tracking->Get([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_left; })) {
-				t.left_upper_arm = val->quat;
-				t.left_upper_arm_compass = val->compass;
-				t.left_upper_arm_gravity = val->gravity;
-			}
-			if (auto val = m_tracking->Get([](const auto& taggedQuat) { return taggedQuat.region == hlvr_region_upper_arm_right; })) {
-				t.right_upper_arm = val->quat;
-				t.right_upper_arm_compass = val->compass;
-				t.right_upper_arm_gravity = val->gravity;
-			}
-
-			return t;
-		}
-	}
-	
-	return boost::none;
-	
-
+	//return info;
 
 }
 
-std::vector<NullSpace::SharedMemory::DeviceInfo> ClientMessenger::ReadDevices()
-{
-	std::vector<NullSpace::SharedMemory::DeviceInfo> info;
-	if (m_devices) {
-		info = m_devices->ToVector();
-	}
-	return info;
-
-}
-
-std::vector<NullSpace::SharedMemory::NodeInfo> ClientMessenger::ReadNodes()
+tl::expected<std::vector<NullSpace::SharedMemory::NodeInfo>, HLVR_Result> ClientMessenger::ReadNodes() const
 {
 	std::vector<NullSpace::SharedMemory::NodeInfo> info;
 	if (m_nodes) {
@@ -125,7 +100,7 @@ void ClientMessenger::WriteEvent(const NullSpaceIPC::HighLevelEvent & e)
 
 
 
-std::vector<NullSpace::SharedMemory::RegionPair> ClientMessenger::ReadBodyView()
+tl::expected<std::vector<NullSpace::SharedMemory::RegionPair>, HLVR_Result> ClientMessenger::ReadBodyView() const
 {
 
 	std::vector<NullSpace::SharedMemory::RegionPair> pairs;
